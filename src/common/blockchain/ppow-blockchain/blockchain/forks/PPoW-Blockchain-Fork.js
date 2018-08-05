@@ -5,8 +5,6 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
-import GZip from "../../../../utils/GZip";
-import InterfaceBlockchainProtocol from "../../../interface-blockchain/protocol/Interface-Blockchain-Protocol";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -103,54 +101,34 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
-            let gzipped = false;
+            let knowGzip = true;
 
             while ( i*length < proofPiData.length && i < 100 ) {
 
                 StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped: true }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                if(answer.gzipped){
-
-                    gzipped = true;
-                    proofsList.push(await GZip.unzip(answer.data));
-
+                if(knowGzip){
+                    for (let i=0; i<answer.data.length; i++)
+                        proofsList.push(answer.data[i]);
                 }else{
                     for (let i=0; i<answer.length; i++)
                         proofsList.push(answer[i]);
                 }
 
+
+
                 i++;
-            }
-
-            let buffer = [];
-
-            if(gzipped){
-                buffer = Buffer.concat(proofsList);
-                proofsList = [];
-            }
-
-            let offset = 0;
-            while(offset!=buffer.length){
-
-                let result = this.forkProofPi.deserializeProof(buffer, offset);
-
-                proofsList.push(result.data);
-                offset = result.offset;
-
             }
 
             if (proofsList.length === 0)
                 throw {message: "Proofs was not downloaded successfully"};
 
-            if (proofsList.length < 150){
-
+            if (proofsList.length < 150)
                 console.error("PROOFS LIST length is less than 150", proofsList.length);
-
-            }
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 
