@@ -16,6 +16,7 @@ class PoolWork {
         this.lastBlockPromise = undefined;
         this.lastBlock = undefined;
         this.lastBlockNonce = 0;
+        this.lastBlockId = 0;
 
         this._blocksList = []; //for garbage collector
 
@@ -58,14 +59,19 @@ class PoolWork {
                 this.lastBlock.computedBlockPrefix
             ]);
 
+            this.lastBlockId ++ ;
+
             this.lastBlockElement = {
+
                 block: this.lastBlock,
+                blockId: this.lastBlockId,
+
                 instances: {
 
                 },
             };
 
-            this._blocksList.push(this.lastBlockElement);
+            this._blocksList.push( this.lastBlockElement );
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
