@@ -1,6 +1,7 @@
 import BufferExtended from "common/utils/BufferExtended"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import consts from 'consts/const_global'
+import GZip from "../../../../../utils/GZip";
 
 class PPoWBlockchainProofBasic{
 
@@ -14,6 +15,7 @@ class PPoWBlockchainProofBasic{
         this.blocksIndex = {};
 
         this.hash = undefined;
+        this.proofGzip = undefined;
 
     }
 
@@ -81,6 +83,17 @@ class PPoWBlockchainProofBasic{
             return Buffer.concat(list);
         else
             return list;
+
+    }
+
+    async calculateProofGzip(){
+
+        let list = [];
+
+        for (let i=0; i<this.blocks.length; i++)
+            list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
+
+        return await GZip.zip(Buffer.concat(list));
 
     }
 

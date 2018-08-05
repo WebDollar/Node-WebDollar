@@ -3,7 +3,7 @@ import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const BigInteger = require('big-integer');
-import GZip from "../../../utils/GZip";
+import GZip from "../../../../utils/GZip";
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 

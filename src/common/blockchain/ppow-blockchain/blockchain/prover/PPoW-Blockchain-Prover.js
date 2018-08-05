@@ -122,7 +122,8 @@ class PPoWBlockchainProver{
                 return a.height - b.height;
             });
 
-            underlyingChain.calculateProofHash();
+            await underlyingChain.calculateProofHash();
+            await underlyingChain.calculateProofGzip();
         }
 
         // let s = "";
