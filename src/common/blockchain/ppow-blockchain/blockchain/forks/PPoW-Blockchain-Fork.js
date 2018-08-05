@@ -5,6 +5,8 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
+import GZip from "../../../../utils/GZip";
+import InterfaceBlockchainProtocol from "../../../interface-blockchain/protocol/Interface-Blockchain-Protocol";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -101,19 +103,41 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
+            let gzipped = true;
 
             while ( i*length < proofPiData.length && i < 100 ) {
 
                 StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped: gzipped }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                for (let i=0; i<answer.length; i++)
-                    proofsList.push(answer[i]);
+                if(gzipped){
+
+                    proofsList.push(await GZip.unzip(answer.data));
+
+                }else{
+                    for (let i=0; i<answer.length; i++)
+                        proofsList.push(answer[i]);
+                }
 
                 i++;
+            }
+
+            let buffer = Buffer.concat(proofsList)
+            proofsList = [];
+
+            // if(gzipped) buffer = await GZip.unzip(buffer);
+
+            let offset = 0;
+            while(offset!=buffer.length){
+
+                let result = this.forkProofPi.deserializeProof(buffer, offset);
+
+                proofsList.push(result.data);
+                offset = result.offset;
+
             }
 
             if (proofsList.length === 0)
