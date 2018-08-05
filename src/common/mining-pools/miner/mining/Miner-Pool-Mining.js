@@ -117,7 +117,7 @@ class MinerPoolMining extends InheritedPoolMining {
     }
 
     _getBlockSuffix(){
-        return BufferExtended.substr(this._miningWork.serializedHeader,0 , 16).toString("hex")
+        return BufferExtended.substr(this._miningWork.serializedHeader, 10 , 26).toString("hex")
     }
 
 
