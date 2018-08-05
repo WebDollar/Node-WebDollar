@@ -33,13 +33,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
                 let serialization = this.blockchain.getSerializedAccountantTree(data.height);
 
-                console.log("Before gziped");
-                console.log(serialization.toString('hex'));
-
                 if (gzipped===true) serialization = await GZip.zip(serialization);
-
-                console.log("After gziped");
-                console.log(serialization.toString('hex'));
 
                 let moreChunks = false;
 

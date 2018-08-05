@@ -134,9 +134,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 let buffer = Buffer.concat(proofsList);
                 proofsList = [];
 
-                console.log("before gzip proofs")
-                console.log(proofsList.toString('hex'))
-
                 let offset = 0;
                 while(offset!=buffer.length){
 

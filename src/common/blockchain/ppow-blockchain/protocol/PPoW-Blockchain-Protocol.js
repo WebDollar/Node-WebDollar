@@ -63,11 +63,7 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
                 else  // full node
                     proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
 
-                console.log("before gzip proof");
-                console.log(proof.toString('hex'));
                 if (data.gzipped === true) proof = await GZip.zip(proof);
-                console.log("after gzip proof");
-                console.log(proof.toString('hex'));
 
                 socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof, gzipped: data.gzipped});
 
