@@ -185,11 +185,6 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
 
-            if (answer.chainWork !== undefined)
-                fork.forkPrevChainWork = Serialization.deserializeBigInteger(answer.chainWork);
-            else
-                fork.forkPrevChainWork = new BigInteger(0);
-
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
 

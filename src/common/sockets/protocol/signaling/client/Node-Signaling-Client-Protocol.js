@@ -237,6 +237,8 @@ class NodeSignalingClientProtocol {
 
     initializeSignalingClientService(socket) {
 
+        //This will deactivate WebRTC on client
+
         this._initializeSimpleProtocol(socket);
 
         this._initializeSignalingClientService1(socket);

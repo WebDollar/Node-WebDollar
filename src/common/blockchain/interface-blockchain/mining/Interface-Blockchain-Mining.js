@@ -89,7 +89,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     /**
      * mine next block
      */
-    async mineNextBlock(showMiningOutput, suspend){
+    async mineNextBlock(suspend){
 
         while (this.started && !global.TERMINATED){
 
@@ -101,9 +101,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 return;
             }
 
-
-            if (showMiningOutput)
-                this.setMiningHashRateInterval();
 
             //mining next blocks
 
@@ -230,12 +227,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this._hashesPerSecond = 0;
             }
 
-            this._destroyMiningInterval();
-
         } catch (Exception){
 
             console.error( "Error mining block ", Exception, block.toJSON() );
-            this._destroyMiningInterval();
 
             throw Exception;
         }

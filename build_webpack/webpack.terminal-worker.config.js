@@ -7,7 +7,7 @@ module.exports = {
 
     //define entry point
     entry: {
-        app: "./src/common/blockchain/interface-blockchain/mining/backbone/Build-Backbone-Worker.js",
+        app: "./src/common/blockchain/interface-blockchain/mining/backbone/workers/Backbone-Worker.js",
     },
 
     // send to distribution
@@ -26,4 +26,4 @@ module.exports = {
         }
     },
     externals: nodeExternals({})
-}
+};
