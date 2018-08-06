@@ -87,7 +87,9 @@ class PPoWBlockchainProofBasic{
         for (let i=0; i<this.blocks.length; i++)
             list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
 
-        return await GZip.zip(Buffer.concat(list));
+        this.proofGzip = await GZip.zip(Buffer.concat(list));
+
+        return this.proofGzip;
 
     }
 
