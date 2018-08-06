@@ -168,8 +168,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                     if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                    for (let i=0; i<answer.length; i++)
-                        proofsList.push(answer[i]);
+                    if (answer.data === undefined)
+                        for (let i=0; i<answer.length; i++)
+                            proofsList.push(answer[i]);
+                    else
+                        for (let i=0; i<answer.data.length; i++)
+                            proofsList.push(answer.data[i]);
 
                     i++;
 

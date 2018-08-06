@@ -127,7 +127,7 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 }
 
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof});
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", proof);
 
             } catch (exception){
 
