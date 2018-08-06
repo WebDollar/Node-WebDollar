@@ -3,6 +3,7 @@ import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const BigInteger = require('big-integer');
+import GZip from "../../../../utils/GZip";
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -140,7 +141,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     }
 
-    preFork(revertActions) {
+    async preFork(revertActions) {
 
         if (this.blockchain.agent.light && this._shouldTakeNewProof() ) {
             this.blockchain.proofPi = this.forkProofPi;
@@ -175,13 +176,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
 
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(this.forkPrevAccountantTree);
 
         } else
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preFork.call(this, revertActions);
     }
 
-    revertFork(){
+    async revertFork(){
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -195,6 +197,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(this._lightAccountantTreeSerializationsHeightClone);
 
         }
 
