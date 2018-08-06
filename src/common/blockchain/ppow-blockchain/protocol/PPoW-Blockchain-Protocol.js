@@ -1,6 +1,6 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
-import GZip from "common/utils/GZip"
+import consts from "consts/const_global";
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 

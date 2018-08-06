@@ -5,7 +5,6 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
-import GZip from "../../../../utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
