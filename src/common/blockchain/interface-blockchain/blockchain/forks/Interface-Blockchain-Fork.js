@@ -98,10 +98,6 @@ class InterfaceBlockchainFork {
 
         if (this.forkBlocks.length === 0) throw {message: "Fork doesn't have any block"};
 
-        if (this.blockchain.blocks.length === this.forkStartingHeight + this.forkBlocks.length ) //I need to check
-            if ( this.forkBlocks[0].hash.compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0 )
-                throw { message: "blockchain has same length, but your block is not better than mine" };
-
         if (validateHashesAgain)
             for (let i = 0; i < this.forkBlocks.length; i++){
 
