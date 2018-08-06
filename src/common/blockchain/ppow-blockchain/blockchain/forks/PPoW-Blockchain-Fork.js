@@ -102,7 +102,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
-            let knowGzip = true;
+
+            let knowGzip = consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined;
 
             while ( i*length < proofPiData.length && i < 100 ) {
 
@@ -112,12 +113,12 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 if (answer === null || answer === undefined) throw { message: "Proof is empty" };
 
-                if(answer.gzipped){
+                if (answer.gzipped){
 
                     knowGzip=true;
                     proofsList.push(await GZip.unzip(answer.data));
 
-                }else{
+                } else{
 
                     knowGzip=false;
 

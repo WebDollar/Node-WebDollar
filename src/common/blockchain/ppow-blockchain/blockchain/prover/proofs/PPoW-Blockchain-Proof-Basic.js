@@ -60,7 +60,7 @@ class PPoWBlockchainProofBasic{
 
             try {
 
-                if(gzipped)
+                if (gzipped)
                     list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
                 else
                     list.push(this.blocks[i].getBlockHeader());
@@ -77,7 +77,7 @@ class PPoWBlockchainProofBasic{
             }
         }
 
-        if(gzipped)
+        if (gzipped)
             return Buffer.concat(list);
         else
             return list;
