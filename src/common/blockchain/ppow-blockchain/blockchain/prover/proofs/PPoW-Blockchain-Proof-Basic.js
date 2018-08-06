@@ -1,4 +1,3 @@
-import BufferExtended from "common/utils/BufferExtended"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import consts from 'consts/const_global'
 import GZip from "../../../../../utils/GZip";

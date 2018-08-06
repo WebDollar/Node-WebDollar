@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
+import GZip from "../../../../utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -119,14 +120,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                             length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
                         }, "answer" , 10000);
 
-                    if (answer === null) throw {message: "get-accountant-tree never received ", answer: answer.message };
-                    if (!answer.result) throw {message: "get-accountant-tree return false ", answer: answer.message };
+                    if (answer === null) throw {message: "get-proofGziped never received ", answer: answer.message };
+                    if (!answer.result) throw {message: "get-proofGziped return false ", answer: answer.message };
 
-                    if ( !Buffer.isBuffer(answer) )
+                    if ( !Buffer.isBuffer(answer.data) )
                         throw {message: "accountantTree data is not a buffer"};
 
-                    if (answer.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
-                        (answer.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
+                    if (answer.data.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
+                        (answer.data.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
                     {
 
                         buffers.push(answer.data);
@@ -140,7 +141,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 }
 
-                let buffer = await Gzip.unzip( Buffer.concat(buffers) );
+                let buffer = await GZip.unzip( Buffer.concat(buffers) );
                 proofsList = [];
 
                 let offset = 0;
@@ -172,7 +173,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 }
 
             }
-
 
             if (proofsList.length === 0)
                 throw {message: "Proofs was not downloaded successfully"};

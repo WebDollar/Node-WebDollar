@@ -1,6 +1,7 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
 import consts from "consts/const_global";
+import BufferExtended from "../../../utils/BufferExtended";
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -76,11 +77,11 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
                             moreChunks = false;
 
                         if (serialization.length - 1 - data.starting > 0)
-                            serialization = BufferExtended(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
+                            serialization = BufferExtended.substr(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
                         else
                             serialization = new Buffer(0);
 
-                        return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip", {
+                        return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer", {
                             result: true,
                             data: serialization,
                             moreChunks: moreChunks,
@@ -94,7 +95,7 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 console.error("Socket Error - get/nipopow-blockchain/headers/get-proofs/pi-gzip", exception, data);
 
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip",{
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer",{
                     result: false,
                     message: exception
                 });
