@@ -48,7 +48,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
@@ -58,9 +58,11 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
                     async () => {
 
-                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions);
+                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
 
-                    }) === false
+                    },
+
+                    showUpdate) === false
 
             ) throw {message: "Error Including Blockchain Light Block"};
 

@@ -145,7 +145,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                         count: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
                     },
 
-                    gzipped: true
+                    gzipped: consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined,
 
                 },
 
@@ -157,7 +157,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
             if ( !Buffer.isBuffer(answer.accountantTree) )
                 throw {message: "accountantTree data is not a buffer"};
 
-            if(gzippedCommunication===false && answer.gzipped===true) gzippedCommunication=true;
+            if (gzippedCommunication===false && answer.gzipped===true) gzippedCommunication=true;
 
             if (answer.accountantTree.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
                 (answer.accountantTree.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
@@ -182,13 +182,13 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
         let buffer = Buffer.concat(buffers);
 
-        console.log("Before ungziped");
-        console.log(buffer.toString('hex'));
+        //console.log("Before ungziped");
+        //console.log(buffer.toString('hex'));
 
         if (gzippedCommunication) buffer = await GZip.unzip(buffer);
 
-        console.log("After ungziped");
-        console.log(buffer.toString('hex'));
+        //console.log("After ungziped");
+        //console.log(buffer.toString('hex'));
 
         return buffer;
 

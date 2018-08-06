@@ -103,6 +103,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             let i = 0, length = 100;
             let proofsList = [];
 
+            let knowGzip = consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined;
+
             let knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
             if (knowGzip === null ) knowGzip = false;
 
@@ -163,6 +165,13 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                     let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
                     if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+
+                if(answer.gzipped){
+
+                    knowGzip=true;
+                    proofsList.push(await GZip.unzip(answer.data));
+
+                }else{
 
                     knowGzip=false;
 

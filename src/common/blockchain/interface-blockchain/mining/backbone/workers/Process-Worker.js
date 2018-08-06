@@ -199,7 +199,7 @@ class ProcessWorker{
             if (data.bestNonce !== undefined) nonce = data.bestNonce;
             else nonce = data.nonce;
 
-            if (hash !== this._prevHash && nonce >= this._start && nonce <= this._end) {
+            if (hash !== this._prevHash) {
 
                 console.info(data);
 
