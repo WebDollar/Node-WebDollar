@@ -102,36 +102,45 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             let i = 0, length = 100;
             let proofsList = [];
-            let knowGzip = true;
 
-            while ( i*length < proofPiData.length && i < 100 ) {
+            let knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
+            if (knowGzip === null ) knowGzip = false;
 
-                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
+            if (knowGzip){
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let downloading = true;
+                let pos = 0;
+                let buffers = [];
 
-                if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+                while (downloading && pos < timeoutCount) {
 
-                if(answer.gzipped){
+                    let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi-gzip", {
+                            starting: pos * consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
+                            length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
+                        }, "answer" , 10000);
 
-                    knowGzip=true;
-                    proofsList.push(await GZip.unzip(answer.data));
+                    if (answer === null) throw {message: "get-accountant-tree never received ", answer: answer.message };
+                    if (!answer.result) throw {message: "get-accountant-tree return false ", answer: answer.message };
 
-                }else{
+                    if ( !Buffer.isBuffer(answer) )
+                        throw {message: "accountantTree data is not a buffer"};
 
-                    knowGzip=false;
+                    if (answer.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
+                        (answer.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
+                    {
 
-                    for (let i=0; i<answer.length; i++)
-                        proofsList.push(answer[i]);
+                        buffers.push(answer.data);
+
+                        if (!answer.moreChunks)
+                            downloading = false;
+
+                    }
+
+                    pos++;
 
                 }
 
-                i++;
-            }
-
-            if(knowGzip){
-
-                let buffer = Buffer.concat(proofsList);
+                let buffer = await Gzip.unzip( Buffer.concat(buffers) );
                 proofsList = [];
 
                 let offset = 0;
@@ -142,6 +151,24 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                     proofsList.push(result.data);
                     offset = result.offset;
 
+                }
+
+            } else {
+
+                while ( i*length < proofPiData.length && i < 100 ) {
+
+                    StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
+
+                    let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+
+                    if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+
+                    knowGzip=false;
+
+                    for (let i=0; i<answer.length; i++)
+                        proofsList.push(answer[i]);
+
+                    i++;
                 }
 
             }

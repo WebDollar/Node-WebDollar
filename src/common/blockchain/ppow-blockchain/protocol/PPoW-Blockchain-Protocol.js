@@ -18,9 +18,15 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
     }
 
-    _initializeNodeNiPoPoW(socket){
+    _initializeNodeNiPoPoW(socket) {
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash",  ()=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", () => {
+
+            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported" + "/answer", {result: true});
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash", () => {
 
             try {
 
@@ -39,7 +45,54 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi/hash" + "/answer", answer);
 
-            } catch (exception){
+            } catch (exception) {
+
+            }
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip", async (data)=>{
+
+            try {
+
+                let serialization = this.blockchain.proofPi.proofGzip;
+
+                let moreChunks = false;
+
+                if (typeof data === "object" && data !== null) {
+
+                    if (typeof data.starting === "number" && typeof data.length === "number") {
+
+                        if (data.length < consts.SETTINGS.PARAMS.MAX_SIZE.MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES) throw {message: "way to few messages"};
+
+                        if ((serialization.length - data.starting) > data.length)
+                            moreChunks = true;
+                        else
+                            moreChunks = false;
+
+                        if (serialization.length - 1 - data.starting > 0)
+                            serialization = BufferExtended(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
+                        else
+                            serialization = new Buffer(0);
+
+                        return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip", {
+                            result: true,
+                            data: serialization,
+                            moreChunks: moreChunks,
+                        });
+
+                    }
+
+                }
+
+            } catch (exception) {
+
+                console.error("Socket Error - get/nipopow-blockchain/headers/get-proofs/pi-gzip", exception, data);
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip",{
+                    result: false,
+                    message: exception
+                });
 
             }
 
@@ -60,20 +113,16 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 if (this.blockchain.agent.light) {
 
-                    if (data.gzipped )
-                        proof = this.blockchain.proofPi.proofGzip;
-                    else
-                        proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
+                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length);
+
                 }
                 else { // full node
 
-                    if (data.gzipped)
-                        proof = this.blockchain.prover.proofPi.proofGzip;
-                    else
-                        proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
+                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
+
                 }
 
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof, gzipped: data.gzipped});
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof});
 
             } catch (exception){
 
