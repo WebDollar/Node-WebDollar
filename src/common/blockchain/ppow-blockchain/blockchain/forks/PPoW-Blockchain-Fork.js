@@ -111,6 +111,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 let downloading = true;
                 let pos = 0;
                 let buffers = [];
+                let timeoutCount = 100;
 
                 while (downloading && pos < timeoutCount) {
 
