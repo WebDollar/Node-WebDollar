@@ -17,6 +17,12 @@ class ProcessWorkerCPP extends ProcessWorker{
 
     }
 
+    async kill(param){
+        console.info("KILL!!");
+        return await this._writeWork("0 0");
+    }
+
+
 }
 
 export default ProcessWorkerCPP;

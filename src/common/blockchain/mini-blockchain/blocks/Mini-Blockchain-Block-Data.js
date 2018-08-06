@@ -30,9 +30,9 @@ class MiniBlockchainBlockData extends  inheritBlockData {
     }
 
 
-    validateBlockData(height, blockValidation){
+    async validateBlockData(height, blockValidation){
 
-        let result = inheritBlockData.prototype.validateBlockData.call(this, height, blockValidation );
+        let result = await inheritBlockData.prototype.validateBlockData.call(this, height, blockValidation );
 
         if (!result)
             return false;

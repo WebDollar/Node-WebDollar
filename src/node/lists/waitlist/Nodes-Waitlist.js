@@ -202,13 +202,13 @@ class NodesWaitlist {
     async _deleteObsoleteFullNodesWaitlist(){
 
         for (let i=this.waitListFullNodes.length-1; i>=0; i--)
-            if (!this.waitListFullNodes.isFallback) {
+            if (!this.waitListFullNodes[i].isFallback) {
 
                 try {
 
                     if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
 
-                    let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
+                    let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 10000);
 
                     if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
                         this.waitListFullNodes[i].failsChecking = 0;

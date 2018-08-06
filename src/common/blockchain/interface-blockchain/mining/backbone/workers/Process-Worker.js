@@ -28,7 +28,11 @@ class ProcessWorker{
         this._is_batching = false;
         this._path = '';
 
-        this._timeoutValidation = setTimeout( this._validateWork.bind(this), 20);
+        this._start = 0;
+        this._end = -1;
+        this._data = undefined;
+
+
     }
 
     _getProcessParams(){
@@ -37,32 +41,39 @@ class ProcessWorker{
 
     }
 
-    async start(path){
+    async start(path) {
 
         if (path !== undefined)
             this._path = path;
 
-        var isWin = /^win/.test(process.platform);
-
         try {
-            await fs.unlinkSync(this._filename + this.suffix + "output");
-        } catch (exception){
+            await this._deleteFile();
+            await this._deleteFile("output");
+        } catch (exception) {
 
         }
 
-        this._child = exec( (isWin ? 'cmd' : '')  + ' '+this._getProcessParams(), async (e, stdout, stderr) => {
+
+        var isWin = /^win/.test(process.platform);
+
+        this._child = exec((isWin ? 'cmd' : '') + ' ' + this._getProcessParams(), async (e, stdout, stderr) => {
 
             //console.log(stdout);
             console.log(stderr);
 
             if (e) {
-                console.error("C/C++ CPU Miner Raised an error", e);
+                console.error("Process Raised an error", e);
 
-                await this.start(path);
-                this._is_batching = true;
+                //await this.start(path);
+                //this._is_batching = true;
             }
 
         });
+
+        await Blockchain.blockchain.sleep(1500);
+
+        if (this._child.exitCode !== null)
+            return false;
 
         this._child.stdout.on('data', (data) => {
 
@@ -75,10 +86,16 @@ class ProcessWorker{
 
         this._prevHash = '';
 
-        await Blockchain.blockchain.sleep(5000);
+        await Blockchain.blockchain.sleep(1500);
 
+        if (this._timeoutValidation === undefined)
+            this._timeoutValidation = setTimeout(this._validateWork.bind(this), 1000);
+
+        // if (this._sendDataTimeout === undefined)
+        //     this._sendDataTimeout = setTimeout(this._writeWork.bind(this), 10);
+
+        return true;
     }
-
 
     kill(param){
         return this._child.kill(param);
@@ -105,13 +122,20 @@ class ProcessWorker{
         this._timeStart = new Date().getTime();
         this._count = end - start;
 
-        this._sendDataTimeout = setTimeout( this._writeWork.bind(this, data), 10 );
+        this._start = start;
+        this._end = end;
+        this._data = data;
 
+        //console.log("SENDING ", start, end);
+
+        this._sendDataTimeout = setTimeout( this._writeWork.bind(this, data), 10 );
     }
+
 
     async _writeWork(data){
 
         try {
+
             await fs.writeFileSync( this._filename + this.suffix, data, "binary");
         } catch (exception){
             console.error("Error sending the data to GPU", exception);
@@ -119,6 +143,37 @@ class ProcessWorker{
         }
 
     }
+
+
+
+    async _deleteFile(prefix = ''){
+
+        if (false === await fs.existsSync(this._filename + this.suffix + prefix ))
+            return;
+
+        try {
+            await fs.unlinkSync(this._filename + this.suffix + prefix );
+        } catch (exception){
+        }
+
+    }
+
+    // async _writeWork(){
+    //
+    //     if (this._data !== undefined)
+    //         try {
+    //
+    //             await this._deleteFile();
+    //
+    //             await fs.writeFileSync( this._filename + this.suffix, this._data, "binary");
+    //             this._data = undefined;
+    //
+    //         } catch (exception){
+    //             console.error("Error sending the data to GPU", exception);
+    //         }
+    //     this._sendDataTimeout = setTimeout( this._writeWork.bind(this), 10 );
+    //
+    // }
 
 
     async _validateWork(){
@@ -140,12 +195,16 @@ class ProcessWorker{
             if (data.bestHash !== undefined) hash = data.bestHash;
             else hash = data.hash;
 
+            let nonce;
+            if (data.bestNonce !== undefined) nonce = data.bestNonce;
+            else nonce = data.nonce;
+
             if (hash !== this._prevHash) {
 
                 console.info(data);
 
                 if ( data.type === "b" || data.type === "s")
-                    data.h = Math.floor(this._count / (new Date().getTime() - this._timeStart) * 1000);
+                    data.h = this._count;
 
                 this._emit("message", data);
 

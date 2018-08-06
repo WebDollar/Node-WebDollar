@@ -24,6 +24,8 @@ export default {
         // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
 
+        {"addr": ["https://pool1.cuckoo-pool.com:8443"]},
+
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
@@ -60,6 +62,8 @@ export default {
         {"addr": ["https://wd.hoste.ro:40007"]}, // Thanks to @morion4000
         {"addr": ["https://wd.hoste.ro:40008"]}, // Thanks to @morion4000
         {"addr": ["https://wd.hoste.ro:40009"]}, // Thanks to @morion4000
+        
+        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
 
         //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
 
@@ -101,16 +105,6 @@ export default {
         // {"addr": ["https://webdollar-vps3.ddns.net:80"]},
 
         //{"addr": ["https://webdollar.ddns.net:80"]},
-
-        {"addr": ["https://webdollar-vps5.hopto.org:8080"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8081"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8082"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8083"]},
-
-        {"addr": ["https://webdollar-vps4.zapto.org:8081"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8082"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8083"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8084"]},
 
         {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu

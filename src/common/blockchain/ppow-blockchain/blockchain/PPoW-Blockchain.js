@@ -42,8 +42,9 @@ class PPoWBlockchain extends InterfaceBlockchain {
         let oldProofActivated = this.prover.proofActivated;
         this.prover.proofActivated = false;
 
+        let answer = false;
         try {
-            if (! (await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset ))) return false;
+            answer = await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset );
         } catch (exception){
 
             console.error("loadBlockchain raised an error", exception);
@@ -52,7 +53,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         this.prover.proofActivated = oldProofActivated;
         await this.prover.createProofs();
 
-        return true;
+        return answer;
 
     }
 

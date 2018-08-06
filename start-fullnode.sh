@@ -353,4 +353,4 @@ elif [[ "$nrofports" == * ]]; then
 	exit 1
 fi
 
-if grep -q -o -m 1 Ubuntu /etc/*release; then sudo iptables-save; elif grep -q -o -m 1 Debian /etc/*release; then sudo iptables-save; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo iptables-save; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo iptables-save; fi

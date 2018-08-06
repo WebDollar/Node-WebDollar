@@ -17,7 +17,7 @@ class NodeAPIPublicNodes{
 
                 let obj = {
 
-                    adr: NodesList.nodes[i].socket.node.sckAddress.address,
+                    adr: NodesList.nodes[i].socket.node.sckAddress.getAddress(true, true),
                     geo: geoLocation.isFulfilled() ? this._getCity ( await geoLocation ) : 'not ready',
 
                 };
