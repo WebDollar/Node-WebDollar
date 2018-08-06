@@ -55,7 +55,12 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
             try {
 
-                let serialization = this.blockchain.proofPi.proofGzip;
+                let serialization;
+
+                if (this.blockchain.agent.light)
+                    serialization = this.blockchain.proofPi.proofGzip;
+                else  // full node
+                    serialization = this.blockchain.prover.proofPi.proofGzip;
 
                 let moreChunks = false;
 
