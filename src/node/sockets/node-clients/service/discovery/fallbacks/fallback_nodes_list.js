@@ -106,16 +106,6 @@ export default {
 
         //{"addr": ["https://webdollar.ddns.net:80"]},
 
-        {"addr": ["https://webdollar-vps5.hopto.org:8080"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8081"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8082"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8083"]},
-
-        {"addr": ["https://webdollar-vps4.zapto.org:8081"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8082"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8083"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8084"]},
-
         {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8087"]}, //Thanks to @Tibi Popescu
