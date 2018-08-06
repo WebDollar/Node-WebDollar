@@ -100,12 +100,11 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
             this.forkProofPi.hash = proofPiData.hash;
 
-            let i = 0, length = 100;
             let proofsList = [];
+            let knowGzip = false;
 
-            let knowGzip = consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined;
-
-            let knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
+            console.log(consts.BLOCKCHAIN.LIGHT.GZIPPED)
+            if(consts.BLOCKCHAIN.LIGHT.GZIPPED) knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
             if (knowGzip === null ) knowGzip = false;
 
             if (knowGzip){
@@ -158,27 +157,22 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             } else {
 
+                let i = 0, length = 100;
+                proofsList = [];
+
                 while ( i*length < proofPiData.length && i < 100 ) {
 
                     StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
 
-                    let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                    let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
                     if (answer === null || answer === undefined) throw { message: "Proof is empty" };
-
-                if(answer.gzipped){
-
-                    knowGzip=true;
-                    proofsList.push(await GZip.unzip(answer.data));
-
-                }else{
-
-                    knowGzip=false;
 
                     for (let i=0; i<answer.length; i++)
                         proofsList.push(answer[i]);
 
                     i++;
+
                 }
 
             }

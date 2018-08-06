@@ -110,7 +110,6 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 if (data.starting === undefined) data.starting = 0;
                 if (data.length === undefined) data.length = 1000;
-                if (data.gzipped === undefined) data.gzipped = false;
 
                 if (typeof data.starting !== "number") throw "starting is not a number";
                 if (typeof data.length !== "number") throw "length is not a number";
