@@ -184,13 +184,13 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
         let buffer = Buffer.concat(buffers);
 
-        console.log("Before ungziped");
-        console.log(buffer.toString('hex'));
+        //console.log("Before ungziped");
+        //console.log(buffer.toString('hex'));
 
         if (gzippedCommunication) buffer = await GZip.unzip(buffer);
 
-        console.log("After ungziped");
-        console.log(buffer.toString('hex'));
+        //console.log("After ungziped");
+        //console.log(buffer.toString('hex'));
 
         return buffer;
 

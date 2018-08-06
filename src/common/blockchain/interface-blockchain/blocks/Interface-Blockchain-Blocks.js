@@ -26,11 +26,13 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    addBlock(block, revertActions, saveBlock){
+    addBlock(block, revertActions, saveBlock, showUpdate = true){
 
         this[this.length] =  block;
 
         this.length += 1;
+        if (showUpdate)
+            this.emitBlockCountChanged();
 
         if (saveBlock)
             this.emitBlockInserted(block);
@@ -65,7 +67,11 @@ class InterfaceBlockchainBlocks{
         StatusEvents.emit("blockchain/block-inserted", block !== undefined ? block : this[this._length-1]);
     }
 
-    spliceBlocks(after, freeMemory = false){
+    emitBlockCountChanged(){
+        StatusEvents.emit("blockchain/blocks-count-changed", this._length);
+    }
+
+    spliceBlocks(after, freeMemory = false, showUpdate = true){
 
         for (let i = this.length - 1; i >= after; i--)
             if (this[i] !== undefined){
@@ -81,6 +87,9 @@ class InterfaceBlockchainBlocks{
             }
 
         this.length = after;
+
+        if (showUpdate)
+            this.emitBlockCountChanged();
     }
 
     clear(){
@@ -146,7 +155,6 @@ class InterfaceBlockchainBlocks{
 
     set length(newValue){
         this._length = newValue;
-        StatusEvents.emit("blockchain/blocks-count-changed", this.length);
     }
 
     get length(){

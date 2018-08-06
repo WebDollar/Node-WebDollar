@@ -201,7 +201,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             if (this.blockchain.blocks.length !== block.height)
                                 return false;
 
-                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions );
+                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
 
                         }) === false) throw {message: "Mining2 returned false"};
 

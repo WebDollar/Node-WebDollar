@@ -326,7 +326,7 @@ class InterfaceBlockchainFork {
 
                 if (this.downloadBlocksSleep) await this.sleep(20);
 
-                this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false);
+                this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false, false);
 
                 let forkedSuccessfully = true;
 
@@ -360,10 +360,20 @@ class InterfaceBlockchainFork {
                         this.forkBlocks[index].blockValidation = this._createBlockValidation_BlockchainValidation( this.forkBlocks[index].height , index);
                         this.forkBlocks[index].blockValidation.blockValidationType['skip-validation-PoW-hash'] = true; //It already validated the hash
 
-                        if (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0))
-                            this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
 
-                        if (! (await this.saveIncludeBlock(index, revertActions, false)) )
+                        this.forkBlocks[index].blockValidation.blockValidationType['skip-recalculating-hash-rate'] = true;
+
+                        //await Blockchain.blockchain.sleep(10);
+
+                        if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
+                            this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
+                        else {
+                            await this.blockchain.sleep(2);
+                        }
+
+
+
+                        if (! (await this.saveIncludeBlock(index, revertActions, false, false)) )
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
                         this.forkBlocks[index].socketPropagatedBy = this.socketsFirst;
@@ -438,6 +448,11 @@ class InterfaceBlockchainFork {
 
         revertActions.destroyRevertActions();
 
+        Blockchain.blockchain.accountantTree.emitBalancesChanges();
+        Blockchain.blockchain.blocks.recalculateNetworkHashRate();
+        Blockchain.blockchain.blocks.emitBlockInserted();
+        Blockchain.blockchain.blocks.emitBlockCountChanged();
+
         try {
 
             if (success) {
@@ -498,7 +513,7 @@ class InterfaceBlockchainFork {
             let revertActions = new RevertActions(this.blockchain);
 
             for (let i=0; i<this._blocksCopy.length; i++)
-                if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, revertActions ))) {
+                if (! (await this.blockchain.includeBlockchainBlock( this._blocksCopy[i], false, "all", false, revertActions, false))) {
 
                     Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
                     Log.error("----------------------------------------------------------", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
@@ -591,9 +606,9 @@ class InterfaceBlockchainFork {
 
     }
 
-    async saveIncludeBlock(index, revertActions, saveBlock = false){
+    async saveIncludeBlock(index, revertActions, saveBlock = false, showUpdate = false){
 
-        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", saveBlock, revertActions))) {
+        if (! (await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", saveBlock, revertActions, showUpdate))) {
             Log.error("fork couldn't be included in main Blockchain " + index, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false;
         }

@@ -198,11 +198,6 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return this._serializeTree(includeHashes);
     }
 
-    _deserializeTree(buffer, offset, includeHashes) {
-        let answer = InterfaceMerkleRadixTree.prototype._deserializeTree.call(this, buffer, offset, includeHashes);
-        this.emitBalancesChanges();
-        return answer;
-    }
 
     deserializeMiniAccountant(buffer, offset, includeHashes = true) {
         return this._deserializeTree(buffer, offset, includeHashes);
@@ -212,14 +207,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         return await this.saveTree(name || "accountantTree", includeHashes, serialization, timeout);
     }
 
-    async loadMiniAccountant(buffer, offset, includeHashes, name = "accountantTree") {
+    async loadMiniAccountant(buffer, offset, includeHashes, name = "accountantTree", showUpdate = true) {
 
         try {
 
             let result = await this.loadTree(name, buffer, offset, includeHashes);
 
-            //console.log("this.root", this.root);
-            this.emitBalancesChanges();
+            if (showUpdate)
+                this.emitBalancesChanges();
 
             return result !== false;
 
