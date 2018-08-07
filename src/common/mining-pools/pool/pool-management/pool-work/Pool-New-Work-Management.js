@@ -49,8 +49,8 @@ class PoolNewWorkManagement{
 
         try{
 
-            if (blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
-            if (blockInformationMinerInstance === undefined) return false;
+            if ( blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
+            if ( blockInformationMinerInstance === undefined ) return false;
 
             let newWork = await this.poolWorkManagement.getWork( minerInstance, blockInformationMinerInstance );
 

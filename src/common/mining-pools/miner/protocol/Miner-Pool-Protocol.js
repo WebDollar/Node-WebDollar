@@ -222,26 +222,24 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                let confirmation = socket.node.sendRequestWaitOnce("mining-pool/new-work/answer", {
+                socket.node.sendRequest("mining-pool/new-work/answer", {
                     hash: this.minerPoolManagement.minerPoolMining.bestHash,
-                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce
-                }, "confirm", 6000);
+                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
+                    id: this._miningWork.blockId,
+                });
 
                 this._validateRequestWork(data.work, socket);
 
-                let answer = await confirmation;
+                this._updateStatistics( data);
 
-                if (answer === null) throw {message: "new-work: confirmation was never received"};
-
-                this._updateStatistics( answer );
-
-                this.minerPoolManagement.minerPoolReward.setReward(answer);
+                this.minerPoolManagement.minerPoolReward.setReward(data);
 
             } catch (exception){
                 console.error("new work raised an exception", exception);
             }
 
         });
+
 
 
     }
@@ -324,18 +322,21 @@ class MinerProtocol extends PoolProtocolList{
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
 
             if (!miningAnswer.result){
+
                 try {
+
                     Log.warn("Statistics: Real " + Math.floor( miningAnswer.hashes / miningAnswer.timeDiff * 1000 )+ " h/s ", Log.LOG_TYPE.POOLS);
+
                 } catch (exception){
 
                 }
+
             }
 
             answer = await answer;
 
             if (answer === null) throw {message: "WorkDone: Answer is null"};
             if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
-
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 

@@ -27,6 +27,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._miningWork = {
             block: undefined, //entire serialization
+            blockId: undefined,
+
             start: undefined,
             end: undefined,
             height: undefined, //number
@@ -95,6 +97,8 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.block = work.block;
 
         this._miningWork.height = work.h;
+        this._miningWork.blockId = work.I||work.h;
+
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;
 
@@ -145,7 +149,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     if (!this.resetForced ) {
                         this._miningWork.resolved = true;
-                        answer.height = workHeight;
+                        answer.id = this._miningWork.blockId;
                         answer.hashes = this._miningWork.end - this._miningWork.start;
                         await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
                     } else {

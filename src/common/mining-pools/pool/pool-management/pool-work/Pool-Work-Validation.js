@@ -1,4 +1,4 @@
-const PROCESS_COUNT = 30;
+const PROCESS_COUNT = 50;
 
 class PoolWorkValidation{
 
@@ -11,8 +11,10 @@ class PoolWorkValidation{
     }
 
     startPoolWorkValidation(){
+
         if (this._timeoutPoolWorkValidation === undefined)
             this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), 100 );
+
     }
 
     stopPoolWorkValidation(){
@@ -26,12 +28,20 @@ class PoolWorkValidation{
         });
     }
 
-    processPoolWorkValidation(){
+    async processPoolWorkValidation(){
 
         try{
 
             let n = Math.min(PROCESS_COUNT, this._works.length);
+
             for (let i=0; i<n; i++){
+
+                let work = this._works[i];
+
+                let prevBlock = this.poolWorkManagement.poolWork.findBlockById( this._works[i].id, this._works[i].height );
+
+                if (prevBlock !== null)
+                    await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
 
             }
 

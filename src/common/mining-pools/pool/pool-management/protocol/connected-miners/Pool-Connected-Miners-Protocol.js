@@ -179,26 +179,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         });
 
-        //Already sent the new work, receiving the work for the past one
-        socket.node.on("mining-pool/new-work/answer", async (answer)=>{
-
-
-            if ( !Buffer.isBuffer(answer.hash ) ) throw {message: "hash is not specified"};
-            if ( typeof answer.nonce !== "number" ) throw {message: "nonce is not specified"};
-
-            if (socket.node.protocol.minerPool === undefined) return;
-
-            let minerInstance = socket.node.protocol.minerPool.minerInstance;
-            if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
-
-            let processedWork = await this.poolManagement.poolWorkManagement.processWork( minerInstance, answer, this.poolManagement.poolWorkManagement.poolNewWorkManagement.prevBlock );
-
-            minerInstance.socket.node.sendRequest("mining-pool/new-work/answer/confirm", {  result: processedWork.result,  reward: processedWork.reward, confirmed: processedWork.confirmed, miner: minerInstance.publicKey,
-                h: this.poolManagement.poolStatistics.poolHashes, m: this.poolManagement.poolStatistics.poolMinersOnline.length, b: this.poolManagement.poolStatistics.poolBlocksConfirmed, bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid, ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed, bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, t: this.poolManagement.poolStatistics.poolTimeRemaining, n: Blockchain.blockchain.blocks.networkHashRate,
-            } ,"answer" );
-
-        });
-
         socket.node.on("mining-pool/get-work", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
@@ -279,11 +259,12 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
+                this.poolManagement.receivePoolWork(minerInstance, data.work);
+
                 let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
 
                 //the new reward
-                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, answer: answer.result, newWork: newWork, } );
-
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: true, newWork: newWork, } );
 
             } catch (exception){
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, {result: false, message: exception.message } )

@@ -24,7 +24,7 @@ export default {
         // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
         // {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
 
-        {"addr": ["https://pool1.cuckoo-pool.com:8443"]},
+        //{"addr": ["https://pool1.cuckoo-pool.com:8443"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
