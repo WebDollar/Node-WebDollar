@@ -41,7 +41,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    validateTransactions(blockHeight, blockValidationType){
+    async validateTransactions(blockHeight, blockValidationType){
 
         let hashTransactions = this.calculateHashTransactions();
 
@@ -60,6 +60,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
             if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType))
                 throw {message: "validation failed at transaction", transaction: this.transactions[i]};
+
+            if ( !blockValidationType['skip-sleep']) await Blockchain.blockchain.sleep(2);
         }
 
         if (!this.validateDuplicateTransactions())

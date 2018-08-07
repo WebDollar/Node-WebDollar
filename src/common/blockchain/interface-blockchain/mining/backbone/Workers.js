@@ -93,9 +93,10 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
             for (let i=0; i< this.workers_list.length; i++)
-                if ( (date  - this.workers_list[i].date ) > 50000 ){
+                if ( (date  - this.workers_list[i].date ) > 50000 ) {
                     this.workers_list[i]._is_batching = false;
                     this.workers_list[i].date = new Date().getTime();
+                    Log.info("Restarting Worker", Log.LOG_TYPE.default);
                 }
 
         if ( this._current >= this._current_max )
@@ -123,7 +124,7 @@ class Workers {
 
         try {
 
-            console.log("Stop Mining xx");
+            console.log("Stop Mining!");
 
             for (let i = 0; i < this.workers_list.length; i++){
                 if (this.workers_list[i] !== undefined && typeof this.workers_list[i].kill === "function")
@@ -166,7 +167,7 @@ class Workers {
 
         }
 
-        // resets
+        // resets8
         this._finished = false;
         this._final_batch = false;
 
@@ -233,7 +234,7 @@ class Workers {
 
         }
 
-        if ( !started ){
+        if ( !started ) {
             worker.date = new Date().getTime();
             this.workers_list[index] = worker;
             return worker;
@@ -268,10 +269,9 @@ class Workers {
                 if (msg.hash.length === 64) hash = Buffer.from(msg.hash, "hex");
                 else hash = new Buffer(msg.hash);
 
-                //if solo
-                // if (!Blockchain.MinerPoolManagement.minerPoolStarted)
-                //     if (false === await this._validateHash(hash, msg.nonce))
-                //         return false;
+                if ( consts.DEBUG && !Blockchain.MinerPoolManagement.minerPoolStarted)
+                    if (false === await this._validateHash(hash, msg.nonce))
+                        return false;
 
                 worker._is_batching = false;
 
@@ -322,7 +322,8 @@ class Workers {
 
                 worker._is_batching = false;
 
-                await this._validateHash(bestHash, parseInt(msg.bestNonce));
+                if (consts.DEBUG)
+                    await this._validateHash(bestHash, parseInt(msg.bestNonce));
 
                 return false;
             }
@@ -342,9 +343,10 @@ class Workers {
 
             let hash = await Argon2.hash(block);
             if (false === hash.equals(initialHash)) {
-                if (consts.DEBUG)
-                    console.error("HASH may be too old");
+                Log.error("HASH may be too old", Log.LOG_TYPE.default );
                 return false;
+            } else {
+                Log.warn("HASH is OK!", Log.LOG_TYPE.default );
             }
         }
 

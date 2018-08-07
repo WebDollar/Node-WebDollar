@@ -109,8 +109,10 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0   ) return false;
 
 
-        if (process.env.BROWSER)
-            this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+        if (this.light) {
+            if (this.blockchain.proofPi.blocks.length > 0 && this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1] !== undefined && this.blockchain.blocks.length >= this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1].height + consts.POPOW_PARAMS.k )
+                this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+        }
         else { //terminal
 
             //let's check if we downloaded blocks in the last 2 minutes

@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
+import GZip from "../../../../utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -99,31 +100,92 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
             this.forkProofPi.hash = proofPiData.hash;
 
-            let i = 0, length = 100;
             let proofsList = [];
+            let knowGzip = false;
 
-            while ( i*length < proofPiData.length && i < 100 ) {
+            console.log(consts.BLOCKCHAIN.LIGHT.GZIPPED)
+            if(consts.BLOCKCHAIN.LIGHT.GZIPPED) knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
+            if (knowGzip === null ) knowGzip = false;
 
-                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
+            if (knowGzip){
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                let downloading = true;
+                let pos = 0;
+                let buffers = [];
+                let timeoutCount = 100;
 
-                if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+                while (downloading && pos < timeoutCount) {
 
-                for (let i=0; i<answer.length; i++)
-                    proofsList.push(answer[i]);
+                    let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi-gzip", {
+                            starting: pos * consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
+                            length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
+                        }, "answer" , 10000);
 
-                i++;
+                    if (answer === null) throw {message: "get-proofGziped never received ", answer: answer.message };
+                    if (!answer.result) throw {message: "get-proofGziped return false ", answer: answer.message };
+
+                    if ( !Buffer.isBuffer(answer.data) )
+                        throw {message: "accountantTree data is not a buffer"};
+
+                    if (answer.data.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
+                        (answer.data.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
+                    {
+
+                        buffers.push(answer.data);
+
+                        if (!answer.moreChunks)
+                            downloading = false;
+
+                    }
+
+                    pos++;
+
+                }
+
+                let buffer = await GZip.unzip( Buffer.concat(buffers) );
+                proofsList = [];
+
+                let offset = 0;
+                while(offset!=buffer.length){
+
+                    let result = this.forkProofPi.deserializeProof(buffer, offset);
+
+                    proofsList.push(result.data);
+                    offset = result.offset;
+
+                }
+
+            } else {
+
+                let i = 0, length = 100;
+                proofsList = [];
+
+                while ( i*length < proofPiData.length && i < 100 ) {
+
+                    StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
+
+                    let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+
+                    if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+
+                    if (answer.data === undefined)
+                        for (let i=0; i<answer.length; i++)
+                            proofsList.push(answer[i]);
+                    else
+                        for (let i=0; i<answer.data.length; i++)
+                            proofsList.push(answer.data[i]);
+
+                    i++;
+
+                }
+
             }
 
             if (proofsList.length === 0)
                 throw {message: "Proofs was not downloaded successfully"};
 
-            if (proofsList.length < 150){
-
+            if (proofsList.length < 150)
                 console.error("PROOFS LIST length is less than 150", proofsList.length);
-
-            }
 
             StatusEvents.emit( "agent/status", {message: "Proofs - Preparing", blockHeight: this.forkStartingHeight } );
 
@@ -155,8 +217,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             StatusEvents.emit( "agent/status", {message: "Proofs Validated", blockHeight: this.forkStartingHeight } );
 
             return true;
-
-
 
         }
 

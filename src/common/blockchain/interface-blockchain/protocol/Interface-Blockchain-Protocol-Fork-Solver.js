@@ -251,8 +251,8 @@ class InterfaceBlockchainProtocolForkSolver{
             let bIncludeBan = true;
 
             if (this.blockchain.agent.light)
-                if (["fork is something new", "blockchain has same length, but your block is not better than mine",
-                        "discoverAndProcessFork - fork already found by socket", "my blockchain is larger than yours",
+                if ([ "FORK is empty", "fork is something new",
+                        "discoverAndProcessFork - fork already found by socket",
                         "same proof, but your blockchain is smaller than mine", "Your proof is worst than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
                     bIncludeBan = false;
 
@@ -332,7 +332,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 throw {message: "Fork Answer is not Buffer"};
             }
 
-
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
@@ -356,6 +355,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 throw {message: "fork.includeForkBlock returned an exception", Exception}
 
             }
+
+            fork.forkHeaders.push(block.hash);
 
             //if the block was included correctly
             if (result)

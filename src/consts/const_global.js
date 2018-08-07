@@ -42,6 +42,8 @@ consts.BLOCKCHAIN = {
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
+        GZIPPED: true,
+
     },
 
 
@@ -237,7 +239,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.173",
+        VERSION: "1.177",
         VERSION_COMPATIBILITY: "1.162.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
@@ -427,7 +429,7 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8082;
+    consts.SETTINGS.NODE.PORT = 8085;
 
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 

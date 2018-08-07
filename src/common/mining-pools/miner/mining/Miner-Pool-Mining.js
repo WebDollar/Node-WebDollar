@@ -4,6 +4,8 @@ import global from 'consts/global';
 import Blockchain from "main-blockchain/Blockchain";
 import AdvancedMessages from "node/menu/Advanced-Messages"
 import Log from 'common/utils/logging/Log';
+import Serialization from "common/utils/Serialization";
+import BufferExtended from "common/utils/BufferExtended";
 
 let InheritedPoolMining;
 
@@ -110,8 +112,12 @@ class MinerPoolMining extends InheritedPoolMining {
             this.resetForced = true;
         }
 
-        Log.info("New Work: "+ (work.end - work.start), Log.LOG_TYPE.POOLS );
+        Log.info("New Work: "+ (work.end - work.start) + "   starting at: "+work.start + " block: "+this._getBlockSuffix(), Log.LOG_TYPE.POOLS );
 
+    }
+
+    _getBlockSuffix(){
+        return BufferExtended.substr(this._miningWork.serializedHeader, 10 , 26).toString("hex")
     }
 
 

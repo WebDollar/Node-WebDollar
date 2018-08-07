@@ -37,11 +37,6 @@ export default {
 
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
-        {"addr": ["https://pool.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool2.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool3.webd.club:80/"]}, // Thanks to @ermethic
-        {"addr": ["https://pool4.webd.club:80/"]}, // Thanks to @ermethic
-
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
 
@@ -79,11 +74,7 @@ export default {
         {"addr": ["https://int-webd.com:5010"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5011"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
-        //{"addr": ["https://int-webd.com:5013"]}, // Thanks to @int_webd
-        //{"addr": ["https://int-webd.com:5014"]}, // Thanks to @int_webd
-        //{"addr": ["https://int-webd.com:5015"]}, // Thanks to @int_webd
-        //{"addr": ["https://int-webd.com:5016"]}, // Thanks to @int_webd
-
+        
         // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
@@ -105,16 +96,6 @@ export default {
         // {"addr": ["https://webdollar-vps3.ddns.net:80"]},
 
         //{"addr": ["https://webdollar.ddns.net:80"]},
-
-        {"addr": ["https://webdollar-vps5.hopto.org:8080"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8081"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8082"]},
-        {"addr": ["https://webdollar-vps5.hopto.org:8083"]},
-
-        {"addr": ["https://webdollar-vps4.zapto.org:8081"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8082"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8083"]},
-        {"addr": ["https://webdollar-vps4.zapto.org:8084"]},
 
         {"addr": ["https://webdollarinfinitypool.space:8085"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8086"]}, //Thanks to @Tibi Popescu

@@ -364,10 +364,10 @@ export default function (self) {
 
                 WorkerChanged = false;
 
-                ARGON2_PARAM.pass [blockLen + 3] = nonce & 0xff;
-                ARGON2_PARAM.pass [blockLen + 2] = nonce>>8 & 0xff;
-                ARGON2_PARAM.pass [blockLen + 1] = nonce>>16 & 0xff;
-                ARGON2_PARAM.pass [blockLen    ] = nonce>>24 & 0xff;
+                ARGON2_PARAM.pass [blockLen + 3] = nonce  & 0xff;
+                ARGON2_PARAM.pass [blockLen + 2] = nonce >> 8 & 0xff;
+                ARGON2_PARAM.pass [blockLen + 1] = nonce >> 16 & 0xff;
+                ARGON2_PARAM.pass [blockLen    ] = nonce >> 24 & 0xff;
 
                 let hash = await algorithm ();
 

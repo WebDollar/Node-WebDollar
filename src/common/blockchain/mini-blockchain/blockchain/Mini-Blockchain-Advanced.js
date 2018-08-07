@@ -3,6 +3,7 @@ import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
 import Log from 'common/utils/logging/Log';
+import GZip from "../../../utils/GZip";
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -11,6 +12,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         super(agent);
 
         this.lightAccountantTreeSerializations = {};
+        this.lightAccountantTreeSerializationsGzipped = {};
+
     }
 
 
@@ -22,6 +25,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             let serialization = this.accountantTree.serializeMiniAccountant();
             this.lightAccountantTreeSerializations[block.height+1] = serialization;
+            this.lightAccountantTreeSerializationsGzipped[block.height+1] = await GZip.zip(serialization);
 
             //delete old lightAccountantTreeSerializations
 
@@ -29,6 +33,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             while (this.lightAccountantTreeSerializations[index] !== undefined){
                 delete this.lightAccountantTreeSerializations[index];
+                delete this.lightAccountantTreeSerializationsGzipped[index];
                 index--;
             }
 
@@ -36,8 +41,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
-
-    getSerializedAccountantTree(height){
+    getSerializedAccountantTree(height, gzipped = false){
 
         if (height < 0)
             height = -1;
@@ -49,15 +53,19 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             return data;
         }
 
-        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )
-            return this.lightAccountantTreeSerializations[height];
+        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) ){
+
+            if(gzipped)
+                return this.lightAccountantTreeSerializationsGzipped[height];
+            else
+                return this.lightAccountantTreeSerializations[height];
+
+        }
 
         // else I need to compute it, by removing n-1..n
         throw {message: "not computed ", height:height};
 
     }
-
-
 
     async _loadBlockchain(){
 
