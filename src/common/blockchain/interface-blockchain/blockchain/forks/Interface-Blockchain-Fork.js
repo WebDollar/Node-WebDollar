@@ -248,6 +248,33 @@ class InterfaceBlockchainFork {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    deleteAlreadyIncludedBlocks(){
+
+        //verify if now, I have some blocks already in my the blockchain that are similar with the fork
+        let pos = -1;
+        for (let i=0; i>=this.forkBlocks.length-1; i++)
+            if ( this.blockchain.blocks[ this.forkBlocks[i].height ] !== undefined && this.blockchain.blocks[ this.forkBlocks[i].height ].hash.equals(this.forkBlocks[i].hash)  ){
+
+                pos = i;
+
+            } else break;
+
+        if (pos >= 0){
+
+            this.forkStartingHeight = this.forkBlocks[pos].height;
+            this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
+
+            for (let j=0; j<=pos; j++)
+                this.forkBlocks[j].destroyBlock();
+
+            this.forkBlocks.splice(0, pos);
+        }
+
+        if (this.forkBlocks.length !== 0) return true;
+        else return false;
+
+    }
+
     /**
      * Validate the Fork and Use the fork as main blockchain
      *
@@ -282,6 +309,11 @@ class InterfaceBlockchainFork {
                 if (! (await this._validateFork(false, false))) {
                     Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
                     return false
+                }
+
+                if (!this.deleteAlreadyIncludedBlocks()){
+                    Log.error("deleteAlreadyIncludedBlocks blocks no longer exist", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    return false;
                 }
 
                 if (this.downloadBlocksSleep) await this.sleep(30);

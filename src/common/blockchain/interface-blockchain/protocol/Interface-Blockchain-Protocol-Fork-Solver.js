@@ -332,7 +332,6 @@ class InterfaceBlockchainProtocolForkSolver{
                 throw {message: "Fork Answer is not Buffer"};
             }
 
-
             let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
             let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
 
@@ -356,6 +355,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 throw {message: "fork.includeForkBlock returned an exception", Exception}
 
             }
+
+            fork.forkHeaders.push(block.hash);
 
             //if the block was included correctly
             if (result)
