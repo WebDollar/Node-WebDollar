@@ -302,7 +302,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
 
-
+``
             // TODO you can paralyze the downloading code from multiple sockets
 
             console.log("downloading block", nextBlockHeight);

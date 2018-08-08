@@ -111,7 +111,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
         }
     }
 
-    serializeProof(proof){
+    serializeProof (proof){
 
         let buffer = [];
 

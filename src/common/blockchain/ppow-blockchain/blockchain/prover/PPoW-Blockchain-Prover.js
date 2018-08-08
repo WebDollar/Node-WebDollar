@@ -123,7 +123,11 @@ class PPoWBlockchainProver{
             });
 
             await underlyingChain.calculateProofHash();
-            await underlyingChain.calculateProofGzip();
+            await underlyingChain.calculateProofSerialized();
+
+            underlyingChain.proofGzip = undefined;
+            underlyingChain.date = new Date().getTime();
+
         }
 
         // let s = "";

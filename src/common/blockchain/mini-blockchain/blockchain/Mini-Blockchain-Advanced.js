@@ -3,7 +3,8 @@ import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
 import Log from 'common/utils/logging/Log';
-import GZip from "../../../utils/GZip";
+import GZip from "common/utils/GZip";
+import MiniBlockchainAdvancedGZipManager from "./Mini-Blockchain-Advanced-GZip-Manager"
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -13,6 +14,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         this.lightAccountantTreeSerializations = {};
         this.lightAccountantTreeSerializationsGzipped = {};
+
+        this.lightGZipManager = new MiniBlockchainAdvancedGZipManager(this);
 
     }
 
@@ -24,8 +27,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         if ( ! block.blockValidation.blockValidationType["skip-saving-light-accountant-tree-serializations"] ){
 
             let serialization = this.accountantTree.serializeMiniAccountant();
+
             this.lightAccountantTreeSerializations[block.height+1] = serialization;
-            this.lightAccountantTreeSerializationsGzipped[block.height+1] = await GZip.zip(serialization);
+            this.lightAccountantTreeSerializationsGzipped[block.height+1] = undefined;
+            //gzip is being calculated later on
 
             //delete old lightAccountantTreeSerializations
 
@@ -55,7 +60,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) ){
 
-            if(gzipped)
+            if (gzipped)
                 return this.lightAccountantTreeSerializationsGzipped[height];
             else
                 return this.lightAccountantTreeSerializations[height];
