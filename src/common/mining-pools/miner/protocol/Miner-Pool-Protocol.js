@@ -180,7 +180,6 @@ class MinerProtocol extends PoolProtocolList{
                 await this._connectionEstablishedWithPool(socket);
 
                 this._updateStatistics(answer);
-
                 this.minerPoolManagement.minerPoolReward.setReward(answer);
 
                 return true;
@@ -231,7 +230,6 @@ class MinerProtocol extends PoolProtocolList{
                 this._validateRequestWork(data.work, socket);
 
                 this._updateStatistics( data);
-
                 this.minerPoolManagement.minerPoolReward.setReward(data);
 
             } catch (exception){
@@ -297,11 +295,10 @@ class MinerProtocol extends PoolProtocolList{
 
         if (answer.result !== true) throw {message: "get-work answered false"};
 
-        this.minerPoolManagement.minerPoolReward.setReward(answer);
-
         this._validateRequestWork( answer.work, poolSocket);
 
         this._updateStatistics(answer);
+        this.minerPoolManagement.minerPoolReward.setReward(answer);
 
         return true;
     }
@@ -343,6 +340,7 @@ class MinerProtocol extends PoolProtocolList{
             this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
+            this.minerPoolManagement.minerPoolReward.setReward(answer);
 
         } catch (exception){
 

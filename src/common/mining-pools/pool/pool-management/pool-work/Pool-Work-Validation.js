@@ -1,3 +1,4 @@
+import Log from 'common/utils/logging/Log';
 const PROCESS_COUNT = 50;
 
 class PoolWorkValidation{
@@ -30,28 +31,32 @@ class PoolWorkValidation{
 
     async processPoolWorkValidation(){
 
-        try{
+        Log.info("Total amount of work to validate: "+this._works.length, Log.LOG_TYPE.POOLS );
 
-            let n = Math.min(PROCESS_COUNT, this._works.length);
+        if (this.poolManagement.blockchain.semaphoreProcessing._list.length === 0 )
 
-            for (let i=0; i<n; i++){
+            try{
 
-                let work = this._works[i];
+                let n = Math.min(PROCESS_COUNT, this._works.length);
 
-                let prevBlock = this.poolWorkManagement.poolWork.findBlockById( this._works[i].id, this._works[i].height );
+                for (let i=0; i<n; i++){
 
-                if (prevBlock !== null)
-                    await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+                    let work = this._works[i];
+
+                    let prevBlock = this.poolWorkManagement.poolWork.findBlockById( this._works[i].work.id, this._works[i].work.height );
+
+                    if (prevBlock !== undefined)
+                        await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+
+                }
+
+                this._works.splice(0, PROCESS_COUNT);
+
+            }catch (exception){
 
             }
 
-            this._works.splice(0, PROCESS_COUNT);
-
-        }catch (exception){
-
-        }
-
-        this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), 100 );
+        this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, 50000/this._works.length)) );
 
     }
 

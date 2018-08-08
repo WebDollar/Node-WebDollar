@@ -29,6 +29,7 @@ class MiniBlockchainAdvancedGZipManager{
     async processGZIP(){
 
         try {
+
             if (this.blockchain.semaphoreProcessing._list.length === 0 && this.blockchain.forksAdministrator.forks.length === 0) {
 
                 let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;

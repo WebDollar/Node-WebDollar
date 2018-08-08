@@ -59,7 +59,9 @@ class PoolNewWorkManagement{
             // i have sent it already in the last - no new work
             if (this.poolWorkManagement.poolWork.lastBlock === blockInformationMinerInstance.workBlock ) return true; //already sent
 
-            await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork,  } );
+            await minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
+                h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
+                b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,  } );
 
         } catch (exception){
 
