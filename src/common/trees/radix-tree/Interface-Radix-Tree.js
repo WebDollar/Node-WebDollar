@@ -365,7 +365,7 @@ class InterfaceRadixTree extends InterfaceTree {
     search(input){
 
         if (!Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
+            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         if (input.length === 0)
             throw {message: 'No input'};
@@ -419,7 +419,7 @@ class InterfaceRadixTree extends InterfaceTree {
     update(input, value){
 
         if (!Buffer.isBuffer(input))
-            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer
+            input = WebDollarCryptoData.createWebDollarCryptoData(input).buffer;
 
         let searchResult = this.search(input);
 

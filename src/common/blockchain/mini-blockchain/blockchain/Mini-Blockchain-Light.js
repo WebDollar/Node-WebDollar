@@ -4,7 +4,7 @@ import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 import MiniBlockchain from "./Mini-Blockchain";
-import GZip from "../../../utils/GZip";
+import GZip from "common/utils/GZip";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -58,7 +58,10 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
                     async () => {
 
-                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
+                        let x = new Date().getTime();
+                        let answer =await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
+                        console.log("diff2", new Date().getTime()-x);
+                        return answer;
 
                     },
 
@@ -87,7 +90,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         MiniBlockchainAdvanced.prototype._onBlockCreated.call(this, block, saveBlock);
 
-        if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
+        if (! (await this._recalculateLightPrevs( block.height, block, this.getSerializedAccountantTree(block.height), this.getSerializedAccountantTree(block.height, true), saveBlock)))
             throw {message: "_recalculateLightPrevs failed"};
 
         /*console.log(" hash", block.hash.toString("hex"));
@@ -101,7 +104,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     /**
      * It must be last element
      */
-    async _recalculateLightPrevs(height, block, serialization, save = true){
+    async _recalculateLightPrevs(height, block, serialization, serializationGzip, save = true){
 
         if (block === undefined || block === null)
             block = BlockchainGenesis;
@@ -112,11 +115,12 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
+            serializationGzip = await GZip.zip(serialization);
             //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
         this.lightAccountantTreeSerializations[height+1] = serialization;
-        this.lightAccountantTreeSerializationsGzipped[height+1] = await GZip.zip(serialization);
+        this.lightAccountantTreeSerializationsGzipped[height+1] = serializationGzip;
 
         this._deleteOldLightSettings();
 

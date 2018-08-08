@@ -3,7 +3,7 @@ import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const BigInteger = require('big-integer');
-import GZip from "../../../../utils/GZip";
+import GZip from "common/utils/GZip";
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -12,6 +12,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
         this.forkPrevAccountantTree = null;
+        this.forkPrevAccountantTreeGzipped = undefined;
+
         this.forkPrevDifficultyTarget = null;
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
@@ -28,7 +30,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this._lightPrevDifficultyTargetClone = null;
         this._lightPrevTimeStampClone = null;
         this._lightPrevHashPrevClone = null;
-        this._lightAccountantTreeSerializationsHeightClone = null;
+
+        this._lightAccountantTreeSerializationsHeightClone = undefined;
+        this._lightAccountantTreeSerializationsHeightCloneGzipped = undefined;
     }
 
     // return the difficultly target for ForkBlock
@@ -127,7 +131,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this._lightChainWorkClone = this.blockchain.blocks.chainWork;
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
-            this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
+            this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined;
+            this._lightAccountantTreeSerializationsHeightCloneGzipped = this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] : 0;
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
             this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
@@ -176,7 +181,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
 
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
-            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(this.forkPrevAccountantTree);
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = this.forkPrevAccountantTreeGzipped;
 
         } else
             //it is just a simple fork
@@ -197,7 +202,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
-            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(this._lightAccountantTreeSerializationsHeightClone);
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = this._lightAccountantTreeSerializationsHeightCloneGzipped;
 
         }
 

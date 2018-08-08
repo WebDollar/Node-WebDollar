@@ -41,6 +41,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try{
 
+            let date = new Date().getTime();
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
                 //updating reward
@@ -121,7 +122,10 @@ class MiniBlockchain extends  inheritBlockchain{
         if (await this.simulateNewBlock(block, false, revertActions,
 
                 async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                    let x = new Date().getTime();
+                    let answer =await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
+                    console.warn("diff2", new Date().getTime()-x);
+                    return answer;
                 }
 
             , showUpdate )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};

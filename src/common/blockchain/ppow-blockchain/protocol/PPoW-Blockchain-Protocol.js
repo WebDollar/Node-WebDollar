@@ -23,7 +23,8 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
         socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", () => {
 
-            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported" + "/answer", {result: true});
+            let proofPi = this.blockchain.agent.light ? this.blockchain.proofPi : this.blockchain.prover.proofPi;
+            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported" + "/answer", { result: ( consts.BLOCKCHAIN.LIGHT.GZIPPED && proofPi !== undefined ) ? ( proofPi.proofGzip !== undefined ? true : false ) : false });
 
         });
 
@@ -57,11 +58,14 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
             try {
 
                 let serialization;
+                let proofPi;
 
-                if (this.blockchain.agent.light)
-                    serialization = this.blockchain.proofPi.proofGzip;
-                else  // full node
-                    serialization = this.blockchain.prover.proofPi.proofGzip;
+                if (this.blockchain.agent.light) proofPi = this.blockchain.proofPi;
+                else proofPi = this.blockchain.prover.proofPi.proofGzip; // full node
+
+
+                if (proofPi.proofGzip !== undefined) serialization = proofPi.proofGzip;
+                else serialization = proofPi.proofSerialized;
 
                 let moreChunks = false;
 
