@@ -114,7 +114,7 @@ class PoolWorkManagement{
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
-            if ( work.result && prevBlock === undefined ) { //it is a solution and prevBlock is undefined
+            if ( work.result  ) { //it is a solution and prevBlock is undefined
 
                 if ( await blockInformationMinerInstance.wasBlockMined() ){
 

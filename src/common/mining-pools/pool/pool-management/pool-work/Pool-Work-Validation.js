@@ -39,7 +39,6 @@ class PoolWorkValidation{
         };
 
 
-
         if (work.work.result || forced){
 
             await this._validateWork(work);

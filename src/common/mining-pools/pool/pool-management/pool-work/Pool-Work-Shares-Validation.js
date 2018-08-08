@@ -1,6 +1,10 @@
-class PoolWorkSharesValidation{
+import PoolWorkValidation from "./Pool-Work-Validation";
 
-    constructor(){
+class PoolWorkSharesValidation extends PoolWorkValidation{
+
+    constructor(poolManagement, poolWorkManagement){
+
+        super(poolManagement, poolWorkManagement);
 
         this.shares = [];
 
