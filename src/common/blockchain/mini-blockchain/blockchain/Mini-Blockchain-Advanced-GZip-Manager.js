@@ -12,6 +12,20 @@ class MiniBlockchainAdvancedGZipManager{
 
     }
 
+    async processAllAccountantTrees(){
+
+        let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
+
+        for (let i = this.blockchain.blocks.length - 1; i >= index; i--) {
+
+            if (this.blockchain.lightAccountantTreeSerializationsGzipped[i] === undefined && this.blockchain.lightAccountantTreeSerializations[i] !== undefined)
+                this.blockchain.lightAccountantTreeSerializationsGzipped[i] = await GZip.zip(this.blockchain.lightAccountantTreeSerializations[i]);
+
+            await this.blockchain.sleep(5);
+        }
+
+    }
+
     async processGZIP(){
 
         try {
@@ -19,14 +33,27 @@ class MiniBlockchainAdvancedGZipManager{
 
                 let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
                 let position;
-                for (let i = this.blockchain.blocks.length - 1; i >= index; i--)
+                let positionInitial;
+
+                for (let i = this.blockchain.blocks.length - 1; i >= index; i--) {
+                    if (this.blockchain.lightAccountantTreeSerializationsGzipped[i] === undefined && this.blockchain.lightAccountantTreeSerializations[i] !== undefined)
+                        positionInitial = i;
+
                     if (this.blockchain.lightAccountantTreeSerializationsGzipped[i] !== undefined && this.blockchain.lightAccountantTreeSerializations[i] !== undefined) {
                         position = i;
                         break;
                     }
+                }
+
+                if (position === undefined && positionInitial !== undefined){
+                    position = positionInitial;
+                }
 
                 if (position !== undefined) {
-                    position++;
+
+                    if (this.blockchain.lightAccountantTreeSerializationsGzipped[position] !== undefined)
+                        position++;
+
                     if (this.blockchain.lightAccountantTreeSerializationsGzipped[position] === undefined && this.blockchain.lightAccountantTreeSerializations[position] !== undefined)
                         this.blockchain.lightAccountantTreeSerializationsGzipped[position] = await GZip.zip(this.blockchain.lightAccountantTreeSerializations[position]);
                 }

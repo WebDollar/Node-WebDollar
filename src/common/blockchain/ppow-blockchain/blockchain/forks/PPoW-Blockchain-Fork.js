@@ -84,7 +84,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
-                if (this.forkChainLength > this.blockchain.blocks.length ){
+                if (this.forkChainWork.greater(this.blockchain.blocks.chainWork)){
                     this.forkProofPi = this.blockchain.proofPi;
                     return true;
                 } //you have actually more forks but with the same proof
@@ -310,9 +310,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         if (comparison === 0 && this.forkProofPi.lastProofBlock.height <= this.blockchain.proofPi.lastProofBlock.height ) {
 
-            if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
+            if ( comparison === 0 && this.forkChainWork.lesser(this.blockchain.chainWork) ) throw {message: "Your proof is worst than mine"};
 
-            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0)
+            if ( comparison === 0 && this.forkChainWork.equals( this.blockchain.chainWork ) )
                 throw {message: "Your proof is worst than mine because you have the same block"};
 
         }

@@ -8,6 +8,11 @@ import BufferExtended from "../../../../../utils/BufferExtended";
 
 class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
 
+    constructor(blockchain, blocks){
+        super(blockchain, blocks)
+        this.proofGzip = undefined;
+    }
+
     /**
      * Returns ths upchain of current chain(C ↑ µ).
      */

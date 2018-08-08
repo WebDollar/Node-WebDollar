@@ -15,7 +15,6 @@ class PPoWBlockchainProofBasic{
 
         this.hash = undefined;
 
-        this.proofGzip = undefined;
         this.proofSerialized = undefined;
 
     }
