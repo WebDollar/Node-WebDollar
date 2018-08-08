@@ -4,6 +4,7 @@ import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NODE_TYPE from "node/lists/types/Node-Type"
+import consts from 'consts/const_global'
 
 const EventEmitter = require('events');
 
@@ -25,6 +26,8 @@ class NodesList {
 
         this.nodes = [];
         this.nodesTotal = 0;
+
+        setInterval( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
 
         this.removeDisconnectedSockets();
     }
@@ -275,6 +278,14 @@ class NodesList {
                 count ++;
 
         return count;
+
+    }
+
+    recalculateSocketsLatency(){
+
+        for (let i=0; i<this.nodes.length; i++)
+            this.nodes[i].socket.node.protocol.calculateLatency();
+
 
     }
 
