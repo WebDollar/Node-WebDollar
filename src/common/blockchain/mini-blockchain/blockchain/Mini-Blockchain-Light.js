@@ -58,10 +58,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
                     async () => {
 
-                        let x = new Date().getTime();
-                        let answer =await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
-                        console.log("diff2", new Date().getTime()-x);
-                        return answer;
+                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
 
                     },
 

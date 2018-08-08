@@ -122,10 +122,7 @@ class MiniBlockchain extends  inheritBlockchain{
         if (await this.simulateNewBlock(block, false, revertActions,
 
                 async ()=>{
-                    let x = new Date().getTime();
-                    let answer =await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
-                    console.warn("diff2", new Date().getTime()-x);
-                    return answer;
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
                 }
 
             , showUpdate )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
