@@ -104,17 +104,6 @@ class PoolWorkManagement{
             if ( (prevBlock  || blockInformationMinerInstance.workBlock) === undefined)
                 throw {message: "miner instance - no block"};
 
-            if (work.timeDiff !== undefined) {
-                if (typeof work.timeDiff !== "number") throw {message: "timeDiff is invalid"};
-
-                let hashesFactor = Math.min(10, ( 80000 / work.timeDiff )); //80 sec
-                hashesFactor = Math.max(0.2, hashesFactor);
-
-                let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
-
-            }
-
 
             if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce, prevBlock )  )
                 throw {message: "block was incorrectly mined", work: work };

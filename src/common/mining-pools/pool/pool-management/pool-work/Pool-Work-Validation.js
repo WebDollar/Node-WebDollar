@@ -24,10 +24,21 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
+        if (typeof work.timeDiff === "number") {
+
+            let hashesFactor = Math.max(0.5, Math.min(2, ( 80000 / work.timeDiff ))); //80 sec
+
+            let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
+            minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
+
+        }
+
         work = {
             work: work,
             minerInstance: minerInstance
         };
+
+
 
         if (work.work.result || forced){
 

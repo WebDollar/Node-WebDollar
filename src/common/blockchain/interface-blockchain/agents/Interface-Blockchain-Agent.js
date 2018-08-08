@@ -110,7 +110,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
 
         if (this.light) {
-            if (this.blockchain.proofPi.blocks.length > 0 && this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1] !== undefined && this.blockchain.blocks.length >= this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1].height + consts.POPOW_PARAMS.k )
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.blocks.length > 0 && this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1] !== undefined && this.blockchain.blocks.length >= this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1].height + consts.POPOW_PARAMS.k )
                 this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
         }
         else { //terminal

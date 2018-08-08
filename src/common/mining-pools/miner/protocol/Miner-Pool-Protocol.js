@@ -12,6 +12,7 @@ import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockc
 import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from "consts/const_global"
 import Log from 'common/utils/logging/Log';
+import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-Status";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -214,6 +215,8 @@ class MinerProtocol extends PoolProtocolList{
 
         StatusEvents.emit("miner-pool/connection-established", {connected: true, message: "Connection Established", socket: socket});
 
+        if (this.minerPoolManagement.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+            this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
@@ -224,7 +227,7 @@ class MinerProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/new-work/answer", {
                     hash: this.minerPoolManagement.minerPoolMining.bestHash,
                     nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                    id: this._miningWork.blockId,
+                    id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
                 });
 
                 this._validateRequestWork(data.work, socket);
