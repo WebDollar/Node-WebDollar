@@ -22,11 +22,22 @@ class PoolWorkValidation{
         clearTimeout(this._timeoutPoolWorkValidation);
     }
 
-    pushWorkForValidation(minerInstance, work, ){
-        this._works.push({
+    async pushWorkForValidation(minerInstance, work, forced ){
+
+        work = {
             work: work,
             minerInstance: minerInstance
-        });
+        };
+
+        if (work.work.result || forced){
+
+            await this._validateWork(work);
+
+            return;
+        }
+
+        this._works.push(work);
+
     }
 
     async processPoolWorkValidation(){
@@ -41,12 +52,7 @@ class PoolWorkValidation{
 
                 for (let i=0; i<n; i++){
 
-                    let work = this._works[i];
-
-                    let prevBlock = this.poolWorkManagement.poolWork.findBlockById( this._works[i].work.id, this._works[i].work.height );
-
-                    if (prevBlock !== undefined)
-                        await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+                    await this._validateWork(this._works[i]);
 
                 }
 
@@ -57,6 +63,15 @@ class PoolWorkValidation{
             }
 
         this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, 50000/this._works.length)) );
+
+    }
+
+    async _validateWork(work){
+
+        let prevBlock = this.poolWorkManagement.poolWork.findBlockById( work.work.id, work.work.height );
+
+        if (prevBlock !== undefined)
+            await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
 
     }
 
