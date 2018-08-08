@@ -103,6 +103,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     messageAddressConfirmation = new Buffer(32);
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance, true);
+                minerInstance.lastWork = work;
 
                 let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer"+suffix, {
 
@@ -198,6 +199,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance, true);
+                minerInstance.lastWork = work;
 
                 await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
@@ -264,6 +266,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
                 let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
+                minerInstance.lastWork = newWork;
 
                 //the new reward
                 socket.node.sendRequest("mining-pool/work-done/answer"+suffix, { result: true, newWork: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
