@@ -20,10 +20,10 @@ class NodeAPIPrivate{
     }
 
     async walletImport(req, res){
-
+        
+        let address = req.address;
+        let publicKey = req.publicKey;
         let privateKey = req.privateKey;
-
-        let address = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
         let content = {
             version: '0.1',
@@ -38,7 +38,7 @@ class NodeAPIPrivate{
 
             if (answer.result === true) {
                 await Blockchain.Wallet.saveWallet();
-                return {result: true, address: address.address};
+                return {result: true, address: address};
             } else
                 return {result: false, message: answer.message};
 
