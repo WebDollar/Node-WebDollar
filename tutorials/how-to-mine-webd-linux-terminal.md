@@ -26,10 +26,7 @@ bash build-argon2.sh
 ```shell
 npm run commands
 ```
-NOTE: after you close miner (with ctrl c) execute (just for now, will be fixed)->
-```shell
-killall argon2-bench2
-```
+
 #### press 8 then Enter
 #### Mining starts after Blockchain is Downloaded
 #### There is a blockchainDB3 backup you can download and use to instantly start mining!
