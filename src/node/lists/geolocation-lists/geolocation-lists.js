@@ -66,15 +66,10 @@ class GeoLocationLists {
             if (this._pendingLocationLists[i].address.matchAddress(sckAddress))
                 return this._pendingLocationLists[i].promise;
 
-        let resolver;
-        let promise = new Promise((resolve)=>{
-            resolver = resolve;
-        });
-
         let data = {
             address: sckAddress,
-            promise: promise,
-            resolver: resolver,
+            promise: sckAddress._geoLocation,
+            resolver: sckAddress._geoLocationResolver,
         };
 
         this._pendingLocationLists.push(data);
@@ -91,7 +86,7 @@ class GeoLocationLists {
         if ( socket.node !== undefined &&  (socket.node.location === undefined || socket.node.location === null))
             await this._includeAddress(socket.node.sckAddress);
 
-        return socket.node.location;
+        return await socket.node.location;
     }
 
     _addGeoLocationContinentByAddress(sckAddress, location){
