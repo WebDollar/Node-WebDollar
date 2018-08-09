@@ -21,19 +21,12 @@ npm install
 ### 3. Use argon2 CPP Optimization
 ```shell
 bash build-argon2.sh
-sed -i -- 's/TYPE: "cpu"/TYPE: "cpu-cpp"/g' src/consts/const_global.js
-sed -i -- 's/CPU_MAX: 0/CPU_MAX: THREAD_NUMBERS/g' src/consts/const_global.js -> edit THREAD_NUMBERS to your value
-sed -i -- 's/CPU_CPP_WORKER_NONCES_WORK: 20000/CPU_CPP_WORKER_NONCES_WORK: 30000/g' src/consts/const_global.js
-sed -i -- 's/CPU_CPP_WORKER_NONCES_WORK_BATCH: 500/CPU_CPP_WORKER_NONCES_WORK_BATCH: 100/g' src/consts/const_global.js
 ```
 ### 4. Run miner
 ```shell
 npm run commands
 ```
-NOTE: after you close miner (with ctrl c) execute (just for now, will be fixed)->
-```shell
-killall argon2-bench2
-```
+
 #### press 8 then Enter
 #### Mining starts after Blockchain is Downloaded
 #### There is a blockchainDB3 backup you can download and use to instantly start mining!
