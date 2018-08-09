@@ -35,8 +35,8 @@ class NodePropagationProtocol {
             let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t, list[key].ct||NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
             //downloading the next elements
-            if (list[key].next !== undefined && list[key].next > 0)
-                list[key].sock.node.sendRequest( (nodeType === NODE_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: DOWNLOAD_WAITLIST_COUNT });
+            if ( list[key].next !== undefined && list[key].next > 0 )
+                list[key].sock.node.sendRequest( (nodeType === NODE_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: this.count(list[key].sock) });
 
             delete list[key];
             list.length--;
@@ -75,17 +75,16 @@ class NodePropagationProtocol {
     initializeSocketForPropagation(socket){
 
         //avoiding download the list from
-        if ( [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) === 0 )
-            return;
-
 
         this.initializeNodesPropagation(socket);
 
 
         setTimeout( ()=>{
 
-            socket.node.sendRequest("propagation/request-all-wait-list/full-nodes", { index: 0, count: DOWNLOAD_WAITLIST_COUNT });
-            socket.node.sendRequest("propagation/request-all-wait-list/light-nodes", { index:0, count: DOWNLOAD_WAITLIST_COUNT });
+            if ([NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) === 0 )
+                socket.node.sendRequest("propagation/request-all-wait-list/full-nodes", { index: 0, count: this.count(socket) });
+
+            socket.node.sendRequest("propagation/request-all-wait-list/light-nodes", { index:0, count: this.count(socket) });
 
         },  3000 + Math.floor( Math.random()*5000));
 
@@ -212,7 +211,7 @@ class NodePropagationProtocol {
 
         socket.node.on("propagation/request-all-wait-list/light-nodes", response =>{
 
-            let answer = this._getWaitlist( response, NodesWaitlist.waitListFullNodes );
+            let answer = this._getWaitlist( response, NodesWaitlist.waitListLightNodes );
 
             if (answer !== null && answer.list.length > 0)
                 socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: answer.list, next: answer.next});
@@ -259,6 +258,9 @@ class NodePropagationProtocol {
     }
 
 
+    count(socket){
+        return [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL].indexOf( socket.node.protocol.nodeConsensusType ) ? 5 : DOWNLOAD_WAITLIST_COUNT;
+    }
 
 }
 

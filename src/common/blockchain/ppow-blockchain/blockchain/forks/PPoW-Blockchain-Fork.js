@@ -118,7 +118,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                         length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
                     }, "answer" , 10000);
 
-                if (answer === null) throw {message: "get-proofGziped never received ", answer: answer.message };
+                if (answer === null) throw {message: "get-proofGziped never received ", answer: answer };
                 if (!answer.result) throw {message: "get-proofGziped return false ", answer: answer.message };
 
                 if ( !Buffer.isBuffer(answer.data) )

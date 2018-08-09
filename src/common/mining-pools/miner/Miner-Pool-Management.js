@@ -96,6 +96,7 @@ class MinerProtocol {
     async setMinerPoolStarted(value, forceStartMinerPool = false){
 
         try {
+
             if (this._minerPoolStarted !== value) {
 
                 if (value && forceStartMinerPool) {
