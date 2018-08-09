@@ -54,11 +54,11 @@ class GeoLocationLists {
 
 
 
-        setTimeout(this._processGeoLocationPendingList.bind(this), 5000);
+        setTimeout(this._processGeoLocationPendingList.bind(this), 1000);
 
     }
 
-    async _includeAddress(sckAddress, port){
+    _includeAddress(sckAddress, port){
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
 
@@ -86,14 +86,12 @@ class GeoLocationLists {
 
         if ( socket === undefined || socket === null) return null;
 
-        //in case the location has been set before  (avoiding double insertion)
-        if ( socket.node !== undefined &&  socket.node.location !== undefined && socket.node.location !== null) return socket.node.location;
+        socket.node.location = socket.node.sckAddress.geoLocation;
 
-        let data = await this._includeAddress(socket.node.sckAddress);
-        socket.node.location = data.promise;
+        if ( socket.node !== undefined &&  (socket.node.location === undefined || socket.node.location === null))
+            await this._includeAddress(socket.node.sckAddress);
 
-        return data.promise;
-
+        return socket.node.location;
     }
 
     _addGeoLocationContinentByAddress(sckAddress, location){
