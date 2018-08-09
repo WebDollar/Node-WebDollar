@@ -23,7 +23,7 @@ class GeoLocationLists {
 
         this._pendingLocationLists = [];
 
-        setTimeout(this._processGeoLocationPendingList.bind(this), 15000);
+        setTimeout(this._processGeoLocationPendingList.bind(this), process.env.BROWSER ? 500 : 5000 );
     }
 
     async _processGeoLocationPendingList(){
@@ -54,7 +54,7 @@ class GeoLocationLists {
 
 
 
-        setTimeout(this._processGeoLocationPendingList.bind(this), 1000);
+        setTimeout(this._processGeoLocationPendingList.bind(this), process.env.BROWSER ? 500 : 5000);
 
     }
 
