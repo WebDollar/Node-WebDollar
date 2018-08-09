@@ -162,7 +162,7 @@ class MinerProtocol extends PoolProtocolList{
                 //if ( typeof answer.reward !== "number") throw {message: "pool: Reward is empty"};
                 //if ( typeof answer.confirmed !== "number") throw {message: "pool: confirmedReward is empty"};
 
-                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
                 if (answer.work !== undefined)
                     this._validateRequestWork(answer.work, socket);

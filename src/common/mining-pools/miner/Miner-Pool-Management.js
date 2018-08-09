@@ -10,6 +10,7 @@ import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 import NodesList from 'node/lists/Nodes-List'
 import Log from 'common/utils/logging/Log';
+import NodeDiscoveryService from 'node/sockets/node-clients/service/discovery/Node-Clients-Discovery-Service'
 
 class MinerProtocol {
 
@@ -144,7 +145,12 @@ class MinerProtocol {
 
                     this.blockchain.blocks.length = 0;
                     this.blockchain.agent.consensus = true;
+                    this.minerPoolReward.totalReward = 0;
+                    this.minerPoolReward.confirmedReward = 0;
+                    this.minerPoolReward.totalReferralReward = 0;
+                    this.minerPoolReward.confirmedReferralReward = 0;
 
+                    NodeDiscoveryService.startDiscovery();
 
                     if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
                         this.blockchain.prover.proofActivated = true;
