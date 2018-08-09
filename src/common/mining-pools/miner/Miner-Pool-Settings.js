@@ -225,8 +225,9 @@ class MinerPoolSettings {
     async _addPoolsList(){
 
         await this.addPoolList("/pool/0/WebDollarExperimentalPool/0.02/WEBD$gDU+tP3@42@L9$Is463vDJi4IKrabPNNn$$/93ba881950314cca579d4f8699a6bc67695ec7292bceadb6f6709b70beba774a/https:$$webdollar.ddns.net/https:$$webdollar.ddns.net:80", undefined, true);
-        await this.addPoolList("pool/1/InfinityPoolTest/0.01/e0d472611e52436da220f68233b5257ccda37d07a5c00cbcaec11b1eb55b3131/https:$$webdollarinfinitypool.space:80", undefined, true);
-        await this.addPoolList("pool/1/WMP/0.02/31182a188f17b8c64f722dcf88293028f9a8b3aa65e912086c201176224801ca/https:$$pool.webdollarminingpool.com:41000", undefined, true);
+        await this.addPoolList("/pool/1/InfinityPoolTest/0.01/e0d472611e52436da220f68233b5257ccda37d07a5c00cbcaec11b1eb55b3131/https:$$webdollarinfinitypool.space:80", undefined, true);
+        await this.addPoolList("/pool/1/BACMpool/0.01/21dc1f57cb7338963ea159877b4ade97b71dd11ac17292e3852bdc33a26a17e4/https:$$pool.bacm.ro:9094", undefined, true);
+        await this.addPoolList("/pool/1/WMP/0.02/31182a188f17b8c64f722dcf88293028f9a8b3aa65e912086c201176224801ca/https:$$pool.webdollarminingpool.com:41000", undefined, true);
 
     }
 
