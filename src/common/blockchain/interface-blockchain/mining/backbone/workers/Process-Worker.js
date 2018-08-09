@@ -13,7 +13,8 @@ class ProcessWorker{
 
     constructor(id, noncesWorkBatch, allowSendBeforeReadPreviously=true){
 
-        this.id = id||0;
+
+         this.id = id||0;
         this.noncesWorkBatch = noncesWorkBatch;
         this.allowSendBeforeReadPreviously = allowSendBeforeReadPreviously;
 
