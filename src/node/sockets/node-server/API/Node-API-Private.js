@@ -27,9 +27,9 @@ class NodeAPIPrivate{
 
         let content = {
             version: '0.1',
-            address: address.address,
-            publicKey: address.publicKey,
-            privateKey: address.privateKey,
+            address: address,
+            publicKey: publicKey,
+            privateKey: privateKey,
         };
 
         try {
