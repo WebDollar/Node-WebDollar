@@ -4,7 +4,7 @@ class ProcessWorkerCPP extends ProcessWorker{
 
     constructor(id, noncesWorkBatch, cores){
 
-        super(id, noncesWorkBatch);
+        super(id, noncesWorkBatch, false);
         this.cores = cores;
 
         this._filename = './dist_bundle/CPU/input.txt';

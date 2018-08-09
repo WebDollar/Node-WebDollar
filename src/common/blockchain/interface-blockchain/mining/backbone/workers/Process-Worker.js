@@ -11,10 +11,11 @@ import Log from 'common/utils/logging/Log';
 
 class ProcessWorker{
 
-    constructor(id, noncesWorkBatch){
+    constructor(id, noncesWorkBatch, allowSendBeforeReadPreviously=true){
 
         this.id = id||0;
         this.noncesWorkBatch = noncesWorkBatch;
+        this.allowSendBeforeReadPreviously = allowSendBeforeReadPreviously;
 
         this._filename = './dist_bundle/CPU/input.txt';
 
@@ -64,8 +65,9 @@ class ProcessWorker{
             if (e) {
                 console.error("Process Raised an error", e);
 
-                //await this.start(path);
-                //this._is_batching = true;
+                // await this.start(path);
+                // this._is_batching = true;
+
             }
 
         });
