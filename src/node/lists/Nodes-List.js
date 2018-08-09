@@ -1,4 +1,4 @@
-import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
+import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";

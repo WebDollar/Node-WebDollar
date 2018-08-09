@@ -1,6 +1,6 @@
 const axios = require('axios');
 const ipaddr = require('ipaddr.js');
-import GeoLocationAddressObject from './geolocation-address-object.js';
+import GeoLocationAddressObject from './GeoLocation-Address-Object.js';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper'
 
@@ -23,7 +23,7 @@ class GeoLocationLists {
 
         this._pendingLocationLists = [];
 
-        setTimeout(this._processGeoLocationPendingList.bind(this), process.env.BROWSER ? 500 : 5000 );
+        setTimeout( this._processGeoLocationPendingList.bind(this), process.env.BROWSER ? 500 : 5000 );
     }
 
     async _processGeoLocationPendingList(){
@@ -33,11 +33,13 @@ class GeoLocationLists {
             let data = this._pendingLocationLists[0];
             this._pendingLocationLists.splice(0,1);
 
-            let location = await GeoHelper.getLocationFromAddress(data.address);
+            let location = await GeoHelper.getLocationFromAddress( data.address );
 
-            if (location === null || location === undefined){
+            if (location === null || location === undefined) {
+
                 //console.warn("LOCATION was not been able to get");
                 return null;
+
             }
 
             location.continent = location.continent || '--';
@@ -45,13 +47,16 @@ class GeoLocationLists {
             this._addGeoLocationContinentByAddress( data.address, location );
 
             try {
+
                 data.resolver(location);
+
             } catch (exception){
+
+
+
             }
 
         }
-
-
 
 
         setTimeout(this._processGeoLocationPendingList.bind(this), process.env.BROWSER ? 500 : 5000);
@@ -96,10 +101,9 @@ class GeoLocationLists {
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress);
 
-
         if (this._searchGeoLocationContinentByAddress(sckAddress) === null) {
 
-            if ( this.geoLocationContinentsLists[location.continent] === undefined) this.geoLocationContinentsLists[location.continent] = [];
+            if ( this.geoLocationContinentsLists[ location.continent ] === undefined) this.geoLocationContinentsLists[ location.continent ] = [];
 
             let geoLocationAddressObject = new GeoLocationAddressObject(sckAddress, undefined, location);
             geoLocationAddressObject.refreshLastTimeChecked();

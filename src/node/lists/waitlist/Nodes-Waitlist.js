@@ -9,7 +9,7 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
 import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
-import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
+import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
 
 const EventEmitter = require('events');
 

@@ -80,11 +80,29 @@ class GeoHelper {
 
 
                 return geoLocation;
-            }
+
+            } else throw {message: "error downloading data"};
+
         }
         catch(Exception){
             console.error("GeoHelper getLocationFromAddress raised an error ",Exception);
-            return null;
+
+            return {
+                country: '',
+                countryCode: '',
+                city: '',
+                state: '',
+                region: '',
+                regionCode: '',
+
+                lat: (22.2120780),
+                lng: (-40.1109744),
+                isp: '',
+                timezone: '',
+
+                continent: '',
+                address: address,
+            };
         }
 
     }
