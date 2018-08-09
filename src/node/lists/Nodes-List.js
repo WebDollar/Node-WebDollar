@@ -84,9 +84,7 @@ class NodesList {
 
             let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
 
-            await this.emitter.emit("nodes-list/connected", object);
 
-            this.nodes.push(object);
 
             if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 
@@ -106,6 +104,10 @@ class NodesList {
 
 
             GeoLocationLists.includeSocket(socket);
+
+            await this.emitter.emit("nodes-list/connected", object);
+
+            this.nodes.push(object);
 
             return true;
         }
