@@ -58,7 +58,7 @@ class DownloadHelper{
         }
     }
 
-    async downloadMultipleFiles(addresses, timeout){
+    async downloadMultipleFiles(addresses, timeout = 5000){
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
@@ -73,7 +73,7 @@ class DownloadHelper{
                     callback(null);
                 }
 
-            }, timeout + 1000);
+            }, timeout + 1000 );
 
             for (let i=0; i<addresses.length; i++){
 

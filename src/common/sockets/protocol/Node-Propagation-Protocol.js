@@ -21,7 +21,7 @@ class NodePropagationProtocol {
 
         this._waitlistProccessed = {};
 
-        setTimeout(this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
+        setTimeout( this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
 
     }
 
@@ -198,7 +198,7 @@ class NodePropagationProtocol {
 
     initializeNodesPropagation(socket){
 
-        socket.on("propagation/nodes", async (data)=>{ await this._processNodesList(data, socket )}, );
+        socket.on("propagation/nodes", async data => { await this._processNodesList(data, socket )}, );
 
         socket.node.on("propagation/request-all-wait-list/full-nodes", response =>{
 

@@ -36,7 +36,7 @@ class GeoHelper {
             list.push("https://geoip.tools/v1/json/?q="+address);
             // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
 
-            let data = await DownloadHelper.downloadMultipleFiles(list, 30000);
+            let data = await DownloadHelper.downloadMultipleFiles( list, 20000 );
 
             if (data !== null && data !== undefined){
 
