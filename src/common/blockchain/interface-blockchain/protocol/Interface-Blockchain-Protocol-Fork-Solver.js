@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 import BufferExtended from "common/utils/BufferExtended";
 import BansList from "common/utils/bans/BansList"
+import Blockchain from "main-blockchain/Blockchain"
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -300,7 +301,7 @@ class InterfaceBlockchainProtocolForkSolver{
         if (fork.forkChainLength - fork.forkStartingHeight > 5 )  trials = 3; else
         if (fork.forkChainLength - fork.forkStartingHeight > 10 )  trials = 4;
 
-        while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
+        while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED   && (Blockchain.MinerPoolManagement === undefined || !Blockchain.MinerPoolManagement.minerPoolStarted)) {
 
 
             // TODO you can paralyze the downloading code from multiple sockets

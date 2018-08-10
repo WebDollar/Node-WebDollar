@@ -381,7 +381,7 @@ class InterfaceBlockchainFork {
                 let index;
                 try {
 
-                    for (index = 0; index < this.forkBlocks.length; index++) {
+                    for (index = 0; index < this.forkBlocks.length && (Blockchain.MinerPoolManagement === undefined || !Blockchain.MinerPoolManagement.minerPoolStarted); index++) {
 
                         StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
