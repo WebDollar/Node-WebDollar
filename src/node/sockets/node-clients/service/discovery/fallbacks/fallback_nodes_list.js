@@ -76,6 +76,31 @@ export default {
         {"addr": ["https://int-webd.com:5010"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5011"]}, // Thanks to @int_webd
         {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node7.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node7.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node7.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node7.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node7.int-webd.com:5005"]}, // Thanks to @int_webd
 
         // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
