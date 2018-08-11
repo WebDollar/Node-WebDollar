@@ -28,6 +28,8 @@ class Workers {
 
         this._from_pool = undefined;
 
+        this.workers_list = [];
+
         // workers setup
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
 
@@ -66,8 +68,6 @@ class Workers {
             return false;
         }
 
-
-        this.workers_list = [];
         this._working = 0;
         this._silent = consts.TERMINAL_WORKERS.SILENT;
 
