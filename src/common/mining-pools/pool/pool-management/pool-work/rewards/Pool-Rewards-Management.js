@@ -50,6 +50,9 @@ class PoolRewardsManagement{
 
         if (this.poolData.blocksInfo.length === 0) return;
 
+        if (this.blockchain.blocks.length === 0) return;
+        if (!Blockchain.synchronized) return;
+
         //already checked, or maybe it is a fork
         if (this._lastTimeCheckHeight > this.blockchain.blocks.length-1)
             return;
