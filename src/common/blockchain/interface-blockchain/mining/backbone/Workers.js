@@ -43,8 +43,13 @@ class Workers {
         } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
-            this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK || 500;
+            this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
+
+
+            if (this.worker_batch === 0){
+                this.worker_batch = 10 * this.worker_batch_thread*this.workers_max;
+            }
 
             this.ibb._intervalPerMinute = true;
         }
