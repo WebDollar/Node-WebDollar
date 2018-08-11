@@ -5,6 +5,8 @@ let AGENT_STATUS = {
 
     AGENT_STATUS_SYNCHRONIZED_SLAVES : 3, //synchronized based on others (not fallback nodes)
 
+    AGENT_STATUS_SYNCHRONIZED_POOL: 4,
+
 };
 
 export default AGENT_STATUS;

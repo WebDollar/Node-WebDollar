@@ -77,19 +77,22 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._initializeProtocol();
 
+        NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-        if (!this.light )
-            NodesList.emitter.on("nodes-list/connected", async (result) => {
+            if ( this._determineSynchronizedSlaves() ){
 
-                if (!NodeExpress.SSL && !NodeExpress.amIFallback() && !Blockchain.isPoolActivated && !Blockchain.MinerPoolManagement.minerPoolStarted )
-                    if ( NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
+                this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+                NodesList.disconnectFromFallbacks();
 
-                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
-                        NodesList.disconnectFromFallbacks();
+            }
 
-                    }
+        });
 
-            });
+    }
+
+    _determineSynchronizedSlaves(){
+
+        return !this.light && !NodeExpress.SSL && !NodeExpress.amIFallback() && NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK;
 
     }
 
@@ -204,7 +207,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._status = newValue;
 
-        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0){
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL].indexOf(newValue) >= 0){
 
             clearTimeout(this._startAgentTimeOut);
             this._startAgentTimeOut = undefined;
@@ -214,7 +217,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         }
 
-        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0)
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL].indexOf(newValue) >= 0)
 
             this._eventEmitter.emit('agent/synchronized', {
                 result: true,
