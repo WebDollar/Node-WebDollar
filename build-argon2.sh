@@ -121,7 +121,7 @@ if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 			git clone https://github.com/WebDollar/argon2.git
 			if cd argon2; then echo "$showexecute Changing dir to ${yellow}$(pwd)$stand"; else echo "$showerror Couldn't cd to argon2 folder!"; fi
 
-			if [[ $(pwd | cut -d '/' -f5) == argon2 ]]; then
+			if [[ $(pwd | cut -d '/' -f5) || $(pwd | cut -d '/' -f4) || $(pwd | cut -d '/' -f3) == argon2 ]]; then
 			        echo "$showinfo Current dir is $(pwd)"
 			        echo "$showexecute ${green}autoreconf -i$stand" && autoreconf -i
 				echo "$showexecute ${green}./configure$stand" && ./configure
