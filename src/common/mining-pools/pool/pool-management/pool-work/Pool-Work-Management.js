@@ -67,17 +67,17 @@ class PoolWorkManagement{
 
         };
 
+        this.poolWork.lastBlockNonce += hashes;
+
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
         minerInstance.dateActivity = new Date().getTime()/1000;
-
-        this.poolWork.lastBlockNonce += hashes;
 
         blockInformationMinerInstance.workBlock = this.poolWork.lastBlock;
 
         if (this.poolManagement.poolSettings.poolUseSignatures) {
 
-            let message = Buffer.concat([this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end)]);
+            let message = Buffer.concat( [ this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end) ]);
             answer.sig = this.poolManagement.poolSettings.poolDigitalSign(message);
 
         }

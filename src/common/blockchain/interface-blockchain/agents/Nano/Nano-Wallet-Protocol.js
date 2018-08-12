@@ -60,12 +60,13 @@ class NanoWalletProtocol{
 
     }
 
-    virtualizeAddress(address){
+    _subscribeAddress(socket, address){
 
-        for (let i=0; i<this._sockets.length; i++) {
+        return new Promise((resolve)=>{
 
-            this._sockets[i].node.sendRequest("api/subscribe/address/balances", { address: address  });
-            this._sockets[i].node.on("api/subscribe/address/balances/answer/"+address, (data)=>{
+            socket.node.sendRequest("api/subscribe/address/balances", { address: address  });
+
+            socket.node.on("api/subscribe/address/balances/answer/"+address, (data)=>{
 
                 if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
@@ -93,35 +94,54 @@ class NanoWalletProtocol{
 
                 }
 
+                resolve( true );
+
             });
 
-            this._sockets[i].node.sendRequest("api/subscribe/address/transactions", { address: address  });
-            this._sockets[i].node.on("api/subscribe/address/transactions/answer/"+address, (data)=>{
 
-                if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
-                if (data === null || !data.result) return false;
+        });
 
-                for (let k in data.transactions){
+    }
 
-                    let transaction = data.transactions[k];
+    _subscribeTransactions(socket, address){
 
-                    let tx = null;
-                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction(transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false);
+        socket.node.sendRequest("api/subscribe/address/transactions", { address: address  });
+        socket.node.on("api/subscribe/address/transactions/answer/"+address, (data)=>{
 
-                    let foundTx = Blockchain.Transactions.pendingQueue.searchPendingTransactionByTxId(transaction.txId);
+            if (Blockchain.Agent.consensus) return; //make sure the virtualization was not canceled
 
-                    if ( foundTx === null) {
-                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
-                        foundTx = transaction;
-                    }
+            if (data === null || !data.result) return false;
 
-                    foundTx .confirmed = transaction.confirmed;
+            for (let k in data.transactions){
 
+                let transaction = data.transactions[k];
+
+                let tx = null;
+                if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
+
+                let foundTx = Blockchain.Transactions.pendingQueue.searchPendingTransactionByTxId( transaction.txId );
+
+                if ( foundTx === null) {
+                    Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
+                    foundTx = transaction;
                 }
 
+                foundTx .confirmed = transaction.confirmed;
 
-            });
+            }
+
+
+        });
+
+    }
+
+    virtualizeAddress(address){
+
+        for (let i=0; i<this._sockets.length; i++) {
+
+            this._subscribeAddress(this._sockets[i], address);
+            this._subscribeTransactions(this._sockets[i], address);
 
         }
     }
