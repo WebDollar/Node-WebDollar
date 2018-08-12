@@ -138,8 +138,6 @@ class MinerPoolSettings {
         else if (poolMinerActivated === "false") poolMinerActivated = false;
         else if (poolMinerActivated === null) poolMinerActivated = false;
 
-        poolMinerActivated = false;
-
         PoolsUtils.validatePoolActivated(poolMinerActivated);
 
 

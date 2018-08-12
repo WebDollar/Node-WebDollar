@@ -79,6 +79,8 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         NodesList.emitter.on("nodes-list/connected", async (result) => {
 
+            //AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES will desync from fallback nodes
+
             // if ( this._determineSynchronizedSlaves() ){
             //
             //     this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;

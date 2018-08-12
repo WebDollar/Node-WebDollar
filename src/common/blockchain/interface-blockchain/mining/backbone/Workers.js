@@ -22,6 +22,7 @@ class Workers {
      * @return {Workers}
      */
     constructor(ibb) {
+
         this.ibb = ibb;
 
         this._abs_end = 0xFFFFFFFF;
@@ -47,9 +48,8 @@ class Workers {
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
 
 
-            if (this.worker_batch === 0){
+            if (this.worker_batch === 0)
                 this.worker_batch = 10 * this.worker_batch_thread*this.workers_max;
-            }
 
             this.ibb._intervalPerMinute = true;
         }
@@ -98,7 +98,7 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
             for (let i=0; i< this.workers_list.length; i++)
-                if ( (date  - this.workers_list[i].date ) > 50000 ) {
+                if ( (date  - this.workers_list[i].date ) > 30000 ) {
                     this.workers_list[i]._is_batching = false;
                     this.workers_list[i].date = new Date().getTime();
                     Log.info("Restarting Worker", Log.LOG_TYPE.default);

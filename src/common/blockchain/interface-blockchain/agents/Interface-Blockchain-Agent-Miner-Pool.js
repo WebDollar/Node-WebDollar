@@ -7,7 +7,9 @@ if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
 }
 
-
+/**
+ * This is the Agent used to control the status when you are mining in a Pool
+ */
 
 class InterfaceBlockchainAgentMinerPool  extends InterfaceBlockchainAgent {
 

@@ -1,3 +1,7 @@
+/**
+ * CPP miner - compiled in C
+ */
+
 import ProcessWorker from "./Process-Worker"
 
 class ProcessWorkerCPP extends ProcessWorker{
