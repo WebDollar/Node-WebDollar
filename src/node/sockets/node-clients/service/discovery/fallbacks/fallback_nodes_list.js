@@ -64,18 +64,6 @@ export default {
 
         //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
 
-        {"addr": ["https://int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5006"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5007"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5008"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5009"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5010"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5011"]}, // Thanks to @int_webd
-        {"addr": ["https://int-webd.com:5012"]}, // Thanks to @int_webd
         {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
         {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
         {"addr": ["https://node3.int-webd.com:5003"]}, // Thanks to @int_webd
