@@ -81,7 +81,9 @@ fi
 
 deps # call deps function
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
+if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f5) == Node-WebDollar || $(pwd | cut -d '/' -f5) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
 
 	if [[ $(ls -d argon2) == argon2 ]]; then
 
@@ -149,7 +151,9 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 	fi
 
 ### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
+if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f5) == Node-WebDollar || $(pwd | cut -d '/' -f5) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
 
 	if [[ ! -d $get_const_global ]]; then
 		echo "$showinfo ${yellow}const_global.js$stand found!"
@@ -157,7 +161,12 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 			read -r -e -p "$showinput Do you want to use the ${yellow}CPU-CPP$stand optimization? (y or n): " yn_cpucpp
 
 			if [[ $yn_cpucpp == [nN] ]]; then
-                	        echo -e "$showinfo OK..."
+
+				if [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+					echo "$showinfo ${yellow}cpu$stand is already set."
+				else
+					echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "cpu"/g' src/consts/const_global.js && echo "$showinfo Result: $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1)"
+				fi
 
 	                elif [[ $yn_cpucpp == [yY] ]]; then
 
