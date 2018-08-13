@@ -337,7 +337,7 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
 
-                    Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
                     revertActions.revertOperations('', "all");
                     this._blocksCopy = []; //We didn't use them so far
