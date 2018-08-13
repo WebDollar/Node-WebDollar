@@ -416,11 +416,15 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
 
-                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    Log.error("saveFork includeBlockchainBlock1 raised exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    this.printException( exception );
-                    Log.error("index: "+ index + "forkStartingHeight"+this.forkStartingHeight + "fork", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+                    try {
+                        Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        Log.error("saveFork includeBlockchainBlock1 raised exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        this.printException(exception);
+                        Log.error("index: " + index + "forkStartingHeight" + this.forkStartingHeight + "fork", Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                    } catch (exception){
+
+                    }
 
                     forkedSuccessfully = false;
 

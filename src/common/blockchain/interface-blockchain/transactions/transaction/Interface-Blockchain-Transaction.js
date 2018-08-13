@@ -361,7 +361,7 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    _preProcessTransaction(multiplicationFactor = 1 , revertActions, showUpdate){
         return true;
     }
 
@@ -370,7 +370,7 @@ class InterfaceBlockchainTransaction{
         if ( multiplicationFactor === 1 ) { // adding transaction
 
             //nonce
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
@@ -385,7 +385,7 @@ class InterfaceBlockchainTransaction{
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
 
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
 
         }else
