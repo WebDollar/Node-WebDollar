@@ -4,7 +4,7 @@ Tutorial to install and configure your own WebDollar Pool
 ### 1. Install ubuntu 18.04 | Have a DOMAIN or SUBDOMAIN that points to the PUBLIC_IP or your VPS
 ### 2. AUTOMATIC INSTALL
 ```shell
-to be updated
+bash install-pool.sh
 ```
 ### 2. MANUAL INSTALL: Update and install required Linux packages
 ```shell
