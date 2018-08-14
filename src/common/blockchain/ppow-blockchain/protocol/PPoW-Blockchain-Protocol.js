@@ -1,5 +1,7 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
+import consts from "consts/const_global";
+import BufferExtended from "../../../utils/BufferExtended";
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -17,9 +19,16 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
     }
 
-    _initializeNodeNiPoPoW(socket){
+    _initializeNodeNiPoPoW(socket) {
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash",  ()=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", () => {
+
+            let proofPi = this.blockchain.agent.light ? this.blockchain.proofPi : this.blockchain.prover.proofPi;
+            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported" + "/answer", { result: ( consts.BLOCKCHAIN.LIGHT.GZIPPED && proofPi !== undefined ) ? ( proofPi.proofGzip !== undefined ? true : false ) : false });
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash", () => {
 
             try {
 
@@ -38,13 +47,68 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi/hash" + "/answer", answer);
 
-            } catch (exception){
+            } catch (exception) {
 
             }
 
         });
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", (data)=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip", async (data)=>{
+
+            try {
+
+                let serialization;
+                let proofPi;
+
+                if (this.blockchain.agent.light) proofPi = this.blockchain.proofPi;
+                else proofPi = this.blockchain.prover.proofPi; // full node
+
+
+                if (proofPi.proofGzip !== undefined) serialization = proofPi.proofGzip;
+                else serialization = proofPi.proofSerialized;
+
+                let moreChunks = false;
+
+                if (typeof data === "object" && data !== null) {
+
+                    if (typeof data.starting === "number" && typeof data.length === "number") {
+
+                        if (data.length < consts.SETTINGS.PARAMS.MAX_SIZE.MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES) throw {message: "way to few messages"};
+
+                        if ((serialization.length - data.starting) > data.length)
+                            moreChunks = true;
+                        else
+                            moreChunks = false;
+
+                        if (serialization.length - 1 - data.starting > 0)
+                            serialization = BufferExtended.substr(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
+                        else
+                            serialization = new Buffer(0);
+
+                        return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer", {
+                            result: true,
+                            data: serialization,
+                            moreChunks: moreChunks,
+                        });
+
+                    }
+
+                }
+
+            } catch (exception) {
+
+                console.error("Socket Error - get/nipopow-blockchain/headers/get-proofs/pi-gzip", exception, data);
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer",{
+                    result: false,
+                    message: exception
+                });
+
+            }
+
+        });
+
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async (data)=>{
 
             try {
 
@@ -56,10 +120,16 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 let proof;
 
-                if (this.blockchain.agent.light)
+                if (this.blockchain.agent.light) {
+
                     proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length);
-                else  // full node
+
+                }
+                else { // full node
+
                     proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
+
+                }
 
                 socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", proof);
 

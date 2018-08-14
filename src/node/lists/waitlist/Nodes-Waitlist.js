@@ -9,6 +9,8 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
 import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
+import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
+
 const EventEmitter = require('events');
 
 class NodesWaitlist {
@@ -61,7 +63,7 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER )
+        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER && nodeType !== NODE_TYPE.NODE_WEB_PEER)
             return {result:false, waitlist: null};
 
 
@@ -138,6 +140,7 @@ class NodesWaitlist {
         if (sckAddresses.length > 0){
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, nodeType, nodeConsensusType, level, backedBy , connected, socket );
+            GeoLocationLists._includeAddress(sckAddresses[0]);
 
             let list;
 
@@ -202,13 +205,13 @@ class NodesWaitlist {
     async _deleteObsoleteFullNodesWaitlist(){
 
         for (let i=this.waitListFullNodes.length-1; i>=0; i--)
-            if (!this.waitListFullNodes.isFallback) {
+            if (!this.waitListFullNodes[i].isFallback) {
 
                 try {
 
                     if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
 
-                    let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 5000);
+                    let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 10000);
 
                     if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
                         this.waitListFullNodes[i].failsChecking = 0;

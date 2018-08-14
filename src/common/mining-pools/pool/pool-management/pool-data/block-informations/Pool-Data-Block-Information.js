@@ -278,7 +278,8 @@ class PoolDataBlockInformation {
         if (this.poolManagement.poolStatistics.poolHashes <= 0) return 40;
         if (Blockchain.blockchain.blocks.networkHashRate <= 0) return 40;
 
-        this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Math.floor( Blockchain.blockchain.blocks.networkHashRate)  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
+        // reducing the timeRemaining with 2x
+        this.timeRemaining = Math.max(0, Math.floor(  new BigNumber (  Math.floor( Blockchain.blockchain.blocks.networkHashRate)  ).dividedBy( this.poolManagement.poolStatistics.poolHashes ).dividedBy(2).multipliedBy( consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ).toNumber()  ) )
 
     }
 

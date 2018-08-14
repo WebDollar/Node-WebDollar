@@ -167,7 +167,8 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             StatusEvents.emit( "agent/status", {message: "Downloading Accountant Tree", blockHeight: fork.forkStartingHeight } );
             let answer = await this.protocol.getAccountantTree(socket, fork.forkStartingHeight);
 
-            fork.forkPrevAccountantTree = answer;
+            fork.forkPrevAccountantTree = answer.buffer;
+            fork.forkPrevAccountantTreeGzipped = answer.gzipped;
 
             //Downloading Proof Xi and light settings
             answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: fork.forkStartingHeight  }, fork.forkStartingHeight,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
@@ -184,11 +185,6 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
             fork.forkPrevHashPrev = answer.hashPrev;
-
-            if (answer.chainWork !== undefined)
-                fork.forkPrevChainWork = Serialization.deserializeBigInteger(answer.chainWork);
-            else
-                fork.forkPrevChainWork = new BigInteger(0);
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
@@ -219,7 +215,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                     if (blockRequested === fork.forkDifficultyCalculation.difficultyAdditionalBlocks[0])
                         block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;
 
-                    if (!result )
+                    if ( !result )
                         throw {message: "The block was not includedForkBlock successfully", block:blockRequested}
 
                 } catch (exception){

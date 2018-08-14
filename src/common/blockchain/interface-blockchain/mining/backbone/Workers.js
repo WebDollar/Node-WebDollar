@@ -3,6 +3,7 @@
 import Serialization from "common/utils/Serialization";
 import Argon2 from 'common/crypto/Argon2/Argon2'
 import Log from 'common/utils/logging/Log';
+import Blockchain from "main-blockchain/Blockchain"
 
 const FS = require('fs');
 const OS = require('os');
@@ -10,20 +11,25 @@ const { fork } = require('child_process');
 //const fkill = require('fkill');
 
 import consts from 'consts/const_global'
-import ProcessWorkerCPP from "./Process-Worker-CPP";
+
+import ProcessWorkerCPP from "./workers/Process-Worker-CPP";
+import ProcessWorkerGPU from "./workers/Process-Worker-GPU";
 
 class Workers {
     /**
-     * @param {InterfaceBlockchainBackboneMining} ibb
+     * @param {BlockchainBackboneMining} ibb
      *
      * @return {Workers}
      */
     constructor(ibb) {
+
         this.ibb = ibb;
 
         this._abs_end = 0xFFFFFFFF;
 
         this._from_pool = undefined;
+
+        this.workers_list = [];
 
         // workers setup
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
@@ -32,21 +38,28 @@ class Workers {
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = this.worker_batch;
-            this.ibb._avoidShowingZeroHashesPerSecond = false;
+
+            this.ibb._intervalPerMinute = false;
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
-            this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK || 500;
+            this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
-            this.ibb._avoidShowingZeroHashesPerSecond = true;
+
+
+            if (this.worker_batch === 0)
+                this.worker_batch = 10 * this.worker_batch_thread*this.workers_max;
+
+            this.ibb._intervalPerMinute = true;
         }
         else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_GPU;
-            this.workers_max = consts.TERMINAL_WORKERS.GPU_INSTANCES||1;
+            this.workers_max = (consts.TERMINAL_WORKERS.GPU_MAX * consts.TERMINAL_WORKERS.GPU_INSTANCES)||1;
             this.worker_batch = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK_BATCH;
-            this.ibb._avoidShowingZeroHashesPerSecond = true;
+
+            this.ibb._intervalPerMinute = true;
         } else {
 
             Log.error('NO WORKER SPECIFIED. Specify "cpu", "cpu-cpp", "gpu" ', Log.LOG_TYPE.default);
@@ -60,8 +73,6 @@ class Workers {
             return false;
         }
 
-
-        this.workers_list = [];
         this._working = 0;
         this._silent = consts.TERMINAL_WORKERS.SILENT;
 
@@ -87,9 +98,10 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
             for (let i=0; i< this.workers_list.length; i++)
-                if ( (date  - this.workers_list[i].date ) > 80000 ){
+                if ( (date  - this.workers_list[i].date ) > 30000 ) {
                     this.workers_list[i]._is_batching = false;
                     this.workers_list[i].date = new Date().getTime();
+                    Log.info("Restarting Worker", Log.LOG_TYPE.default);
                 }
 
         if ( this._current >= this._current_max )
@@ -98,14 +110,18 @@ class Workers {
     }
 
     haveSupport() {
+
         // disabled by miner
-        if (consts.TERMINAL_WORKERS.CPU_MAX === -1)
-            return false;
+        if (consts.TERMINAL_WORKERS.TYPE === "cpu" ) {
 
-        // it needs at least 2
-        if (this.workers_max <= 1)
-            return false;
+            if (consts.TERMINAL_WORKERS.CPU_MAX === -1)
+                return false;
 
+            // it needs at least 2
+            if (this.workers_max <= 1)
+                return false;
+
+        }
         return true;
     }
 
@@ -113,8 +129,10 @@ class Workers {
 
         try {
 
+            console.log("Stop Mining!");
+
             for (let i = 0; i < this.workers_list.length; i++){
-                if (this.workers_list[i] && typeof this.workers_list[i].kill === "function")
+                if (this.workers_list[i] !== undefined && typeof this.workers_list[i].kill === "function")
                     this.workers_list[i].kill('SIGINT');
             }
 
@@ -129,6 +147,7 @@ class Workers {
     }
 
     async run(start, end, loop_delay = 2) {
+
         this._current = start || 0;
         this._current_max = (end) ? end : this._abs_end;
 
@@ -153,7 +172,7 @@ class Workers {
 
         }
 
-        // resets
+        // resets8
         this._finished = false;
         this._final_batch = false;
 
@@ -176,9 +195,9 @@ class Workers {
         if ( consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" )
             count = 1;
 
+
         for (let index = this.workers_list.length ; index < count; index++)
             await this._initializeWorker(index);
-
 
         return this;
     }
@@ -195,26 +214,35 @@ class Workers {
         // { execArgv: [`--max_old_space_size=${Math.floor(os.totalmem()/1024/1024)}`] }
 
         let worker;
+        let started = false;
+
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
             worker = fork(
                 this._worker_path, {}, {silent: this._silent}
             );
             Log.info("CPU worker created", Log.LOG_TYPE.defaultLogger );
+            started = worker.connected;
         } else
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
 
             worker = new ProcessWorkerCPP( index,  this.worker_batch, this.workers_max );
-            worker.start(this._worker_path);
+            started = await worker.start(this._worker_path);
 
             Log.info("CPU CPP worker created", Log.LOG_TYPE.defaultLogger );
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
 
-            worker = new GPUWorker( index );
-            worker.start(this._worker_path);
+            worker = new ProcessWorkerGPU( index,  this.worker_batch );
+            started = await worker.start(this._worker_path);
 
             Log.info("GPU worker created", Log.LOG_TYPE.defaultLogger );
 
+        }
+
+        if ( !started ) {
+            worker.date = new Date().getTime();
+            this.workers_list[index] = worker;
+            return worker;
         }
 
         worker._is_batching = false;
@@ -239,19 +267,23 @@ class Workers {
                 this._finished = true;
 
                 if (msg.h !== undefined)
-                    this.ibb._hashesPerSecond += parseInt( msg.h );
+                    this.ibb._hashesPerSecond += parseInt(msg.h);
 
                 let hash;
 
-                if (msg.hash.length === 64)
-                    hash = Buffer.from(msg.hash, "hex");
-                else
-                    hash = new Buffer(msg.hash);
+                if (msg.hash.length === 64) hash = Buffer.from(msg.hash, "hex");
+                else hash = new Buffer(msg.hash);
+
+                if ( consts.DEBUG && !Blockchain.MinerPoolManagement.minerPoolStarted)
+                    if (false === await this._validateHash(hash, msg.nonce))
+                        return false;
+
+                worker._is_batching = false;
 
                 this.ibb._workerResolve({
                     result: true,
                     nonce: parseInt(msg.nonce),
-                    hash: new Buffer(hash),
+                    hash: hash,
                 });
 
                 // console.log("sol",new Buffer(msg.hash).toString("hex"));
@@ -262,17 +294,14 @@ class Workers {
             // batching: finished a batch of nonces
             if (msg.type === 'b') {
 
-                worker._is_batching = false;
-
                 if (msg.h !== undefined)
-                    this.ibb._hashesPerSecond += parseInt( msg.h );
+                    this.ibb._hashesPerSecond += parseInt(msg.h);
+
 
                 let bestHash;
 
-                if (msg.bestHash.length === 64)
-                    bestHash = Buffer.from(msg.bestHash, "hex");
-                else
-                    bestHash = new Buffer(msg.bestHash);
+                if (msg.bestHash.length === 64) bestHash = Buffer.from(msg.bestHash, "hex");
+                else bestHash = new Buffer(msg.bestHash);
 
                 let change = false;
                 for (let i = 0, l = this.ibb.bestHash.length; i < l; i++)
@@ -296,28 +325,37 @@ class Workers {
                 if (!this._working && this._current >= this._current_max)
                     this._stopAndResolve();
 
-                if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
-                    //validate hash
-                    let nonceBuffer = new Buffer([msg.bestNonce >> 24 & 0xff, msg.bestNonce >> 16 & 0xff, msg.bestNonce >> 8 & 0xff, msg.bestNonce & 0xff]);
-                    let block = Buffer.concat([this.block, nonceBuffer]);
+                worker._is_batching = false;
 
-                    let hash = await Argon2.hash(block);
-                    if (false === hash.equals(bestHash))
-                        console.error("HASH MAY BE TO OLD!!!");
-                    else
-                        console.info("HASH is OK!!!");
-                }
-
+                if (consts.DEBUG)
+                    await this._validateHash(bestHash, parseInt(msg.bestNonce));
 
                 return false;
             }
         });
 
         worker.date = new Date().getTime();
-
         this.workers_list[index] = worker;
+        return worker;
+    }
 
-        return this;
+    async _validateHash(initialHash, nonce){
+
+        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
+            //validate hash
+            let nonceBuffer = new Buffer([nonce >> 24 & 0xff, nonce >> 16 & 0xff, nonce >> 8 & 0xff, nonce & 0xff]);
+            let block = Buffer.concat([this.block, nonceBuffer]);
+
+            let hash = await Argon2.hash(block);
+            if (false === hash.equals(initialHash)) {
+                Log.error("HASH may be too old", Log.LOG_TYPE.default );
+                return false;
+            } else {
+                Log.warn("HASH is OK!", Log.LOG_TYPE.default );
+            }
+        }
+
+        return true;
     }
 
     _stopAndResolve() {
@@ -349,7 +387,7 @@ class Workers {
             return false;
         }
 
-        this.workers_list.forEach( async (worker, index) => {
+        await this.workers_list.forEach( async (worker, index) => {
 
             if (this._finished)
                 return false;
@@ -360,7 +398,7 @@ class Workers {
             if (this._final_batch)
                 return false;
 
-            worker._is_batching = true;
+
 
             // add only the rest
             if (this._current_max - this._current < this.worker_batch)
@@ -370,6 +408,11 @@ class Workers {
             this._working++;
 
             let batch  = this._final_batch ? this._final_batch : this.worker_batch;
+
+
+            worker.date = new Date().getTime();
+            this._current += this.worker_batch;
+            worker._is_batching = true;
 
             if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
                 worker.send({
@@ -382,13 +425,11 @@ class Workers {
                     }
                 });
             } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
-                if ( false === await worker.send( this.block.length, this.block, this.difficulty, this._current, this._current+batch, this.worker_batch_thread ))
+
+                if ( false === await worker.send ( this.block.length, this.block, this.difficulty, this._current, this._current + batch, this.worker_batch_thread ))
                 return false;
+
             }
-
-            worker.date = new Date().getTime();
-
-            this._current += this.worker_batch;
 
         });
 

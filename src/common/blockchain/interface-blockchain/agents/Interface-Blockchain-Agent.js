@@ -77,19 +77,24 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._initializeProtocol();
 
+        NodesList.emitter.on("nodes-list/connected", async (result) => {
 
-        if (!this.light )
-            NodesList.emitter.on("nodes-list/connected", async (result) => {
+            //AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES will desync from fallback nodes
 
-                if (!NodeExpress.SSL && !NodeExpress.amIFallback() && !Blockchain.isPoolActivated && !Blockchain.MinerPoolManagement.minerPoolStarted )
-                    if ( NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK){
+            // if ( this._determineSynchronizedSlaves() ){
+            //
+            //     this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
+            //     NodesList.disconnectFromFallbacks();
+            //
+            // }
 
-                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES;
-                        NodesList.disconnectFromFallbacks();
+        });
 
-                    }
+    }
 
-            });
+    _determineSynchronizedSlaves(){
+
+        return !this.light && !NodeExpress.SSL && !NodeExpress.amIFallback() && NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.TERMINAL_CONNECTIONS_REQUIRED_TO_DISCONNECT_FROM_FALLBACK;
 
     }
 
@@ -109,50 +114,54 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
         if ( NodesList.countNodesByConnectionType(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET) <= 0   ) return false;
 
 
-        if (process.env.BROWSER)
-            this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+        if (this.light) {
+            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.blocks.length > 0 && this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1] !== undefined && this.blockchain.blocks.length >= this.blockchain.proofPi.blocks[this.blockchain.proofPi.blocks.length-1].height + consts.POPOW_PARAMS.k )
+                this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+        }
         else { //terminal
 
             //let's check if we downloaded blocks in the last 2 minutes
 
             let set = true;
 
-            if (this.lastTimeChecked !== undefined ){
+            // if (this.lastTimeChecked !== undefined ){
+            //
+            //     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+            //     let shouldItStart = false;
+            //     if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
+            //         NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
+            //         shouldItStart = true;
+            //     }
+            //
+            //     let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
+            //
+            //     if (Math.random() < 0.1){
+            //
+            //         Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+            //         Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
+            //         Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+            //
+            //     }
+            //
+            //     if ( difference <= 0) {
+            //
+            //         if (shouldItStart)
+            //             this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+            //
+            //     } else set = false;
+            //
+            // }
+            //
+            //
+            // if (set)
+            //     this.lastTimeChecked ={
+            //
+            //         date: new Date().getTime(),
+            //         blocks: this.blockchain.blocks.length,
+            //
+            //     }
 
-                let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
-                let shouldItStart = false;
-                if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
-                    NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
-                    shouldItStart = true;
-                }
-
-                let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
-
-                if (Math.random() < 0.1){
-
-                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
-                    Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
-                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
-
-                }
-
-                if ( difference <= 0) {
-
-                    if (shouldItStart)
-                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
-
-                } else set = false;
-
-            }
-
-
-            if (set)
-                this.lastTimeChecked ={
-
-                    date: new Date().getTime(),
-                    blocks: this.blockchain.blocks.length,
-
-                }
+            this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         }
 
@@ -202,7 +211,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         this._status = newValue;
 
-        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0){
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL].indexOf(newValue) >= 0){
 
             clearTimeout(this._startAgentTimeOut);
             this._startAgentTimeOut = undefined;
@@ -212,7 +221,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
         }
 
-        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES].indexOf(newValue) >= 0)
+        if ( [AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES, AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL].indexOf(newValue) >= 0)
 
             this._eventEmitter.emit('agent/synchronized', {
                 result: true,

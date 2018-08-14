@@ -36,15 +36,15 @@ showport="$yellow[PORT]$stand"
 
 ### GENERAL_VARS
 get_const_global="src/consts/const_global.js"
-get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then apt-cache policy libtool | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list libtool | grep -o Installed; fi)
-get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list autoconf | grep -o Installed; fi)
-get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy cmake | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then apt-cache policy cmake | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list cmake | grep -o Installed; fi)
-get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}'; elif cat /etc/*release | grep -q -o -m 1 centos; then yum list psmisc | grep -o Installed; fi)
+get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list libtool | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list autoconf | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy cmake | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy cmake | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 ###
 
 #### Dependencies START
 function deps() {
-if [[ "$get_libtool" == "(none)" ]]; then
+if [[ "$get_libtool" == none ]]; then
 	echo "$showinfo We need to install ${blue}libtool$stand"
 	if cat /etc/*release | grep -q -o -m1 Ubuntu; then sudo apt install -y libtool; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y libtool; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y libtool; fi
 else
@@ -52,7 +52,7 @@ else
 		echo "$showok ${blue}libtool$stand is already installed!"
 	fi
 fi
-if [[ "$get_autoconf" == "(none)" ]]; then
+if [[ "$get_autoconf" == none ]]; then
         echo "$showinfo We need to install ${blue}autoconf$stand"
         if cat /etc/*release | grep -q -o -m1 Ubuntu; then sudo apt install -y autoconf; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y autoconf; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y autoconf; fi
 else
@@ -60,7 +60,7 @@ else
                 echo "$showok ${blue}autoconf$stand is already installed!"
         fi
 fi
-if [[ "$get_cmake" == "(none)" ]]; then
+if [[ "$get_cmake" == none ]]; then
         echo "$showinfo We need to install ${blue}cmake$stand"
         if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y cmake; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y cmake; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y cmake; fi
 else
@@ -68,7 +68,7 @@ else
                 echo "$showok ${blue}cmake$stand is already installed!"
         fi
 fi
-if [[ "$get_psmisc" == "(none)" ]]; then
+if [[ "$get_psmisc" == none ]]; then
         echo "$showinfo We need to install ${blue}psmisc$stand"
         if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y psmisc; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y psmisc; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y psmisc; fi
 else
@@ -81,7 +81,9 @@ fi
 
 deps # call deps function
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
+if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f5) == Node-WebDollar || $(pwd | cut -d '/' -f5) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
 
 	if [[ $(ls -d argon2) == argon2 ]]; then
 
@@ -119,7 +121,7 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 			git clone https://github.com/WebDollar/argon2.git
 			if cd argon2; then echo "$showexecute Changing dir to ${yellow}$(pwd)$stand"; else echo "$showerror Couldn't cd to argon2 folder!"; fi
 
-			if [[ $(pwd | cut -d '/' -f5) == argon2 ]]; then
+			if [[ $(pwd | cut -d '/' -f5) || $(pwd | cut -d '/' -f4) || $(pwd | cut -d '/' -f3) == argon2 ]]; then
 			        echo "$showinfo Current dir is $(pwd)"
 			        echo "$showexecute ${green}autoreconf -i$stand" && autoreconf -i
 				echo "$showexecute ${green}./configure$stand" && ./configure
@@ -149,7 +151,9 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 	fi
 
 ### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
+if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f5) == Node-WebDollar || $(pwd | cut -d '/' -f5) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || \
+      $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
 
 	if [[ ! -d $get_const_global ]]; then
 		echo "$showinfo ${yellow}const_global.js$stand found!"
@@ -157,7 +161,12 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 			read -r -e -p "$showinput Do you want to use the ${yellow}CPU-CPP$stand optimization? (y or n): " yn_cpucpp
 
 			if [[ $yn_cpucpp == [nN] ]]; then
-                	        echo -e "$showinfo OK..."
+
+				if [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+					echo "$showinfo ${yellow}cpu$stand is already set."
+				else
+					echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "cpu"/g' src/consts/const_global.js && echo "$showinfo Result: $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1)"
+				fi
 
 	                elif [[ $yn_cpucpp == [yY] ]]; then
 

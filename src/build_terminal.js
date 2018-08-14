@@ -6,7 +6,7 @@ import termination from "./termination";
 
 //                            light-node
 
-Blockchain.createBlockchain("full-node", async ()=>{
+Blockchain.createBlockchain("full-node", ()=>{}, async ()=>{
 
     await Node.NodeExpress.startExpress();
 

@@ -202,6 +202,37 @@ class Serialization{
 
     }
 
+    serializeHashOptimized(hash){
+
+        return this.serializeBufferRemovingLeadingZeros(hash);
+
+    }
+
+    deserializeHashOptimized(buffer,offset){
+
+        let hashPrefix = [];
+
+        let hashLength = this.deserializeNumber1Bytes(buffer, offset);
+        offset += 1;
+
+        for (let i = 0; i < 32 - hashLength; i++) hashPrefix.push(0);
+
+        let hashLeadingZero = BufferExtended.substr(buffer, offset, hashLength);
+        offset += hashLength;
+
+        let deserializedHash = Buffer.concat([
+            new Buffer(hashPrefix),
+            hashLeadingZero
+        ]);
+
+        let result = {
+            hash: deserializedHash,
+            offset: offset
+        };
+
+        return result;
+    }
+
     serializeBufferRemovingLeadingZeros(buffer){
 
         let count = 0;
@@ -217,7 +248,8 @@ class Serialization{
         return result;
 
     }
-    
+
+
     /**
      * Returns the position of most significant bit of 1
      * Eg: for n = 00000000000000000000000000001010 returns 3

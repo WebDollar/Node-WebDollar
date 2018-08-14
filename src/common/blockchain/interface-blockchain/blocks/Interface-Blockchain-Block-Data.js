@@ -46,7 +46,7 @@ class InterfaceBlockchainBlockData {
 
     }
 
-    validateBlockData(blockHeight, blockValidation){
+    async validateBlockData(blockHeight, blockValidation){
 
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )
             throw {message: 'data.minerAddress is empty'};
@@ -65,7 +65,7 @@ class InterfaceBlockchainBlockData {
 
         if (!blockValidation.blockValidationType["skip-block-data-transactions-validation"]) {
 
-            if (!this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType))
+            if (await this.transactions.validateTransactions(blockHeight, blockValidation.blockValidationType) === false)
                 throw {message: "transactions failed to validate"};
 
         }

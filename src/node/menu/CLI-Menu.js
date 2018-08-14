@@ -112,7 +112,7 @@ class CLI {
 
     async processRemainingPayment(){
 
-        await this._callCallbackBlockchainSync( undefined, undefined, async ()=>{
+        await this._callCallbackBlockchainSync( undefined, undefined, undefined, async ()=>{
             await Blockchain.PoolManagement.poolRemainingRewards.doPayout();
         }, true);
 
@@ -349,7 +349,7 @@ class CLI {
 
     async startMining(instantly){
 
-        await this._callCallbackBlockchainSync( async ()=>{
+        await this._callCallbackBlockchainSync( undefined, async ()=>{
 
             await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
 
@@ -370,7 +370,7 @@ class CLI {
 
         consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
 
-        await this._callCallbackBlockchainSync(async ()=>{
+        await this._callCallbackBlockchainSync(undefined, async ()=>{
 
             try {
 
@@ -480,13 +480,15 @@ class CLI {
 
                 }
 
-                await Blockchain.PoolManagement.startPool(true);
-
             } catch (exception){
 
                 Log.error("Error starting your pool", Log.LOG_TYPE.POOLS, exception);
 
             }
+
+        }, async ()=>{
+
+            await Blockchain.PoolManagement.startPool(true);
 
         }, undefined, undefined, true);
 
@@ -494,38 +496,44 @@ class CLI {
 
     async createServerForMiningPool(){
 
-        console.info('Create Server Pool');
-        console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
+        await this._callCallbackBlockchainSync( async ()=> {
 
-        let serverPoolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
+                console.info('Create Server Pool');
+                console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
-        if (isNaN(serverPoolFee) || serverPoolFee < 0 || 100 < serverPoolFee){
-            console.log("You have entered an invalid number:", serverPoolFee);
-            return false;
-        }
-        else
-            console.log("your fee is", serverPoolFee );
+                let serverPoolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
 
-        await this._callCallbackBlockchainSync(async ()=>{
+                if (isNaN(serverPoolFee) || serverPoolFee < 0 || 100 < serverPoolFee){
+                    console.log("You have entered an invalid number:", serverPoolFee);
+                    return false;
+                }
+                else
+                    console.log("your fee is", serverPoolFee );
 
-            await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
-            await Blockchain.ServerPoolManagement.startServerPool();
+                await Blockchain.ServerPoolManagement.serverPoolSettings.setServerPoolFee(serverPoolFee / 100);
 
-        }, undefined, undefined, true);
+            },
+            async ()=>{
+
+                await Blockchain.ServerPoolManagement.startServerPool();
+
+            }, undefined, undefined, true,
+
+        );
 
 
     }
 
-    async _callCallbackBlockchainSync(callbackBeforeServerInitialization, callbackAfterServerInitialization, afterSynchronizationCallback, synchronize=true ){
+    async _callCallbackBlockchainSync(callbackBeforeBlockchainLoaded, callbackBeforeServerInitialization, callbackAfterServerInitialization, afterSynchronizationCallback, synchronize=true ){
 
         if (!Blockchain._blockchainInitiated) {
 
-            await Blockchain.createBlockchain("full-node", async () => {
-
-                await Node.NodeServer.startServer();
+            await Blockchain.createBlockchain("full-node", callbackBeforeBlockchainLoaded, async () => {
 
                 if (typeof callbackBeforeServerInitialization === "function")
                     await callbackBeforeServerInitialization();
+
+                await Node.NodeServer.startServer();
 
                 await Node.NodeClientsService.startService();
 
@@ -535,6 +543,9 @@ class CLI {
             }, afterSynchronizationCallback, synchronize );
 
         } else {
+
+            if (typeof callbackBeforeBlockchainLoaded === "function")
+                await callbackBeforeBlockchainLoaded();
 
             if (typeof callbackBeforeServerInitialization === "function")
                 await callbackBeforeServerInitialization();

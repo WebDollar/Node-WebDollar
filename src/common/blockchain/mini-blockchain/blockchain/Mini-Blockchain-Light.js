@@ -3,6 +3,8 @@ import global from "consts/global"
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
+import MiniBlockchain from "./Mini-Blockchain";
+import GZip from "common/utils/GZip";
 
 /**
  * Light Nodes virtualize prevHash, prevTimestamp and prevDifficultyTarget
@@ -47,7 +49,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
@@ -57,9 +59,11 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
                     async () => {
 
-                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions);
+                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
 
-                    }) === false
+                    },
+
+                    showUpdate) === false
 
             ) throw {message: "Error Including Blockchain Light Block"};
 
@@ -84,7 +88,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         MiniBlockchainAdvanced.prototype._onBlockCreated.call(this, block, saveBlock);
 
-        if (! (await this._recalculateLightPrevs( block.height, block, undefined, saveBlock)))
+        if (! (await this._recalculateLightPrevs( block.height, block, this.getSerializedAccountantTree(block.height), this.getSerializedAccountantTree(block.height, true), saveBlock)))
             throw {message: "_recalculateLightPrevs failed"};
 
         /*console.log(" hash", block.hash.toString("hex"));
@@ -98,7 +102,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     /**
      * It must be last element
      */
-    async _recalculateLightPrevs(height, block, serialization, save = true){
+    async _recalculateLightPrevs(height, block, serialization, serializationGzip, save = true){
 
         if (block === undefined || block === null)
             block = BlockchainGenesis;
@@ -109,10 +113,12 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
+            serializationGzip = await GZip.zip(serialization);
             //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
         this.lightAccountantTreeSerializations[height+1] = serialization;
+        this.lightAccountantTreeSerializationsGzipped[height+1] = serializationGzip;
 
         this._deleteOldLightSettings();
 
@@ -197,6 +203,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         if (numBlocks > consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS) {
 
             this.lightAccountantTreeSerializations[diffIndex] = serializationAccountantTreeInitial;
+            this.lightAccountantTreeSerializationsGzipped[diffIndex] = await GZip.zip(serializationAccountantTreeInitial);
 
             this.lightPrevDifficultyTargets[diffIndex] = await this.db.get(this._blockchainFileName + "_LightSettings_prevDifficultyTarget");
             if (this.lightPrevDifficultyTargets[diffIndex] === null) {
@@ -365,6 +372,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         while (this.lightPrevDifficultyTargets.hasOwnProperty(index)){
 
             delete this.lightAccountantTreeSerializations[index];
+            delete this.lightAccountantTreeSerializationsGzipped[index];
             delete this.lightPrevDifficultyTargets[index];
             delete this.lightPrevHashPrevs[index];
             delete this.lightPrevTimeStamps[index];

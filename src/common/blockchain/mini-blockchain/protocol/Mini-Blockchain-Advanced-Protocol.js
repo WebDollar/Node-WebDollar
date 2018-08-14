@@ -1,16 +1,15 @@
 import MiniBlockchainProtocol from "./Mini-Blockchain-Protocol"
 import BufferExtended from "../../../utils/BufferExtended";
 import consts from "consts/const_global"
+import GZip from "common/utils/GZip"
 
 class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
-
 
     _initializeNewSocket(nodesListObject) {
 
         let socket = nodesListObject.socket;
 
         MiniBlockchainProtocol.prototype._initializeNewSocket.call(this, nodesListObject);
-
 
         /**
          * Get last K accountant Trees
@@ -30,7 +29,13 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                 if (data.height < -1)
                     throw {message: "height is not valid"};
 
-                let serialization = this.blockchain.getSerializedAccountantTree(data.height);
+                let gzipped = data.gzipped || false;
+
+                let serialization = this.blockchain.getSerializedAccountantTree( data.height , gzipped );
+
+                if (serialization === undefined && gzipped) //just send the initial tree
+                    serialization = this.blockchain.getSerializedAccountantTree( data.height );
+
                 let moreChunks = false;
 
                 if (typeof data.substr === "object" && data.substr !== null) {
@@ -46,7 +51,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                             moreChunks = false;
 
                         if (serialization.length - 1 - data.substr.startIndex > 0)
-                            serialization = BufferExtended.substr(serialization, data.substr.startIndex, Math.min(data.substr.count, serialization.length - 1 - data.substr.startIndex));
+                            serialization = BufferExtended.substr(serialization, data.substr.startIndex, Math.min(data.substr.count, serialization.length  - data.substr.startIndex));
                         else
                             serialization = new Buffer(0);
 
@@ -54,6 +59,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                             result: true,
                             accountantTree: serialization,
                             moreChunks: moreChunks,
+                            gzipped: gzipped,
                         });
                         
                     }
@@ -62,6 +68,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                     return socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
                         result: true,
                         accountantTree:serialization,
+                        gzipped: gzipped,
                     }); 
                 }
 
@@ -105,7 +112,6 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                     difficultyTarget: difficultyTarget,
                     timeStamp: timestamp,
                     hashPrev: hashPrev,
-                    chainWork: this.blockchain.blocks.chainWorkSerialized
                 });
 
 
@@ -129,6 +135,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
         let downloading = true;
         let pos = 0;
         let buffers = [];
+        let gzippedCommunication = false;
 
         //can not be more than 1000
         while (downloading && pos < timeoutCount) {
@@ -139,7 +146,9 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                     substr: {
                         startIndex: pos * consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
                         count: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
-                    }
+                    },
+
+                    gzipped: consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined,
 
                 },
 
@@ -150,6 +159,8 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
             if ( !Buffer.isBuffer(answer.accountantTree) )
                 throw {message: "accountantTree data is not a buffer"};
+
+            if (gzippedCommunication===false && answer.gzipped===true) gzippedCommunication=true;
 
             if (answer.accountantTree.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
                 (answer.accountantTree.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
@@ -174,7 +185,13 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
         let buffer = Buffer.concat(buffers);
 
-        return buffer;
+        //console.log("Before ungziped");
+        //console.log(buffer.toString('hex'));
+
+        return {
+            buffer: gzippedCommunication  ? await GZip.unzip(buffer) : buffer,
+            gzipped: gzippedCommunication ? buffer : undefined
+        };
 
     }
 

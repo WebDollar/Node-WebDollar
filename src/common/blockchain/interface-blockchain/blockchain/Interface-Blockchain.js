@@ -58,7 +58,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
 
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
@@ -77,18 +77,20 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         }
 
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
 
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         //let's check again the heights
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
-        this.blocks.addBlock(block, revertActions, saveBlock);
+        this.blocks.addBlock(block, revertActions, saveBlock, showUpdate);
+
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         //hard fork
         if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && block.height === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY-1 )
@@ -96,6 +98,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
 
         await this._blockIncluded( block);
+
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         if (saveBlock) {
 
@@ -105,7 +109,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
         }
 
-        this._onBlockCreated(block,  saveBlock);
+        await this._onBlockCreated(block,  saveBlock);
+
+
+        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
             this.mining.resetMining();
@@ -333,7 +340,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             if ( indexStart < numBlocks ){
 
                 validationType["skip-recalculating-hash-rate"] = true;
-                validationType["skip-saving-light-accountant-tree-serializations"] = true;
+
+                if ( i < numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE )
+                    validationType["skip-saving-light-accountant-tree-serializations"] = true;
+
                 validationType["skip-calculating-proofs"] = true;
 
             }
@@ -455,7 +465,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
-            if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions) ) {
+            if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions, false) ) {
 
                 if (i % 100 === 0)
                     console.warn("blockchain loaded successfully index ", i);

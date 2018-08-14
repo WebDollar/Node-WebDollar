@@ -3,6 +3,7 @@ import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const BigInteger = require('big-integer');
+import GZip from "common/utils/GZip";
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -11,6 +12,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
         this.forkPrevAccountantTree = null;
+        this.forkPrevAccountantTreeGzipped = undefined;
+
         this.forkPrevDifficultyTarget = null;
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
@@ -27,7 +30,9 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this._lightPrevDifficultyTargetClone = null;
         this._lightPrevTimeStampClone = null;
         this._lightPrevHashPrevClone = null;
-        this._lightAccountantTreeSerializationsHeightClone = null;
+
+        this._lightAccountantTreeSerializationsHeightClone = undefined;
+        this._lightAccountantTreeSerializationsHeightCloneGzipped = undefined;
     }
 
     // return the difficultly target for ForkBlock
@@ -126,7 +131,8 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this._lightChainWorkClone = this.blockchain.blocks.chainWork;
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
-            this._lightAccountantTreeSerializationsHeightClone = new Buffer(this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializations[diffIndex] : 0);
+            this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined;
+            this._lightAccountantTreeSerializationsHeightCloneGzipped = this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] : 0;
             this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
             this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
@@ -140,7 +146,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     }
 
-    preFork(revertActions) {
+    async preFork(revertActions) {
 
         if (this.blockchain.agent.light && this._shouldTakeNewProof() ) {
             this.blockchain.proofPi = this.forkProofPi;
@@ -154,13 +160,20 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             let diffIndex = this.forkDifficultyCalculation.difficultyAdditionalBlocks[0];
 
             //fork sum
-            this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree );
+            this.blockchain.accountantTree.deserializeMiniAccountant( this.forkPrevAccountantTree,  );
             let forkSum = this.blockchain.accountantTree.calculateNodeCoins();
 
             if ( forkSum !== BlockchainMiningReward.getSumReward(diffIndex-1) || forkSum <= 0 )
                 throw {message: "Accountant Tree sum is smaller than previous accountant Tree!!! Impossible", forkSum: forkSum, rewardShould: BlockchainMiningReward.getSumReward(diffIndex-1)};
 
             this.blockchain.blocks.blocksStartingPoint = diffIndex;
+
+            //forkPrevChainWork is actually the current ChainWork
+
+            this.forkPrevChainWork = this.forkChainWork;
+            for (let i=0; i<this.forkBlocks.length; i++)
+                this.forkPrevChainWork = this.forkPrevChainWork.minus( this.forkBlocks[i].workDone );
+
             this.blockchain.blocks.chainWork = this.forkPrevChainWork;
 
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
@@ -168,13 +181,14 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
 
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = this.forkPrevAccountantTreeGzipped;
 
         } else
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preFork.call(this, revertActions);
     }
 
-    revertFork(){
+    async revertFork(){
 
         //recover to the original Accountant Tree & state
         if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
@@ -188,6 +202,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this.blockchain.lightPrevTimeStamps[diffIndex] = this._lightPrevTimeStampClone;
             this.blockchain.lightPrevHashPrevs[diffIndex] = this._lightPrevHashPrevClone;
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this._lightAccountantTreeSerializationsHeightClone;
+            this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = this._lightAccountantTreeSerializationsHeightCloneGzipped;
 
         }
 

@@ -206,7 +206,7 @@ class NodesWaitlistConnecting {
             this.connectingMaximum.minimum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK;
             this.connectingMaximum.minimum_waitlist = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.MIN_SOCKET_CLIENTS_WAITLIST;
 
-            if (NodeExpress.SSL){
+            if (NodeExpress.SSL ){
                 this.connectingMaximum.maximum_waitlist =  consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_WHEN_SSL;
                 this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.CLIENT.SSL.MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK_WHEN_SSL;
             } else {
@@ -229,16 +229,21 @@ class NodesWaitlistConnecting {
         }
 
         if (Blockchain !== undefined && Blockchain.isPoolActivated){
+
             this.connectingMaximum.maximum_fallbacks += 10;
             this.connectingMaximum.maximum_waitlist += 20;
+
+            this.connectingMaximum.minimum_fallbacks += 5;
+            this.connectingMaximum.minimum_waitlist += 5;
+
         }
 
         try {
             let date = new Date().getTime();
             for (let i = this._connectingQueue.length - 1; i >= 0; i--)
                 if (date - this._connectingQueue[i].blockedLastTime > 2 * 60 * 1000) {
-                    this._connectingQueue.splice(i, 1);
                     Log.warn("Deleting OLD connectingQueue element " + i + " " + this._connectingQueue[i].sckAddresses[0].getAddress(), Log.LOG_TYPE.default);
+                    this._connectingQueue.splice(i, 1);
                 }
         } catch (exception){
             console.error(exception)

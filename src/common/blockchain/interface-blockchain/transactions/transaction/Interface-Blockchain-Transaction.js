@@ -172,6 +172,10 @@ class InterfaceBlockchainTransaction{
         if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
         if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
 
+        if (blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
+        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+
         if (this.nonce > 0xFFFF) throw {message: "nonce is invalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
 
@@ -357,7 +361,7 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    _preProcessTransaction(multiplicationFactor = 1 , revertActions, showUpdate){
         return true;
     }
 
@@ -366,7 +370,7 @@ class InterfaceBlockchainTransaction{
         if ( multiplicationFactor === 1 ) { // adding transaction
 
             //nonce
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
@@ -381,7 +385,7 @@ class InterfaceBlockchainTransaction{
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
 
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
 
         }else

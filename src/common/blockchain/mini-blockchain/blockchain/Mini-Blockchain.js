@@ -41,6 +41,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try{
 
+            let date = new Date().getTime();
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
                 //updating reward
@@ -50,10 +51,10 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (result === null || result === undefined)
                     throw {message: "reward couldn't be set to the minerAddress"};
 
-                if (!block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType))
+                if (await block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType) === false)
                     throw {message: "Validate Transactions is wrong"};
 
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
                 if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
 
@@ -65,13 +66,13 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
                     throw {message: "Process Block Data Transactions failed"};
 
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
             }
 
             let callbackDone = await callback();
 
-            if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(50);
+            if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
             if (callbackDone === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
@@ -116,7 +117,7 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock( block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions ){
+    async includeBlockchainBlock( block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate ){
 
         if (await this.simulateNewBlock(block, false, revertActions,
 
@@ -124,7 +125,7 @@ class MiniBlockchain extends  inheritBlockchain{
                     return await inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions );
                 }
 
-            )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+            , showUpdate )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         return true;
     }
