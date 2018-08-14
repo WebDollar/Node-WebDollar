@@ -117,7 +117,7 @@ class InterfaceBlockchainFork {
     validateForkImmutability(){
 
         //detecting there is a fork in my blockchain
-        if ( this.blockchain.blocks.blocksStartingPoint > this.blockchain.blocks.length - 30 )
+        if ( this.blockchain.blocks.blocksStartingPoint < this.blockchain.blocks.length - 30 )
             if (this.forkStartingHeight <= this.blockchain.blocks.length - 30){
                 //verify if there were only a few people mining in my last 30 blocks
 
