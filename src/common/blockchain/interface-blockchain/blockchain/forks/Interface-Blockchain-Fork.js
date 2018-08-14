@@ -111,7 +111,7 @@ class InterfaceBlockchainFork {
 
         this._validateChainWork();
 
-        //this._validateForkImmutability();
+        this._validateForkImmutability();
 
         return true;
     }
@@ -119,7 +119,7 @@ class InterfaceBlockchainFork {
     _validateForkImmutability(){
 
         //detecting there is a fork in my blockchain
-        if ( ! process.env.BROWSER && this.blockchain.blocks.length > 30 )
+        if ( this.blockchain.blocks.blocksStartingPoint > this.blockchain.blocks.length - 30 )
             if (this.forkStartingHeight <= this.blockchain.blocks.length - 30){
                 //verify if there were only a few people mining in my last 30 blocks
 
@@ -301,7 +301,11 @@ class InterfaceBlockchainFork {
             this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
 
             for (let j=0; j<=pos; j++)
-                this.forkBlocks[j].destroyBlock();
+                if (this.blockchain.blocks[ this.forkBlocks[j].height ] !== this.forkBlocks[j])
+                    this.forkBlocks[j].destroyBlock();
+                else
+                    this.forkBlocks[j] = undefined;
+
 
             this.forkBlocks.splice(0, pos);
         }
