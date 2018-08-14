@@ -157,10 +157,10 @@ elif [[ "$readft" == 2 ]]; then
 			echo "$showinfo Current directory is $(pwd)"
 
 			crnt_dir=$(pwd)
-			countcurrentnodes=$(find / -name "Node-WebDollar[0-9]" | wc -l)
+			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -171,8 +171,7 @@ elif [[ "$readft" == 2 ]]; then
 					echo "$showok Node-WebDollar$i Deployed successfully!"
 				done
 			else
-				if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
-
+				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 					echo "$showok We are outside of a Node-WebDollar Folder"
 
 					for ((i=countcurrentnodes+1; i<=countcurrentnodes+readnrofnodesdeploy; i++));
@@ -238,10 +237,10 @@ elif [[ "$readft" == 3 ]]; then
 			echo "$showinfo Current directory is $(pwd)"
 
 			crnt_dir=$(pwd)
-			countcurrentnodes=$(find / -name "Node-WebDollar[0-9]" | wc -l)
+			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -266,7 +265,7 @@ elif [[ "$readft" == 3 ]]; then
 					fi
 				fi
 			else
-				if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
+				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 					echo "$showok We are outside of a Node-WebDollar Folder"
 					echo -e "---\\n${cyan}$(ls)$stand\\n---"
