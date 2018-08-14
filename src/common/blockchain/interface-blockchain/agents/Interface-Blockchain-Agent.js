@@ -160,7 +160,7 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
             //         blocks: this.blockchain.blocks.length,
             //
             //     }
-            
+
             this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         }
