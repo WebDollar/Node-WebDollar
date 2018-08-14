@@ -1,3 +1,7 @@
+/**
+ * Backbone Worker based on node-gyp and multi-threading in node.js
+ */
+
 const argon2 = require('argon2');
 
 const opt = {

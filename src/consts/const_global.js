@@ -46,11 +46,16 @@ consts.BLOCKCHAIN = {
 
     },
 
+    FORKS:{
+
+        //forks larger than this will not be accepted
+        IMMUTABILITY_LENGTH: 15,
+
+    },
 
     HARD_FORKS : {
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
-
 
         TRANSACTIONS_OPTIMIZATION: 153060,
         DIFFICULTY_TIME_BIGGER: 153060,
@@ -239,8 +244,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.176",
-        VERSION_COMPATIBILITY: "1.162.0",
+        VERSION: "1.192",
+
+        VERSION_COMPATIBILITY: "1.174",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -255,7 +262,11 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,
+        LATENCY_CHECK: 5*1000,
+        MAX_ALLOWED_LATENCY: 10*1000,  //miliseconds
+        CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
+
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
@@ -292,10 +303,10 @@ consts.SETTINGS = {
                 CLIENT: {
 
                     MAX_SOCKET_CLIENTS_WAITLIST: 3,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
-                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
 
                     SERVER_OPEN:{
                         MAX_SOCKET_CLIENTS_WAITLIST: 5,
@@ -349,7 +360,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 300,
                 MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP: 30,
             },
 
@@ -377,7 +388,7 @@ consts.TERMINAL_WORKERS = {
     // file gets created on build
     CPU_WORKER_NONCES_WORK: 700,  //per seconds
 
-    CPU_CPP_WORKER_NONCES_WORK: 40000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK: 0,  //per second   0 is undefined
     CPU_CPP_WORKER_NONCES_WORK_BATCH: 500,  //per second
 
     //NONCES_WORK should be way bigger than WORK_BATCHES

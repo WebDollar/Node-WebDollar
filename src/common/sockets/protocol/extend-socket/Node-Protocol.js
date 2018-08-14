@@ -175,6 +175,18 @@ class NodeProtocol {
         }, callback);
     }
 
+    async calculateLatency(){
+
+        let maxLatency = consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY;
+        let startTime = Date.now();
+        let answer = await this.node.sendRequestWaitOnce("ping", undefined, "pong", maxLatency);
+
+        if (answer === 'r')
+            this.latency = Date.now() - startTime;
+        else
+            this.latency = maxLatency;
+
+    }
 
 }
 

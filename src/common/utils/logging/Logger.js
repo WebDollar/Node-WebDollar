@@ -2,6 +2,35 @@ class Logger{
 
     constructor(name){
         this.name = name;
+
+        if (process.env.BROWSER){
+            this.error = this.error_browser;
+            this.info = this.info_browser;
+            this.debug = this.debug_browser;
+            this.warn = this.warn_browser;
+            this.log = this.log_browser;
+        }
+
+    }
+
+    error_browser(){
+        console.error(this.name, " : ", this.convertArguments.apply(this, arguments) );
+    }
+
+    info_browser(){
+        console.info(this.name, " : ", this.convertArguments.apply(this, arguments) );
+    }
+
+    debug_browser(){
+        console.log(this.name, " : ", this.convertArguments.apply(this, arguments) );
+    }
+
+    warn_browser(){
+        console.warn(this.name, " : ", this.convertArguments.apply(this, arguments) );
+    }
+
+    log_browser(){
+        console.debug(this.name, " : ", this.convertArguments.apply(this, arguments) );
     }
 
     error(){

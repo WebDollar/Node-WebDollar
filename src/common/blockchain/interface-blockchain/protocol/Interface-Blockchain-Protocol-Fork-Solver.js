@@ -119,7 +119,6 @@ class InterfaceBlockchainProtocolForkSolver{
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
-
                     if (i === forkChainLength-1 && forkLastBlockHash !== undefined && forkLastBlockHash !== undefined) {
                         answer = { hash: forkLastBlockHash };
                     } else {
@@ -127,7 +126,6 @@ class InterfaceBlockchainProtocolForkSolver{
                         if (answer === null || answer === undefined || answer.hash === undefined)
                             continue;
                     }
-
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
 
@@ -141,7 +139,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         return {result: true, fork: forkFound};
                     }
-
 
                     fork.pushHeader(answer.hash);
 
@@ -291,79 +288,148 @@ class InterfaceBlockchainProtocolForkSolver{
         if (fork.sockets.length === 0 || !fork.forkReady)
             return false;
 
-        //interval timer
-        let socket = fork.sockets[Math.floor(Math.random() * fork.sockets.length)];
-
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        let trials = 2;
-        if (fork.forkChainLength - fork.forkStartingHeight > 5 )  trials = 3; else
-        if (fork.forkChainLength - fork.forkStartingHeight > 10 )  trials = 4;
+        while (( fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED  ) {
 
-        while ( (fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED ) {
-
-
-            // TODO you can paralyze the downloading code from multiple sockets
-
-            console.log("downloading block", nextBlockHeight);
+            let socketListOptimized = fork.sockets.sort((a,b) => {return (a.latency > b.latency) ? 1 : ((b.latency > a.latency ) ? -1 : 0);} );
 
             StatusEvents.emit( "agent/status", {message: "Synchronizing - Downloading Block", blockHeight: nextBlockHeight, blockHeightMax: fork.forkChainLength } );
 
-            //console.log("this.protocol.acceptBlocks", this.protocol.acceptBlocks);
-
             let onlyHeader;
-            if (this.protocol.acceptBlocks) onlyHeader = false; else
-            if (this.protocol.acceptBlockHeaders) onlyHeader = true;
 
+            if (this.protocol.acceptBlocks)
+                onlyHeader = false;
+            else
+                if (this.protocol.acceptBlockHeaders)
+                    onlyHeader = true;
 
             let answer;
 
-            for (let i=0; i<trials; i++) {
-                answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight}, nextBlockHeight, 6000);
-                if (answer !== null && answer !== undefined)
-                    break;
+            let howManyBlocks = Math.min( fork.forkChainLength - (fork.forkStartingHeight + fork.forkBlocks.length), consts.SETTINGS.PARAMS.CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER);
+            let downloadingList = [];
+            let trialsList = [];
+            let alreadyDownloaded = 0;
+
+            let finished = new Promise((resolve)=>{
+
+                let timeout;
+                let processing = ()=>{
+
+                    for (let i=0, socketOffset = 0; i < howManyBlocks; i++)
+                        if (downloadingList[i] === undefined) {
+
+                            if (trialsList[i] > 5){
+                                clearTimeout(timeout);
+                                resolve(false);
+                                return;
+                            }
+
+                            trialsList[i] ++ ;
+
+                            if ( socketOffset >= socketListOptimized.length)
+                                socketOffset=0;
+
+                            if (socketListOptimized.length === 0){
+                                clearTimeout(timeout);
+                                resolve(false);
+                                continue;
+                            }
+
+                            if ( !socketListOptimized[socketOffset].connected ) {
+                                socketListOptimized.splice(socketOffset, 1);
+                                continue;
+                            }
+
+
+                            let socket = socketListOptimized[socketOffset];
+                            let waitingTime = socket.latency===0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : socket.latency;
+
+                            answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+i}, nextBlockHeight+i, waitingTime + Math.random()*2000 );
+                            downloadingList[i] = answer;
+
+                            answer.then(async (result)=>{
+
+                                if (result === undefined || result === null)
+                                    downloadingList[i] = undefined;
+                                else {
+                                    alreadyDownloaded++;
+                                    downloadingList[i] = result;
+                                }
+
+                            });
+
+                            socketOffset++
+
+                        }
+
+                    if ( (alreadyDownloaded === howManyBlocks) || global.TERMINATED ){
+                        clearTimeout(timeout);
+                        resolve(true);
+                    } else
+                        setTimeout(processing, 200);
+
+                };
+
+                setTimeout(processing, 200);
+
+            });
+
+            await finished;
+
+            //verify if all blocks were downloaded
+
+            let blockValidation;
+            let block;
+
+            for(let i=0; i<downloadingList.length; i++){
+
+                if (downloadingList[i] === null || downloadingList[i] === undefined)
+                    throw {message: "block never received "+ nextBlockHeight};
+
+                if ( !downloadingList[i].result || downloadingList[i].block === undefined  || !Buffer.isBuffer(downloadingList[i].block) ) {
+                    console.error("Fork Answer received ", downloadingList[i]);
+                    throw {message: "Fork Answer is not Buffer"};
+                }
+
+                blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
+                block = this._deserializeForkBlock(fork, downloadingList[i].block, nextBlockHeight, blockValidation );
+
+                if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
+                    await this.blockchain.sleep(15);
+
+                if (this.blockchain.blocks[block.height] !== undefined && block.hash.equals(this.blockchain.blocks[block.height].hash) )
+                    throw {message: "You gave me a block which I already have have the same block"};
+
+                let result;
+
+                try {
+
+                    result = await fork.includeForkBlock(block);
+
+                } catch (Exception) {
+
+                    console.error("Error including block " + nextBlockHeight + " in fork ", Exception);
+                    throw {message: "fork.includeForkBlock returned an exception", Exception}
+
+                }
+
+                fork.forkHeaders.push(block.hash);
+
+                //if the block was included correctly
+                if (result){
+
+                    if (nextBlockHeight % 10 === 0)
+                        console.log("Block " + nextBlockHeight + " successful downloaded!");
+
+                    nextBlockHeight++;
+                }
+                else
+                    throw {message: "Fork didn't work at height ", nextBlockHeight};
+
+                if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
+
             }
-
-            if (answer === null || answer === undefined)
-                throw {message: "block never received "+ nextBlockHeight};
-
-            if ( !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) ) {
-                console.error("Fork Answer received ", answer);
-                throw {message: "Fork Answer is not Buffer"};
-            }
-
-
-            let blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
-            let block = this._deserializeForkBlock(fork, answer.block, nextBlockHeight, blockValidation );
-
-            //console.log("block.hash", block.hash.toString("hex"));
-
-            if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
-
-            let result;
-
-            try {
-
-                result = await fork.includeForkBlock(block);
-
-                // if (block.interlink !== undefined)
-                //     console.log("block.interlink", block.interlink.length);
-
-            } catch (Exception) {
-
-                console.error("Error including block " + nextBlockHeight + " in fork ", Exception);
-
-                throw {message: "fork.includeForkBlock returned an exception", Exception}
-
-            }
-
-            //if the block was included correctly
-            if (result)
-                nextBlockHeight++;
-            else
-                throw {message: "Fork didn't work at height ", nextBlockHeight};
-
-            if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0) await this.blockchain.sleep(15);
 
         }
 

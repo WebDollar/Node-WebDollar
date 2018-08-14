@@ -62,41 +62,9 @@ class InterfaceBlockchainProtocolForksManager {
                 return false;
             }
 
-            if (  ( forkChainWork.equals(0) && this.blockchain.blocks.length === forkChainLength )
-                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
+            if (forkChainWork.equals(0))
+                throw {message: "forkChainWork is zero"};
 
-                //in case the hashes are exactly the same, there is no reason why we should download it
-                let comparison = this.blockchain.blocks[this.blockchain.blocks.length - 1].hash.compare( forkLastBlockHash );
-
-                if ( comparison < 0) {
-                    socket.node.protocol.blocks = forkChainLength;
-                    socket.node.protocol.sendLastBlock();
-                    return false;
-                }
-
-                if ( comparison === 0) {
-                    socket.node.protocol.blocks = forkChainLength;
-                    return true;
-                }
-
-            }
-
-            if (  ( forkChainWork.equals(0) && forkChainLength < this.blockchain.blocks.length )
-                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
-
-                //updating the status of his blocks
-                if ( this.blockchain.blocks[ forkChainLength ] !== undefined && this.blockchain.blocks[forkChainLength].hash.equals( forkLastBlockHash ) )
-                    socket.node.protocol.blocks = forkChainLength;
-
-                if (Math.random() < 0.5)
-                    socket.node.protocol.sendLastBlock();
-
-                if (forkChainLength < this.blockchain.blocks.length - 50)
-                    BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+forkChainLength+" / "+this.blockchain.blocks.length );
-
-                throw "Your blockchain is smaller than mine";
-
-            }
 
             let answer = await this.protocol.forkSolver.discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork );
 

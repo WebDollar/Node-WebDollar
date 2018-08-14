@@ -42,7 +42,6 @@ class PoolManagement{
         let answer;
 
         try {
-
             answer = await this.poolSettings.initializePoolSettings(poolFee);
 
             console.info("The url is just your domain: " + this.poolSettings.poolURL);
@@ -55,7 +54,7 @@ class PoolManagement{
                 throw {message: "Pool Couldn't be started"};
 
         } catch (exception){
-            console.error("initializePoolManagement raised an error", exception);
+            console.error("Couldn't initialize a Pool", exception);
         }
 
         this.poolInitialized = true;
@@ -79,7 +78,7 @@ class PoolManagement{
     }
 
     receivePoolWork(minerInstance, work){
-        return this.poolWorkManagement.processWork(minerInstance, work)
+        return this.poolWorkManagement.poolWorkValidation.pushWorkForValidation(minerInstance, work)
     }
 
     /**
@@ -142,7 +141,6 @@ class PoolManagement{
             if (value) {
 
                 this.poolStatistics.startInterval();
-                this.poolWorkManagement.poolWork.startGarbageCollector();
                 await this.poolProtocol._startPoolProtocol();
 
                 if (this.blockchain!== undefined && this.blockchain.prover !== undefined)
@@ -155,11 +153,11 @@ class PoolManagement{
 
                 Blockchain.PoolManagement.poolSettings.printPoolSettings();
 
+                this.poolWorkManagement.startPoolWorkManagement();
             }
             else {
 
                 await this.poolProtocol._stopPoolProtocol();
-                this.poolWorkManagement.poolWork.stopGarbageCollector();
                 this.poolStatistics.clearInterval();
 
                 if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
@@ -169,6 +167,7 @@ class PoolManagement{
 
                 this.poolData.connectedMinerInstances.stopPoolDataConnectedMinerInstances();
 
+                this.poolWorkManagement.stopPoolWorkManagement();
             }
 
             StatusEvents.emit("pools/status", {result: value, message: "Pool Started changed" } );

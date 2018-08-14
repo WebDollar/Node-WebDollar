@@ -2,6 +2,7 @@ import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
 import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
+import Blockchain from "../../../../../main-blockchain/Blockchain";
 
 class TransactionsPendingQueue {
 
@@ -51,6 +52,7 @@ class TransactionsPendingQueue {
         let inserted = false;
 
         for (let i=0; i<this.list.length && inserted === false; i++ ) {
+
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
@@ -140,7 +142,7 @@ class TransactionsPendingQueue {
 
             try{
 
-                if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  !this.list[i].validateTransactionEveryTime(undefined, blockValidationType )) &&
+                if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  ( Blockchain.blockchain.agent.consensus && !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
                      (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )) {
                     this._removePendingTransaction(i);
                 }

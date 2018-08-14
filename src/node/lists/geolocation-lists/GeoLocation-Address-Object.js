@@ -15,7 +15,7 @@ class GeoLocationAddressObject  {
 
     constructor(sckAddress, port, location){
 
-        if ( location === undefined) location = {}
+        if ( location === undefined) location = {};
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
         this.sckAddress = sckAddress;

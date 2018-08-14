@@ -100,6 +100,7 @@ class NodeDiscoveryService {
     async processFallbackNodes(data){
 
         try {
+
             //console.log(data);
 
             if (typeof data === 'string') {
@@ -155,6 +156,7 @@ class NodeDiscoveryService {
 
                 return nodes;
             }
+
         } catch (exception){
             console.log("error processing fallback list processFallbackNodes", data, exception);
         }

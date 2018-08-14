@@ -1,9 +1,10 @@
-import GeoLocationLists from 'node/lists/geolocation-lists/geolocation-lists'
+import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import NodesListObject from './Mode-List-Object.js';
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NODE_TYPE from "node/lists/types/Node-Type"
+import consts from 'consts/const_global'
 
 const EventEmitter = require('events');
 
@@ -25,6 +26,8 @@ class NodesList {
 
         this.nodes = [];
         this.nodesTotal = 0;
+
+        setInterval( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
 
         this.removeDisconnectedSockets();
     }
@@ -84,9 +87,7 @@ class NodesList {
 
             let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
 
-            await this.emitter.emit("nodes-list/connected", object);
 
-            this.nodes.push(object);
 
             if (socket.node.protocol.nodeDomain !== undefined && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 
@@ -106,6 +107,10 @@ class NodesList {
 
 
             GeoLocationLists.includeSocket(socket);
+
+            await this.emitter.emit("nodes-list/connected", object);
+
+            this.nodes.push(object);
 
             return true;
         }
@@ -275,6 +280,14 @@ class NodesList {
                 count ++;
 
         return count;
+
+    }
+
+    recalculateSocketsLatency(){
+
+        for (let i=0; i<this.nodes.length; i++)
+            this.nodes[i].socket.node.protocol.calculateLatency();
+
 
     }
 

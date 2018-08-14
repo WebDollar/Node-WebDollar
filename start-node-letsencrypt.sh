@@ -48,7 +48,7 @@ get_user=$(whoami)
 function deps(){
 if [[ "$get_certbot" == "none" ]]; then
         echo "$showinfo We need to Install CERTBOT"
-        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y certbot; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt install -y certbot; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y certbot; fi
+        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y software-properties-common && sudo add-apt-repository ppa:certbot/certbot && sudo apt update && sudo apt-get install certbot; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt install -y certbot; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y certbot; fi
 else
         if [[ "$get_certbot" == * ]]; then
        	        echo "$showok CERTBOT is already installed!"

@@ -44,7 +44,7 @@ class NodeAPICallbacks{
             let balances = data.balances;
             let nonce = data.nonce;
 
-            this._addSubscribedEvent(unsubscribe, "addressBalancesSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent( unsubscribe, "addressBalancesSubscribe"+address, res, callback, nodeApiType );
 
             return {result: true, address: address, balances: balances, nonce: nonce,  _suffix: address};
 

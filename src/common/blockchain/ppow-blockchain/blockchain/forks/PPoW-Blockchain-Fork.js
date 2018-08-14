@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
-import GZip from "../../../../utils/GZip";
+import GZip from "common/utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -84,7 +84,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
-                if (this.forkChainLength > this.blockchain.blocks.length ){
+                if (this.forkChainWork.greater(this.blockchain.blocks.chainWork)){
                     this.forkProofPi = this.blockchain.proofPi;
                     return true;
                 } //you have actually more forks but with the same proof
@@ -100,6 +100,8 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
             this.forkProofPi.hash = proofPiData.hash;
 
+            let proofsList = [];
+
             let downloading = true;
             let pos = 0;
             let buffers = [];
@@ -112,7 +114,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                         length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
                     }, "answer" , 10000);
 
-                if (answer === null) throw {message: "get-proofGziped never received ", answer: answer.message };
+                if (answer === null) throw {message: "get-proofGziped never received ", answer: answer };
                 if (!answer.result) throw {message: "get-proofGziped return false ", answer: answer.message };
 
                 if ( !Buffer.isBuffer(answer.data) )
@@ -133,8 +135,15 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             }
 
-            let buffer = await GZip.unzip( Buffer.concat(buffers) );
-            let proofsList = [];
+            let buffer = Buffer.concat(buffers);
+
+            try {
+
+                buffer = await GZip.unzip(buffer);
+
+            } catch (exception){
+
+            }
 
             let offset = 0;
             while(offset!=buffer.length){
@@ -145,6 +154,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 offset = result.offset;
 
             }
+
 
             if (proofsList.length === 0)
                 throw {message: "Proofs was not downloaded successfully"};
