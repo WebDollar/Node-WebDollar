@@ -68,7 +68,6 @@ class SocketExtend{
 
         socket.node.protocol.calculateLatency = NodeProtocol.prototype.calculateLatency.bind(socket) ;
         socket.node.on("ping", ()=>{
-            console.log("trimitem ping")
             socket.node.sendRequest("ping/pong", 'r' )
         });
 
