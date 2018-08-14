@@ -244,7 +244,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.191",
+        VERSION: "1.192",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
@@ -360,7 +360,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 300,
                 MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP: 30,
             },
 

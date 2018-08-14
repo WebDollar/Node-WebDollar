@@ -418,7 +418,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 //if the block was included correctly
                 if (result){
-                    console.log("Block " + nextBlockHeight + " successful downloaded!");
+
+                    if (nextBlockHeight % 10 === 0)
+                        console.log("Block " + nextBlockHeight + " successful downloaded!");
+
                     nextBlockHeight++;
                 }
                 else
