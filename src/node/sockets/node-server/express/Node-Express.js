@@ -171,8 +171,11 @@ class NodeExpress{
 
     _initializeRouter(app){
 
+
+        NodeAPIRouter._routesEnabled = true;
         NodeAPIRouter.initializeRouter( this.app.get.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter._routesEnabled = false;
 
     }
 
