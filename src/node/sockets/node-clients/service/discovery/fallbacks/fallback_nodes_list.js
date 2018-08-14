@@ -64,14 +64,14 @@ export default {
         //
         // //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
         //
-        // {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
-        // {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
-        // {"addr": ["https://node3.int-webd.com:5003"]}, // Thanks to @int_webd
-        // {"addr": ["https://node3.int-webd.com:5004"]}, // Thanks to @int_webd
-        // {"addr": ["https://node3.int-webd.com:5005"]}, // Thanks to @int_webd
-        // {"addr": ["https://node4.int-webd.com:5001"]}, // Thanks to @int_webd
-        // {"addr": ["https://node4.int-webd.com:5002"]}, // Thanks to @int_webd
-        // {"addr": ["https://node4.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node3.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:5003"]}, // Thanks to @int_webd
         // {"addr": ["https://node4.int-webd.com:5004"]}, // Thanks to @int_webd
         // {"addr": ["https://node4.int-webd.com:5005"]}, // Thanks to @int_webd
         // {"addr": ["https://node5.int-webd.com:5001"]}, // Thanks to @int_webd
@@ -141,9 +141,9 @@ export default {
         // {"addr": ["https://angrybirds.webdollarvpn.io:9666"]}, // Thanks to @cbusuioceanu*/
         //
         // {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
-        // {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
+         {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
         // {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
-        {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
+        //{"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
 
     ]
 }
