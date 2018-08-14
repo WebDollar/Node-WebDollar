@@ -177,18 +177,14 @@ class NodeProtocol {
 
     async calculateLatency(){
 
-        let maxLatency = 10 * 1000;
+        let maxLatency = consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY;
         let startTime = Date.now();
         let answer = await this.node.sendRequestWaitOnce("ping", undefined, "pong", maxLatency);
-
-        console.log("latency answer", answer);
 
         if (answer === 'r')
             this.latency = Date.now() - startTime;
         else
             this.latency = maxLatency;
-
-        console.log("LATENCY: " + this.latency)
 
     }
 
