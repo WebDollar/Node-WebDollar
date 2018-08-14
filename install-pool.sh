@@ -57,9 +57,7 @@ fi
 
 deps # call deps function
 
-if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f5) == Node-WebDollar || $(pwd | cut -d '/' -f5) == *eb*ollar* || \
-      $(pwd | cut -d '/' -f4) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f4) == Node-WebDollar || $(pwd | cut -d '/' -f4) == *eb*ollar* || \
-      $(pwd | cut -d '/' -f3) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/' -f3) == Node-WebDollar || $(pwd | cut -d '/' -f3) == *eb*ollar* ]]; then
+if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update -y; fi
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get upgrade -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum upgrade -y; fi
@@ -69,8 +67,8 @@ if [[ $(pwd | cut -d '/' -f5) =~ Node-WebDollar[[:alnum:]]+ || $(pwd | cut -d '/
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi \
 	elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi \
 	elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.bash_profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi fi
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo npm install pm2 -g --unsafe-perm ; fi
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install pm2 -g --unsafe-perm ; fi
 	npm install
 	npm run build_browser && npm run build_browser_user_interface
 
