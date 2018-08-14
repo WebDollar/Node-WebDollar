@@ -46,6 +46,12 @@ consts.BLOCKCHAIN = {
 
     },
 
+    FORKS:{
+
+        //forks larger than this will not be accepted
+        IMMUTABILITY_LENGTH: 15,
+
+    },
 
     HARD_FORKS : {
 
@@ -238,8 +244,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.188",
-        VERSION_COMPATIBILITY: "1.174.0",
+        VERSION: "1.190",
+
+        VERSION_COMPATIBILITY: "1.174",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -295,10 +303,10 @@ consts.SETTINGS = {
                 CLIENT: {
 
                     MAX_SOCKET_CLIENTS_WAITLIST: 3,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
-                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
 
                     SERVER_OPEN:{
                         MAX_SOCKET_CLIENTS_WAITLIST: 5,
