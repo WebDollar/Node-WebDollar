@@ -132,6 +132,10 @@ class InterfaceBlockchainFork {
                             break;
                         }
 
+                    if (!found){
+                        addresses.push(this.blockchain.blocks[i].data.minerAddress)
+                    }
+
                 }
 
                 if (addresses.length > 3)  //in my fork, there were a lot of miners, and not just me
