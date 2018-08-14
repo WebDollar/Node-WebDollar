@@ -51,7 +51,6 @@ consts.BLOCKCHAIN = {
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
 
-
         TRANSACTIONS_OPTIMIZATION: 153060,
         DIFFICULTY_TIME_BIGGER: 153060,
         WALLET_RECOVERY: 153060,
@@ -255,7 +254,9 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,
+        LATENCY_CHECK: 5*1000,                          //miliseconds
+        CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: 5,
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds

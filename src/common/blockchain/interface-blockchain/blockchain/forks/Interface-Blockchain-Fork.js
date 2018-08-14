@@ -712,7 +712,9 @@ class InterfaceBlockchainFork {
                 this.sockets.splice(0,0, socket);
             else
                 this.sockets.push(socket)
+
         }
+
     }
 
     pushHeaders(hashes){
