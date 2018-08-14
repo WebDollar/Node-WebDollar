@@ -26,10 +26,10 @@ export default {
         //
         // //{"addr": ["https://pool1.cuckoo-pool.com:8443"]},
         //
-        // {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
         // {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
         // {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
         // {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
