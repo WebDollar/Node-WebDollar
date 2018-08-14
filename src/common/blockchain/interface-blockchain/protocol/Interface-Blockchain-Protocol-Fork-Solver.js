@@ -316,7 +316,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 let timeout;
                 let processing = ()=>{
 
-                    for (let i=0, socketOffset = 0; i < howManyBlocks; i++, socketOffset++)
+                    for (let i=0, socketOffset = 0; i < howManyBlocks; i++)
                         if (downloadingList[i] === undefined) {
 
                             if (trialsList[i] > 5){
@@ -325,29 +325,41 @@ class InterfaceBlockchainProtocolForkSolver{
                                 return;
                             }
 
-                            if( socketListOptimized[socketOffset] === undefined || socketListOptimized[socketOffset] === null )
+                            trialsList[i] ++ ;
+
+                            if ( socketOffset >= socketListOptimized.length)
                                 socketOffset=0;
 
-                            let socket = socketListOptimized[socketOffset];
-                            let waitingTime = socket.latency===0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : socket.latency*1000 + 2000;
+                            if (socketListOptimized.length === 0){
+                                clearTimeout(timeout);
+                                resolve(false);
+                                continue;
+                            }
 
-                            answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+i}, nextBlockHeight+i, waitingTime);
+                            if ( !socketListOptimized[socketOffset].connected ) {
+                                socketListOptimized.splice(socketOffset, 1);
+                                continue;
+                            }
+
+
+                            let socket = socketListOptimized[socketOffset];
+                            let waitingTime = socket.latency===0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : socket.latency;
+
+                            answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+i}, nextBlockHeight+i, waitingTime + Math.random()*2000 );
                             downloadingList[i] = answer;
 
                             answer.then(async (result)=>{
 
-                                if (result === undefined || result === null){
-
-                                    trialsList[i] ++ ;
+                                if (result === undefined || result === null)
                                     downloadingList[i] = undefined;
-
-                                }
                                 else {
                                     alreadyDownloaded++;
                                     downloadingList[i] = result;
                                 }
 
                             });
+
+                            socketOffset++
 
                         }
 

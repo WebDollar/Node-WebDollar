@@ -289,7 +289,7 @@ class InterfaceBlockchainFork {
 
         //verify if now, I have some blocks already in my the blockchain that are similar with the fork
         let pos = -1;
-        for (let i=0; i>=this.forkBlocks.length-1; i++)
+        for (let i=0; i<this.forkBlocks.length-1; i++)
             if ( this.blockchain.blocks[ this.forkBlocks[i].height ] !== undefined && this.blockchain.blocks[ this.forkBlocks[i].height ].hash.equals(this.forkBlocks[i].hash)  ){
 
                 pos = i;
