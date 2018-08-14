@@ -37,15 +37,19 @@ class NodeAPIAntiDos{
 
     }
 
-    callRoute(route, callback){
+    protectRoute(route, callback){
 
         let element = this.totalWeights[route];
+
+        if (element === undefined) return callback();
+
         if (element.weight >= element.max )
             return {result:false, message: "TOO MANY REQUESTS"};
 
-        callback();
-
         element.weight++;
+
+        return callback();
+
 
     }
 

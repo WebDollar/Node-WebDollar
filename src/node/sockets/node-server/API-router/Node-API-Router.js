@@ -17,9 +17,9 @@ class NodeAPIRouter{
 
     }
 
-    _addRoute = (route, callback, nodeApiType, maxWeight, app, prefix, middleWare ) => {
+    _addRoute (route, callback, nodeApiType, maxWeight, app, prefix, middleWare ) {
 
-        this.app(prefix + route, (req,res) => middleWare(req, res, callback, nodeApiType), );
+        app( prefix + route, (req, res)=> NodeAPIAntiDos.protectRoute( route, () => { middleWare(req, res, callback, nodeApiType) }) );
 
         if (this._routesEnabled)
             this._routes.push(route);
@@ -38,7 +38,7 @@ class NodeAPIRouter{
 
 
             // respond with "hello world" when a GET request is made to the homepage
-        this._addRoute('', NodeAPIPublic.info, nodeApiType, 1000, app, prefix, middleWare , app, prefix, middleWare );
+        this._addRoute('', NodeAPIPublic.info, nodeApiType, 200, app, prefix, middleWare , app, prefix, middleWare );
 
         // Return blocks information
         this._addRoute('blocks/between/:blocks', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
@@ -47,7 +47,7 @@ class NodeAPIRouter{
         // Return block information
         this._addRoute( 'blocks/at/:block', NodeAPIPublicBlocks.block, nodeApiType, 20, app, prefix, middleWare );
 
-        this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 ) ;
+        this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 , app, prefix, middleWare ) ;
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
@@ -62,13 +62,13 @@ class NodeAPIRouter{
         }
 
         // Return address info: balance, blocks mined and transactions
-        this._addRoute( 'address/:address', NodeAPIPublicAddresses.addressInfo, nodeApiType, 5 , app, prefix, middleWare );
+        this._addRoute( 'address/:address', NodeAPIPublicAddresses.addressInfo, nodeApiType, 3 , app, prefix, middleWare );
 
         // Return address info: balance, blocks mined and transactions
-        this._addRoute( 'server/nodes/list', NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes), nodeApiType, 30 , app, prefix, middleWare );
+        this._addRoute( 'server/nodes/list', NodeAPIPublicNodes.nodesList.bind(NodeAPIPublicNodes), nodeApiType, 20 , app, prefix, middleWare );
 
         // Return blocks information
-        this._addRoute( 'server/nodes/blocks-propagated', NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes), nodeApiType, 30, app, prefix, middleWare );
+        this._addRoute( 'server/nodes/blocks-propagated', NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes), nodeApiType, 20, app, prefix, middleWare );
 
         // respond with "hello"
         this._addRoute( 'hello', NodeAPIPublic.helloWorld, nodeApiType, 1000, app, prefix, middleWare );
@@ -76,15 +76,15 @@ class NodeAPIRouter{
         // respond with "ping"
         this._addRoute( 'ping', NodeAPIPublic.ping, nodeApiType, 1000, app, prefix, middleWare );
 
-        this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 300 , app, prefix, middleWare );
+        this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
 
         
     }
 
     initializeRouterCallbacks(app, middleWare, prefix='', nodeApiType){
 
-        this._addRoute( 'subscribe/address/balances',  NodeAPICallbacks.addressBalancesSubscribe.bind(NodeAPICallbacks), nodeApiType, 400 , app, prefix, middleWare );
-        this._addRoute( 'subscribe/address/transactions',  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType, 200 , app, prefix, middleWare );
+        this._addRoute( 'subscribe/address/balances',  NodeAPICallbacks.addressBalancesSubscribe.bind(NodeAPICallbacks), nodeApiType, 200 , app, prefix, middleWare );
+        this._addRoute( 'subscribe/address/transactions',  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType, 100 , app, prefix, middleWare );
 
     }
 
