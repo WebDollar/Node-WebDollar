@@ -46,6 +46,12 @@ consts.BLOCKCHAIN = {
 
     },
 
+    FORKS:{
+
+        //forks larger than this will not be accepted
+        IMMUTABILITY_LENGTH: 15,
+
+    },
 
     HARD_FORKS : {
 
@@ -239,8 +245,8 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.188",
-        VERSION_COMPATIBILITY: "1.174.0",
+        VERSION: "1.190",
+        VERSION_COMPATIBILITY: "1.185",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,

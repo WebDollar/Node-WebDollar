@@ -117,8 +117,8 @@ class InterfaceBlockchainFork {
     validateForkImmutability(){
 
         //detecting there is a fork in my blockchain
-        if ( this.blockchain.blocks.blocksStartingPoint < this.blockchain.blocks.length - 30 )
-            if (this.forkStartingHeight <= this.blockchain.blocks.length - 30){
+        if ( this.blockchain.blocks.blocksStartingPoint < this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH )
+            if (this.forkStartingHeight <= this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH){
                 //verify if there were only a few people mining in my last 30 blocks
 
                 let addresses = [];
