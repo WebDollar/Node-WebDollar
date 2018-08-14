@@ -57,7 +57,6 @@ consts.BLOCKCHAIN = {
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
 
-
         TRANSACTIONS_OPTIMIZATION: 153060,
         DIFFICULTY_TIME_BIGGER: 153060,
         WALLET_RECOVERY: 153060,
@@ -245,7 +244,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.190",
+        VERSION: "1.191",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
@@ -263,7 +262,11 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,
+        LATENCY_CHECK: 5*1000,
+        MAX_ALLOWED_LATENCY: 10*1000,  //miliseconds
+        CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 20),
+
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
