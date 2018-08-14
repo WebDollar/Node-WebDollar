@@ -95,7 +95,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         console.log(" prev difficulty ", block.difficultyTargetPrev.toString("hex"));
         console.log(" prev hash ", block.hashPrev.toString("hex"));
 
-        console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );*/
+        console.log("blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.toString("hex") );*/
     }
 
     /**
@@ -295,13 +295,13 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
             if (! (await this.accountantTree.loadMiniAccountant(undefined, undefined, true)))
                 throw {message: "Problem Loading Mini Accountant Tree Initial"};
 
-            console.log("loading blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.sha256.toString("hex") );
+            console.log("loading blockchain balances ",  this.accountantTree.calculateNodeCoins(), this.accountantTree.root.hash.toString("hex") );
 
             let serializationAccountantTreeInitial = this.accountantTree.serializeMiniAccountant();
 
             //check the accountant Tree if matches
             //console.log("this.accountantTree initial balanances ", this.accountantTree.root.edges[0].balances);
-            //console.log("this.accountantTree initial ", this.accountantTree.root.hash.sha256);
+            //console.log("this.accountantTree initial ", this.accountantTree.root.hash);
 
             //load the number of blocks
             let answer = await this._loadLightSettings(serializationAccountantTreeInitial)
@@ -315,7 +315,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
-            console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
+            console.log("this.accountantTree final", this.accountantTree.root.hash);
 
             return true;
 

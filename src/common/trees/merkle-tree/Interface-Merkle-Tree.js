@@ -42,7 +42,7 @@ class InterfaceMerkleTree extends InterfaceTree{
         let result = this.validateRoot();
         result = result && tree.validateRoot();
 
-        result = result && BufferExtended.safeCompare(this.root.hash.sha256, tree.root.hash.sha256);
+        result = result && BufferExtended.safeCompare(this.root.hash, tree.root.hash);
 
         return result;
     }

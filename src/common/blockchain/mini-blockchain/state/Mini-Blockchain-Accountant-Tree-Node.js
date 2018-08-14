@@ -14,7 +14,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         super(root, parent, edges);
 
         //console.log("value", value);
-        this.hash = { sha256: new Buffer(32) };
+        this.hash = new Buffer(32);
         this.total = 0;
 
         if (value !== undefined && value !== null) {

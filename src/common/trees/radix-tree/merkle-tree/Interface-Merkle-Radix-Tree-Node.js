@@ -20,10 +20,8 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
     serializeNodeDataHash(includeHashes){
 
-        if (includeHashes)
-            return this.hash.sha256;
-        else
-            return null;
+        if (includeHashes) return this.hash;
+        else return null;
     }
 
     serializeNodeData(includeEdges, includeHashes){
@@ -46,10 +44,8 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
             offset = offset || 0;
 
-            let hashSha256 = BufferExtended.substr(buffer, offset, 32);
+            this.hash = BufferExtended.substr(buffer, offset, 32);
             offset += 32;
-
-            this.hash = {sha256: hashSha256};
 
         }
 

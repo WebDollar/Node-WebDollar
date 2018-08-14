@@ -314,7 +314,7 @@ class InterfaceTree{
             if ( hasHashses ) {
                 dataString += "} hashes { ";
                 data.forEach((element) => {
-                    dataString += element.hash.sha256.toString("hex") + " | ";
+                    dataString += element.hash.toString("hex") + " | ";
                 });
             }
 

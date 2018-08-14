@@ -407,7 +407,7 @@ class InterfaceBlockchainFork {
                 //show information about Transactions Hash
                 if (consts.DEBUG) {
 
-                    Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
+                    Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.toString("hex"));
 
                     for (let i = 0; i < this.forkBlocks.length; i++) {
 
