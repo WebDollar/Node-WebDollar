@@ -247,11 +247,11 @@ function set_cpucpp() {
 
 	if [[ $yn_cpucpp == [nN] ]]; then
 
-		if [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showok ${yellow}cpu$stand miner is already set."
+		if [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "cpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 		else
-			echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "cpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showinfo Ok...."
 			set_cputhreads
 		fi
 
@@ -260,8 +260,13 @@ function set_cpucpp() {
 		if [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
 			echo "$showok ${yellow}cpu-cpp$stand miner is already set."
 			set_cputhreads
-		else
-			echo "$showexecute Setting terminal worker type to ${yellow}cpu-cpp$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+
+		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: cpu-cpp$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+			set_cputhreads
+
+		elif [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: cpu-cpp$stand" && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 		fi
 
@@ -271,26 +276,27 @@ function set_cpucpp() {
 }
 ### CPU_CPP_FUNCTION_END
 
-### GPU_FUNCTION_START
+### GPU_CUDA_FUNCTION_START
 function set_gpu_cuda() {
 	read -r -e -p "$showinput Do you want to use the ${yellow}GPU(cuda)$stand miner? (y or n): " yn_gpu_cuda
 
 	if [[ $yn_gpu_cuda == [nN] ]]; then
 
-		if [[ $(grep "TYPE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showok ${yellow}GPU(cuda)$stand is already set."
+		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 		else
-			echo -e "$showinfo Reverting ${yellow}GPU(cuda)$stand to CPU-CPP..." && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showinfo Ok..."
 		fi
 
         elif [[ $yn_gpu_cuda == [yY] ]]; then
 
 		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showok ${yellow}gpu$stand miner is already set."
+			echo "$showok ${yellow}TYPE; gpu$stand miner is already set."
 
 		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo "$showexecute Setting terminal worker type to ${yellow}gpu$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
 
 			if [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
 
@@ -303,7 +309,7 @@ function set_gpu_cuda() {
 
 		elif [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo "$showexecute Setting terminal worker type to ${yellow}gpu$stand" && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
 
 			if [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
 
@@ -319,7 +325,67 @@ function set_gpu_cuda() {
 		echo -e "$showerror Possible options are: yY or nN." && set_gpu_cuda
 	fi
 }
-### GPU_FUNCTION_END
+### GPU_CUDA_FUNCTION_END
+
+### GPU_OPENCL_FUNCTION_START
+function set_gpu_opencl() {
+	read -r -e -p "$showinput Do you want to use the ${yellow}GPU(opencl)$stand miner? (y or n): " yn_gpu_opencl
+
+	if [[ $yn_gpu_opencl == [nN] ]]; then
+
+		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+		else
+			echo "$showinfo Ok..."
+		fi
+
+        elif [[ $yn_gpu_opencl == [yY] ]]; then
+
+		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo "$showok ${yellow}TYPE: gpu$stand miner is already set."
+
+			if [[ $(grep "GPU_MODE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showexecute Setting terminal ${yellow}GPU_MODE$stand to ${yellow}opencl$stand" && sed -i -- 's/GPU_MODE: "cuda"/GPU_MODE: "opencl"/g' $get_const_global && echo "$showinfo Result: $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1)"
+
+			elif [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showok ${yellow}GPU_MODE: opencl$stand is already set."
+			fi
+
+		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+
+			if [[ $(grep "GPU_MODE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showexecute Setting terminal ${yellow}GPU_MODE$stand to ${yellow}opencl$stand" && sed -i -- 's/GPU_MODE: "cuda"/GPU_MODE: "opencl"/g' $get_const_global && echo "$showinfo Result: $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1)"
+
+			elif [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showok ${yellow}GPU_MODE: opencl$stand is already set."
+			fi
+
+		elif [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+
+			if [[ $(grep "GPU_MODE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showexecute Setting terminal ${yellow}GPU_MODE$stand to ${yellow}opencl$stand" && sed -i -- 's/GPU_MODE: "cuda"/GPU_MODE: "opencl"/g' $get_const_global && echo "$showinfo Result: $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1)"
+
+			elif [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
+
+				echo "$showok ${yellow}GPU_MODE: opencl$stand is already set."
+			fi
+		fi
+
+	elif [[ $yn_gpu_opencl == * ]]; then
+		echo -e "$showerror Possible options are: yY or nN." && set_gpu_opencl
+	fi
+}
+### GPU_OPENCL_FUNCTION_END
 
 ### NODE_WEBDOLLAR_START
 if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
@@ -464,9 +530,9 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 
 	if [[ ! -d $get_const_global ]]; then
 		echo "$showinfo ${yellow}const_global.js$stand found!"
-		echo "+--------+"
-		echo -e "| 1. ${yellow}CPU$stand |\\n| 2. ${yellow}GPU$stand |"
-		echo "+--------+"
+		echo "+----------------+"
+		echo -e "| 1. ${yellow}CPU$stand         |\\n| 2. ${yellow}GPU(cuda)$stand   |\\n| 3. ${yellow}GPU(opencl)$stand |"
+		echo "+----------------+"
 		read -r -e -p "$showinput Enter number of device you'll want to mine with: " select_device
 
 		if [[ $select_device == 1 ]]; then
@@ -476,6 +542,10 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 		elif [[ $select_device == 2 ]]; then
 
 			set_gpu_cuda
+
+		elif [[ $select_device == 3 ]]; then
+
+			set_gpu_opencl
 
 		elif [[ $select_device == * ]]; then
 
