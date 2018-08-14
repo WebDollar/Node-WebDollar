@@ -239,7 +239,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.187",
+        VERSION: "1.188",
         VERSION_COMPATIBILITY: "1.174.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
