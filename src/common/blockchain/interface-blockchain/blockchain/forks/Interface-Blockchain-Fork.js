@@ -111,12 +111,10 @@ class InterfaceBlockchainFork {
 
         this._validateChainWork();
 
-        this._validateForkImmutability();
-
         return true;
     }
 
-    _validateForkImmutability(){
+    validateForkImmutability(){
 
         //detecting there is a fork in my blockchain
         if ( this.blockchain.blocks.blocksStartingPoint > this.blockchain.blocks.length - 30 )
