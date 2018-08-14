@@ -101,10 +101,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.forkProofPi.hash = proofPiData.hash;
 
             let proofsList = [];
-            let knowGzip = false;
-
-            if (consts.BLOCKCHAIN.LIGHT.GZIPPED) knowGzip = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", { }, "answer", 3000 );
-            if (knowGzip === null ) knowGzip = false;
 
             let downloading = true;
             let pos = 0;
@@ -146,14 +142,13 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 buffer = await GZip.unzip(buffer);
 
             } catch (exception){
-                knowGzip = false;
+
             }
 
             let offset = 0;
+            while(offset!=buffer.length){
 
-            while (offset !== buffer.length){
-
-                let result = this.forkProofPi.deserializeProof( buffer, offset );
+                let result = this.forkProofPi.deserializeProof(buffer, offset);
 
                 proofsList.push(result.data);
                 offset = result.offset;
@@ -173,15 +168,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
                 console.warn("Strange this.blockchain is empty");
                 return;
             }
-
-
-            if (knowGzip === false) {
-                this.forkProofPi.proofSerialized = buffer;
-                this.forkProofPi.proofGzip = undefined;
-            } else {
-                this.forkProofPi.proofGzip = buffer;
-            }
-
 
             if ( this.blockchain.proofPi !== undefined) {
 
@@ -310,9 +296,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         if (comparison === 0 && this.forkProofPi.lastProofBlock.height <= this.blockchain.proofPi.lastProofBlock.height ) {
 
-            if ( comparison === 0 && this.forkChainWork.lesser(this.blockchain.blocks.chainWork) ) throw {message: "Your proof is worst than mine"};
+            if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
 
-            if ( comparison === 0 && this.forkChainWork.equals( this.blockchain.blocks.chainWork ) )
+            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0)
                 throw {message: "Your proof is worst than mine because you have the same block"};
 
         }

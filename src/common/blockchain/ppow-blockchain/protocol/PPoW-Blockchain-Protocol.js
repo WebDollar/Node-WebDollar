@@ -21,13 +21,6 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
     _initializeNodeNiPoPoW(socket) {
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported", () => {
-
-            let proofPi = this.blockchain.agent.light ? this.blockchain.proofPi : this.blockchain.prover.proofPi;
-            socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip-supported" + "/answer", { result: ( consts.BLOCKCHAIN.LIGHT.GZIPPED && proofPi !== undefined ) ? ( proofPi.proofGzip !== undefined ? true : false ) : false });
-
-        });
-
         socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash", () => {
 
             try {
@@ -103,39 +96,6 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
                     result: false,
                     message: exception
                 });
-
-            }
-
-        });
-
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async (data)=>{
-
-            try {
-
-                if (data.starting === undefined) data.starting = 0;
-                if (data.length === undefined) data.length = 1000;
-
-                if (typeof data.starting !== "number") throw "starting is not a number";
-                if (typeof data.length !== "number") throw "length is not a number";
-
-                let proof;
-
-                if (this.blockchain.agent.light) {
-
-                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length);
-
-                }
-                else { // full node
-
-                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length);
-
-                }
-
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", proof);
-
-            } catch (exception){
-
-                console.error("Error getting proofs headers", exception);
 
             }
 
