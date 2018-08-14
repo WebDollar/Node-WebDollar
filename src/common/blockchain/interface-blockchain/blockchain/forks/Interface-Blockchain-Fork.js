@@ -92,6 +92,9 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
+
+
+
     async _validateFork(validateHashesAgain, firstValidation){
 
         //forkStartingHeight is offseted by 1
@@ -108,7 +111,40 @@ class InterfaceBlockchainFork {
 
         this._validateChainWork();
 
+        //this._validateForkImmutability();
+
         return true;
+    }
+
+    _validateForkImmutability(){
+
+        //detecting there is a fork in my blockchain
+        if ( ! process.env.BROWSER && this.blockchain.blocks.length > 30 )
+            if (this.forkStartingHeight <= this.blockchain.blocks.length - 30){
+                //verify if there were only a few people mining in my last 30 blocks
+
+                let addresses = [];
+
+                for (let i=this.blockchain.blocks.length-30; i<this.blockchain.blocks.length; i++){
+
+                    let found = false;
+                    for (let j=0; j<addresses.length; j++)
+                        if (addresses[j].equals(this.blockchain.blocks[i].data.minerAddress)){
+                            found = true;
+                            break;
+                        }
+
+                }
+
+                if (addresses.length > 3)  //in my fork, there were a lot of miners, and not just me
+                    throw {message: "Validate for Immutability failed"};
+                else
+                    return true; //there were just 3 miners, probably it is my own fork...
+
+            }
+
+        return true;
+
     }
 
     _validateChainWork(){
@@ -395,9 +431,9 @@ class InterfaceBlockchainFork {
 
                         if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
                             this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
-                        else {
+                        else
                             await this.blockchain.sleep(2);
-                        }
+
 
 
 
@@ -510,7 +546,6 @@ class InterfaceBlockchainFork {
 
         return success;
     }
-
 
     preForkClone(cloneBlocks=true){
 
