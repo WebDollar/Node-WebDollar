@@ -15,7 +15,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions, showUpdate){
+    _preProcessTransaction(multiplicationFactor = 1 ,  revertActions, showUpdate){
 
         this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions, showUpdate);
 

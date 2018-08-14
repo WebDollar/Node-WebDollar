@@ -9,6 +9,8 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain";
 import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
+import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
+
 const EventEmitter = require('events');
 
 class NodesWaitlist {
@@ -61,7 +63,7 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER )
+        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER && nodeType !== NODE_TYPE.NODE_WEB_PEER)
             return {result:false, waitlist: null};
 
 
@@ -138,6 +140,7 @@ class NodesWaitlist {
         if (sckAddresses.length > 0){
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, nodeType, nodeConsensusType, level, backedBy , connected, socket );
+            GeoLocationLists._includeAddress(sckAddresses[0]);
 
             let list;
 

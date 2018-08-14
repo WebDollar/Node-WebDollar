@@ -8,6 +8,7 @@ import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import NODE_TYPE from "node/lists/types/Node-Type";
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationProtocol from 'common/sockets/protocol/Node-Propagation-Protocol'
+import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 
 let NodeExpress, NodeServer;
 
@@ -103,6 +104,9 @@ class NodeClient {
                 }
                 this.socket = socket;
 
+                if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
+                    throw {message: "You switched to pool"};
+
                 NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
 
                 socket.once("connect", async ( response ) =>{
@@ -171,6 +175,12 @@ class NodeClient {
     async initializeSocket(validationDoubleConnectionsTypes, waitlist){
 
         //it is not unique... then I have to disconnect
+
+        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+            this.socket.disconnect();
+            delete this.socket;
+            return false;
+        }
 
         if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, waitlist.nodeConsensusType,  validationDoubleConnectionsTypes) === false){
             return false;

@@ -92,6 +92,18 @@ class PoolPayouts{
 
             Log.info("Payout: Initialized ", Log.LOG_TYPE.POOLS);
 
+            let totalSumReward = 0;
+            for (let i=0; i<blocksConfirmed.length; i++)
+                totalSumReward += BlockchainMiningReward.getReward ( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
+
+            let poolFork = totalSumReward - Blockchain.blockchain.accountantTree.getBalance( this.blockchain.mining.minerAddress );
+
+            let poolForkDifferencePerBlock = 0;
+
+            if (poolFork > 0)
+                poolForkDifferencePerBlock = Math.ceil( poolFork / blocksConfirmed );
+
+
             for (let i=0; i<blocksConfirmed.length; i++) {
 
                 let totalDifficulty = new BigNumber(0);
@@ -112,12 +124,12 @@ class PoolPayouts{
                     sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].rewardForReferral;
                 }
 
-                let difference = sumReward - maxSumReward ;
+                let difference = (sumReward - maxSumReward) + poolForkDifferencePerBlock;
 
                 //reducing the price
                 if ( Math.abs( difference ) > 1 ) {
 
-                    difference = Math.floor( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
+                    difference = Math.ceil( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
 
                     blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance)=>{
 

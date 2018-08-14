@@ -168,6 +168,7 @@ class PoolDataBlockInformationMinerInstance {
 
                             address = this.poolManagement.poolData.miners[i].address;
                             break;
+
                         }
 
         } else {

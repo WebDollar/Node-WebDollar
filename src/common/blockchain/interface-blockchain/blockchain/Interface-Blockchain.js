@@ -109,7 +109,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
         }
 
-        this._onBlockCreated(block,  saveBlock);
+        await this._onBlockCreated(block,  saveBlock);
+
 
         if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 

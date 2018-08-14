@@ -63,7 +63,7 @@ class Blockchain{
 
     }
 
-    async createBlockchain(agentName, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true ){
+    async createBlockchain(agentName, beforeBlockchainLoadCallback, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true ){
 
         this._blockchainInitiated = true;
 
@@ -90,7 +90,7 @@ class Blockchain{
         StatusEvents.emit('blockchain/status', {message: "Single Window"});
 
 
-        await this.initializeBlockchain( afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize );
+        await this.initializeBlockchain( beforeBlockchainLoadCallback, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize );
 
     }
 
@@ -106,7 +106,7 @@ class Blockchain{
         }
     }
 
-    async initializeBlockchain(afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true){
+    async initializeBlockchain(beforeBlockchainLoadCallback, afterBlockchainLoadCallback, afterSynchronizationCallback, synchronize = true){
 
         await this.loadWallet();
 
@@ -120,15 +120,22 @@ class Blockchain{
 
         }
 
-        if (typeof afterBlockchainLoadCallback === "function")
-            await afterBlockchainLoadCallback();
+        if (typeof beforeBlockchainLoadCallback === "function")
+            await beforeBlockchainLoadCallback();
 
-        //loading the blockchain
         if (synchronize){
 
             await this.Chain.loadBlockchain();
 
             await this.blockchain.transactions.pendingQueue.pendingQueueSavingManager.loadPendingTransactions();
+
+        }
+
+        if (typeof afterBlockchainLoadCallback === "function")
+            await afterBlockchainLoadCallback();
+
+        //loading the blockchain
+        if (synchronize){
 
             await this.Agent.initializeStartAgentOnce();
 

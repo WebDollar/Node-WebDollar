@@ -12,6 +12,7 @@ import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockc
 import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from "consts/const_global"
 import Log from 'common/utils/logging/Log';
+import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-Status";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -161,7 +162,7 @@ class MinerProtocol extends PoolProtocolList{
                 //if ( typeof answer.reward !== "number") throw {message: "pool: Reward is empty"};
                 //if ( typeof answer.confirmed !== "number") throw {message: "pool: confirmedReward is empty"};
 
-                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", {result: true});
+                socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
                 if (answer.work !== undefined)
                     this._validateRequestWork(answer.work, socket);
@@ -180,7 +181,6 @@ class MinerProtocol extends PoolProtocolList{
                 await this._connectionEstablishedWithPool(socket);
 
                 this._updateStatistics(answer);
-
                 this.minerPoolManagement.minerPoolReward.setReward(answer);
 
                 return true;
@@ -215,6 +215,8 @@ class MinerProtocol extends PoolProtocolList{
 
         StatusEvents.emit("miner-pool/connection-established", {connected: true, message: "Connection Established", socket: socket});
 
+        if (this.minerPoolManagement.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+            this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
@@ -222,26 +224,23 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                let confirmation = socket.node.sendRequestWaitOnce("mining-pool/new-work/answer", {
+                socket.node.sendRequest("mining-pool/new-work/answer", {
                     hash: this.minerPoolManagement.minerPoolMining.bestHash,
-                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce
-                }, "confirm", 6000);
+                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
+                    id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
+                });
 
                 this._validateRequestWork(data.work, socket);
 
-                let answer = await confirmation;
-
-                if (answer === null) throw {message: "new-work: confirmation was never received"};
-
-                this._updateStatistics( answer );
-
-                this.minerPoolManagement.minerPoolReward.setReward(answer);
+                this._updateStatistics( data);
+                this.minerPoolManagement.minerPoolReward.setReward(data);
 
             } catch (exception){
                 console.error("new work raised an exception", exception);
             }
 
         });
+
 
 
     }
@@ -299,11 +298,10 @@ class MinerProtocol extends PoolProtocolList{
 
         if (answer.result !== true) throw {message: "get-work answered false"};
 
-        this.minerPoolManagement.minerPoolReward.setReward(answer);
-
         this._validateRequestWork( answer.work, poolSocket);
 
         this._updateStatistics(answer);
+        this.minerPoolManagement.minerPoolReward.setReward(answer);
 
         return true;
     }
@@ -324,11 +322,15 @@ class MinerProtocol extends PoolProtocolList{
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
 
             if (!miningAnswer.result){
+
                 try {
+
                     Log.warn("Statistics: Real " + Math.floor( miningAnswer.hashes / miningAnswer.timeDiff * 1000 )+ " h/s ", Log.LOG_TYPE.POOLS);
+
                 } catch (exception){
 
                 }
+
             }
 
             answer = await answer;
@@ -336,12 +338,12 @@ class MinerProtocol extends PoolProtocolList{
             if (answer === null) throw {message: "WorkDone: Answer is null"};
             if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
-
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 
             this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
+            this.minerPoolManagement.minerPoolReward.setReward(answer);
 
         } catch (exception){
 
