@@ -23,9 +23,10 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
         } catch (exception){
 
             console.error("Loading BLocks raised an error");
-            MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true);
+            await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true);
 
             await this.prover.provesCalculated._saveProvesCalculated();
+            //save all difficulties for all blocks
 
         }
 

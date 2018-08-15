@@ -134,14 +134,14 @@ class PPoWBlockchainProvesCalculated{
 
         let array = [];
 
-        array.push( Serialization.serializeNumber4Bytes(this.levels.length) );
+        array.push( Serialization.serializeNumber2Bytes(this.levels.length) );
         for (let i=-1; i < this.levels.length; i++ ){
 
-            array.push( Serialization.serializeNumber7Bytes(this.levels[i].length) );
+            array.push( Serialization.serializeNumber3Bytes(this.levels[i].length) );
             for (let j=0; j< this.levels[i].length; j++){
 
-                array.push( Serialization.serializeBufferCountingLeadingZeros(this.levels[j].hash) ); //1 bytes
-                array.push( Serialization.serializeBufferRemovingLeadingZeros(this.levels[j].hash) ); //32-zero count bytes
+                array.push( Serialization.serializeHashOptimized(this.levels[i][j].hash) ); //max 32 bytes
+                array.push( Serialization.serializeNumber4Bytes(this.levels[i][j].height) );
 
             }
 
@@ -155,8 +155,8 @@ class PPoWBlockchainProvesCalculated{
 
         if ( Object.keys(Buffer).length !== 0 ){
 
-            let levelsLength = Serialization.deserializeNumber4Bytes(Buffer, offset);
-            offset += 4;
+            let levelsLength = Serialization.deserializeNumber2Bytes(Buffer, offset);
+            offset += 2;
 
             console.log(levelsLength);
 
@@ -164,26 +164,20 @@ class PPoWBlockchainProvesCalculated{
 
                 for (let i = -1; i < levelsLength; i++) {
 
-                    if (this.levels[i].length !== 0) {
+                    let currentLevelLength = Serialization.deserializeNumber3Bytes(Buffer, offset);
+                    offset += 3;
 
-                        this.levels[i].length = Serialization.deserializeNumber7Bytes(Buffer, offset);
-                        offset += 7;
+                    if (currentLevelLength !== 0) {
 
-                        for (let j = 0; j < this.levels[i].length; j++) {
+                        for (let j = 0; j < currentLevelLength; j++) {
 
-                            let zeroCount = this.levels[j].hash = BufferExtended.substr(Buffer, offset, 1);
-                            offset += 1;
+                            this.levels[i][j] = {};
+                            let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
+                            this.levels[i][j].hash = deserializeResult.hash;
+                            offset = deserializeResult.offset;
 
-                            let hashPrefix = [];
-
-                            for (let z = 0; z < zeroCount; z++) hashPrefix.push(0);
-
-                            this.levels[j].hash = Buffer.concat([
-                                hashPrefix,
-                                this.levels[j].hash = BufferExtended.substr(Buffer, offset, 32 - zeroCount)
-                            ]);
-
-                            offset += 32 - zeroCount;
+                            this.levels[i][j].height = Serialization.deserializeNumber4Bytes(Buffer,offset);
+                            offset += 4;
 
                         }
 
@@ -202,10 +196,11 @@ class PPoWBlockchainProvesCalculated{
         if (key === undefined)
             key = this.blockchain._blockchainFileName+"_proves_calculated";
 
-        let buffer = this._SerializationProves();
+
+        let buffer = await this._SerializationProves();
 
         console.log("Save proof creator "+key);
-        console.log(buffer);
+        console.log(buffer.toString('hex'));
 
         return (await this.db.save( key, buffer ));
 
@@ -222,12 +217,12 @@ class PPoWBlockchainProvesCalculated{
 
             let buffer = await this.db.get(key, 12000);
 
-            if (buffer === null && !Buffer.isBuffer(buffer)) {
+            if (buffer === null || !Buffer.isBuffer(buffer)) {
                 console.error("Proof for key "+key+" was not found");
                 return false;
             }
 
-            console.log("bufffffr ",buffer);
+            console.log("Loaded proof creator ",buffer.toString('hex'));
 
             await this._DeserializationProves(buffer);
 
