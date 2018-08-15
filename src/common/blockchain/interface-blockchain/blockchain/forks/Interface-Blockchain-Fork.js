@@ -137,7 +137,7 @@ class InterfaceBlockchainFork {
 
                 }
 
-                if (addresses.length > 3)  //in my fork, there were a lot of miners, and not just me
+                if (addresses.length > 1)  //in my fork, there were a lot of miners, and not just me
                     throw {message: "Validate for Immutability failed"};
                 else
                     return true; //there were just 3 miners, probably it is my own fork...
