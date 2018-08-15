@@ -49,7 +49,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 15,
+        IMMUTABILITY_LENGTH: 10,
 
     },
 
@@ -244,7 +244,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.193",
+        VERSION: "1.195",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",

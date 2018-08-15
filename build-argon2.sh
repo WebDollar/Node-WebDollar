@@ -403,8 +403,8 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 
 		elif [[ $yn_compile_argon2cpu == [yY] ]]; then
 			if cd argon2; then echo "$showexecute Changing dir to ${yellow}argon2$stand"; else echo "$showerror Couldn't cd to argon2 folder!"; fi
-		        echo "$showexecute ${green}autoreconf -i$stand" && autoreconf -i
-			echo "$showexecute ${green}./configure$stand" && ./configure
+		        #echo "$showexecute ${green}autoreconf -i$stand" && autoreconf -i
+			#echo "$showexecute ${green}./configure$stand" && ./configure
 			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
 			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
 
@@ -496,7 +496,7 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 			echo "$showerror ${yellow}argon2-gpu$stand not found inside Node-WebDollar!"
 			echo "$showinfo Cloning ${yellow}argon2-gpu$stand from WebDollar repository..."
 			git clone https://github.com/WebDollar/argon2-gpu.git
-			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}$(pwd)$stand"; else echo "$showerror Couldn't cd to ${yellow}argon2-gpu$stand folder!"; fi
+			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}$(pwd)$stand" && git submodule update --init; else echo "$showerror Couldn't cd to ${yellow}argon2-gpu$stand folder!"; fi
 
 			if [[ $(grep -m 1 project CMakeLists.txt | cut -d '(' -f2 | sed s'/[( CXX)]//g') == argon2-gpu ]]; then
 			        echo "$showinfo Current dir is $(pwd)"
@@ -577,7 +577,7 @@ else
 		}
 		argon2_compile
 	else
-	        if [[ ! $(pwd | cut -d '/' -f4) == argon2 ]]; then
+	        if [[ ! $(ls -d argon2) == argon2 ]]; then
 	       	        echo "$showerror You are not inside ${yellow}Node-WebDollar$stand folder."
 	               	echo "$showinfo Run this script inside ${yellow}Node-WebDollar$stand folder to compile ${yellow}argon2$stand."
 	        fi
