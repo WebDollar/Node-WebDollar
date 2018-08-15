@@ -175,7 +175,7 @@ class NodeServer {
 
                 let semiPublicKeyConsensus = socket.request._query["semiPublicKeyConsensus"];
 
-                if (consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS === '' || semiPublicKeyConsensus === consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS)
+                if (consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS === undefined || consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS.indexOf(semiPublicKeyConsensus) === -1 )
                     if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
                         //be sure it is not a fallback node

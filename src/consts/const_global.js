@@ -234,7 +234,7 @@ consts.MINING_POOL = {
 
     },
 
-    SEMI_PUBLIC_KEY_CONSENSUS: '',
+    SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
 
 
 
