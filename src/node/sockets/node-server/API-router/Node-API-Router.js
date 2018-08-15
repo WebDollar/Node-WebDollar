@@ -38,7 +38,7 @@ class NodeAPIRouter{
 
 
             // respond with "hello world" when a GET request is made to the homepage
-        this._addRoute('', NodeAPIPublic.info, nodeApiType, 200, app, prefix, middleWare , app, prefix, middleWare );
+        this._addRoute('', NodeAPIPublic.info, nodeApiType, 200, app, prefix, middleWare );
 
         // Return blocks information
         this._addRoute('blocks/between/:blocks', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
@@ -57,7 +57,7 @@ class NodeAPIRouter{
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare , app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare );
 
         }
 
