@@ -1,5 +1,4 @@
 import Argon2 from 'common/crypto/Argon2/Argon2'
-
 let crypto = (process.env.BROWSER) ? require('crypto-browserify') : require('crypto');
 
 class WebDollarCrypto {
@@ -90,8 +89,10 @@ class WebDollarCrypto {
 
     static SHA256(bytes){
 
-        return crypto.createHash('sha256').update(bytes).digest(); //sha256
+        let sha256 = crypto.createHash('sha256'); //sha256
+        sha256.update(bytes);
 
+        return sha256.digest();
     }
     
     static encryptAES(buffer, password){
