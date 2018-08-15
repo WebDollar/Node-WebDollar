@@ -21,15 +21,15 @@ class NodeAPIPrivate{
 
     async walletImport(req, res){
 
-        let privateKey = req.privateKey;
-
-        let address = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
+        let address = req.query.address;
+        let publicKey = req.query.publicKey;
+        let privateKey = req.query.privateKey;
 
         let content = {
             version: '0.1',
-            address: address.address,
-            publicKey: address.publicKey,
-            privateKey: address.privateKey,
+            address: address,
+            publicKey: publicKey,
+            privateKey: privateKey,
         };
 
         try {
@@ -38,7 +38,7 @@ class NodeAPIPrivate{
 
             if (answer.result === true) {
                 await Blockchain.Wallet.saveWallet();
-                return {result: true, address: address.address};
+                return {result: true, address: address};
             } else
                 return {result: false, message: answer.message};
 
@@ -50,10 +50,10 @@ class NodeAPIPrivate{
 
     async walletCreateTransaction(req, res){
 
-        let from = req.from;
-        let to = req.to;
-        let amount = req.amount;
-        let fee = req.fee;
+        let from = req.query.from;
+        let to = req.query.to;
+        let amount = req.query.amount;
+        let fee = req.query.fee;
 
         amount = parseInt(amount) * WebDollarCoins.WEBD;
         fee = parseInt(fee) * WebDollarCoins.WEBD;

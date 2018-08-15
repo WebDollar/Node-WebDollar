@@ -13,7 +13,7 @@ class NodeAPIPublicAddresses{
 
     addressInfo(req, res){
 
-        let address = req.address;
+        let address = req.params.address;
 
         try {
             address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
@@ -79,7 +79,7 @@ class NodeAPIPublicAddresses{
 
     addressBalance(req, res){
 
-        let address = req.address;
+        let address = req.params.address;
 
         try {
             address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);

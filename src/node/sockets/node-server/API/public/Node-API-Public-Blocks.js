@@ -7,7 +7,7 @@ class NodeAPIPublicBlocks{
 
     blocks(req, res){
 
-        let block_start = req.block_start;
+        let block_start = req.params.block_start;
 
         try {
 
@@ -27,7 +27,7 @@ class NodeAPIPublicBlocks{
 
     block(req, res){
 
-        let index = req.block;
+        let index = req.params.block;
 
         try {
 
