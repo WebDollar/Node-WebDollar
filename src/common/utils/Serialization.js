@@ -186,22 +186,6 @@ class Serialization{
 
     }
 
-    serializeBufferCountingLeadingZeros(buffer){
-
-        let count=0;
-        let stop=false;
-
-        while(!stop){
-
-            if( buffer[count] === 0 ) count++;
-                else stop = true;
-
-        }
-
-        return this.serializeNumber1Byte(count);
-
-    }
-
     serializeHashOptimized(hash){
 
         return this.serializeBufferRemovingLeadingZeros(hash);
