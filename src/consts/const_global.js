@@ -234,6 +234,8 @@ consts.MINING_POOL = {
 
     },
 
+    SEMI_PUBLIC_KEY_CONSENSUS: '',
+
 
 
 };
