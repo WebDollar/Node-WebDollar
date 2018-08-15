@@ -372,9 +372,10 @@ class InterfaceBlockchainBlock {
 
     }
 
-    saveBlockDifficulty(){
+    async saveBlockDifficulty(){
 
-        return this.db.save("blockDiff" + this.height, this.difficultyTargetPrev);
+        let data = await this.db.save("blockDiff" + this.height, this.difficultyTargetPrev);
+        return data;
 
     }
 

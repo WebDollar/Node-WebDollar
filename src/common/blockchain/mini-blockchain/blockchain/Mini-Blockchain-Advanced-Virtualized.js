@@ -24,6 +24,8 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
             //save all difficulties for all blocks
             await this.saveVirtualizedDificulties();
 
+            return;
+
         }
 
 
@@ -56,7 +58,7 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
     async saveVirtualizedDificulties(){
 
         for (let i=0; i<this.blocks.length; i++)
-            return (await this.blocks[i].saveBlockDifficulty() );
+             await this.blocks[i].saveBlockDifficulty();
 
     }
 

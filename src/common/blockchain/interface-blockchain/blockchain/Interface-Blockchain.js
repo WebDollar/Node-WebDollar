@@ -204,7 +204,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         else{
 
             if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined) return this.loadingManager.getBlockDifficulty(height);
+            if (this.blocks[height-1] === undefined) return await this.loadingManager.getBlockDifficulty(height);
 
             return this.blocks[height-1].difficultyTarget;
         }
@@ -218,7 +218,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return BlockchainGenesis.timeStamp;
         else{
             if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
-            if (this.blocks[height-1] === undefined) throw {message: "getTimeStamp invalid height ", height: height};
+            if (this.blocks[height-1] === undefined) return this.loadingManager._loadBlock(height).timeStamp;
 
             return this.blocks[height-1].timeStamp;
         }

@@ -14,9 +14,10 @@ class LoadingManager{
 
     }
 
-    getBlockDifficulty(height){
+    async getBlockDifficulty(height){
 
-        return this.blockchain.db.get("blockDiff"+height);
+        let data = await this.blockchain.db.get("blockDiff"+height);
+        return data;
 
     }
 
