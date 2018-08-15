@@ -14,7 +14,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         super(root, parent, edges);
 
         //console.log("value", value);
-        this.hash = { sha256: new Buffer(32) };
+        this.hash =  new Buffer(32);
         this.total = 0;
 
         if (value !== undefined && value !== null) {
@@ -456,7 +456,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                 list[i].address = list[i].node.getAddress();
 
                 if (!bIncludeMiningReward)
-                    if ( [ "WEBD$gAHF1r0FJjDxWvEAZe3MV8izwWKEXhNt03$", "WEBD$gCSiJ0yUAV#TPnoFDYJu+opGmKCHHXDw3z$", "WEBD$gD#Ws@o65Imk9DLWJTsPRd0oMxnUeU7S@r$", "WEBD$gAuP5uvvJo6c#hxTtor9n5GV5m1Ysd0zjT$", "WEBD$gAvnyWnGSVcrVu4ERMEK8PHm8WCZiwa2ET$", "WEBD$gDvYAPvIDAe+gnqByY$A2kMF21yiQiE#0j$", "WEBD$gAIhBLJi6yvx#+PZtxMg5piwIW0p1#4HU3$", "WEBD$gDH2IIR+DprpggngzC5Ssw5eMjgiPFM@sf$", "WEBD$gC9ri$@bfpHLhiDppCfcxDzRvnNLH79L2j$", "WEBD$gBwnT+PoK1sI9xyz1PI1t9ZqVK5htrwLWn$", "\n" +
+                    if ( [ "WEBD$gDZwjjD7ZE5+AE+44ITr8yo5E2aXYT3mEH$", "WEBD$gDx8CjURuVS+LSI91ufs@LH2QpIdSzaAxT$", "WEBD$gD5@1VU3ZiJ1siQxib#wAb4xeQTUS2zscn$", "WEBD$gCP41xykgy6K$LyGHCVNDZ44@PTp1kGufP$", "WEBD$gAHF1r0FJjDxWvEAZe3MV8izwWKEXhNt03$", "WEBD$gCSiJ0yUAV#TPnoFDYJu+opGmKCHHXDw3z$", "WEBD$gD#Ws@o65Imk9DLWJTsPRd0oMxnUeU7S@r$", "WEBD$gAuP5uvvJo6c#hxTtor9n5GV5m1Ysd0zjT$", "WEBD$gAvnyWnGSVcrVu4ERMEK8PHm8WCZiwa2ET$", "WEBD$gDvYAPvIDAe+gnqByY$A2kMF21yiQiE#0j$", "WEBD$gAIhBLJi6yvx#+PZtxMg5piwIW0p1#4HU3$", "WEBD$gDH2IIR+DprpggngzC5Ssw5eMjgiPFM@sf$", "WEBD$gC9ri$@bfpHLhiDppCfcxDzRvnNLH79L2j$", "WEBD$gBwnT+PoK1sI9xyz1PI1t9ZqVK5htrwLWn$", "\n" +
                         "WEBD$gBAjU3JemoRXZ5KNEG$b45QE6aI+oDUggb$", "WEBD$gBcJMPpviZNU4PT8Y5p+ijtM@ohPc@5CGX$", "WEBD$gByeqrPHBGvZfwssFbLtFc64Tt6WQDknXP$" ].indexOf( list[i].address ) >= 0 ){
                         list.splice(i,1);
                         i++;

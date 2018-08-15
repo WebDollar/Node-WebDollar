@@ -159,7 +159,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 throw {message: "Problem loading the blockchain"};
 
             //check the accountant Tree if matches
-            console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
+            console.log("this.accountantTree final", this.accountantTree.root.hash);
 
             //TODO verify accountantTree
 

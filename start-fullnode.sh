@@ -54,7 +54,7 @@ function checkroot(){
 
 function start_pm2node(){
 
-if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f4) =~ Node-WebDollar || $(pwd | cut -d '/' -f3) =~ Node-WebDollar ]]; then
+if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 	echo "$showinfo We are inside a Node-WebDollar Folder"
 
@@ -85,7 +85,7 @@ if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] || $(pwd | cut -d '/' -f3) 
 		if [[ $nrofports == 1 ]]; then f_oneport; elif [[ $nrofports == 2 ]]; then f_twoports; elif [[ $nrofports == 3 ]]; then f_threeports; elif [[ $nrofports == 4 ]]; then f_fourports; elif [[ $nrofports == 5 ]]; then f_fiveports;  elif [[ $nrofports == 6 ]]; then f_sixports; fi
 	fi
 else
-	if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
+	if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 		echo "$showok We are outside of a Node-WebDollar Folder"
 		echo -e "---Choose where to run PM2 instance\\n${cyan}$(ls -d -1 "$PWD"/** | grep 'Node-WebDollar')$stand\\n---"

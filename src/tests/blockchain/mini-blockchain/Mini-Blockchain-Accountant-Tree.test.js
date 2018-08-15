@@ -28,7 +28,7 @@ describe('MiniBlockchainAccountantTree', () => {
             sum += parseInt(array[i].val);
         }
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -39,7 +39,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined,undefined, true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
         for (let i = 0; i < array.length; i++){
             assert(Tree2.getBalance(array[i].addr) === Tree.getBalance(array[i].addr), "final balance is not right after deserialization "+Tree2.getBalance(array[i].addr)+" "+Tree.getBalance(array[i].addr)+" "+JSON.stringify(array[i]) );
@@ -83,7 +83,7 @@ describe('MiniBlockchainAccountantTree', () => {
         for (let i = 0; i < list.length; i++)
             assert(Tree.getBalance(list[i].address) === list[i].value, " value is not equal: " +list[i].value+"  "+Tree.getBalance(list[i].address));
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -94,7 +94,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined,undefined,true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
 
         for (let i = 0; i < list.length; i++) {
@@ -170,7 +170,7 @@ describe('MiniBlockchainAccountantTree', () => {
             assert(Tree.getBalance(list[i].address) === sum, " value is not equal: " + list[i].value + list[i].value2 + "  " + Tree.getBalance(list[i].address));
         }
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -181,7 +181,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined,undefined,true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
 
         for (let i = 0; i < list.length; i++) {
@@ -375,7 +375,7 @@ describe('MiniBlockchainAccountantTree', () => {
             assert(Tree.getAccountNonce(list[i].address) === sum, " nonce 2 is not equal: " + sum + "  " + Tree.getBalance(list[i].address));
         }
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -386,7 +386,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined,undefined,true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
 
         for (let i = 0; i < list.length; i++) {
@@ -554,7 +554,7 @@ describe('MiniBlockchainAccountantTree', () => {
             assert(Tree.getAccountNonce(list[i].address) === sum, " nonce 2 is not equal: " + sum + "  " + Tree.getBalance(list[i].address));
         }
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -565,7 +565,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined, undefined, true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
 
         for (let i = 0; i < list.length; i++) {
@@ -734,7 +734,7 @@ describe('MiniBlockchainAccountantTree', () => {
             assert(Tree.getAccountNonce(list[i].address) === sum, " nonce 2 is not equal: " + sum + "  " + Tree.getBalance(list[i].address));
         }
 
-        assert(!Tree.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.sha256.toString("hex"));
+        assert(!Tree.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree.root.hash.toString("hex"));
 
         let response = await Tree.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
 
@@ -745,7 +745,7 @@ describe('MiniBlockchainAccountantTree', () => {
         response = await Tree2.loadMiniAccountant(undefined, undefined, true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
-        assert(Tree2.root.hash.sha256.equals(Tree.root.hash.sha256), " root hash is not the same: " +Tree2.root.hash.sha256.toString("hex")+"  "+Tree.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree.root.hash), " root hash is not the same: " +Tree2.root.hash.toString("hex")+"  "+Tree.root.hash.toString("hex"));
 
 
         for (let i = 0; i < list.length; i++) {
@@ -826,7 +826,7 @@ describe('MiniBlockchainAccountantTree', () => {
         for (let i = tests.length-1; i >= 0 ; i-- )
             assert( Tree1.getBalance( tests[i].address ) === sumAddress(tests[i].address), " balance value is not equal: " + Tree1.getBalance( tests[i].address ) + "  " + sumAddress(tests[i].address) );
 
-        assert(!Tree1.root.hash.sha256.equals(new Buffer(32)), "root hash is not valid "+Tree1.root.hash.sha256.toString("hex"));
+        assert(!Tree1.root.hash.equals(new Buffer(32)), "root hash is not valid "+Tree1.root.hash.toString("hex"));
 
         let response = await Tree1.saveMiniAccountant(true, "MiniBlockchainAccountantTree.test");
         assert(response === true, 'save miniblockchain accountant tree : ' + response);
@@ -844,14 +844,14 @@ describe('MiniBlockchainAccountantTree', () => {
         assert(response === true, 'load miniblockchain accountant tree: ' + response);
 
 
-        assert(Tree1_2.root.hash.sha256.equals(Tree1.root.hash.sha256), " root hash is not the same: " +Tree1_2.root.hash.sha256.toString("hex")+"  "+Tree1.root.hash.sha256.toString("hex"));
-        assert(Tree2_2.root.hash.sha256.equals(Tree2.root.hash.sha256), " root hash is not the same: " +Tree2_2.root.hash.sha256.toString("hex")+"  "+Tree2.root.hash.sha256.toString("hex"));
+        assert(Tree1_2.root.hash.equals(Tree1.root.hash), " root hash is not the same: " +Tree1_2.root.hash.toString("hex")+"  "+Tree1.root.hash.toString("hex"));
+        assert(Tree2_2.root.hash.equals(Tree2.root.hash), " root hash is not the same: " +Tree2_2.root.hash.toString("hex")+"  "+Tree2.root.hash.toString("hex"));
 
 
         for (let i = 0; i < tests.length; i++)
             assert( Tree1.getBalance( tests[i].address ) === Tree2.getBalance( tests[i].address ), " balance value is not equal: " + Tree2.getBalance( tests[i].address ) + "  " + Tree1.getBalance( tests[i].address ) );
 
-        assert(Tree2.root.hash.sha256.equals(Tree1.root.hash.sha256), " HASHES ARE NOT THE SAME: " +Tree1.root.hash.sha256.toString("hex")+"  "+Tree2.root.hash.sha256.toString("hex"));
+        assert(Tree2.root.hash.equals(Tree1.root.hash), " HASHES ARE NOT THE SAME: " +Tree1.root.hash.toString("hex")+"  "+Tree2.root.hash.toString("hex"));
 
 
         assert(Tree1.calculateNodeCoins() === sumTotal, "Sums are not Equals "+" "+ Tree1.calculateNodeCoins().toString() +" "+sumTotal.toString()+" ");

@@ -15,7 +15,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         super(root, parent,  edges, value);
 
         if (hash === undefined)
-            hash = {sha256: new Buffer(32)};
+            hash = new Buffer(32);
 
         this.hash = hash;
 
@@ -24,7 +24,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
     serializeNodeData(){
 
         return Buffer.concat ( [
-            this.hash.sha256,
+            this.hash,
             InterfaceTreeNode.prototype.serializeNodeData.apply(this, arguments),
         ]);
 
@@ -33,10 +33,8 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
     deserializeNodeData(buffer, offset){
 
-        let hashSha256 =  BufferExtended.substr(buffer, offset, 32);
+        this.hash =  BufferExtended.substr(buffer, offset, 32);
         offset += 32;
-
-        this.hash = {sha256: hashSha256};
 
         arguments[1] = offset;
         offset = InterfaceTreeNode.prototype.deserializeNodeData.apply( this, arguments );
@@ -63,8 +61,8 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         if (!InterfaceTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
 
-        if (typeof this.hash !== "object" || typeof this.hash.sha256 !== "object") throw {message: "hash or sha256 doesn't exist in node"}
-        if ( !Buffer.isBuffer(this.hash.sha256) || this.hash.sha256.length !== 32 ) throw {message: "hash.sha256 is not a Buffer(32)"}
+        if (typeof this.hash !== "object" ) throw {message: "hash or sha256 doesn't exist in node"}
+        if ( !Buffer.isBuffer(this.hash) || this.hash.length !== 32 ) throw {message: "hash is not a Buffer(32)"}
 
         if (validateMerkleTree)
             return this._validateHash();
@@ -85,26 +83,20 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         let initialHash = null;
 
 
-        if ( this.hash === undefined || this.hash === null || this.hash.sha256 === undefined || this.hash.sha256 === null )
+        if ( this.hash === undefined || this.hash === null  )
             return false;
-        else {
-            initialHash = {};
-            initialHash.sha256 = this.hash.sha256;
-        }
+        else
+            initialHash = this.hash;
 
         this._computeHash();
 
         if (initialHash === null && this.hash !== null)
             return false; // different hash
-        if (initialHash.sha256 === null && this.hash.sha256 !== null) // different hash
+
+        if (this.hash.length !== initialHash.length)
             return false;
 
-        if (this.hash.sha256.length !== initialHash.sha256.length)
-            return false;
-
-        for (let i = 0; i < this.hash.sha256.length; i++)
-            if (this.hash.sha256[i] !== initialHash.sha256[i])
-                return false;
+        if (!this.hash.equals(initialHash)) return false;
 
         return true;
     }
@@ -129,7 +121,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
     _computeHash(){
 
         if (this === this.root && this.edges.length === 0){
-            this.hash = { sha256: new Buffer(32) };
+            this.hash = new Buffer(32);
             return this.hash;
         }
 
@@ -145,8 +137,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
             // Let's hash
 
-            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash ) )
-            this.hash = {sha256: sha256};
+            this.hash  = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash ) )
 
         } else
         if (this.edges.length > 0){
@@ -160,9 +151,9 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
                     this.edges[i].targetNode._computeHash();
 
                 if (i === 0)
-                    hashConcat.push( new Buffer(this.edges[i].targetNode.hash.sha256) );
+                    hashConcat.push( new Buffer(this.edges[i].targetNode.hash) );
                 else
-                    hashConcat.push ( this.edges[i].targetNode.hash.sha256 );
+                    hashConcat.push ( this.edges[i].targetNode.hash );
             }
 
             if (hashConcat === [])
@@ -170,8 +161,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
             hashConcat = Buffer.concat(hashConcat);
 
-            let sha256 = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( Buffer.concat ( [valueToHash, hashConcat]  ) ));
-            this.hash = {sha256: sha256};
+            this.hash = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( Buffer.concat ( [valueToHash, hashConcat]  ) ));
 
             return this.hash;
         }

@@ -12,7 +12,7 @@ class PPoWBlockchainProvesCalculated{
         this.levelsLengths = [];
         this.levels = [];
 
-        for (let i=-1; i<=32; i++) {
+        for (let i=-1; i<256; i++) {
             this.levelsLengths[i] = 0;
             this.levels[i] = [];
         }
