@@ -234,6 +234,8 @@ consts.MINING_POOL = {
 
     },
 
+    SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
+
 
 
 };
@@ -244,7 +246,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.195",
+        VERSION: "1.197",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",

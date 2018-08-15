@@ -45,10 +45,14 @@ class ProcessWorker{
 
     }
 
+    get isWin(){
+        return /^win/.test(process.platform);
+    }
+
     async start(path) {
 
         if (path !== undefined)
-            this._path = path;
+            this._path = path + this.isWin ? '.exe' : '';
 
         try {
             await this._deleteFile();
@@ -57,10 +61,7 @@ class ProcessWorker{
 
         }
 
-
-        var isWin = /^win/.test(process.platform);
-
-        this._child = exec((isWin ? 'cmd' : '') + ' ' + this._getProcessParams(), async (e, stdout, stderr) => {
+        this._child = exec((this.isWin ? 'cmd' : '') + ' ' + this.isWin ? this._getProcessParams().replace("./",'') : this._getProcessParams(), async (e, stdout, stderr) => {
 
             //console.log(stdout);
             console.log(stderr);
