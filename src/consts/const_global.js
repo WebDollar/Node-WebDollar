@@ -49,7 +49,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 15,
+        IMMUTABILITY_LENGTH: 10,
 
     },
 
