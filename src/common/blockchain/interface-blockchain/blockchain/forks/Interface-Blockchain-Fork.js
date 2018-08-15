@@ -125,6 +125,8 @@ class InterfaceBlockchainFork {
 
                 for (let i=this.forkStartingHeight; i<this.blockchain.blocks.length; i++){
 
+                    if (this.blockchain.blocks[i].data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
+
                     let found = false;
                     for (let j=0; j<addresses.length; j++)
                         if (addresses[j].equals(this.blockchain.blocks[i].data.minerAddress)){
@@ -137,7 +139,7 @@ class InterfaceBlockchainFork {
 
                 }
 
-                if (addresses.length > 1)  //in my fork, there were a lot of miners, and not just me
+                if (addresses.length >= 1)  //in my fork, there were also other miners, and not just me
                     throw {message: "Validate for Immutability failed"};
                 else
                     return true; //there were just 3 miners, probably it is my own fork...

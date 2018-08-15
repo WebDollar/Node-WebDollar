@@ -224,6 +224,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 if ( fork.forkStartingHeight > fork.forkChainLength-1 )
                     throw {message: "FORK is empty"};
 
+                fork.validateForkImmutability();
+
                 await fork.initializeFork(); //download the requirements and make it ready
 
                 if (!fork.forkReady)
