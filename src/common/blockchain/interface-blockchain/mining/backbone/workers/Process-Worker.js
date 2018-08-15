@@ -52,7 +52,7 @@ class ProcessWorker{
     async start(path) {
 
         if (path !== undefined)
-            this._path = path + this.isWin ? '.exe' : '';
+            this._path = path + (this.isWin ? '.exe' : '');
 
         try {
             await this._deleteFile();
@@ -61,7 +61,7 @@ class ProcessWorker{
 
         }
 
-        this._child = exec((this.isWin ? 'cmd' : '') + ' ' + this.isWin ? this._getProcessParams().replace("./",'') : this._getProcessParams(), async (e, stdout, stderr) => {
+        this._child = exec((this.isWin ? 'cmd' : '') + ' ' + (this.isWin ? this._getProcessParams().replace("./",'') : this._getProcessParams()), async (e, stdout, stderr) => {
 
             //console.log(stdout);
             console.log(stderr);
