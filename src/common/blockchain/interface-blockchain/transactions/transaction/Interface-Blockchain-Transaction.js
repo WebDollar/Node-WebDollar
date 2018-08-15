@@ -30,8 +30,6 @@ class InterfaceBlockchainTransaction{
 
         this._confirmed = false;
 
-        this.pendingTransactionsIncluded = 0;
-
         if (timeLock === undefined)
             this.timeLock = blockchain.blocks.length-1;
         else
