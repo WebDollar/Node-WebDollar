@@ -14,6 +14,12 @@ class LoadingManager{
 
     }
 
+    getBlockDifficulty(height){
+
+        return this.blockchain.db.get("blockDiff"+height);
+
+    }
+
     async getBlock(height){
 
         if(this.loadedBlocks[height]!==undefined){
@@ -33,7 +39,7 @@ class LoadingManager{
 
         let validationType = this.blockchain.setFastLoadingValidationType(undefined);
 
-        let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this), this.blockchain.getDifficultyTarget.bind(this), this.blockchain.getTimeStamp.bind(this), this.blockchain.getHashPrev.bind(this), validationType );
+        let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this), await this.blockchain.getDifficultyTarget.bind(this), this.blockchain.getTimeStamp.bind(this), this.blockchain.getHashPrev.bind(this), validationType );
 
         let block = await this.blockchain._loadBlock(height, height, blockValidation);
 

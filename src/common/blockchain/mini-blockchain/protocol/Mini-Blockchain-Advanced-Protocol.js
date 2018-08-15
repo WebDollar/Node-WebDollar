@@ -103,7 +103,7 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
                 if (this.blockchain.blocks.length < data.height)
                     throw {message: "height is not valid"};
 
-                let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
+                let difficultyTarget = await this.blockchain.getDifficultyTarget(data.height);
                 let timestamp = this.blockchain.getTimeStamp(data.height);
                 let hashPrev = this.blockchain.getHashPrev(data.height);
 

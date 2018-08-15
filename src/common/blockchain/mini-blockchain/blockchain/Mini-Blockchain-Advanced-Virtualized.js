@@ -6,12 +6,6 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
         if (process.env.BROWSER) return;
 
-        let numBlocks = await this.readNumberSavedBlocks();
-        if( numBlocks === false ) return { result:false };
-
-        await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, false);
-
-        this.blocks.length = numBlocks;
 
         try {
 
@@ -23,12 +17,25 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
         } catch (exception){
 
             console.error("Loading BLocks raised an error");
-            await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true);
+            await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true, undefined);
 
             await this.prover.provesCalculated._saveProvesCalculated();
+
             //save all difficulties for all blocks
+            await this.saveVirtualizedDificulties();
 
         }
+
+
+        let numBlocks = await this.readNumberSavedBlocks();
+        if( numBlocks === false ) return { result:false };
+
+        await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true, true );
+
+        this.blocks.length = numBlocks;
+
+        if (this.prover.proofActivated)
+            await this.prover.createProofs();
 
     }
 
@@ -43,6 +50,13 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
         //save proofs
         let answer = await this.prover.provesCalculated._saveProvesCalculated();
         console.log("SAVEEEEEEEEED "+answer)
+
+    }
+
+    async saveVirtualizedDificulties(){
+
+        for (let i=0; i<this.blocks.length; i++)
+            return (await this.blocks[i].saveBlockDifficulty() );
 
     }
 

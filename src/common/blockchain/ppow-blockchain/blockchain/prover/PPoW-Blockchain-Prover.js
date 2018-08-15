@@ -45,8 +45,10 @@ class PPoWBlockchainProver{
 
             //for µ = |C[−k].interlink| down to 0 do
 
+            let C = chain.blocks[chainLength - consts.POPOW_PARAMS.k];
+
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
-                for (let miu = chain.blocks[chainLength - consts.POPOW_PARAMS.k].interlink.length; miu >= 0; --miu) {
+                for (let miu = C.interlink.length; miu >= 0; --miu) {
 
                     // //  α ← C[: −k]{B :}↑µ
                     // //  α is superChain

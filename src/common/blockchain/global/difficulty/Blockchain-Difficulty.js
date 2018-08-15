@@ -26,9 +26,9 @@ class BlockchainDifficulty{
      *
      */
 
-    static getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
+    static async getDifficultyMean( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
-        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
+        let prevBlockDifficulty = await getDifficultyCallback(blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty))
             prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));

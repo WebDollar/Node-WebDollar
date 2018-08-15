@@ -250,9 +250,9 @@ class PoolDataBlockInformation {
     }
 
 
-    calculateTargetDifficulty(){
+    async calculateTargetDifficulty(){
 
-        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") ) );
+        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ await this.poolManagement.blockchain.getDifficultyTarget().toString("hex") ) );
 
     }
 
@@ -271,7 +271,7 @@ class PoolDataBlockInformation {
         // if (this.bestHash === undefined) return 40;
         //
 
-        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
+        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ await this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
 
         //formula no 2
 

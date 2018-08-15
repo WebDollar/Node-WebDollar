@@ -116,7 +116,7 @@ class InterfaceBlockchainBlock {
         if ( ! (await this._validateBlockHash()) )
             throw {message: "validateBlockchain returned false"};
 
-        this._validateTargetDifficulty();
+        await this._validateTargetDifficulty();
 
         this._validateBlockTimeStamp();
 
@@ -166,11 +166,11 @@ class InterfaceBlockchainBlock {
 
     }
 
-    _validateTargetDifficulty(){
+    async _validateTargetDifficulty(){
 
         if (!this.blockValidation.blockValidationType['skip-target-difficulty-validation']){
 
-            let prevDifficultyTarget = this.blockValidation.getDifficultyCallback(this.height);
+            let prevDifficultyTarget = await this.blockValidation.getDifficultyCallback(this.height);
 
             if (prevDifficultyTarget instanceof BigInteger)
                 prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
@@ -372,6 +372,12 @@ class InterfaceBlockchainBlock {
 
     }
 
+    saveBlockDifficulty(){
+
+        return this.db.save("blockDiff" + this.height, this.difficultyTargetPrev);
+
+    }
+
     async saveBlock(){
 
         let key = "block" + this.height;
@@ -408,7 +414,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height, undefined, await this.blockValidation.getDifficultyCallback(this.height) );
 
             return true;
         }

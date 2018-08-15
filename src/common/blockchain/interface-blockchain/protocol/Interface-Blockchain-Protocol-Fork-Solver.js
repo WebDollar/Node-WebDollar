@@ -395,7 +395,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
                 blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
-                block = this._deserializeForkBlock(fork, downloadingList[i].block, nextBlockHeight, blockValidation );
+                block = await this._deserializeForkBlock(fork, downloadingList[i].block, nextBlockHeight, blockValidation );
 
                 if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
                     await this.blockchain.sleep(15);
@@ -447,7 +447,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     }
 
-    _deserializeForkBlock( fork, blockData, blockHeight, validationBlock){
+    async _deserializeForkBlock( fork, blockData, blockHeight, validationBlock){
 
         let block = undefined;
 
@@ -458,7 +458,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                 block.data._onlyHeader = true; //avoiding to store the transactions
 
-            block.deserializeBlock( blockData, blockHeight, undefined, fork.getForkDifficultyTarget(block.height) );
+            block.deserializeBlock( blockData, blockHeight, undefined, await fork.getForkDifficultyTarget(block.height) );
 
         } catch (Exception) {
             console.error("Error deserializing blocks ", Exception, blockData);

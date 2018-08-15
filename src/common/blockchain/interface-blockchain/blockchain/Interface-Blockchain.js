@@ -158,7 +158,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
-        block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
+        block.difficultyTargetPrev = await block.blockValidation.getDifficultyCallback(block.height);
 
 
         //validate difficulty & hash
@@ -170,7 +170,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             //console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
 
-            block.difficultyTarget = block.blockValidation.getDifficulty( block.timeStamp, block.height );
+            block.difficultyTarget = await block.blockValidation.getDifficulty( block.timeStamp, block.height );
 
             block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
@@ -194,7 +194,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    getDifficultyTarget(height){
+    async getDifficultyTarget(height){
 
         if (height === undefined)
             height = this.blocks.length;
@@ -202,8 +202,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height <= 0)
             return BlockchainGenesis.difficultyTarget;
         else{
+
             if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+            if (this.blocks[height-1] === undefined) return this.loadingManager.getBlockDifficulty(height);
 
             return this.blocks[height-1].difficultyTarget;
         }

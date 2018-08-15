@@ -204,7 +204,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                     throw {message: "block for difficulty never received ", blockRequested: blockRequested};
 
                 let blockValidation = fork._createBlockValidation_ForkValidation(blockRequested, fork.forkBlocks.length-1);
-                let block = this._deserializeForkBlock( fork, answer.block, blockRequested , blockValidation);
+                let block = await this._deserializeForkBlock( fork, answer.block, blockRequested , blockValidation);
 
                 if (blockRequested < fork.forkDifficultyCalculation.difficultyCalculationStarts)
                     block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;

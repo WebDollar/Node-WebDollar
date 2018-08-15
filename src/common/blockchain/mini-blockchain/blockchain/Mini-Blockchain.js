@@ -152,7 +152,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
             let result;
 
-
             result = await inheritBlockchain.prototype._loadBlockchain.call( this  );
 
             if ( result === false )

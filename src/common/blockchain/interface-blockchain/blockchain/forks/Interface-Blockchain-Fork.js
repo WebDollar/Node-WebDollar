@@ -213,14 +213,14 @@ class InterfaceBlockchainFork {
     }
 
     // return the difficultly target for ForkBlock
-    getForkDifficultyTarget(height){
+    async getForkDifficultyTarget(height){
 
         let forkHeight = height - this.forkStartingHeight;
 
         if (height === 0)
             return BlockchainGenesis.difficultyTarget; // based on genesis block
         else if ( forkHeight === 0)
-            return this.blockchain.getDifficultyTarget(height);
+            return await this.blockchain.getDifficultyTarget(height);
         else if ( forkHeight > 0) {
 
             if ( forkHeight-1 >= this.forkBlocks.length )
@@ -229,7 +229,7 @@ class InterfaceBlockchainFork {
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
         }
         else
-            return this.blockchain.getDifficultyTarget(height) // the blockchain
+            return await this.blockchain.getDifficultyTarget(height) // the blockchain
     }
 
     getForkTimeStamp(height){
