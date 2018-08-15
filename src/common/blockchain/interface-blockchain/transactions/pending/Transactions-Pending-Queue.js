@@ -122,6 +122,8 @@ class TransactionsPendingQueue {
         if (index === -1)
             return true;
 
+        if (this.list[index].pendingTransactionsIncluded !== 0) return; //try next time
+
         this.list[index].destroyTransaction();
         this.list.splice(index, 1);
 
