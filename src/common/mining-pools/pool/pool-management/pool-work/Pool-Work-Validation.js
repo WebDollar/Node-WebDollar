@@ -1,5 +1,5 @@
 import Log from 'common/utils/logging/Log';
-const PROCESS_COUNT = 50;
+const PROCESS_COUNT = 30;
 
 class PoolWorkValidation{
 
