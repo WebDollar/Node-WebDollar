@@ -63,7 +63,7 @@ class ProcessWorker{
 
         }
 
-        this._child = exec(( Utils.isWin ? 'cmd' : '') + ' ' + this._getProcessParams(), async (e, stdout, stderr) => {
+        this._child = exec(( Utils.isWin ? '' : '') + ' ' + this._getProcessParams(), async (e, stdout, stderr) => {
 
             //console.log(stdout);
             console.log(stderr);
