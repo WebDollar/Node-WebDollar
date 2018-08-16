@@ -750,14 +750,32 @@ class InterfaceBlockchainFork {
         return -1;
     }
 
+    getForkSocket(index){
+
+        if (this.sockets.length === 0) return undefined;
+        
+        if (! this.sockets[index % this.sockets.length].connected) {
+            this.sockets.splice(index % this.sockets.length);
+            return undefined;
+        }
+        return this.sockets[index % this.sockets.length];
+    }
+
     pushSocket(socket, priority){
 
         if (this._findSocket(socket) === -1) {
 
             if (priority)
                 this.sockets.splice(0,0, socket);
-            else
+            else {
+
+                if (socket.latency !== 0)
+                    for (let i=0; i<this.sockets.length; i++)
+                        if (this.sockets[i].latency > socket.latency)
+                            return this.sockets.splice(i, 0, socket);
+
                 this.sockets.push(socket)
+            }
 
         }
 

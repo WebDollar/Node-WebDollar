@@ -111,6 +111,8 @@ class TransactionsPendingQueue {
 
     _removePendingTransaction (transaction){
 
+        if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
+
         let index;
 
         if (typeof transaction === "object") index = this.findPendingTransaction(transaction);

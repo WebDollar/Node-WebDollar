@@ -103,7 +103,9 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
         if (this.hash.sha256.length !== initialHash.sha256.length)
             return false;
 
-        if (!this.hash.sha256.equals(initialHash.sha256)) return false;
+        for (let i = 0; i < this.hash.sha256.length; i++)
+            if (this.hash.sha256[i] !== initialHash.sha256[i])
+                return false;
 
         return true;
     }

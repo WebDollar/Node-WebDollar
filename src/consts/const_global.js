@@ -234,6 +234,8 @@ consts.MINING_POOL = {
 
     },
 
+    SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
+
 
 
 };
@@ -244,7 +246,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.195",
+        VERSION: "1.197.1",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
@@ -264,7 +266,7 @@ consts.SETTINGS = {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
         STATUS_INTERVAL: 40 * 1000,
         LATENCY_CHECK: 5*1000,
-        MAX_ALLOWED_LATENCY: 10*1000,  //miliseconds
+        MAX_ALLOWED_LATENCY: 6*1000,  //miliseconds
         CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
 
 
