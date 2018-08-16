@@ -11,13 +11,11 @@ class ProcessWorkerCPP extends ProcessWorker{
         super(id, noncesWorkBatch, false);
         this.cores = cores;
 
-        this._filename = './dist_bundle/CPU/input.txt';
-
     }
 
     _getProcessParams(){
 
-        return this._path+ ' -d 0 -c '+this.cores+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._filename + this.suffix;
+        return this._path+ ' -d 0 -c '+this.cores+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._outputFilename + this.suffix;
 
     }
 

@@ -35,6 +35,8 @@ class Workers {
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH;
+            this._worker_path_file_name = '';
+
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = this.worker_batch;
@@ -42,7 +44,10 @@ class Workers {
             this.ibb._intervalPerMinute = false;
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
+
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
+            this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_CPP_FILENAME;
+
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
@@ -54,7 +59,10 @@ class Workers {
             this.ibb._intervalPerMinute = true;
         }
         else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
+
             this._worker_path = consts.TERMINAL_WORKERS.PATH_GPU;
+            this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_GPU_FILENAME;
+
             this.workers_max = (consts.TERMINAL_WORKERS.GPU_MAX * consts.TERMINAL_WORKERS.GPU_INSTANCES)||1;
             this.worker_batch = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK_BATCH;
@@ -67,11 +75,8 @@ class Workers {
         }
 
 
-        if (!FS.existsSync(this._worker_path)) {
+        if (!FS.existsSync(this._worker_path + this._worker_path_file_name))
             Log.error('Worker build is missing.', Log.LOG_TYPE.default);
-
-            return false;
-        }
 
         this._working = 0;
         this._silent = consts.TERMINAL_WORKERS.SILENT;
@@ -226,14 +231,14 @@ class Workers {
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
 
             worker = new ProcessWorkerCPP( index,  this.worker_batch, this.workers_max );
-            started = await worker.start(this._worker_path);
+            started = await worker.start(this._worker_path , this._worker_path_file_name);
 
             Log.info("CPU CPP worker created", Log.LOG_TYPE.defaultLogger );
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
 
             worker = new ProcessWorkerGPU( index,  this.worker_batch );
-            started = await worker.start(this._worker_path);
+            started = await worker.start(this._worker_path, this._worker_path_file_name);
 
             Log.info("GPU worker created", Log.LOG_TYPE.defaultLogger );
 
