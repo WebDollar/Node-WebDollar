@@ -312,13 +312,15 @@ class InterfaceBlockchainProtocolForkSolver{
             let downloadingList = [];
             let trialsList = [];
             let alreadyDownloaded = 0;
+            let resolved = false;
 
             let socketIndex = 0;
             let finished = new Promise((resolve)=>{
 
                 let downloadingBlock = (index)=>{
 
-                    if (trialsList[index] > 5){
+                    if (trialsList[index] > 5 && !resolved){
+                        resolved = true;
                         resolve(false);
                         return;
                     }
@@ -327,6 +329,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     trialsList[index] ++ ;
 
                     let socket = fork.getForkSocket(socketIndex);
+
                     if (socket === undefined)
                         return downloadingBlock(index);
 
@@ -341,15 +344,18 @@ class InterfaceBlockchainProtocolForkSolver{
                             downloadingList[index] = undefined;
                             socket.latency += Math.random()*1500;
 
-                            downloadingBlock(index);
+                            if (!resolved)
+                                downloadingBlock(index);
 
                         }
                         else {
                             alreadyDownloaded++;
                             downloadingList[index] = result;
 
-                            if ( (alreadyDownloaded === howManyBlocks) || global.TERMINATED )
+                            if ( (alreadyDownloaded === howManyBlocks) || global.TERMINATED && !resolved) {
+                                resolved = true;
                                 resolve(true);
+                            }
 
                         }
 
