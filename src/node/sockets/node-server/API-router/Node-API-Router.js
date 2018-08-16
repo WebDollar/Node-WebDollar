@@ -53,9 +53,9 @@ class NodeAPIRouter{
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import', NodeAPIPrivate.walletImport, nodeApiType, 100, app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import/:address/:publicKey/:privateKey', NodeAPIPrivate.walletImport, nodeApiType, 100, app, prefix, middleWare );
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction/:from/:to/:amount/:fee', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare );
 
