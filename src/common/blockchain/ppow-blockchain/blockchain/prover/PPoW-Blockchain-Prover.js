@@ -94,6 +94,13 @@ class PPoWBlockchainProver{
 
                         }
 
+
+
+
+
+
+
+
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
                         B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];

@@ -266,7 +266,7 @@ consts.SETTINGS = {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
         STATUS_INTERVAL: 40 * 1000,
         LATENCY_CHECK: 5*1000,
-        MAX_ALLOWED_LATENCY: 10*1000,  //miliseconds
+        MAX_ALLOWED_LATENCY: 6*1000,  //miliseconds
         CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
 
 

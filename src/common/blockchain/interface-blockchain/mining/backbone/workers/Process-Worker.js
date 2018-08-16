@@ -51,6 +51,7 @@ class ProcessWorker{
 
     async start(path) {
 
+
         if (path !== undefined)
             this._path = path + (this.isWin ? '.exe' : '');
 
