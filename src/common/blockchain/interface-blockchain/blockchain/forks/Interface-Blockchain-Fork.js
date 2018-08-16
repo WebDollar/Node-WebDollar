@@ -277,9 +277,6 @@ class InterfaceBlockchainFork {
         if (height === this.forkChainLength-1)
             validationType["validation-timestamp-adjusted-time"] = true;
 
-        if (height !== this.forkChainLength-1)
-            validationType["skip-calculating-proofs"] = true;
-
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
@@ -498,6 +495,9 @@ class InterfaceBlockchainFork {
 
                 this.postFork(forkedSuccessfully);
 
+                if (forkedSuccessfully)
+                    await this.blockchain.blockchainChanged(this.forkStartingHeight, !this.downloadAllBlocks);
+
                 if (this.downloadAllBlocks){
                     await this.sleep(30);
                     Blockchain.synchronizeBlockchain();
@@ -523,14 +523,14 @@ class InterfaceBlockchainFork {
 
         revertActions.destroyRevertActions();
 
-        Blockchain.blockchain.accountantTree.emitBalancesChanges();
-        Blockchain.blockchain.blocks.recalculateNetworkHashRate();
-        Blockchain.blockchain.blocks.emitBlockInserted();
-        Blockchain.blockchain.blocks.emitBlockCountChanged();
-
         try {
 
             if (success) {
+
+                Blockchain.blockchain.accountantTree.emitBalancesChanges();
+                Blockchain.blockchain.blocks.recalculateNetworkHashRate();
+                Blockchain.blockchain.blocks.emitBlockInserted();
+                Blockchain.blockchain.blocks.emitBlockCountChanged();
 
                 //successfully, let's delete the backup blocks
                 this._deleteBackupBlocks();

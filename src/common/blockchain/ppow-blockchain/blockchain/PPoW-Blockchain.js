@@ -20,27 +20,25 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         block.updateInterlink();
 
+    }
 
-        if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {
-            block.level = block.getLevel(); //computing the level
-            this.prover.provesCalculated.updateBlock(block);
-        }
+    async blockchainChanged(startingHeight, createProof=true){
 
         //TODO generate proofs as a LightNode
-        if (!this.agent.light)
-            if (!block.blockValidation.blockValidationType["skip-calculating-proofs"]){
+        if ( !this.agent.light ) {
 
-                await this.prover.createProofs();
-
+            for (let i=startingHeight; i<this.blocks.length-1; i++) {
+                this.blocks[i].level = this.blocks[i].getLevel(); //computing the level
+                this.prover.provesCalculated.updateBlock( this.blocks[i] );
             }
+
+            if (createProof)
+                await this.prover.createProofs();
+        }
 
     }
 
-
     async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset ){
-
-        let oldProofActivated = this.prover.proofActivated;
-        this.prover.proofActivated = false;
 
         let answer = false;
         try {
@@ -49,9 +47,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
             console.error("loadBlockchain raised an error", exception);
         }
-
-        this.prover.proofActivated = oldProofActivated;
-        await this.prover.createProofs();
 
         return answer;
 

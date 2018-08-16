@@ -302,7 +302,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-validation"] = true;
                 validationType["skip-interlinks-update"] = true;
                 validationType["skip-target-difficulty-validation"] = true;
-                validationType["skip-calculating-proofs"] = true;
                 //validationType["skip-calculating-block-nipopow-level"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-recalculating-hash-rate"] = true;
@@ -319,8 +318,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                 if ( i < numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE )
                     validationType["skip-saving-light-accountant-tree-serializations"] = true;
-
-                validationType["skip-calculating-proofs"] = true;
 
             }
 
@@ -362,9 +359,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         let answer = true;
 
+        let indexStart = 0;
         try {
-
-            let indexStart = 0;
 
             if (indexStartLoadingOffset )
                 indexStart = numBlocks - indexStartLoadingOffset;
@@ -408,6 +404,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     answer = false;
 
             }
+
+
+            await this.blockchainChanged(indexStart, true);
 
         } catch (exception){
 
@@ -503,6 +502,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
+    blockchainChanged(forkStartingHeight){
+
+    }
 
 }
 
