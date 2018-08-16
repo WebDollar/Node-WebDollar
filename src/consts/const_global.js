@@ -230,7 +230,7 @@ consts.MINING_POOL = {
 
     CONNECTIONS:{
 
-        NO_OF_IDENTICAL_IPS: 80,
+        NO_OF_IDENTICAL_IPS: 101,
 
     },
 
