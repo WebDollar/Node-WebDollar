@@ -751,6 +751,9 @@ class InterfaceBlockchainFork {
     }
 
     getForkSocket(index){
+
+        if (this.sockets.length === 0) return undefined;
+        
         if (! this.sockets[index % this.sockets.length].connected) {
             this.sockets.splice(index % this.sockets.length);
             return undefined;
