@@ -40,14 +40,30 @@ class LoadingManager{
 
         let validationType = this.blockchain.setFastLoadingValidationType(undefined);
 
-        let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this), await this.blockchain.getDifficultyTarget.bind(this), this.blockchain.getTimeStamp.bind(this), this.blockchain.getHashPrev.bind(this), validationType );
+        let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this.blockchain), this.blockchain.getDifficultyTarget.bind(this.blockchain), this.blockchain.getTimeStamp.bind(this.blockchain), this.blockchain.getHashPrev.bind(this.blockchain), validationType );
 
-        let block = await this.blockchain._loadBlock(height, height, blockValidation);
+        try {
+            let block = this.blockchain.blockCreator.createEmptyBlock(height, blockValidation);
+            block.height = height;
 
-        block.lastTimeUsed = new Date().getTime();
-        this.loadedBlocks[height] = block;
+            block.prevDifficultyTarget = this.blockchain.getDifficultyTarget(height);
+            block.difficultyTarget = this.blockchain.getDifficultyTarget(height+1, true);
 
-        return block;
+            if (await block.loadBlock() === false)
+                throw {message: "no block to load was found"};
+
+            block.lastTimeUsed = new Date().getTime();
+            this.loadedBlocks[height] = block;
+
+            return block;
+
+        } catch (exception){
+
+            console.error("Loading Manager raised an exception", exception);
+
+        }
+
+        return null;
 
     }
 

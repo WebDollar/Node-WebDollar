@@ -174,7 +174,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
-        }
+        } else
+            if (block.blockValidation.blockValidationType["load-difficulty-calculated"]){
+                block.difficultyTarget = await block.blockValidation.getDifficultyCallback( block.height + 1, true);
+            }
 
         return true;
     }
@@ -194,7 +197,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async getDifficultyTarget(height){
+    async getDifficultyTarget(height, skipLengthValidation){
 
         if (height === undefined)
             height = this.blocks.length;
@@ -203,7 +206,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return BlockchainGenesis.difficultyTarget;
         else{
 
-            if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (height > this.blocks.length && !skipLengthValidation) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
             if (this.blocks[height-1] === undefined) return await this.loadingManager.getBlockDifficulty(height);
 
             return this.blocks[height-1].difficultyTarget;
@@ -414,6 +417,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
                     let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+
+                    //vor virtualizing the first
+                    if (indexStartLoadingOffset !== undefined && index <= indexStartLoadingOffset + 20){
+                        validationType["skip-difficulty-recalculation"] = true;
+                        validationType["load-difficulty-calculated"] = true;
+                        validationType["skip-validation-timestamp"] = true;
+                        validationType["skip-recalculating-hash-rate"] = true;
+                    }
 
                     let block = await this._loadBlock(indexStart, index, blockValidation);
 
