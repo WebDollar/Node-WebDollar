@@ -197,7 +197,7 @@ class NodeExpress{
             for (let k in req.params)
                 req.params[k] = decodeURIComponent(req.params[k]);
 
-            let answer = await callback(req.params, res);
+            let answer = await callback(req, res);
             res.json(answer);
 
         } catch (exception){
