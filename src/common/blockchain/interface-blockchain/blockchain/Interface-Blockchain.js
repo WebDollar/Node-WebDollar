@@ -502,7 +502,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    blockchainChanged(forkStartingHeight){
+    blockchainBlocksRemoved(startingHeight, endingPosition){
+
+    }
+
+    blockchainBlocksAdded(startingHeight){
 
     }
 

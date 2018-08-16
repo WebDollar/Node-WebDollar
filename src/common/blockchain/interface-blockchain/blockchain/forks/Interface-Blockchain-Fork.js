@@ -346,6 +346,8 @@ class InterfaceBlockchainFork {
         else
             success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
+                let prevBlockLength = this.blockchain.blocks.length;
+
                 if (! (await this._validateFork(false, false))) {
                     Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
                     return false
@@ -495,8 +497,10 @@ class InterfaceBlockchainFork {
 
                 this.postFork(forkedSuccessfully);
 
-                if (forkedSuccessfully)
-                    await this.blockchain.blockchainChanged(this.forkStartingHeight, !this.downloadAllBlocks);
+                if (forkedSuccessfully) {
+                    await this.blockchain.blockchainBlocksRemoved(this.forkStartingHeight, prevBlockLength);
+                    await this.blockchain.blockchainBlocksAdded(this.forkStartingHeight, !this.downloadAllBlocks);
+                }
 
                 if (this.downloadAllBlocks){
                     await this.sleep(30);

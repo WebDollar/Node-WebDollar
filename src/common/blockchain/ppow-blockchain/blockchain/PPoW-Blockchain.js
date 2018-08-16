@@ -22,7 +22,15 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-    async blockchainChanged(startingHeight, createProof=true){
+    async blockchainBlocksRemoved(startingHeight, endingPosition){
+
+        if ( !this.agent.light )
+            for (let i=startingHeight; i<endingPosition; i++)
+                this.prover.provesCalculated.deleteBlock(this.blocks[i])
+
+    }
+
+    async blockchainBlocksAdded(startingHeight, createProof=true){
 
         //TODO generate proofs as a LightNode
         if ( !this.agent.light ) {
