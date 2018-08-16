@@ -5,7 +5,7 @@ const BigInteger = require('big-integer');
 
 let consts = {
 
-    DEBUG: true,
+    DEBUG: false,
     OPEN_SERVER: true,
 
 };

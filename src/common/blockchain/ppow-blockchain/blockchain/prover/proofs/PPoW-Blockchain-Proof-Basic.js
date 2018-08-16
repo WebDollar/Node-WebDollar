@@ -55,14 +55,15 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    getProofHeaders(starting, length){
+    async getProofHeaders(starting, length){
 
         let list = [];
         for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++) {
 
             try {
 
-                list.push(this.blocks[i].getBlockHeader());
+                let block = await this.blockchain.loadingManager.getBlock(i);
+                list.push(block.getBlockHeader());
 
             } catch (exception){
 
@@ -84,8 +85,10 @@ class PPoWBlockchainProofBasic{
 
         let list = [];
 
-        for (let i=0; i<this.blocks.length; i++)
-            list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
+        for (let i=0; i<this.blocks.length; i++){
+            let block = await this.blockchain.loadingManager.getBlock(i);
+            list.push(this.serializeProof(block.getBlockHeader()));
+        }
 
         this.proofSerialized  = Buffer.concat(list);
         return this.proofSerialized;

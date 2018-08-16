@@ -200,7 +200,6 @@ class PPoWBlockchainProvesCalculated{
         let buffer = await this._SerializationProves();
 
         console.log("Save proof creator "+key);
-        console.log(buffer.toString('hex'));
 
         return (await this.db.save( key, buffer ));
 
@@ -221,8 +220,6 @@ class PPoWBlockchainProvesCalculated{
                 console.error("Proof for key "+key+" was not found");
                 return false;
             }
-
-            console.log("Loaded proof creator ",buffer.toString('hex'));
 
             await this._DeserializationProves(buffer);
 
