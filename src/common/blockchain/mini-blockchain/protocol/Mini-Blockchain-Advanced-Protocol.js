@@ -33,8 +33,10 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
                 let serialization = this.blockchain.getSerializedAccountantTree( data.height , gzipped );
 
-                if (serialization === undefined && gzipped) //just send the initial tree
-                    serialization = this.blockchain.getSerializedAccountantTree( data.height );
+                if (serialization === undefined && gzipped) { //just send the initial tree
+                    serialization = this.blockchain.getSerializedAccountantTree(data.height);
+                    gzipped = false;
+                }
 
                 let moreChunks = false;
 
