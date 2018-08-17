@@ -406,7 +406,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             }
 
 
-            await this.blockchainChanged(indexStart, true);
+            await this.blockchainBlocksAdded(indexStart, true);
 
         } catch (exception){
 
