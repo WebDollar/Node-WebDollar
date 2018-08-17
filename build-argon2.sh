@@ -92,6 +92,7 @@ if [[ "$get_cmake" == none ]]; then
 			echo "$showexecute Running make..." && make
 			echo "$showexecute Running sudo make install" && sudo make install
 			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
 			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
 		fi
 
@@ -120,6 +121,7 @@ if [[ "$get_cmake" == none ]]; then
 				echo "$showexecute Running make..." && make
 				echo "$showexecute Running sudo make install" && sudo make install
 				echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+				echo "$showexecute Going back to WebDollar folder..." && cd ..
 				echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
 			}
 			cmake_centos
@@ -205,6 +207,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute Running sudo make install" && sudo make install
 			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
 			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
 			echo "$showexecute CUDA SETUP"
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-375 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.2.148-1_amd64.deb
@@ -611,7 +614,7 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 
 		elif [[ $select_device == * ]]; then
 
-			echo "$showerror Possible options are 1 or 2!"
+			echo "$showerror Possible options are 1, 2 or 3!"
 		fi
 
 	else
