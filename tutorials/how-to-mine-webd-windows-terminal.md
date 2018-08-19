@@ -16,10 +16,18 @@ npm install
 ```
 ----
 ### CPU-CPP Optimization for Windows
-#### If you want to use this optimization, copy ```argon2-bench2.exe``` and ```libargon2.dll``` from this repository to your Node-WebDollar folder.
+##### For 32bit Windows download files from <a href="https://github.com/cbusuioceanu/How-to-mine-WebDollar-with-Windows-Terminal/tree/master/argon2-32bit-windows" >here</a> inside Node-WebDollar folder
+##### For 64bit Windows download files from <a href="https://github.com/cbusuioceanu/How-to-mine-WebDollar-with-Windows-Terminal/tree/master/argon2-64bit-windows" >here</a> inside Node-WebDollar folder
+
 #### Edit in *src/consts/const_global.js* the following: 
 ##### from ```TYPE: "cpu",``` to ```TYPE: "cpu-cpp",```
 ##### from ```CPU_MAX: 0,``` to ```CPU_MAX: 12,``` -> # 12 is the number of threads. Change that to your CPU thread number.
+----
+### GPU Optimization for Windows
+##### For 64bit Windows Opencl download files from <a href="https://github.com/cbusuioceanu/How-to-mine-WebDollar-with-Windows-Terminal/tree/master/argon2-gpu-64bit-windows-opencl" >here</a> inside Node-WebDollar folder
+
+#### Edit in *src/consts/const_global.js* the following: 
+##### from ```TYPE: "cpu",``` to ```TYPE: "gpu",```
 ----
 ### Running the commands Menu:
 ##### -> ```npm run commands``` and ```8``` or ```10``` if you mine in a POOL.
