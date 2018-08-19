@@ -42,7 +42,7 @@ showport="$yellow[PORT]$stand"
 get_const_global="src/consts/const_global.js"
 get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list libtool | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list autoconf | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --version | grep 3.10.* > /dev/null; then echo "Installed"; elif ! cmake --version | grep 3.5.* > /dev/null || command -v cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --version | grep 3.10.* || cmake --version | grep 3.12.* > /dev/null; then echo "Installed"; elif ! cmake --version | grep 3.5.* > /dev/null; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_openclheaders=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list opencl-headers | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_libopencl=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list ocl-icd | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
@@ -92,6 +92,7 @@ if [[ "$get_cmake" == none ]]; then
 			echo "$showexecute Running make..." && make
 			echo "$showexecute Running sudo make install" && sudo make install
 			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
 			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
 		fi
 
@@ -120,6 +121,7 @@ if [[ "$get_cmake" == none ]]; then
 				echo "$showexecute Running make..." && make
 				echo "$showexecute Running sudo make install" && sudo make install
 				echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+				echo "$showexecute Going back to WebDollar folder..." && cd ..
 				echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
 			}
 			cmake_centos
@@ -205,6 +207,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute Running sudo make install" && sudo make install
 			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
 			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
 			echo "$showexecute CUDA SETUP"
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-375 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.2.148-1_amd64.deb
@@ -611,7 +614,7 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 
 		elif [[ $select_device == * ]]; then
 
-			echo "$showerror Possible options are 1 or 2!"
+			echo "$showerror Possible options are 1, 2 or 3!"
 		fi
 
 	else
