@@ -248,7 +248,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.197.2",
+        VERSION: "1.197.3",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
