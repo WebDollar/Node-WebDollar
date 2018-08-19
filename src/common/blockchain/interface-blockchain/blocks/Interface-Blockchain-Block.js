@@ -328,7 +328,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -338,7 +338,7 @@ class InterfaceBlockchainBlock {
         if (reward !== undefined) this.reward = reward;
         else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
 
-        if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
+        if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
 
         if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
