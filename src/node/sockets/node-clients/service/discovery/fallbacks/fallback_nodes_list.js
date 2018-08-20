@@ -60,7 +60,7 @@ export default {
         {"addr": ["https://wd.hoste.ro:40008"]}, // Thanks to @morion4000
         {"addr": ["https://wd.hoste.ro:40009"]}, // Thanks to @morion4000
 
-        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
+        {"addr": ["https://pool.webdollarminingpool.com:443"]}, // Thanks to @morion4000
 
         //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
 
