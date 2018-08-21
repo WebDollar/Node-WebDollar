@@ -57,13 +57,20 @@ class PoolDataBlockInformation {
 
     }
 
-    adjustBlockInformationDifficulty(difficulty, hash){
+    adjustBlockInformationDifficultyBestTarget (difficulty, prevDifficulty){
+
+        this.totalDifficultyMinus( prevDifficulty, true );
+        this.totalDifficultyPlus( difficulty );
+
+    }
+
+    adjustBlockInformationDifficulty (difficulty, hash){
 
         // target     =     maximum target / difficulty
         // difficulty =     maximum target / target
 
         if (difficulty === undefined)
-            difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy( new BigNumber ( "0x"+ hash.toString("hex") ) );
+            difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy(new BigNumber("0x" + hash.toString("hex")));
 
         this.totalDifficultyPlus( difficulty );
 
@@ -288,9 +295,11 @@ class PoolDataBlockInformation {
         this._calculateTimeRemaining();
     }
 
-    totalDifficultyMinus(value){
+    totalDifficultyMinus(value, avoidToCalculateRemaining = false){
         this.totalDifficulty = this.totalDifficulty.minus(value);
-        this._calculateTimeRemaining();
+
+        if (!avoidToCalculateRemaining)
+            this._calculateTimeRemaining();
     }
 
     set timeRemaining(newValue){
