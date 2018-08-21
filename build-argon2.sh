@@ -48,6 +48,7 @@ get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --versi
 get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_openclheaders=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list opencl-headers | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_libopencl=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list ocl-icd | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_pciutils=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list pciutils | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 elif [[ $is_Linux == MINGW ]]; then
 	echo "$showwarning Windows Detected..."
 fi
@@ -116,7 +117,7 @@ if [[ "$get_cmake" == none ]]; then
 
 	elif cat /etc/*release | grep -q -o -m 1 centos; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
 
 			function cmake_centos() {
 				echo "$showinfo CMAKE SETUP"
@@ -133,7 +134,7 @@ if [[ "$get_cmake" == none ]]; then
 			}
 			cmake_centos
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
 
 			cmake_centos
 		fi
@@ -169,6 +170,16 @@ if [[ "$get_libopencl" == none ]]; then
 else
 	if [[ "$get_libtool" == * ]]; then
 		echo "$showok ${blue}ocl-icd$stand is already installed!";
+	fi
+fi
+if [[ "$get_pciutils" == none ]]; then
+	echo "$showinfo We need to install ${blue}pciutils$stand";
+	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
+		sudo apt install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y pciutils;
+	fi
+else
+	if [[ "$get_pciutils" == * ]]; then
+		echo "$showok ${blue}pciutils$stand is already installed!";
 	fi
 fi
 
