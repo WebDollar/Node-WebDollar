@@ -39,17 +39,25 @@ showport="$yellow[PORT]$stand"
 ##
 
 ### GENERAL_VARS
+is_Linux=$(expr substr $(uname -s) 1 5)
 get_const_global="src/consts/const_global.js"
+if [[ $is_Linux == Linux ]]; then
 get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list libtool | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list autoconf | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --version | grep 3.10.* || cmake --version | grep 3.12.* > /dev/null; then echo "Installed"; elif ! cmake --version | grep 3.5.* > /dev/null; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_openclheaders=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list opencl-headers | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_libopencl=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list ocl-icd | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_pciutils=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list pciutils | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+fi
 ###
 
 #### Dependencies START
 function deps() {
+if [[ $is_Linux == Linux ]]; then
+
 if [[ "$get_libtool" == none ]]; then
 	echo "$showinfo We need to install ${blue}libtool$stand";
 	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
@@ -109,7 +117,7 @@ if [[ "$get_cmake" == none ]]; then
 
 	elif cat /etc/*release | grep -q -o -m 1 centos; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
 
 			function cmake_centos() {
 				echo "$showinfo CMAKE SETUP"
@@ -126,7 +134,7 @@ if [[ "$get_cmake" == none ]]; then
 			}
 			cmake_centos
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
 
 			cmake_centos
 		fi
@@ -162,6 +170,16 @@ if [[ "$get_libopencl" == none ]]; then
 else
 	if [[ "$get_libtool" == * ]]; then
 		echo "$showok ${blue}ocl-icd$stand is already installed!";
+	fi
+fi
+if [[ "$get_pciutils" == none ]]; then
+	echo "$showinfo We need to install ${blue}pciutils$stand";
+	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
+		sudo apt install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y pciutils;
+	fi
+else
+	if [[ "$get_pciutils" == * ]]; then
+		echo "$showok ${blue}pciutils$stand is already installed!";
 	fi
 fi
 
@@ -280,6 +298,40 @@ fi
 ### CUDA_CHECK_FILE
 fi
 ### CUDA_INSTALLER_END
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+
+	if [[ $(wmic path win32_VideoController get name | grep -o -m 1 NVIDIA) == NVIDIA ]]; then
+		function Windows_CUDA() {
+		read -r -e -p "$showinfo NVIDIA video card detected!\\nDo you want to install CUDA? " yn_windows_cuda
+
+		if [[ $yn_windows_cuda == [nN] ]]; then
+			echo "$showinfo OK..."
+
+		elif [[ $yn_windows_cuda == [yY] ]]; then
+
+			if [[ ! -d "C:/ProgramData/NVIDIA Corporation/" ]]; then
+				echo "$showexecute Checking browser..."
+				if [[ -a $(ls "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe") ]]; then
+					echo "$showok Chrome Browser Detected"
+					start chrome --new-window "https://developer.nvidia.com/compute/cuda/9.2/Prod2/network_installers/cuda_9.2.148_win10_network"
+				elif [[ -a $(ls "C:\Program Files\Mozilla Firefox\firefox.exe") ]]; then
+					echo "$showok Firefox Browser Detected"
+					start firefox --new-window "https://developer.nvidia.com/compute/cuda/9.2/Prod2/network_installers/cuda_9.2.148_win10_network"
+				fi
+			else
+				echo "$showinfo NVIDIA CUDA is probably already installed!"
+			fi
+
+		elif [[ $yn_windows_cuda == * ]]; then
+			echo -e "$showerror Possible options are: yY or nN." && Windows_CUDA
+		fi
+		}
+		Windows_CUDA
+	else
+		echo "$showerror No NVIDIA GPU found! Proceeding..."
+	fi # Detect GPU
+fi # Detect OS
 }
 #### Dependencies check END
 
@@ -452,8 +504,45 @@ function set_gpu_opencl() {
 }
 ### GPU_OPENCL_FUNCTION_END
 
+### ASK_USER_FUNCTION_START
+function ask_user() {
+### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
+if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+
+	if [[ ! -d $get_const_global ]]; then
+		echo "$showinfo ${yellow}const_global.js$stand found!"
+		echo "+----------------+"
+		echo -e "| 1. ${yellow}CPU$stand         |\\n| 2. ${yellow}GPU(cuda)$stand   |\\n| 3. ${yellow}GPU(opencl)$stand |"
+		echo "+----------------+"
+		read -r -e -p "$showinput Enter number of device you'll want to mine with: " select_device
+
+		if [[ $select_device == 1 ]]; then
+
+			set_cpucpp
+
+		elif [[ $select_device == 2 ]]; then
+
+			set_gpu_cuda
+
+		elif [[ $select_device == 3 ]]; then
+
+			set_gpu_opencl
+
+		elif [[ $select_device == * ]]; then
+
+			echo "$showerror Possible options are 1, 2 or 3!"
+		fi
+	else
+		echo "$showerror ${yellow}$get_const_global$stand not found! Something is wrong..."
+	fi
+fi
+}
+### ASK_USER_FUNCTION_END
+
 ### NODE_WEBDOLLAR_START
 if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+
+if [[ $is_Linux == Linux ]]; then
 
 	echo "$showinfo We're inside a ${yellow}Node-WebDollar$stand folder."
 
@@ -589,41 +678,15 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 		fi
 	fi
 	### ARGON2_GPU_END
+	ask_user
 
-### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
-if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+	ask_user
 
-	if [[ ! -d $get_const_global ]]; then
-		echo "$showinfo ${yellow}const_global.js$stand found!"
-		echo "+----------------+"
-		echo -e "| 1. ${yellow}CPU$stand         |\\n| 2. ${yellow}GPU(cuda)$stand   |\\n| 3. ${yellow}GPU(opencl)$stand |"
-		echo "+----------------+"
-		read -r -e -p "$showinput Enter number of device you'll want to mine with: " select_device
+fi ### Detect OS
 
-		if [[ $select_device == 1 ]]; then
-
-			set_cpucpp
-
-		elif [[ $select_device == 2 ]]; then
-
-			set_gpu_cuda
-
-		elif [[ $select_device == 3 ]]; then
-
-			set_gpu_opencl
-
-		elif [[ $select_device == * ]]; then
-
-			echo "$showerror Possible options are 1, 2 or 3!"
-		fi
-
-	else
-		echo "$showerror ${yellow}$get_const_global$stand not found! Something is wrong..."
-	fi
-fi
-###
-
-else
+else ### Node
 	if [[ $(ls -d argon2) == argon2 ]]; then
 
 		echo "$showinfo argon2 folder found.."
@@ -647,5 +710,4 @@ else
 	               	echo "$showinfo Run this script inside ${yellow}Node-WebDollar$stand folder to compile ${yellow}argon2$stand."
 	        fi
 	fi
-fi
-### NODE_WEBDOLLAR_END
+fi ### NODE_WEBDOLLAR_END
