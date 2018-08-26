@@ -35,22 +35,31 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
     }
 
+    _validatePoolMiner(socket){
+
+        if (  (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0) ||
+              (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )){
+
+            return true;
+
+        }
+
+        return false;
+
+    }
 
     async _subscribePoolConnectedMiners(socket){
 
         if (!this.poolManagement._poolStarted) return;
 
-        if ( !( (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0) ||
-                (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )) ){
-
-            return false;
-
-        }
+        if (!this._validatePoolMiner()) return false;
 
 
         socket.node.on("mining-pool/hello-pool", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+            if (!this._validatePoolMiner()) return;
+            if (typeof socket.node.protocol.minerPool === "object" && socket.node.protocol.minerPool.socketAddress !== undefined && socket.node.protocol.minerPool.minerInstance !== undefined) return;
 
             try{
 
@@ -176,7 +185,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
-            return false;
+            return;
 
         });
 
@@ -399,6 +408,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
     _addConnectedMinerPool(socket, socketAddress, minerInstance){
+
+        if (typeof socket.node.protocol.minerPool === "object" && socket.node.protocol.minerPool.socketAddress !== undefined && socket.node.protocol.minerPool.minerInstance !== undefined) return;
 
         socket.node.protocol.minerPool = {
             socketAddress: socketAddress,

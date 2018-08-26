@@ -12,7 +12,7 @@ class PoolProtocolList{
 
     _checkDisconnection(){
 
-        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
 
             this.deleteElementBySocket(nodesListObject.socket);
 
