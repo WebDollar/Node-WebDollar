@@ -52,13 +52,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         if (!this.poolManagement._poolStarted) return;
 
-        if (!this._validatePoolMiner()) return false;
+        if (!this._validatePoolMiner(socket)) return false;
 
 
         socket.node.on("mining-pool/hello-pool", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
-            if (!this._validatePoolMiner()) return;
+            if (!this._validatePoolMiner(socket)) return;
             if (typeof socket.node.protocol.minerPool === "object" && socket.node.protocol.minerPool.socketAddress !== undefined && socket.node.protocol.minerPool.minerInstance !== undefined) return;
 
             try{
