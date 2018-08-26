@@ -195,15 +195,20 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
 		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18.* ]]; then
-			echo "$showerror CUDA for Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') not supported for the moment."
-			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390.* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3.*;  then
+			echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390.* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3.*;  then # check for NVIDIA drivers
 				echo "$showok ${blue}nvidia-driver-390$stand and ${blue}nvidia-modprobe$stand already installed."
 			else
 				echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-driver-390 nvidia-modprobe
 			fi
+			if apt-cache policy nvidia-cuda-toolkit | grep Installed | grep 9* > /dev/null;  then # check for CUDA toolkit
+				echo "$showok ${blue}nvidia-cuda-toolkit$stand already installed."
+			else
+				echo "$showexecute Installing nVidia CUDA..." && sudo apt-get install -y nvidia-cuda-toolkit
+			fi
 
 		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17.* ]]; then
-        	        echo "$showerror Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+        	        echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -244,7 +249,7 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
 		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9.* ]]; then
-			echo "$showerror Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
+			echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -255,7 +260,7 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
 		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8.* ]]; then
-        	        echo "$showerror Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+        	        echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -274,7 +279,7 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
 		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7.* ]]; then
-			echo "$showerror Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
+			echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-9.2.148-1.x86_64.rpm
 			echo "$showexecute Installing REPO..." && sudo rpm -i cuda-repo-rhel7-9.2.148-1.x86_64.rpm
@@ -283,7 +288,7 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
 		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6.* ]]; then
-        	        echo "$showerror Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+        	        echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel6/x86_64/cuda-repo-rhel6-9.2.148-1.x86_64.rpm
 			echo "$showexecute Installing REPO..." && sudo sudo rpm -i cuda-repo-rhel6-9.2.148-1.x86_64.rpm
@@ -625,19 +630,19 @@ if [[ $is_Linux == Linux ]]; then
 			echo -e "$showinfo OK..."
 
 		elif [[ $yn_compile_argon2gpu == [yY] ]]; then
-			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}argon2$stand"; else echo "$showerror Couldn't cd to argon2 folder!"; fi
-			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
+			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}argon2-gpu$stand"; else echo "$showerror Couldn't cd to argon2-gpu folder!"; fi
+			echo "$showexecute Compiling argon2-gpu..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
 			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
 
 			if [[ -d dist_bundle/GPU  ]]; then
 
-				echo "$showok CPU folder inside dist_bundle exists!"
-				echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/GPU/
+				echo "$showok GPU folder inside dist_bundle exists!"
+				echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 			else
 				if [[ ! -d dist_bundle/GPU ]]; then
-					echo "$showerror CPU folder inside dist_bundle not found!"
+					echo "$showerror GPU folder inside dist_bundle not found!"
 					echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
-					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/GPU/
+					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 				fi
 			fi
 
@@ -661,12 +666,12 @@ if [[ $is_Linux == Linux ]]; then
 				if [[ -d dist_bundle/GPU  ]]; then
 
 					echo "$showok GPU folder inside dist_bundle exists!"
-					echo "$showexecute Copying argon2/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 				else
 					if [[ ! -d dist_bundle/GPU ]]; then
 						echo "$showerror GPU folder inside dist_bundle not found!"
 						echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
-						echo "$showexecute Copying argon2/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+						echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 					fi
 				fi
 			else
