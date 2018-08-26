@@ -45,22 +45,22 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
         setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
     }
 
-    findElementBySocket(socket){
+    findElement(socket){
 
         for (let i=0; i<this.list.length; i++)
-            if ( this.list[i].socket === socket )
+            if (this.list[i].socket === socket || this.list[i] === socket  )
                 return i;
 
         return -1;
 
     }
 
-    deleteElementBySocket(socket){
+    deleteElement(socket){
 
-        let pos = this.findElementBySocket(socket);
+        for (let i=this.list.length-1; i>= 0; i--)
+            if (this.list[i].socket === socket || this.list[i] === socket  )
+                this.list.splice(i,1);
 
-        if (pos !== -1)
-            this.list.splice(pos, 1);
 
     }
     
