@@ -48,7 +48,13 @@ class PoolPayouts{
         if (this._payoutInProgress) return;
 
         this._payoutInProgress = true;
-        await this._doPayout();
+
+        try {
+            await this._doPayout();
+        } catch (exception){
+            console.error("doPayout raised an error", exception)
+        }
+
         this._payoutInProgress = false;
 
     }
