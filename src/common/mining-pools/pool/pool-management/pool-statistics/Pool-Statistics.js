@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Log from 'common/utils/logging/Log';
+import NodesList from 'node/lists/Nodes-List'
 
 class PoolStatistics{
 
@@ -18,7 +19,8 @@ class PoolStatistics{
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
-        this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
+        //this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
+        this.poolMinersOnline = NodesList.nodes;
 
         this.poolBlocksConfirmedAndPaid = 0;
         this.poolBlocksUnconfirmed = 0;
@@ -54,11 +56,6 @@ class PoolStatistics{
         let poolHashes = Math.floor( this.poolHashesNow / (this.POOL_STATISTICS_TIME/1000));
         this.poolHashesNow = 0;
 
-        let poolMinersOnline = this.poolMinersOnlineNow;
-        this.poolMinersOnlineNow = {
-            length: 0
-        };
-
         if (this._poolHashesLast.length === this.POOL_STATISTICS_MEAN_VALUES ){
 
             for (let i=0; i<this._poolHashesLast.length-1; i++) {
@@ -83,7 +80,7 @@ class PoolStatistics{
         this.poolHashes = array[Math.floor(array.length / 4)];
 
         this.emitter.emit("pools/statistics/update", { poolHashes: this.poolHashes,
-            poolMinersOnline: this.poolMinersOnline,
+            poolMinersOnline: this.poolMinersOnline.length,
             poolBeingConfirmed: this.poolBlocksBeingConfirmed,
             poolBlocksConfirmed: this.poolBlocksConfirmed,
             poolBlocksConfirmedAndPaid: this.poolBlocksConfirmedAndPaid,
