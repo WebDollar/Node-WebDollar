@@ -233,6 +233,8 @@ consts.MINING_POOL = {
     CONNECTIONS:{
 
         NO_OF_IDENTICAL_IPS: 101,
+        PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE: 0,       //0  - means unlimited, it requires a lot of bandwidth
+                                                        //30 - means after sending to 30 pool miners, it will do a sleep of 10 ms
 
     },
 

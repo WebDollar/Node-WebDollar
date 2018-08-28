@@ -2,6 +2,7 @@ import StatusEvents from "common/events/Status-Events";
 import NodesList from 'node/lists/Nodes-List'
 import Blockchain from "main-blockchain/Blockchain"
 import Log from 'common/utils/logging/Log';
+import consts from 'consts/const_global';
 
 class PoolNewWorkManagement{
 
@@ -30,6 +31,7 @@ class PoolNewWorkManagement{
 
         });
 
+        //start first time
         setTimeout(this.propagateNewWork.bind(this, this._workInProgressIndex), 20000)
 
     }
@@ -39,9 +41,16 @@ class PoolNewWorkManagement{
 
         Log.info("   Connected Miners: "+this.poolManagement.poolData.connectedMinerInstances.list.length, Log.LOG_TYPE.POOLS);
 
+        let count = 0;
         for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
-            this._sendNewWork( this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, workInProgressIndex);
+            if (workInProgressIndex !== this._workInProgress) return;
+
+            if (this._sendNewWork( this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, workInProgressIndex) === false) continue;
+
+            count ++;
+
+            if (consts.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE !== 0 && count % consts.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE === 0) await this.blockchain.sleep(10);
 
         }
 
@@ -50,6 +59,9 @@ class PoolNewWorkManagement{
     async _sendNewWork( minerInstance, blockInformationMinerInstance, workInProgressIndex){
 
         try{
+
+            if (!minerInstance.socket.connected)
+                return false;
 
             if ( blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
             if ( blockInformationMinerInstance === undefined ) return false;
@@ -66,6 +78,8 @@ class PoolNewWorkManagement{
                 b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,  } );
 
             blockInformationMinerInstance.lastWork = newWork;
+
+            return true;
 
         } catch (exception){
 
