@@ -26,7 +26,7 @@ class PoolNewWorkManagement{
             try {
                 await this.propagateNewWork(this._workInProgressIndex);
             } catch (exception){
-                console.error("Propagating New Work raised an error", exception);
+                Log.error("propagateNewWork raised a total error", Log.LOG_TYPE.POOLS, exception);
             }
 
         });
@@ -44,17 +44,24 @@ class PoolNewWorkManagement{
         let count = 0;
         for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
-            if (workInProgressIndex !== this._workInProgress) return;
+            if (workInProgressIndex !== this._workInProgress) {
+                Log.info("   PROPAGATE NEW WORK returned: " + this._workInProgress + workInProgressIndex, Log.LOG_TYPE.POOLS);
+                return;
+            }
 
-            if (this._sendNewWork( this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, workInProgressIndex) === false) continue;
+            try {
+                if (this._sendNewWork(this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, workInProgressIndex) === false) continue;
+            } catch (exception){
+                Log.error("propagateNewWork raised an error", Log.LOG_TYPE.POOLS, exception)
+            }
 
             count ++;
 
-            if (consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE !== 0 && count % consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE === 0) await this.blockchain.sleep(10);
+            if (consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE !== 0 && (count % consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE === 0)) await this.blockchain.sleep(10);
 
         }
 
-        console.info("   Work sent to ", count);
+        Log.info("   Work sent to " +  count, Log.LOG_TYPE.POOLS);
 
     }
 
