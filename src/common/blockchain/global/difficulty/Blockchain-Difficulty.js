@@ -15,7 +15,10 @@ class BlockchainDifficulty{
             return this.getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
         else {
 
-
+            if (blockTimestamp % 30 < 10)
+                return this.getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
+            else
+                return this.getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
 
         }
 
@@ -54,7 +57,7 @@ class BlockchainDifficulty{
         }
 
 
-        if ( (blockNumber+1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
+        if ( (blockNumber + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS !== 0)
             return  prevBlockDifficulty;
         else {
 
