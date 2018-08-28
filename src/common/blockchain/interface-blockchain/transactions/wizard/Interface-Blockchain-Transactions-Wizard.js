@@ -11,8 +11,18 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+
+        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock);
+
+        if(process.result)
+            return await this.propagateTransaction( process.signature , process.transaction );
+        else
+            return process;
+
+    }
+
+    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
         try {
 
@@ -43,7 +53,6 @@ class InterfaceBlockchainTransactionsWizard{
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Get Address failed", reason: exception }
         }
-
 
         let transaction = undefined;
 
@@ -76,8 +85,6 @@ class InterfaceBlockchainTransactionsWizard{
 
 
             }
-
-
 
             let from = {
                 addresses: [
@@ -145,6 +152,18 @@ class InterfaceBlockchainTransactionsWizard{
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
+
+        return {
+
+            result: true,
+            transaction: transaction,
+            signature: signature
+
+        };
+
+    }
+
+    async propagateTransaction(signature,transaction){
 
         try{
 
