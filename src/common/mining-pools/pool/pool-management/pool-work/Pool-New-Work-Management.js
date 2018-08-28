@@ -13,7 +13,6 @@ class PoolNewWorkManagement{
 
         this.blockchain = blockchain;
 
-        this._workInProgress = false;
         this._workInProgressIndex = 0;
 
         StatusEvents.on("blockchain/new-blocks",async (data)=>{
@@ -44,8 +43,8 @@ class PoolNewWorkManagement{
         let count = 0;
         for (let i=0; i < this.poolManagement.poolData.connectedMinerInstances.list.length; i++ ) {
 
-            if (workInProgressIndex !== this._workInProgress) {
-                Log.info("   PROPAGATE NEW WORK returned: " + this._workInProgress + workInProgressIndex, Log.LOG_TYPE.POOLS);
+            if (workInProgressIndex !== this._workInProgressIndex) {
+                Log.info("   PROPAGATE NEW WORK returned: " + this._workInProgressIndex +" "+ workInProgressIndex, Log.LOG_TYPE.POOLS);
                 return;
             }
 
@@ -96,6 +95,8 @@ class PoolNewWorkManagement{
                 console.error("_sendNewWork", exception);
 
         }
+
+        return false;
     }
 
 
