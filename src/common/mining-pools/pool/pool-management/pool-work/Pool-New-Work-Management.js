@@ -26,7 +26,7 @@ class PoolNewWorkManagement{
             try {
                 await this.propagateNewWork(this._workInProgressIndex);
             } catch (exception){
-
+                console.error("Propagating New Work raised an error", exception);
             }
 
         });
@@ -50,7 +50,7 @@ class PoolNewWorkManagement{
 
             count ++;
 
-            if (consts.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE !== 0 && count % consts.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE === 0) await this.blockchain.sleep(10);
+            if (consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE !== 0 && count % consts.MINING_POOL.CONNECTIONS.PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE === 0) await this.blockchain.sleep(10);
 
         }
 
