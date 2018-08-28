@@ -35,6 +35,8 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
                     if (!this.poolManagement.poolSettings.poolUsePoolServers)
                         this.connectedMinerInstances[i].socket.disconnect();
+                    else
+                        this.connectedMinerInstances.splice(i, 1);
 
                 } catch (exception){
 
