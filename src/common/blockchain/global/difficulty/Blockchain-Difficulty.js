@@ -1,4 +1,5 @@
 import consts from 'consts/const_global';
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 let BigNumber = require ('bignumber.js');
 
@@ -37,13 +38,17 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
-        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
+        let prevBlockDifficulty;
 
-        if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
+        if ( blockTimestamp < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
+            prevBlockDifficulty = getDifficultyCallback( blockNumber );
         else
-        if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
+            prevBlockDifficulty = getDifficultyCallback( blockNumber - consts.BLOCKCHAIN.HARD_FORKS - 20 );
+
+
+
+        if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
+        if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
         //              blockNumber === 9
@@ -115,13 +120,19 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber ){
 
-        let prevBlockDifficulty = getDifficultyCallback(blockNumber);
+        let prevBlockDifficulty;
 
-        if (Buffer.isBuffer(prevBlockDifficulty))
-            prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex"));
-        else
-        if (typeof prevBlockDifficulty === "string") // it must be hex
-            prevBlockDifficulty = new BigNumber(prevBlockDifficulty);
+        if (blockTimestamp <= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + 10) // Genesis POS
+            prevBlockDifficulty = BlockchainGenesis.difficultyTargetPOS;
+        else {
+            if (blockTimestamp % 30 < 10)  //first part
+                prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS - 10);
+            else
+                prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS);
+        }
+
+        if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
+        if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
         //              blockNumber === 9
