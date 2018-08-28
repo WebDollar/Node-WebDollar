@@ -12,6 +12,7 @@ class BlockchainGenesis{
         //this.timeStampOffset = 1529344475; //test net
 
         this.difficultyTarget = new Buffer ( "00029112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
+        this.difficultyTargetPOS = new Buffer ( "00000000000000000ac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ); //hard difficulty
 
         this.address = BufferExtended.fromBase("WEBD$gBzsiV+$FARK8qSGqs09V6AEDBi#@fP6n7$"); // genesis address
     }
@@ -29,7 +30,6 @@ class BlockchainGenesis{
     }
 
     getLevel(){
-
         return 0;
     }
 

@@ -40,8 +40,12 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
 
-        if (this.height === 0)
+        if ( this.height === 0 )
             T = BlockchainGenesis.difficultyTarget;
+        else
+        if ( this.height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
+            T = BlockchainGenesis.difficultyTargetPOS;
+
         
         if (T === undefined || T === null) throw {message: "Target is not defined"};
         
