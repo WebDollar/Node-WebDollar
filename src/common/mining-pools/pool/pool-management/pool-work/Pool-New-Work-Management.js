@@ -54,13 +54,15 @@ class PoolNewWorkManagement{
 
         }
 
+        console.info("   Work sent to ", count);
+
     }
 
     async _sendNewWork( minerInstance, blockInformationMinerInstance, workInProgressIndex){
 
         try{
 
-            if (!minerInstance.socket.connected)
+            if (minerInstance.socket.disconnected)
                 return false;
 
             if ( blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
