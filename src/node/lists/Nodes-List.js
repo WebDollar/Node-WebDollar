@@ -244,7 +244,7 @@ class NodesList {
             if (this.nodes[i].socket.disconnected)
                 this.nodes.splice(i,1);
 
-        setTimeout(()=>{this.removeDisconnectedSockets()}, 2000);
+        setTimeout( this.removeDisconnectedSockets.bind(this), 2000);
     }
 
     disconnectAllNodes(connectionType = CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET){
