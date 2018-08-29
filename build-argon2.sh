@@ -81,15 +81,15 @@ if [[ "$get_cmake" == none ]]; then
 
         if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
 
 			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
 
 			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
 
 			echo "$showinfo CMAKE SETUP"
 			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
@@ -106,11 +106,11 @@ if [[ "$get_cmake" == none ]]; then
 
 	elif cat /etc/*release | grep -q -o -m 1 Debian; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
 
 			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
 
 			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
 		fi
