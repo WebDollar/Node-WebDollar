@@ -121,7 +121,7 @@ class NodesList {
     }
 
     //Removing socket from the list (the connection was terminated)
-    disconnectSocket(socket, connectionType){
+    async disconnectSocket(socket, connectionType){
 
 
         if (socket !== null && !socket.hasOwnProperty("node") ) {
@@ -145,7 +145,7 @@ class NodesList {
                 let nodeToBeDeleted = this.nodes[i];
                 this.nodes.splice(i, 1);
 
-                this.emitter.emit("nodes-list/disconnected", nodeToBeDeleted);
+                await this.emitter.emit("nodes-list/disconnected", nodeToBeDeleted);
 
                 socket.disconnect();
                 return true;

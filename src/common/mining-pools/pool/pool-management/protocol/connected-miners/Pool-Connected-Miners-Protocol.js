@@ -418,13 +418,21 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL;
 
-        this.addElement(socket);
+        this.addElement(socket, minerInstance);
+
+    }
+
+
+    addElement(socket, minerInstance){
+
+        PoolProtocolList.prototype.addElement.call(this, socket);
+
+        minerInstance.socket = socket;
 
         minerInstance.dateActivity = new Date().getTime()/1000;
         this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
     }
-
 
 }
 
