@@ -138,18 +138,18 @@ class NodeClient {
 
                 });
 
-                socket.once("connect_error", (response) =>{
+                socket.once("connect_error", async (response) =>{
 
                     //console.log("Client error connecting", address, response);
-                    NodesList.disconnectSocket(this.socket);
+                    await NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
 
-                socket.once("connect_failed", (response) =>{
+                socket.once("connect_failed", async (response) =>{
 
                     //console.log("Client error connecting (connect_failed) ", address, response);
-                    NodesList.disconnectSocket(this.socket);
+                    await NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -190,13 +190,15 @@ class NodeClient {
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
-        this.socket.on("disconnect", () => {
+        this.socket.on("disconnect", async () => {
 
             //disconnect over the time, so it was connected before
 
             try {
                 console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
-                NodesList.disconnectSocket(this.socket);
+
+                await NodesList.disconnectSocket(this.socket);
+
             } catch (exception){
 
             }

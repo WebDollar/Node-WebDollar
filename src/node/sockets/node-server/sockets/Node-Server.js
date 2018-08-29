@@ -300,10 +300,10 @@ class NodeServer {
             return false;
         }
 
-        socket.once("disconnect", () => {
+        socket.once("disconnect", async () => {
 
             try {
-                NodesList.disconnectSocket(socket);
+                await NodesList.disconnectSocket(socket);
             } catch (exception){
 
             }
