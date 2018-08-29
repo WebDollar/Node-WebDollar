@@ -1,6 +1,5 @@
 import PoolProtocolList from "common/mining-pools/common/Pool-Protocol-List"
 import NodesList from 'node/lists/Nodes-List'
-import PoolProtocolList from "../../../common/Pool-Protocol-List";
 import Log from 'common/utils/logging/Log';
 
 class PoolDataConnectedMinerInstances extends PoolProtocolList{

@@ -15,7 +15,7 @@ class InterfaceBlockchainBlockData {
         miner address is unencodedAddress
      **/
 
-    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData){
+    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData ){
 
         this.blockchain = blockchain;
 
@@ -26,6 +26,8 @@ class InterfaceBlockchainBlockData {
             minerAddress = BlockchainGenesis.address;
 
         this.minerAddress = minerAddress;
+
+
 
         this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions);
 
@@ -87,9 +89,13 @@ class InterfaceBlockchainBlockData {
         if (this.transactions.hashTransactions === undefined || this.transactions.hashTransactions === null)
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
+        if (this.blo)
+
         return Buffer.concat ( [
+
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.minerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
+
         ]);
 
     }

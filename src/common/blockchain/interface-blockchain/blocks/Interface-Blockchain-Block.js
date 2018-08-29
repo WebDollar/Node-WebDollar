@@ -15,7 +15,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
 
         this.blockchain = blockchain;
 
@@ -40,6 +40,9 @@ class InterfaceBlockchainBlock {
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
+        this.posMinerAddress = posMinerAddress||undefined;
+        this.posMinerPublicKey = posMinerPublicKey||undefined;
+        this.posSignature = posSignature||undefined;
 
         if (data === undefined || data === null)
             data = this.blockchain.blockCreator.createEmptyBlockData();
@@ -108,9 +111,8 @@ class InterfaceBlockchainBlock {
         //timestamp must be on 4 bytes
         if (this.timeStamp < 0 || this.timeStamp >= 0xFFFFFFFF) throw {message: 'timeStamp is invalid'};
 
-        if (height >= 0) {
+        if (height >= 0)
             if (this.version !== consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION) throw {message: 'invalid version ', version: this.version};
-        }
 
         if (height !== this.height)
             throw {message: 'height is different', height: height, myHeight: this.height};
@@ -194,7 +196,6 @@ class InterfaceBlockchainBlock {
 
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
-
         if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
 
             let medianTimestamp = 0;
@@ -253,6 +254,7 @@ class InterfaceBlockchainBlock {
                                                      Serialization.serializeNumber4Bytes( this.timeStamp ),
                                                      //data contains addressMiner, transactions history, contracts, etc
                                                      this.data.serializeData(requestHeader),
+
                                                     ]);
 
         return this.computedBlockPrefix;
@@ -263,7 +265,16 @@ class InterfaceBlockchainBlock {
      * @param newNonce
      * @returns {Promise<Buffer>}
      */
-    async computeHash(newNonce){
+    computeHash(newNonce){
+
+        if ( BlockchainGenesis.isPoSActivated(this.height) )
+            return this.computeHashPOS( );
+        else
+            return this.computeHashPOW(newNonce);
+
+    }
+
+    async computeHashPOW(newNonce){
 
         try {
 
@@ -272,8 +283,8 @@ class InterfaceBlockchainBlock {
                 return this._computeBlockHeaderPrefix();
 
             let buffer = Buffer.concat([
-                Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),
-                Serialization.serializeBufferRemovingLeadingZeros(this.difficultyTargetPrev),
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev),
                 this.computedBlockPrefix,
                 Serialization.serializeNumber4Bytes(newNonce || this.nonce),
             ]);
@@ -285,6 +296,34 @@ class InterfaceBlockchainBlock {
             return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
         }
     }
+
+    async computeHashPOS(newNonce){
+
+        try {
+
+            //  SHA256(prevhash + address + timestamp) <= 2^256 * balance / diff
+
+            if (this.computedBlockPrefix === null)
+                return this._computeBlockHeaderPrefix();
+
+            let buffer = Buffer.concat([
+
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.posMinerAddress !== undefined ? this.posMinerAddress : this.data.minerAddress ),
+                Serialization.serializeBufferRemovingLeadingZeros( this.timeStamp ),
+
+            ]);
+
+            return await WebDollarCrypto.SHA256(buffer);
+
+        } catch (exception){
+            console.error("Error computeHash", exception);
+            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+        }
+    }
+
 
     /**
      * Computes a hash based on static block data
@@ -317,9 +356,11 @@ class InterfaceBlockchainBlock {
             this.hash = this.computeHash();
 
         let data = Buffer.concat( [
+
                                      this.hash,
                                      Serialization.serializeNumber4Bytes( this.nonce ),
                                      this.computedBlockPrefix,
+
                                   ]);
 
         if (this.computedSerialization === null && requestHeader === true) this.computedSerialization = data;

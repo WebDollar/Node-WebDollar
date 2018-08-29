@@ -33,6 +33,19 @@ class BlockchainGenesis{
         return 0;
     }
 
+    isPoSActivated(height){
+
+        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+            return false;
+        else {
+
+            if (height % 30 < 10) return false;
+            else return true;
+        }
+
+
+    }
+
 }
 
 export default new BlockchainGenesis();
