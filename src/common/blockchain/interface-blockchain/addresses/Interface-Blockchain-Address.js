@@ -444,7 +444,7 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async signMessage(serialization, password){
+    async signMessage(serialization, password, returnPublicKey = false){
 
         let addressGenerated;
 
@@ -455,7 +455,7 @@ class InterfaceBlockchainAddress{
             addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
         } catch (exception) {
-            console.error("Error Serializing the Transaction", exception);
+            console.error("Error Getting Private Key", exception);
             throw exception;
         }
 
@@ -463,7 +463,8 @@ class InterfaceBlockchainAddress{
 
             let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
 
-            return signature;
+            if (returnPublicKey ) return {signature: signature, publicKey: addressGenerated.publicKey};
+            else return signature;
 
         } catch (exception){
             console.error("Error Signing the message ", exception);

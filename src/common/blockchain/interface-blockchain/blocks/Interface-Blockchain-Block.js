@@ -15,7 +15,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
 
@@ -39,10 +39,6 @@ class InterfaceBlockchainBlock {
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
-
-        this.posMinerAddress = posMinerAddress||undefined;
-        this.posMinerPublicKey = posMinerPublicKey||undefined;
-        this.posSignature = posSignature||undefined;
 
         if (data === undefined || data === null)
             data = this.blockchain.blockCreator.createEmptyBlockData();
@@ -260,6 +256,7 @@ class InterfaceBlockchainBlock {
         return this.computedBlockPrefix;
     }
 
+
     /**
      * Computes block's hash
      * @param newNonce
@@ -267,10 +264,7 @@ class InterfaceBlockchainBlock {
      */
     computeHash(newNonce){
 
-        if ( BlockchainGenesis.isPoSActivated(this.height) )
-            return this.computeHashPOS( );
-        else
-            return this.computeHashPOW(newNonce);
+        return this.computeHashPOW(newNonce);
 
     }
 
@@ -297,32 +291,7 @@ class InterfaceBlockchainBlock {
         }
     }
 
-    async computeHashPOS(newNonce){
 
-        try {
-
-            //  SHA256(prevhash + address + timestamp) <= 2^256 * balance / diff
-
-            if (this.computedBlockPrefix === null)
-                return this._computeBlockHeaderPrefix();
-
-            let buffer = Buffer.concat([
-
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.posMinerAddress !== undefined ? this.posMinerAddress : this.data.minerAddress ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.timeStamp ),
-
-            ]);
-
-            return await WebDollarCrypto.SHA256(buffer);
-
-        } catch (exception){
-            console.error("Error computeHash", exception);
-            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
-        }
-    }
 
 
     /**
