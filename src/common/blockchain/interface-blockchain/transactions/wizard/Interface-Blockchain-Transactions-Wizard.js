@@ -1,4 +1,5 @@
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
@@ -8,6 +9,16 @@ class InterfaceBlockchainTransactionsWizard{
         this.blockchain = blockchain;
         this.transactions = transactions;
         this.wallet = wallet;
+
+    }
+
+    async deserializeValidateTransaction(transaction){
+
+        let myTransaction = new MiniBlockchainTransactions(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
+
+        await myTransaction.deserializeTransaction(transaction.data,0,true);
+
+        return myTransaction;
 
     }
 
@@ -31,15 +42,22 @@ class InterfaceBlockchainTransactionsWizard{
 
         } catch (exception){
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
+
             return { result:false,  message: "Amount is not a valid number", reason: exception }
         }
 
         try {
-            if (typeof fee ==='string') fee = parseInt(fee);
+
+            if (typeof fee ==='string')
+                fee = parseInt(fee);
+
         } catch (exception){
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
+
             return { result:false,  message: "Fee is not a valid number", reason: exception }
         }
 
@@ -48,10 +66,14 @@ class InterfaceBlockchainTransactionsWizard{
             address = this.wallet.getAddress(address);
 
         } catch (exception){
+
             console.error("Creating a new transaction raised an exception - Getting Address", exception);
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
+
             return { result:false,  message: "Get Address failed", reason: exception }
+
         }
 
         let transaction = undefined;
@@ -70,7 +92,7 @@ class InterfaceBlockchainTransactionsWizard{
                         unencodedAddress: toAddress,
                         amount: toAmount
                     },
-                    ]};
+                ]};
 
             } else if (Array.isArray(toAddress)) {
 
