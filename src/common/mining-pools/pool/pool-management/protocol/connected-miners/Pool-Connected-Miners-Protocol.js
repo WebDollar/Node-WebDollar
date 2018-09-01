@@ -251,6 +251,32 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         });
 
+        socket.node.on("mining-pool/work-partially-done", async (data) => {
+
+            if (!this.poolManagement._poolStarted) return;
+
+            if ( data === null || data === undefined ) return;
+
+            //in case there is an suffix in the answer
+            let suffix = "";
+            if ( typeof data.suffix === "string")
+                suffix = '/'+data.suffix;
+
+            try{
+
+                if (socket.node.protocol.minerPool === undefined) return;
+
+                let minerInstance = socket.node.protocol.minerPool.minerInstance;
+                if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
+
+                await this.poolManagement.receivePoolWork(minerInstance, data.work);
+
+            } catch (exception){
+                socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {result: false, message: exception.message } )
+            }
+
+
+        });
 
         socket.node.on("mining-pool/work-done", async (data) => {
 

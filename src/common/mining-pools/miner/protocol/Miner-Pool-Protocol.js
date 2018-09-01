@@ -224,10 +224,13 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                socket.node.sendRequest("mining-pool/new-work/answer", {
-                    hash: this.minerPoolManagement.minerPoolMining.bestHash,
-                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                    id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
+                socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
+                    work: {
+                        result: false,
+                        hash: this.minerPoolManagement.minerPoolMining.bestHash,
+                        nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
+                        id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
+                    }
                 });
 
                 this._validateRequestWork(data.work, socket);
