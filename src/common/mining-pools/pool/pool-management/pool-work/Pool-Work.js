@@ -115,10 +115,10 @@ class PoolWork {
 
             if (!found)
                 //delete block
-                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK)) {
+                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 20*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) && this._blocksList[i].block.height < this.blockchain.blocks.length - 20 ) {
 
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
-                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+i+" height "+this._blocksList[i].block.height, Log.LOG_TYPE.POOLS);
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                     for (let key in this._blocksList[i].instances)

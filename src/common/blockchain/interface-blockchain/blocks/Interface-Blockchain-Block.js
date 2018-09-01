@@ -52,7 +52,7 @@ class InterfaceBlockchainBlock {
                 timeStamp = exception.medianTimestamp + 1;
 
                 this._validateMedianTimestamp( timeStamp );
-                
+
                 //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
             }
 
