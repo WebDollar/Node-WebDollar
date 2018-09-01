@@ -179,8 +179,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
     }
 
-
-
     async downloadTransactions(socket, start, count, max){
 
         if (start >= max) return;
