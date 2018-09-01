@@ -35,20 +35,20 @@ class PoolWorkValidation{
 
         minerInstance.dateActivity = new Date().getTime()/1000;
 
-        work = {
+        let workData = {
             work: work,
             minerInstance: minerInstance
         };
 
 
-        if (work.work.result || forced){
+        if (work.result || forced){
 
-            await this._validateWork(work);
+            await this._validateWork(workData);
 
             return;
         }
 
-        this._works.push(work);
+        this._works.push(workData);
 
     }
 
