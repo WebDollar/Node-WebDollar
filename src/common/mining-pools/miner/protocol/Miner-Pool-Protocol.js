@@ -228,14 +228,15 @@ class MinerProtocol extends PoolProtocolList{
 
                 Log.info("Sending Partial Work: ("+this.minerPoolManagement.minerPoolMining._miningWork.height+")"+ this.minerPoolManagement.minerPoolMining.bestHash.toString("hex") , Log.LOG_TYPE.POOLS);
 
-                socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
-                    work: {
-                        result: false,
-                        hash: new Buffer(this.minerPoolManagement.minerPoolMining.bestHash),
-                        nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                        id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
-                    }
-                });
+                if ( this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
+                    socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
+                        work: {
+                            result: false,
+                            hash: new Buffer(this.minerPoolManagement.minerPoolMining.bestHash),
+                            nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
+                            id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
+                        }
+                    });
 
                 this._validateRequestWork(data.work, socket);
 
@@ -456,7 +457,7 @@ class MinerProtocol extends PoolProtocolList{
             }
 
         }
-         catch (exception){
+        catch (exception){
 
             console.error("Couldn't change the wallet", exception);
             return {result:false, message: exception.message}
