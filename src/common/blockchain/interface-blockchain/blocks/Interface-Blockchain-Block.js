@@ -41,7 +41,7 @@ class InterfaceBlockchainBlock {
             try {
 
                 if ( this.height === this.blockchain.blocks.length )  //last block
-                    this._validateMedianTimestamp();
+                    this._validateMedianTimestamp(timeStamp);
 
             } catch (exception){
                 timeStamp = exception.medianTimestamp;
@@ -208,7 +208,7 @@ class InterfaceBlockchainBlock {
 
         medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
-        if ( (timestamp||this.timeStamp) < medianTimestamp)
+        if ( timestamp < medianTimestamp)
             throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp};
     }
 
@@ -217,7 +217,7 @@ class InterfaceBlockchainBlock {
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
         if ( !this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1 )
-            this._validateMedianTimestamp();
+            this._validateMedianTimestamp(this.timeStamp);
 
 
         if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
