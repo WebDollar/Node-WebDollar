@@ -200,7 +200,7 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    _validateMedianTimestamp(){
+    _validateMedianTimestamp(timestamp){
 
         let medianTimestamp = 0;
         for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
@@ -208,7 +208,7 @@ class InterfaceBlockchainBlock {
 
         medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
-        if (this.timeStamp < medianTimestamp)
+        if ( (timestamp||this.timeStamp) < medianTimestamp)
             throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp};
     }
 
