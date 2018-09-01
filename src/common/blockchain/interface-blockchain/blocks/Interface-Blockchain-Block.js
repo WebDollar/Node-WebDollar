@@ -28,6 +28,11 @@ class InterfaceBlockchainBlock {
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
         this.height = (typeof height === "number" ? height : null); // index set by me
+
+        if (blockValidation === undefined)
+            blockValidation = this.blockchain.createBlockValidation();
+
+        this.blockValidation = blockValidation;
         
         if ( timeStamp === undefined  || timeStamp === null) {
 
@@ -66,11 +71,6 @@ class InterfaceBlockchainBlock {
         this.difficultyTargetPrev = null; // difficulty set by Blockchain
 
         this.reward = undefined;
-
-        if (blockValidation === undefined)
-            blockValidation = this.blockchain.createBlockValidation();
-
-        this.blockValidation = blockValidation;
 
         this.db = db;
 
