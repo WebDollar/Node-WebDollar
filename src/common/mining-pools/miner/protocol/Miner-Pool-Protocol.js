@@ -228,7 +228,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 Log.info("Sending Partial Work: ("+this.minerPoolManagement.minerPoolMining._miningWork.height+")"+ this.minerPoolManagement.minerPoolMining.bestHash.toString("hex") , Log.LOG_TYPE.POOLS);
 
-                if ( this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
+                if ( this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 || this.minerPoolManagement.minerPoolMining.bestHashNonce !== -1 || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
                     socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
                         work: {
                             result: false,
