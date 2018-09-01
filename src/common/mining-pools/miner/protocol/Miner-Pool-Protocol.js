@@ -237,6 +237,8 @@ class MinerProtocol extends PoolProtocolList{
                             id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
                         }
                     });
+                else
+                    Log.warn("Sending Partial Work was skipped" , Log.LOG_TYPE.POOLS);
 
                 this._validateRequestWork(data.work, socket);
 
