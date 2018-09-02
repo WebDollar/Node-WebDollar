@@ -118,11 +118,11 @@ class CLI {
             let nonce = await AdvancedMessages.input('Enter the nonce for transaction: ');
             let timelock = await AdvancedMessages.input('Enter the current block: ');
             let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
-            let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend * WebDollarCoins.WEBD) / WebDollarCoins.WEBD;
+            let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
 
-            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend * WebDollarCoins.WEBD, undefined, undefined, timelock-1, nonce );
+            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce );
             let data ={};
 
             if (answer.result){
