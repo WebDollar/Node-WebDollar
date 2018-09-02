@@ -105,7 +105,8 @@ class InterfaceBlockchainTransaction{
             if (version === 0x00) nonce = nonce % 0x100;
             else if (version >= 0x01) nonce = nonce % 0X10000;
 
-        this.nonce = nonce; //1 bytes
+        if(validateNonce)
+            this.nonce = nonce; //1 bytes
 
         if(validateTxId)
             if (txId === undefined || txId === null)
