@@ -122,6 +122,8 @@ class CLI {
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
 
+            Blockchain.blockchain.blocks.length = timelock-1;
+
             let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce );
             let data ={};
 
