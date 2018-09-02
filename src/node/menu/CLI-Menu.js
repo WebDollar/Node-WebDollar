@@ -122,9 +122,11 @@ class CLI {
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
 
+            //Trick for blocks length and address nonce
             Blockchain.blockchain.blocks.length = timelock+1;
+            Blockchain.AccountantTree.updateAccountNonce(addressString,nonce,undefined,undefined);
 
-            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce+1 );
+            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce );
             let data ={};
 
             if (answer.result){
