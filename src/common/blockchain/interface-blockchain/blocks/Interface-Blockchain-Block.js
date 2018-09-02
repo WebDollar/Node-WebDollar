@@ -333,24 +333,34 @@ class InterfaceBlockchainBlock {
         return await WebDollarCrypto.hashPOW( buffer );
     }
 
+    aserializeBlock(){
+
+    }
+
+    _calculateSerializedBlock(){
+
+        return Buffer.concat( [
+
+            this.hash,
+            Serialization.serializeNumber4Bytes( this.nonce ),
+            this.computedBlockPrefix,
+
+        ]);
+
+    }
+
     serializeBlock(requestHeader){
 
         // serialize block is ( hash + nonce + header )
 
         if (this.computedSerialization !== null && requestHeader === true) return this.computedSerialization;
 
-        this._computeBlockHeaderPrefix(true, requestHeader);
+        this._computeBlockHeaderPrefix( true, requestHeader );
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();
 
-        let data = Buffer.concat( [
-
-                                     this.hash,
-                                     Serialization.serializeNumber4Bytes( this.nonce ),
-                                     this.computedBlockPrefix,
-
-                                  ]);
+        let data = this._calculateSerializedBlock();
 
         if (this.computedSerialization === null && requestHeader === true) this.computedSerialization = data;
 
@@ -358,11 +368,23 @@ class InterfaceBlockchainBlock {
 
     }
 
+    _deserializeBlock(buffer, offset){
+
+
+        this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+        offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
+
+        this.nonce = Serialization.deserializeNumber4Bytes(buffer, offset,);
+        offset += 4;
+
+        return offset;
+
+    }
+
     deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0){
 
-        if (!Buffer.isBuffer(buffer))
-            if (typeof buffer === "string")
-                buffer = new Buffer(buffer, "hex");
+        if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
+            buffer = new Buffer(buffer, "hex");
 
         if (height !== undefined)  this.height = height;
         if (reward !== undefined) this.reward = reward;
@@ -375,12 +397,7 @@ class InterfaceBlockchainBlock {
 
         try {
 
-            this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
-            offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
-
-            this.nonce = Serialization.deserializeNumber4Bytes( buffer, offset, );
-            offset += 4;
-
+            offset = this._deserializeBlock(buffer, offset);
 
             //TODO 1 byte version
             this.version = Serialization.deserializeNumber2Bytes( buffer, offset );
@@ -412,7 +429,7 @@ class InterfaceBlockchainBlock {
         let bufferValue;
 
         try {
-            bufferValue = this.serializeBlock();
+            bufferValue = await this.serializeBlock();
         } catch (exception){
             console.error('ERROR serializing block: ',  exception);
             throw exception;
