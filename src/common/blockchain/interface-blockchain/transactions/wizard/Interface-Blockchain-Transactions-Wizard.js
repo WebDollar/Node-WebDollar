@@ -122,11 +122,8 @@ class InterfaceBlockchainTransactionsWizard{
 
             transaction = this.transactions._createTransaction(
 
-                //from
-                from,
-
-                //to
-                to,
+                from, //from
+                to, //to
                 nonce, //nonce
                 timeLock, //timeLock
                 undefined, //version
