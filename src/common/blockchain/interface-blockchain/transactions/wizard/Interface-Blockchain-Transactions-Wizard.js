@@ -131,7 +131,7 @@ class InterfaceBlockchainTransactionsWizard{
                 timeLock, //timeLock
                 undefined, //version
                 undefined, //txId
-                false, false
+                false, false, false
             );
 
         } catch (exception) {
