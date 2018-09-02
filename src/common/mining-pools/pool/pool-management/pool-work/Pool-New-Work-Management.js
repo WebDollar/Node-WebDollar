@@ -51,7 +51,8 @@ class PoolNewWorkManagement{
             try {
                 if (this._sendNewWork(this.poolManagement.poolData.connectedMinerInstances.list[i], undefined, workInProgressIndex) === false) continue;
             } catch (exception){
-                Log.error("propagateNewWork raised an error", Log.LOG_TYPE.POOLS, exception)
+                Log.error("propagateNewWork raised an error", Log.LOG_TYPE.POOLS, exception);
+                continue;
             }
 
             count ++;
@@ -79,9 +80,9 @@ class PoolNewWorkManagement{
             if (workInProgressIndex !== this._workInProgressIndex) return false;
 
             // i have sent it already in the last - no new work
-            if (minerInstance.lastWork !== undefined && newWork.s.equals(minerInstance.lastWork.s) ) return true; //already sent
+            if (minerInstance.lastWork !== undefined && newWork.s.equals(minerInstance.lastWork.s) ) return false; //already sent
 
-            minerInstance.socket.node.sendRequestWaitOnce("mining-pool/new-work", {  work: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
+            minerInstance.socket.node.sendRequest("mining-pool/new-work", {  work: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
                 h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
                 b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,  } );
 

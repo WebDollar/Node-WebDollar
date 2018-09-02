@@ -44,10 +44,10 @@ export default {
 
         // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
 
-        {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
-        {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
         //
 
         {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000

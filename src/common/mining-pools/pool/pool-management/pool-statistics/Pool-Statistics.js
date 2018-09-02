@@ -19,8 +19,7 @@ class PoolStatistics{
         this.poolHashes = 0;
         this.poolHashesNow = 0;
 
-        //this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
-        this.poolMinersOnline = NodesList.nodes;
+        this.poolMinersOnline = this.poolManagement.poolData.connectedMinerInstances.list;
 
         this.poolBlocksConfirmedAndPaid = 0;
         this.poolBlocksUnconfirmed = 0;

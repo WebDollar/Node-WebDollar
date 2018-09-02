@@ -5,7 +5,7 @@ Mine WebDollar with Linux Terminal
 ```shell
 git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar1 #Note: it is recommended to clone WebDollar repo in your home user folder, eg: /home/YOUR_USER/
 cd Node-WebDollar1
-bash miner-install.sh
+bash install-miner.sh
 ```
 ### 2. Manual Install and Clone:
 ```shell
