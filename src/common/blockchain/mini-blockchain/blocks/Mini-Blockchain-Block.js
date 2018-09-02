@@ -58,7 +58,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    async computeHashPOS(newNonce){
+    async computeHashPOS(){
 
         try {
 
