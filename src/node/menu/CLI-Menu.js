@@ -115,7 +115,7 @@ class CLI {
 
             let toAddress = await AdvancedMessages.input('Enter the recipient address: ');
             let amountToSend = await AdvancedMessages.input('Enter the transaction amount: ');
-            let nonce = await AdvancedMessages.input('Enter the nonce for transaction: ');
+            let nonce = await AdvancedMessages.input('Enter the address current nonce: ');
             let timelock = await AdvancedMessages.input('Enter the current block: ');
             let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
             let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
@@ -124,9 +124,9 @@ class CLI {
 
             //Trick for blocks length and address nonce
             Blockchain.blockchain.blocks.length = timelock+1;
-            Blockchain.AccountantTree.updateAccountNonce(addressString,nonce,undefined,undefined);
+            // Blockchain.AccountantTree.updateAccountNonce(addressString,nonce,undefined,undefined);
 
-            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce );
+            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce, true);
             let data ={};
 
             if (answer.result){
@@ -142,7 +142,7 @@ class CLI {
 
             }
 
-            let jsonAddress = new Blob( [JSON.stringify(data)], {type: "application/text;charset=utf-8"});
+            let jsonAddress = JSON.stringify(answer.data);
 
             FileSystem.writeFile(addressPath+"transaction.tx", jsonAddress, 'utf8', (err) => {
 
@@ -152,7 +152,7 @@ class CLI {
                     return;
                 }
 
-                console.log("Transaction successfully exported to ," + addressPath+fileName);
+                console.log("Transaction successfully exported to ," + addressPath+"transaction.tx");
 
                 resolve(true);
                 return;
@@ -646,6 +646,7 @@ const commands = [
         '11. Mining Pool: Create a New Pool',
         '11-1. Mining Pool: Process Remaining Payment',
         '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
+        '13. Create Offline Transaction',
         '20. HTTPS Express Start',
     ];
 

@@ -33,7 +33,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce){
+    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce, skipValidationNonce=false){
 
         try {
 
@@ -156,14 +156,19 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try{
-            let blockValidationType = {
-                "take-transactions-list-in-consideration": {
-                    validation: true
-                }
-            };
 
-            if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
-                throw {message: "Transaction is invalid"};
+            if(!skipValidationNonce){
+
+                let blockValidationType = {
+                    "take-transactions-list-in-consideration": {
+                        validation: true
+                    }
+                };
+
+                if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
+                    throw {message: "Transaction is invalid"};
+
+            }
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
