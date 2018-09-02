@@ -24,7 +24,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
-        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock);
+        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, undefined);
 
         if(process.result)
             return await this.propagateTransaction( process.signature , process.transaction );
@@ -33,7 +33,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce){
 
         try {
 
@@ -127,7 +127,7 @@ class InterfaceBlockchainTransactionsWizard{
 
                 //to
                 to,
-                undefined, //nonce
+                nonce, //nonce
                 timeLock, //timeLock
                 undefined, //version
                 undefined, //txId

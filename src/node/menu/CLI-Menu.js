@@ -82,6 +82,9 @@ class CLI {
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
                 break;
+            case '13': //  Import Address
+                await this.signTransaction();
+                break;
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
@@ -95,6 +98,69 @@ class CLI {
 
         await this._runMenu();
     };
+
+    signTransaction(){
+
+        console.info('Sign Transaction');
+
+        return new Promise( async (resolve) => {
+
+            let addressId = await this._chooseAddress();
+
+            if (addressId < 0) {
+                console.warn("You must enter a valid number.");
+                resolve(false);
+                return;
+            }
+
+            let toAddress = await AdvancedMessages.input('Enter the recipient address: ');
+            let amountToSend = await AdvancedMessages.input('Enter the transaction amount: ');
+            let nonce = await AdvancedMessages.input('Enter the nonce for transaction: ');
+            let timelock = await AdvancedMessages.input('Enter the current block: ');
+            let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
+            let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend * WebDollar.Applications.CoinsHelper.WEBD) / WebDollar.Applications.CoinsHelper.WEBD;
+
+            let addressString = Blockchain.Wallet.addresses[addressId].address;
+
+            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend * WebDollar.Applications.CoinsHelper.WEBD, undefined, undefined, timelock-1, nonce );
+            let data ={};
+
+            if (answer.result){
+
+                data.transaction = answer.transaction.serializeTransaction();
+                data.signature = answer.signature;
+
+            }else{
+
+                console.log("Transaction was not created. " + answer.message);
+                resolve(false);
+                return;
+
+            }
+
+            let jsonAddress = new Blob( [JSON.stringify(data)], {type: "application/text;charset=utf-8"});
+
+            FileSystem.writeFile(addressPath+"transaction.tx", jsonAddress, 'utf8', (err) => {
+
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
+
+                console.log("Transaction successfully exported to ," + addressPath+fileName);
+
+                resolve(true);
+                return;
+
+            });
+
+            resolve(true);
+            return;
+
+        });
+
+    }
 
     async _start() {
 
