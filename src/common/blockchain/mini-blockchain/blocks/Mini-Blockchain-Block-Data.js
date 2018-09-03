@@ -64,8 +64,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
         if (!Buffer.isBuffer(this.hashAccountantTree) || this.hashAccountantTree.length !== 32)
             this.computeAccountantTreeHashBlockData();
 
-        return Buffer.concat (
-            [
+        return Buffer.concat ([
                 inheritBlockData.prototype._computeBlockDataHeaderPrefix.call(this, onlyHeader),
                 this.hashAccountantTree,
             ]);

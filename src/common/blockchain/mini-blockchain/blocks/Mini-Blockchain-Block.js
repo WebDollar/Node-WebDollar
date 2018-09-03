@@ -1,5 +1,5 @@
 import consts from 'consts/const_global'
-import BufferExtended from "./BufferExtended";
+import BufferExtended from "common/utils/BufferExtended";
 
 import InterfaceBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import PPoWBlock from 'common/blockchain/ppow-blockchain/blocks/PPoW-Blockchain-Block'
