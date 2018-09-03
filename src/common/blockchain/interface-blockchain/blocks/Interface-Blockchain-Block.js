@@ -288,6 +288,15 @@ class InterfaceBlockchainBlock {
 
     }
 
+    _getHashPOWData(newNonce){
+        return Buffer.concat([
+            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
+            Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev),
+            this.computedBlockPrefix,
+            Serialization.serializeNumber4Bytes(newNonce || this.nonce),
+        ]);
+    }
+
     async computeHashPOW(newNonce){
 
         try {
@@ -296,14 +305,7 @@ class InterfaceBlockchainBlock {
             if (this.computedBlockPrefix === null)
                 return this._computeBlockHeaderPrefix();
 
-            let buffer = Buffer.concat([
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev),
-                this.computedBlockPrefix,
-                Serialization.serializeNumber4Bytes(newNonce || this.nonce),
-            ]);
-
-            return await WebDollarCrypto.hashPOW(buffer);
+            return await WebDollarCrypto.hashPOW( this._getHashPOWData(newNonce) );
 
         } catch (exception){
             console.error("Error computeHash", exception);

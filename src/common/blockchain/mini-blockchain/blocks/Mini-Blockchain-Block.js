@@ -58,6 +58,25 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
+    _getHashPOWData(newNonce){
+
+        if (!BlockchainGenesis.isPoSActivated(this.height + 1))
+            return inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
+        else {
+
+            let data = inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
+
+            if ( BlockchainGenesis.isPoSActivated(this.height + 1) )
+                data = Buffer.concat([
+                        data,
+                        this.blockValidation.getBlockCallBack(this.height).posSignature,
+                    ]);
+
+            return data;
+        }
+
+    }
+
     async computeHashPOS(){
 
         try {
@@ -73,6 +92,9 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( this.timeStamp ),
 
             ]);
+
+            if ( BlockchainGenesis.isPoSActivated(this.height + 1) )
+                buffer.push( this.blockValidation.getBlockCallBack(this.height).posSignature );
 
             return await WebDollarCrypto.SHA256(buffer);
 
