@@ -82,6 +82,9 @@ class CLI {
             case '12':  // Server Mining Pool: Create a new Server for Mining Pool
                 await this.createServerForMiningPool();
                 break;
+            case '13': //  Import Address
+                await this.signTransaction();
+                break;
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
@@ -95,6 +98,74 @@ class CLI {
 
         await this._runMenu();
     };
+
+    signTransaction(){
+
+        console.info('Sign Transaction');
+
+        return new Promise( async (resolve) => {
+
+            let addressId = await this._chooseAddress();
+
+            if (addressId < 0) {
+                console.warn("You must enter a valid number.");
+                resolve(false);
+                return;
+            }
+
+            let toAddress = await AdvancedMessages.input('Enter the recipient address: ');
+            let amountToSend = await AdvancedMessages.input('Enter the transaction amount: ');
+            let nonce = await AdvancedMessages.input('Enter the address current nonce: ');
+            let timelock = await AdvancedMessages.input('Enter the current block: ');
+            let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
+            let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
+
+            let addressString = Blockchain.Wallet.addresses[addressId].address;
+            let answer = null;
+
+            //Trick for blocks length and address nonce
+            Blockchain.blockchain.blocks.length = timelock+1;
+
+            for(let i=0; i<Blockchain.Wallet.addresses.length; i++)
+                if(addressString === Blockchain.Wallet.addresses[i].address)
+                    answer = await Blockchain.Transactions.wizard.validateTransaction( Blockchain.Wallet.addresses[i].address, toAddress, amountToSend*WebDollarCoins.WEBD, feeToSend, undefined, undefined, timelock-1, nonce, true);
+
+            let data ={};
+
+            if (answer.result){
+
+                data.transaction = answer.transaction.serializeTransaction();
+                data.signature = answer.signature;
+
+            }else{
+
+                console.log("Transaction was not created. " + answer.message);
+                resolve(false);
+                return;
+
+            }
+
+            FileSystem.writeFile(addressPath+"transaction.tx", JSON.stringify(data), 'utf8', (err) => {
+
+                if (err) {
+                    console.error(err);
+                    resolve(false);
+                    return;
+                }
+
+                console.log("Transaction successfully exported to ," + addressPath+"transaction.tx");
+
+                resolve(true);
+                return;
+
+            });
+
+            resolve(true);
+            return;
+
+        });
+
+    }
 
     async _start() {
 
@@ -576,6 +647,7 @@ const commands = [
         '11. Mining Pool: Create a New Pool',
         '11-1. Mining Pool: Process Remaining Payment',
         '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
+        '13. Create Offline Transaction',
         '20. HTTPS Express Start',
     ];
 
