@@ -22,8 +22,8 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
     }
 
 
-    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo){
-        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo);
+    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo, validateNonce){
+        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo, validateNonce);
     }
 
     _createTransactionFromBuffer(buffer, offset = 0){

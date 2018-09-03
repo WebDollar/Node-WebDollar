@@ -451,11 +451,11 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
     addElement(socket, minerInstance){
 
-        PoolProtocolList.prototype.addElement.call(this, socket);
+        if (!PoolProtocolList.prototype.addElement.call(this, socket)){
+            minerInstance.dateActivity = new Date().getTime()/1000;
+        }
 
         minerInstance.socket = socket;
-
-        minerInstance.dateActivity = new Date().getTime()/1000;
         this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
 
     }

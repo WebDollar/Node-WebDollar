@@ -45,8 +45,6 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
         }
 
-
-
         this.addresses.forEach ( (fromObject, index) =>{
 
             let value = this.transaction.blockchain.accountantTree.getBalance( fromObject.unencodedAddress, this.currencyTokenId );

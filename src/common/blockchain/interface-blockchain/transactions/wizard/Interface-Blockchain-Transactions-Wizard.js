@@ -24,7 +24,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
-        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock);
+        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, undefined);
 
         if(process.result)
             return await this.propagateTransaction( process.signature , process.transaction );
@@ -33,7 +33,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce, skipValidationNonce=false){
 
         try {
 
@@ -122,16 +122,13 @@ class InterfaceBlockchainTransactionsWizard{
 
             transaction = this.transactions._createTransaction(
 
-                //from
-                from,
-
-                //to
-                to,
-                undefined, //nonce
+                from, //from
+                to, //to
+                nonce, //nonce
                 timeLock, //timeLock
                 undefined, //version
                 undefined, //txId
-                false, false
+                false, false, false
             );
 
         } catch (exception) {
@@ -159,14 +156,19 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try{
-            let blockValidationType = {
-                "take-transactions-list-in-consideration": {
-                    validation: true
-                }
-            };
 
-            if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
-                throw {message: "Transaction is invalid"};
+            if(!skipValidationNonce){
+
+                let blockValidationType = {
+                    "take-transactions-list-in-consideration": {
+                        validation: true
+                    }
+                };
+
+                if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
+                    throw {message: "Transaction is invalid"};
+
+            }
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
