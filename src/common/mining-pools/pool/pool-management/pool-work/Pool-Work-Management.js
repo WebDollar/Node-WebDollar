@@ -164,7 +164,7 @@ class PoolWorkManagement{
                         try {
                             blockInformation.block = workBlock;
                         } catch (exception){
-
+                            console.error("blockInformation block", exception);
                         }
 
                         this.poolManagement.poolData.addBlockInformation();
@@ -184,8 +184,6 @@ class PoolWorkManagement{
                             block.destroyBlock();
 
                     }
-
-                    this.poolWork.getNextBlockForWork();
 
                     revertActions.destroyRevertActions();
 

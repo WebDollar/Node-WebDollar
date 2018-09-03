@@ -84,6 +84,8 @@ class PoolWorkValidation{
 
         if (prevBlock !== undefined)
             await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+        else
+            Log.error("_validateWork didn't work as the block " + work.work.id + " was not found", Log.LOG_TYPE.POOLS, work);
 
     }
 
