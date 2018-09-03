@@ -128,7 +128,7 @@ class CLI {
 
             for(let i=0; i<Blockchain.Wallet.addresses.length; i++)
                 if(addressString === Blockchain.Wallet.addresses[i].address)
-                    answer = await Blockchain.Transactions.wizard.validateTransaction( Blockchain.Wallet.addresses[i].address, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce, true);
+                    answer = await Blockchain.Transactions.wizard.validateTransaction( Blockchain.Wallet.addresses[i].address, toAddress, amountToSend*WebDollarCoins.WEBD, feeToSend, undefined, undefined, timelock-1, nonce, true);
 
             let data ={};
 
