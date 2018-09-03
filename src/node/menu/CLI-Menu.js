@@ -144,7 +144,7 @@ class CLI {
 
             let jsonAddress = JSON.stringify(answer.data);
 
-            FileSystem.writeFile(addressPath+"transaction.tx", jsonAddress, 'utf8', (err) => {
+            FileSystem.writeFile(addressPath+"transaction.tx", data, 'utf8', (err) => {
 
                 if (err) {
                     console.error(err);
