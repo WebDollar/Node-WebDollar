@@ -121,12 +121,15 @@ class CLI {
             let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
+            let answer = null;
 
             //Trick for blocks length and address nonce
             Blockchain.blockchain.blocks.length = timelock+1;
-            // Blockchain.AccountantTree.updateAccountNonce(addressString,nonce,undefined,undefined);
 
-            let answer = await Blockchain.Transactions.wizard.validateTransaction( addressString, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce, true);
+            for(let i=0; i<Blockchain.Wallet.addresses.length; i++)
+                if(addressString === Blockchain.Wallet.addresses[i].address)
+                    answer = await Blockchain.Transactions.wizard.validateTransaction( Blockchain.Wallet.addresses[i].address, toAddress, amountToSend, feeToSend, undefined, undefined, timelock-1, nonce, true);
+
             let data ={};
 
             if (answer.result){
