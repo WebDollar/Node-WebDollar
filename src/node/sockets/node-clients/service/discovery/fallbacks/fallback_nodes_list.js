@@ -108,7 +108,7 @@ export default {
         {"addr": ["https://webdollarinfinitypool.space:8088"]}, //Thanks to @Tibi Popescu
         {"addr": ["https://webdollarinfinitypool.space:8089"]}, //Thanks to @Tibi Popescu
 
-
+        {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8080"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8081"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://chucknorris.webdollarvpn.io:8082"]}, // Thanks to @cbusuioceanu
