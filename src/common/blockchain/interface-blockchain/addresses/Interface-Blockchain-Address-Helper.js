@@ -429,7 +429,7 @@ class InterfaceBlockchainAddressHelper{
                 return;
             }
 
-            resolve(oldPassword);
+            resolve(password);
 
 
         });
