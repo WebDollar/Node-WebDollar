@@ -370,7 +370,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    _deserializeBlock(buffer, offset){
+    _deserializeBlock(buffer, offset = 0){
 
 
         this.hash = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);

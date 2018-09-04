@@ -12,7 +12,7 @@ class BlockchainDifficulty{
         if ( typeof blockNumber !== "number" )
             throw {message: "invalid block number"};
 
-        if (blockTimestamp < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+        if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return this.getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
         else {
 
@@ -40,7 +40,7 @@ class BlockchainDifficulty{
 
         let prevBlockDifficulty;
 
-        if ( blockTimestamp < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
+        if ( blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
             prevBlockDifficulty = getDifficultyCallback( blockNumber );
         else
             prevBlockDifficulty = getDifficultyCallback( blockNumber - consts.BLOCKCHAIN.HARD_FORKS - 20 );
@@ -122,10 +122,10 @@ class BlockchainDifficulty{
 
         let prevBlockDifficulty;
 
-        if (blockTimestamp <= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + 10) // Genesis POS
+        if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + 10) // Genesis POS
             prevBlockDifficulty = BlockchainGenesis.difficultyTargetPOS;
         else {
-            if (blockTimestamp % 30 < 10)  //first part
+            if (blockNumber % 30 < 10)  //first part
                 prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS - 10);
             else
                 prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS);

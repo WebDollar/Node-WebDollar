@@ -150,6 +150,7 @@ class InterfaceBlockchainAddressHelper{
             addressWIF: BufferExtended.toBase(addressWIF),
             address: BufferExtended.toBase(unencodedAddress),
         };
+
     }
 
     static generateAddressWIF(address, showDebug, toBase = false){

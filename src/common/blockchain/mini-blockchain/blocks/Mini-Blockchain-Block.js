@@ -9,6 +9,7 @@ import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import Blockchain from "main-blockchain/Blockchain"
 
 import ed25519 from "common/crypto/ed25519";
+import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 let inheritBlockchainBlock;
 
@@ -145,7 +146,13 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             if ( this.posMinerAddress.length !== 0 && this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "posMinerAddress length is invalid"};
 
+            if ( this.posMinerAddress.length === 0 )
+                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey( this.posMinerAddress, false ).equals( this.data.minerAddress ) )
+                    throw {message: "Signature"}
+
         }
+
+        return true;
 
     }
 
@@ -202,7 +209,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             return offset;
 
         } else
-            return inheritBlockchainBlock.prototype._deserializeBlock(buffer, offset);
+            return inheritBlockchainBlock.prototype._deserializeBlock.call(this, buffer, offset);
     }
 
 }
