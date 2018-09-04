@@ -51,7 +51,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             // if (this.blockchain.accountantTree.root.edges.length > 0)
             //     console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
-            if (! BufferExtended.safeCompare(hashAccountantTree, this.hashAccountantTree) )
+            if ( ! BufferExtended.safeCompare(hashAccountantTree, this.hashAccountantTree) )
                 throw {message: "block.data hashAccountantTree is not right  ", hashAccountantTree: hashAccountantTree.toString("hex"), myHashAccoutantTree:this.hashAccountantTree.toString("hex") };
 
         }

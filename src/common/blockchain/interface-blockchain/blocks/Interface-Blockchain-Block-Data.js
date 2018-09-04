@@ -89,9 +89,7 @@ class InterfaceBlockchainBlockData {
         if (this.transactions.hashTransactions === undefined || this.transactions.hashTransactions === null)
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
-        if (this.blo)
-
-        return Buffer.concat ( [
+        return Buffer.concat ([
 
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.minerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
