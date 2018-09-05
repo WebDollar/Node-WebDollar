@@ -16,6 +16,11 @@ class MiningTransactionsSelector{
         for (let j = 0; j < transaction.from.addresses.length; j++) {
             if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
                 throw {message: "too many inputs", from: transaction.from.addresses[j]};
+
+            if ( transaction.from.addresses[j].amount < consts.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
+                throw {message: "amount too small"};
+
+
         }
 
         for (let j = 0; j < transaction.to.addresses.length; j++) {
@@ -23,6 +28,7 @@ class MiningTransactionsSelector{
                 throw {message: "too many outputs", from: transaction.to.addresses[j]};
 
         }
+
 
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
