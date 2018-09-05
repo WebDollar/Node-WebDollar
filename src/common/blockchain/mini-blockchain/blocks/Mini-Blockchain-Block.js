@@ -120,6 +120,18 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _verifyPOSSignature(){
 
+        if ( !Buffer.isBuffer(this.posMinerAddress) ) throw {message: "posMinerAddress is invalid"};
+
+        if ( this.posMinerAddress.length !== 0 && this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "posMinerAddress length is invalid"};
+
+        if ( this.posMinerAddress.length === 0 ) {
+
+            if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
+                throw {message: "posPublicKey doesn't match with the minerAddress"}
+        } else
+            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.posMinerAddress))
+                throw {message: "posPublicKey doesn't match with the posMinerAddress"};
+
         if (this.computedBlockPrefix === null)
             this._computeBlockHeaderPrefix();
 
@@ -141,14 +153,6 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             if ( !this.blockValidation.blockValidationType['skip-validation-PoS-signature'] )
                 await this._verifyPOSSignature();
-
-            if ( !Buffer.isBuffer(this.posMinerAddress) ) throw {message: "posMinerAddress is invalid"};
-
-            if ( this.posMinerAddress.length !== 0 && this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "posMinerAddress length is invalid"};
-
-            if ( this.posMinerAddress.length === 0 )
-                if ( ! InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey( this.posMinerAddress, false ).equals( this.data.minerAddress ) )
-                    throw {message: "Signature"}
 
         }
 
