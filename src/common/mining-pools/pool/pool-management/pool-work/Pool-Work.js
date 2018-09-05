@@ -60,7 +60,7 @@ class PoolWork {
             this.lastBlockNonce = 0;
 
 
-            if (this.lastBlock.computedBlockPrefix === null )
+            if (this.lastBlock.computedBlockPrefix === undefined )
                 this.lastBlock._computeBlockHeaderPrefix();
 
             this.lastBlockSerialization = Buffer.concat( [

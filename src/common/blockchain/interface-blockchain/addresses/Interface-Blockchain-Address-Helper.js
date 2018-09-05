@@ -417,15 +417,19 @@ class InterfaceBlockchainAddressHelper{
 
             let answer = await AdvancedMessages.input("Please enter your last password (12 words separated by space):");
 
-            let oldPassword = answer.trim().split(' ');
+            let password = answer.trim().split(' ');
 
-            if (oldPassword.length !== 12) {
-                AdvancedMessages.alert('Your old password has ' + oldPassword.length + ' words. It must have 12!', "Password Error", "error", 5000);
+            for ( let i=password.length; i > 0; i-- )
+                if ( password[i].length === 0 )
+                    password.splice( i , 1);
+
+            if (password.length !== 12) {
+                AdvancedMessages.alert('You entered a password that has ' + password.length + ' words. It must have 12!', "Password Error", "error", 5000);
                 resolve(null);
                 return;
             }
 
-            resolve(oldPassword);
+            resolve(password);
 
 
         });
