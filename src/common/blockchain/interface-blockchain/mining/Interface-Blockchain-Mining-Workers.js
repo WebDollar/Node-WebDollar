@@ -5,6 +5,7 @@ import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
 import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -26,7 +27,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     }
 
 
-    mine(block, difficultyTarget, start, end){
+    mine (block, difficultyTarget, start, end, height){
 
         //serialize the block
         if ( !Buffer.isBuffer( block ) && typeof block === 'object' && block.computedBlockPrefix !== undefined) {
@@ -39,6 +40,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this.bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
         this.bestHashNonce = -1;
+
+        if ( BlockchainGenesis.isPoSActivated( height ) )
+            return this._minePOS();
 
         this.block = block;
         this.difficulty = difficultyTarget;

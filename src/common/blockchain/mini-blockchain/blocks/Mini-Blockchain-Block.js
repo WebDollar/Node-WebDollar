@@ -59,14 +59,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    async _getHashPOWData(newNonce){
+    _getHashPOWData(newNonce){
 
-        if (!BlockchainGenesis.isPoSActivated(this.height + 1))
+        if (!BlockchainGenesis.isPoSActivated(this.height - 1))
             return inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
 
-        let data = await inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
+        let data = inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
 
-        if ( BlockchainGenesis.isPoSActivated(this.height + 1) )
+        if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
             data = Buffer.concat([
                     data,
                     this.blockValidation.getBlockCallBack(this.height).posSignature,
@@ -92,7 +92,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             ]);
 
-            if ( BlockchainGenesis.isPoSActivated(this.height + 1) )
+            if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
                 buffer.push( this.blockValidation.getBlockCallBack(this.height).posSignature );
 
             return await WebDollarCrypto.SHA256(buffer);

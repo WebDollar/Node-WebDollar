@@ -152,7 +152,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param block
      * @param difficulty
      */
-    async mineBlock( block,  difficulty, start, end ){
+    async mineBlock( block,  difficulty, start, end, height){
 
         console.log("");
         console.log(" ----------- mineBlock-------------");
@@ -165,7 +165,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             let answer;
 
             try {
-                answer = await this.mine(block, difficulty, start, end);
+                answer = await this.mine(block, difficulty, start, end, height);
             } catch (exception){
                 console.error("Couldn't mine block " + block.height, exception);
                 answer.result = false;
@@ -246,6 +246,27 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         return this.block.computeHash(nonce);
     }
 
+    async _minePOS(){
+
+        while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
+
+            let answer = await this._mineNonces( 0, 0 );
+
+            if (answer.result)
+                return answer;
+
+            await this.blockchain.sleep(300);
+
+        }
+
+        return {
+            result: false,
+            hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+            nonce: -1,
+        };
+
+    }
+
     async _mineNonces(start, end){
 
         let nonce = start;
@@ -303,7 +324,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param difficulty
      * @returns {Promise.<boolean>}
      */
-    async mine(block, difficulty, start, end){
+    async mine(block, difficulty, start, end, height){
 
         if (start === undefined) start = 0;
         if (end === undefined) end = 0xFFFFFFFF;

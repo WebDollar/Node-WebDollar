@@ -1,6 +1,7 @@
 import InterfaceBlockchainMining from "../Interface-Blockchain-Mining";
 import Workers from './Workers';
 import consts from 'consts/const_global'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class BlockchainBackboneMining extends InterfaceBlockchainMining {
 
@@ -22,6 +23,8 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         this._workers = new Workers(this);
     }
 
+
+
     async _mineNonces(start, end){
 
         try {
@@ -29,7 +32,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
             if (start > end ) return {
                 result: false,
                 hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
-                nonce:1,
+                nonce: -1,
             };
 
             let answer = await InterfaceBlockchainMining.prototype._mineNonces.call(this, start, Math.min(this.end, start + this.WORKER_NONCES_WORK));
@@ -46,12 +49,14 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
             return answer;
 
         } catch (exception){
+
             console.error("error _mince _nonces Backbone mining error");
             return {
                 result:false,
                 hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
-                nonce:1,
+                nonce: -1,
             };
+
         }
 
     }
@@ -66,7 +71,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         return promiseResolve;
     }
 
-    async mine(block, difficulty, start, end,){
+    async mine(block, difficulty, start, end, height){
 
         this.block = block;
         this.difficulty = difficulty;
@@ -75,12 +80,15 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         this.bestHashNonce = -1;
 
+        if ( BlockchainGenesis.isPoSActivated( height ) )
+            return this._minePOS()  ;
+
         // multi threading
         if (this._workers.haveSupport())
-            return await this._mineNoncesWithWorkers(start, end);
+            return this._mineNoncesWithWorkers(start, end);
 
         // solo
-        return await this._mineNonces(start, start + this.WORKER_NONCES_WORK);
+        return this._mineNonces(start, start + this.WORKER_NONCES_WORK);
 
     }
 
