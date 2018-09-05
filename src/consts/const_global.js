@@ -228,7 +228,7 @@ consts.MINING_POOL = {
 
     MINING:{
         MINING_POOL_MINIMUM_PAYOUT: 200000,
-        FEE_PER_BYTE: 600, // in WEBD
+        FEE_PER_BYTE: 24000, // in WEBD
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
