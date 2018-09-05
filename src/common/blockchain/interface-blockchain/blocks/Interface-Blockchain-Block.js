@@ -68,8 +68,8 @@ class InterfaceBlockchainBlock {
 
         
         //computed data
-        this.computedBlockPrefix = null;
-        this.computedSerialization = null;
+        this.computedBlockPrefix = undefined;
+        this.computedSerialization = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
         this.difficultyTargetPrev = null; // difficulty set by Blockchain
@@ -165,7 +165,7 @@ class InterfaceBlockchainBlock {
         //skip the validation, if the blockValidationType is provided
         if (!this.blockValidation.blockValidationType['skip-validation-PoW-hash']) {
 
-            if (this.computedBlockPrefix === null)
+            if (this.computedBlockPrefix === undefined)
                 this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
             let hash = await this.computeHash();
@@ -286,7 +286,7 @@ class InterfaceBlockchainBlock {
         try {
 
             // hash is hashPow ( block header + nonce )
-            if (this.computedBlockPrefix === null)
+            if (this.computedBlockPrefix === undefined)
                 return this._computeBlockHeaderPrefix();
 
             let buffer = Buffer.concat([
@@ -327,7 +327,7 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
-        if (this.computedSerialization !== null && requestHeader === true) return this.computedSerialization;
+        if (requestHeader === true && this.computedSerialization !== undefined ) return this.computedSerialization;
 
         this._computeBlockHeaderPrefix(true, requestHeader);
 
@@ -340,7 +340,7 @@ class InterfaceBlockchainBlock {
                                      this.computedBlockPrefix,
                                   ]);
 
-        if (this.computedSerialization === null && requestHeader === true) this.computedSerialization = data;
+        if ( requestHeader === true && this.computedSerialization === undefined ) this.computedSerialization = data;
 
         return data;
 
