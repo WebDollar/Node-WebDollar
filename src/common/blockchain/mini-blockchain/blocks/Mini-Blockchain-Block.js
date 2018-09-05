@@ -127,10 +127,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
         if ( this.posMinerAddress.length === 0 ) {
 
             if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
-                throw {message: "posPublicKey doesn't match with the minerAddress"}
+                throw { message: "posPublicKey doesn't match with the minerAddress" }
         } else
             if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.posMinerAddress))
-                throw {message: "posPublicKey doesn't match with the posMinerAddress"};
+                throw { message: "posPublicKey doesn't match with the posMinerAddress" };
 
         if (this.computedBlockPrefix === null)
             this._computeBlockHeaderPrefix();

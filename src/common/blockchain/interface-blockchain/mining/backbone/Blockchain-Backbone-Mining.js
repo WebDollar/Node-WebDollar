@@ -39,7 +39,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
 
             if (!answer.result && (start + this.WORKER_NONCES_WORK + 1 <= this.end) && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) { // in case I still have work to do
 
-                let answer2 = await this._mineNonces(start + this.WORKER_NONCES_WORK + 1, Math.min(this.end, start + this.WORKER_NONCES_WORK + this.WORKER_NONCES_WORK));
+                let answer2 = await this._mineNonces( start + this.WORKER_NONCES_WORK + 1, Math.min(this.end, start + this.WORKER_NONCES_WORK + this.WORKER_NONCES_WORK));
 
                 if (answer2.hash !== undefined && answer2.hash.compare(answer.hash) < 0)
                     answer = answer2;

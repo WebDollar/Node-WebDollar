@@ -34,29 +34,8 @@ class InterfaceBlockchainBlock {
 
         this.blockValidation = blockValidation;
 
-        if ( timeStamp === undefined  || timeStamp === null) {
-
-            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
-
-            if (timeStamp === undefined || timeStamp === null)
-                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
-
-            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
-
-            try {
-
-                if ( this.height === this.blockchain.blocks.length )  //last block
-                    this._validateMedianTimestamp( timeStamp );
-
-            } catch (exception){
-                timeStamp = exception.medianTimestamp + 1;
-
-                this._validateMedianTimestamp( timeStamp );
-
-                //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
-            }
-
-        }
+        if ( timeStamp === undefined  || timeStamp === null)
+            timeStamp = this._getTimestamp();
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -81,6 +60,31 @@ class InterfaceBlockchainBlock {
 
         this._workDone = undefined;
 
+    }
+
+    _getTimestamp(){
+
+        let timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+        if (timeStamp === undefined || timeStamp === null)
+            timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+
+        timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
+
+        try {
+
+            if ( this.height === this.blockchain.blocks.length )  //last block
+                this._validateMedianTimestamp( timeStamp );
+
+        } catch (exception){
+            timeStamp = exception.medianTimestamp + 1;
+
+            this._validateMedianTimestamp( timeStamp );
+
+            //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
+        }
+
+        return timeStamp;
     }
 
     destroyBlock(){

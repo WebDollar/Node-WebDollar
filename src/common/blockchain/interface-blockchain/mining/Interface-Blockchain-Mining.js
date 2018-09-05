@@ -134,7 +134,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let start = Math.floor( Math.random() * 3700000000 );
                 let end = 0xFFFFFFFF;
 
-                await this.mineBlock(nextBlock, difficulty, start, end);
+                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height);
 
 
             } catch (exception){
@@ -248,6 +248,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     async _minePOS(){
 
+        this.end = 0;
+
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
 
             let answer = await this._mineNonces( 0, 0 );
@@ -255,6 +257,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result)
                 return answer;
 
+            this._hashesPerSecond = 1;
             await this.blockchain.sleep(300);
 
         }
