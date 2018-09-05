@@ -18,7 +18,7 @@ class MiningTransactionsSelector{
             if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
                 throw {message: "too many inputs", from: transaction.from.addresses[j]};
 
-            if ( transaction.from.addresses[j].amount < consts.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
+            if ( transaction.from.addresses[j].amount < consts.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
                 throw {message: "amount too small"};
 
         }
@@ -28,7 +28,7 @@ class MiningTransactionsSelector{
             if (this._countAddresses(transaction.to.addresses[j].unencodedAddress, false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
                 throw { message: "too many outputs", from: transaction.to.addresses[j] };
 
-            if ( transaction.to.addresses[j].amount < consts.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
+            if ( transaction.to.addresses[j].amount < consts.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
                 throw { message: "amount too small" };
 
         }
