@@ -20,7 +20,7 @@ class InterfaceFreeMemory{
                 this.blockchain.blocks[i].data.transactions.transactions[j]._serializated = undefined;
 
 
-            if (i % 50000 === 0) await this.blockchain.sleep(50);
+            if (i % 10000 === 0) await this.blockchain.sleep(50);
 
         }
 
