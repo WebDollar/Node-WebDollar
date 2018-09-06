@@ -419,7 +419,7 @@ class InterfaceBlockchainAddressHelper{
 
             let password = answer.trim().split(' ');
 
-            for ( let i=password.length; i > 0; i-- )
+            for ( let i=password.length-1; i >= 0; i-- )
                 if ( password[i].length === 0 )
                     password.splice( i , 1);
 
