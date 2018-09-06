@@ -18,7 +18,7 @@ class TransactionsDownloadManager{
         });
 
         setTimeout( this._processSockets.bind(this), 5000 );
-        setTimeout( this._processTransactions.bind(this), 5*1000 );
+        setTimeout( this._processTransactions.bind(this), 3*1000 );
         setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
 
     }
@@ -119,10 +119,12 @@ class TransactionsDownloadManager{
 
             this._transactionsQueue[pos].deleted = true;
 
+            tx.buffer = undefined;
+
         }
 
 
-        setTimeout( this._processTransactions.bind(this), 3000 );
+        setTimeout( this._processTransactions.bind(this), 2000 );
 
     }
 
@@ -145,9 +147,10 @@ class TransactionsDownloadManager{
 
     _createTransaction(buffer, socket){
 
+        let transaction;
         try {
 
-            let transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
+            transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "validation failed"};
@@ -159,6 +162,10 @@ class TransactionsDownloadManager{
 
             return transaction
         } catch (exception) {
+
+            if (transaction !== undefined && transaction !== null)
+                if (this._transactionsQueue.findPendingTransaction(transaction) === -1)
+                    transaction.destroyTransaction();
 
         }
 
