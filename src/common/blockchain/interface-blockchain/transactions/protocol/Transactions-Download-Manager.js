@@ -18,7 +18,7 @@ class TransactionsDownloadManager{
         });
 
         setTimeout( this._processSockets.bind(this), 5000 );
-        setTimeout( this._processTransactions.bind(this), 3*1000 );
+        setTimeout( this._processTransactions.bind(this), 2*1000 );
         setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
 
     }
@@ -85,7 +85,7 @@ class TransactionsDownloadManager{
         if (socket !== undefined)
             await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
-        setTimeout( this._processSockets.bind(this), 3000 );
+        setTimeout( this._processSockets.bind(this), 2000 );
 
     }
 
@@ -124,7 +124,7 @@ class TransactionsDownloadManager{
         }
 
 
-        setTimeout( this._processTransactions.bind(this), 2000 );
+        setTimeout( this._processTransactions.bind(this), 1000 );
 
     }
 
