@@ -164,7 +164,7 @@ class TransactionsDownloadManager{
         } catch (exception) {
 
             if (transaction !== undefined && transaction !== null)
-                if (this._transactionsQueue.findPendingTransaction(transaction) === -1)
+                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction) === -1)
                     transaction.destroyTransaction();
 
         }
