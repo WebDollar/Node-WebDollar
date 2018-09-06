@@ -18,7 +18,8 @@ class TransactionsDownloadManager{
         });
 
         setTimeout( this._processSockets.bind(this), 5000 );
-        setTimeout( this._processTransactions.bind(this), 5000 );
+        setTimeout( this._processTransactions.bind(this), 5*1000 );
+        setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
 
     }
 
@@ -58,13 +59,16 @@ class TransactionsDownloadManager{
         }
 
         if (this.findTransactionById(txId) === null) {
+
             this._transactionsQueue.push({
                 txId: txId,
                 buffer: buffer,
                 socket: socket,
                 dateInitial: new Date().getTime(),
+                deleted: false,
             });
             return true;
+
         }
 
         return false;
@@ -85,13 +89,22 @@ class TransactionsDownloadManager{
 
     }
 
+    _findFirstUndeletedTransaction(){
+
+        for (let i=0; i < this._transactionsQueue.length; i++)
+            if ( !this._transactionsQueue[i].deleted )
+                return i;
+
+        return -1;
+
+    }
 
     async _processTransactions(){
 
-        let pos = Math.floor(Math.random()*this._transactionsQueue.length);
+        let pos = this._findFirstUndeletedTransaction();
 
         let tx;
-        if (this._transactionsQueue.length > 0)
+        if (pos !== -1)
             tx = this._transactionsQueue[pos];
 
         if (tx !== undefined) {
@@ -104,19 +117,30 @@ class TransactionsDownloadManager{
                 transaction = this._createTransaction(tx.buffer, tx.socket);
 
             if (transaction !== null)
-                this._transactionsQueue.splice(pos,1);
-            else {
-
-                if (new Date().getTime() - this._transactionsQueue[pos].dateInitial  > 4*60*1000)
-                    this._transactionsQueue.splice(pos,1);
-
-            }
+                this._transactionsQueue[pos].deleted = true;
 
         }
 
 
         setTimeout( this._processTransactions.bind(this), 3000 );
 
+    }
+
+    _deleteOldTransactions(){
+
+        let date = new Date().getTime();
+
+        try {
+
+            for (let i = this._transactionsQueue.length - 1; i >= 0; i--)
+                if ( ( (date - this._transactionsQueue[i].dateInitial) > 20 * 60 * 1000) && this._transactionsQueue[i].deleted )
+                    this._transactionsQueue.splice(i, 1);
+
+        } catch (exception){
+            console.error("_deleteOldTransactions raised an error", exception);
+        }
+
+        setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
     }
 
     _createTransaction(buffer, socket){
