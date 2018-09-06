@@ -113,11 +113,11 @@ class TransactionsDownloadManager{
                 tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
             let transaction;
+
             if (Buffer.isBuffer(tx.buffer))
                 transaction = this._createTransaction(tx.buffer, tx.socket);
 
-            if (transaction !== null)
-                this._transactionsQueue[pos].deleted = true;
+            this._transactionsQueue[pos].deleted = true;
 
         }
 
