@@ -109,6 +109,8 @@ class TransactionsDownloadManager{
 
         if (tx !== undefined) {
 
+            console.info("processing transaction ", pos, tx.txId.toString("hex"));
+
             if (tx.buffer === undefined)
                 tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
@@ -182,8 +184,12 @@ class TransactionsDownloadManager{
         for (let i=this._transactionsQueue.length-1; i  >= 0; i--)
             if ( this._transactionsQueue[i].socket === socket) {
                 this._transactionsQueue[i].socket = undefined;
-                this._transactionsQueue[i].deleted = true;
-                this._transactionsQueue.splice(i, 1);
+
+                if (!this._transactionsQueue[i].deleted) {
+                    this._transactionsQueue[i].deleted = true;
+                    this._transactionsQueue.splice(i, 1);
+                }
+
             }
 
     }
