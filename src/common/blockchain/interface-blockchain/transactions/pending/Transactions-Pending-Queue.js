@@ -25,7 +25,7 @@ class TransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
-        if (this.findPendingTransaction(transaction) !== -1)
+        if ( this.findPendingTransaction(transaction) !== -1 )
             return false;
 
         let blockValidationType = {
