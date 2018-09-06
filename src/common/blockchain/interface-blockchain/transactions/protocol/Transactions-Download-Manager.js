@@ -109,7 +109,7 @@ class TransactionsDownloadManager{
 
         if (tx !== undefined) {
 
-            console.info("processing transaction ", pos, tx.txId.toString("hex"));
+            console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
 
             if (tx.buffer === undefined)
                 tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
