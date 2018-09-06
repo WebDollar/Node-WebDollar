@@ -175,10 +175,15 @@ class TransactionsDownloadManager{
 
     _unsubscribeSocket(socket){
 
-        for (let i = this._socketsQueue.length; i>= 0; i--)
-            if (this._socketsQueue[i] === socket){
+        for (let i = this._socketsQueue.length-1; i >= 0; i--)
+            if (this._socketsQueue[i] === socket)
                 this._socketsQueue.splice(i, 1);
-                return;
+
+        for (let i=this._transactionsQueue.length-1; i  >= 0; i--)
+            if ( this._transactionsQueue[i].socket === socket) {
+                this._transactionsQueue[i].socket = undefined;
+                this._transactionsQueue[i].deleted = true;
+                this._transactionsQueue.splice(i, 1);
             }
 
     }
