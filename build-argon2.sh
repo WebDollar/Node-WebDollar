@@ -194,9 +194,9 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
 			echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
-			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390.* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3.*;  then # check for NVIDIA drivers
+			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3*;  then # check for NVIDIA drivers
 				echo "$showok ${blue}nvidia-driver-390$stand and ${blue}nvidia-modprobe$stand already installed."
 			else
 				echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-driver-390 nvidia-modprobe
@@ -207,7 +207,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 				echo "$showexecute Installing nVidia CUDA..." && sudo apt-get install -y nvidia-cuda-toolkit
 			fi
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
         	        echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
@@ -218,7 +218,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute Running sudo apt-get install -y cuda..." && sudo apt-get install -y cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
         	        echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 			echo "$showinfo CMAKE SETUP"
 			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
@@ -248,7 +248,7 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
 			echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
@@ -259,7 +259,7 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 			echo "$showexecute Running sudo apt-get install -y cuda..." && sudo apt-get install -y cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
         	        echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
@@ -278,7 +278,7 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7.* ]]; then
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
 			echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-9.2.148-1.x86_64.rpm
@@ -287,7 +287,7 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 			echo "$showexecute Running sudo yum install cuda..." && sudo yum install cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
         	        echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel6/x86_64/cuda-repo-rhel6-9.2.148-1.x86_64.rpm
