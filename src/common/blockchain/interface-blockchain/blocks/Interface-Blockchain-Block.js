@@ -34,8 +34,29 @@ class InterfaceBlockchainBlock {
 
         this.blockValidation = blockValidation;
 
-        if ( timeStamp === undefined  || timeStamp === null)
-            timeStamp = this._getTimestamp();
+        if ( timeStamp === undefined  || timeStamp === null) {
+
+            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+            if (timeStamp === undefined || timeStamp === null)
+                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+
+            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
+
+            try {
+
+                if ( this.height === this.blockchain.blocks.length )  //last block
+                    this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
+
+            } catch (exception){
+                timeStamp = exception.medianTimestamp + 1;
+
+                this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
+
+                //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
+            }
+
+        }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
@@ -64,27 +85,7 @@ class InterfaceBlockchainBlock {
 
     _getTimestamp(){
 
-        let timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
-        if (timeStamp === undefined || timeStamp === null)
-            timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
-
-        timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
-
-        try {
-
-            if ( this.height === this.blockchain.blocks.length )  //last block
-                this._validateMedianTimestamp( timeStamp );
-
-        } catch (exception){
-            timeStamp = exception.medianTimestamp + 1;
-
-            this._validateMedianTimestamp( timeStamp );
-
-            //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
-        }
-
-        return timeStamp;
     }
 
     destroyBlock(){
@@ -207,35 +208,18 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
-    _validateMedianTimestamp(timestamp){
 
-        let medianTimestamp = 0;
-
-        for (let i = this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
-            medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
-
-        medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
-
-        if ( timestamp < medianTimestamp )
-            throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp };
-            //throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: this.blockValidation.getTimeStampCallback(this.height) };
-
-    }
 
     _validateBlockTimeStamp(){
 
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
-        if ( !this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1 )
-            this._validateMedianTimestamp(this.timeStamp);
+        if ( ! this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS + 1 )
+            this.blockchain.blocks.timestampBlocks.validateMedianTimestamp(this.timeStamp, this.height, this.blockValidation);
 
 
-        if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
-
-            if (this.timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET)
-                throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: this.timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
-
-        }
+        if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true )
+            this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp);
 
     }
 

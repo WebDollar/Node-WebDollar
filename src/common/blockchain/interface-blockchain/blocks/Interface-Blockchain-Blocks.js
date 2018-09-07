@@ -5,6 +5,7 @@ const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
 
 import Serialization from "common/utils/Serialization";
+import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -24,6 +25,7 @@ class InterfaceBlockchainBlocks{
         this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
 
+        this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
     }
 
     addBlock(block, revertActions, saveBlock, showUpdate = true){

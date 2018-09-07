@@ -18,6 +18,8 @@ import StatusEvents from "common/events/Status-Events";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
@@ -252,10 +254,20 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
 
-            let answer = await this._mineNonces( 0, 0 );
+            //try all timestamps
+            let medianTimestamp = this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.height);
 
-            if (answer.result)
-                return answer;
+            for (let i=0; i <= consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET; i++){
+
+                let timestamp = medianTimestamp + i;
+
+                let answer = await this._mineNonces( 0, 0 );
+
+                if (answer.result)
+                    return answer;
+
+            }
+
 
             this._hashesPerSecond = 1;
             await this.blockchain.sleep(300);
