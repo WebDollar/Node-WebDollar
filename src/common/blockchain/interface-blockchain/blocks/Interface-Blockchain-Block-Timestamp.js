@@ -31,6 +31,7 @@ class InterfaceBlockchainBlockTimestamp {
         if ( timestamp < medianTimestamp )
             throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp };
 
+        return true;
     }
 
     validateNetworkAdjustedTime(timeStamp){
@@ -38,6 +39,7 @@ class InterfaceBlockchainBlockTimestamp {
         if ( timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET )
             throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET }
 
+        return true;
     }
 
 }

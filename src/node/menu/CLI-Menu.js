@@ -420,6 +420,8 @@ class CLI {
 
     async startMining(instantly){
 
+
+
         await this._callCallbackBlockchainSync( undefined, async ()=>{
 
             await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
