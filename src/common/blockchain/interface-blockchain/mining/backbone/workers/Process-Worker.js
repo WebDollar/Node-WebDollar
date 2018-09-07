@@ -46,6 +46,10 @@ class ProcessWorker{
 
     }
 
+    restartWorker(){
+        this._is_batching = false;
+    }
+
     async start(path, filename) {
 
 

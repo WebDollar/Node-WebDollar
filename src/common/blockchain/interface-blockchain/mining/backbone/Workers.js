@@ -97,16 +97,20 @@ class Workers {
 
     }
 
-    _makeUnresponsiveThreads(){
+    async _makeUnresponsiveThreads(){
 
         let date = new Date().getTime();
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
-            for (let i=0; i< this.workers_list.length; i++)
+            for (let i=this.workers_list.length-1; i>=0; i--)
                 if ( (date  - this.workers_list[i].date ) > 30000 ) {
-                    this.workers_list[i]._is_batching = false;
+
+                    await this.workers_list[i].restartWorker();
                     this.workers_list[i].date = new Date().getTime();
                     Log.info("Restarting Worker", Log.LOG_TYPE.default);
+
+                    this.workers_list.splice(i, 1);
+
                 }
 
         if ( this._current >= this._current_max )
@@ -159,6 +163,7 @@ class Workers {
         this.block = this.ibb.block;
         this.difficulty = this.ibb.difficulty;
         this.height = this.ibb.block.height;
+        this.blockId = this.ibb.blockId || this.ibb.block.height;
 
         this._from_pool = true;
         if (this.block.height) {
@@ -186,7 +191,8 @@ class Workers {
 
         await this._initiateWorkers();
 
-        this._loop(loop_delay);
+        if (this._loopTimeout === undefined)
+            this._loopTimeout = setTimeout( this._loop.bind(this, loop_delay), 1);
     }
 
     _maxWorkersDefault() {
@@ -263,7 +269,7 @@ class Workers {
             if (msg.type === 'h') {
                 this.ibb._hashesPerSecond += 3;
 
-                return false;
+                return true;
             }
 
             // solved: stop and resolve but with a solution
@@ -271,8 +277,12 @@ class Workers {
 
                 this._finished = true;
 
-                if (msg.h !== undefined)
+                if ( msg.h )
                     this.ibb._hashesPerSecond += parseInt(msg.h);
+
+                //the blockId is not matching
+                if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
+                    return false;
 
                 let hash;
 
@@ -291,9 +301,12 @@ class Workers {
                     hash: hash,
                 });
 
+                if (this._loopTimeout)
+                    clearTimeout(this._loopTimeout);
+
                 // console.log("sol",new Buffer(msg.hash).toString("hex"));
 
-                return false;
+                return true;
             }
 
             // batching: finished a batch of nonces
@@ -302,6 +315,9 @@ class Workers {
                 if (msg.h !== undefined)
                     this.ibb._hashesPerSecond += parseInt(msg.h);
 
+                //the blockId is not matching
+                if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
+                    return false;
 
                 let bestHash;
 
@@ -335,7 +351,7 @@ class Workers {
                 if (consts.DEBUG)
                     await this._validateHash(bestHash, parseInt(msg.bestNonce));
 
-                return false;
+                return true;
             }
         });
 
@@ -367,8 +383,9 @@ class Workers {
 
         this._finished = true;
 
-        if (this._run_timeout) {
-            clearTimeout(this._run_timeout);
+        if (this._loopTimeout) {
+            clearTimeout(this._loopTimeout);
+            this._loopTimeout = undefined;
         }
 
         this.ibb._workerResolve({
@@ -427,6 +444,7 @@ class Workers {
                         difficulty: this.difficulty,
                         start: this._current,
                         batch: batch,
+                        blockId: this.blockId,
                     }
                 });
             } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
@@ -439,9 +457,8 @@ class Workers {
         });
 
         // healthy loop delay
-        this._run_timeout = setTimeout( this._loop.bind(this) , _delay);
+        this._loopTimeout = setTimeout( this._loop.bind(this, _delay), _delay);
 
-        return this;
     }
 }
 
