@@ -10,6 +10,7 @@ import Blockchain from "main-blockchain/Blockchain"
 
 import ed25519 from "common/crypto/ed25519";
 import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+const BigInteger = require('big-integer');
 
 let inheritBlockchainBlock;
 
@@ -95,7 +96,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
                 buffer.push( this.blockValidation.getBlockCallBack(this.height).posSignature );
 
-            return await WebDollarCrypto.SHA256(buffer);
+            let hash = await WebDollarCrypto.SHA256(buffer);
+            let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
+
+            return  Buffer.from( new BigInteger(hash.toString("hex"), 16).divide( balance ).toString("hex") , "hex");
 
         } catch (exception){
             console.error("Error computeHash", exception);
