@@ -99,6 +99,13 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             let hash = await WebDollarCrypto.SHA256(buffer);
 
             let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
+
+            //reward already included
+            if (this.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
+                if (this.posMinerAddress === undefined) //in case it was sent to the minerAddress
+                    balance -= this.reward
+            }
+
             if (balance === null || balance === 0)
                 return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER;
 
