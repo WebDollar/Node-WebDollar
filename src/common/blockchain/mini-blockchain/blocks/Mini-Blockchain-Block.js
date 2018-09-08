@@ -97,9 +97,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 buffer.push( this.blockValidation.getBlockCallBack(this.height).posSignature );
 
             let hash = await WebDollarCrypto.SHA256(buffer);
-            let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
 
-            return  Buffer.from( new BigInteger(hash.toString("hex"), 16).divide( balance ).toString("hex") , "hex");
+            let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
+            if (balance === null || balance === 0)
+                return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER;
+
+            let number = new BigInteger(hash.toString("hex"), 16);
+
+            return  Buffer.from( number.divide( balance ).toString(16) , "hex");
 
         } catch (exception){
             console.error("Error computeHash", exception);
