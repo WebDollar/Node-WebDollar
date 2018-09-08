@@ -157,7 +157,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async mineBlock( block,  difficulty, start, end, height){
 
         console.log("");
-        console.log(" ----------- mineBlock-------------");
+        console.log(" ----------- mineBlock-------------", height);
 
         try{
 
@@ -255,22 +255,23 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
 
             // try all timestamps
-            let medianTimestamp = this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.height);
+            let medianTimestamp = Math.floor( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
 
             let i = 0;
 
             try {
 
-                while (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i)) {
+                while (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i) && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
 
                     this.block.timeStamp = medianTimestamp + i;
                     i++;
 
                     let answer = await this._mineNonces(0, 0);
 
+                    console.log( i, answer.hash.toString("hex") );
+
                     if (answer.result)
                         return answer;
-
                 }
 
             } catch (exception){

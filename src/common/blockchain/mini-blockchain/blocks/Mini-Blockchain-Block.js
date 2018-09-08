@@ -88,7 +88,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.posMinerAddress || this.data.minerAddress ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.timeStamp ),
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.timeStamp) ),
 
             ]);
 
