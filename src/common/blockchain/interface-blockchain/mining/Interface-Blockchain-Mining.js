@@ -270,8 +270,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     if (i % 60 === 0)
                         console.log( i, answer.hash.toString("hex") );
 
-                    if (answer.result)
+                    if (answer.result) {
+                        this.block.posSignature = await this.block._signPOSSignature();
                         return answer;
+                    }
 
                     i++;
                 }

@@ -136,11 +136,9 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _verifyPOSSignature(){
 
-        if ( !Buffer.isBuffer(this.posMinerAddress) ) throw {message: "posMinerAddress is invalid"};
+        if ( this.posMinerAddress !== undefined && ( !Buffer.isBuffer(this.posMinerAddress) || this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) ) throw {message: "posMinerAddress length is invalid"};
 
-        if ( this.posMinerAddress.length !== 0 && this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "posMinerAddress length is invalid"};
-
-        if ( this.posMinerAddress.length === 0 ) {
+        if ( this.posMinerAddress === undefined ) {
 
             if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
                 throw { message: "posPublicKey doesn't match with the minerAddress" }
