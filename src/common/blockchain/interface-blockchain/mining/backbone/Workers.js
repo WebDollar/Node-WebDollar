@@ -295,14 +295,7 @@ class Workers {
 
                 worker._is_batching = false;
 
-                this.ibb._workerResolve({
-                    result: true,
-                    nonce: parseInt(msg.nonce),
-                    hash: hash,
-                });
-
-                if (this._loopTimeout)
-                    clearTimeout(this._loopTimeout);
+                this._stop();
 
                 // console.log("sol",new Buffer(msg.hash).toString("hex"));
 
@@ -379,7 +372,7 @@ class Workers {
         return true;
     }
 
-    _stopAndResolve() {
+    _stop(){
 
         this._finished = true;
 
@@ -387,6 +380,12 @@ class Workers {
             clearTimeout(this._loopTimeout);
             this._loopTimeout = undefined;
         }
+
+    }
+
+    _stopAndResolve() {
+
+        this._stop();
 
         this.ibb._workerResolve({
             result: false,
@@ -399,9 +398,7 @@ class Workers {
 
     async _loop(_delay) {
 
-        const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
-
-        if (ibb_halt) {
+        if (!this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus)) {
 
             if (!this._finished)
                 this._stopAndResolve();

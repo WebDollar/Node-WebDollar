@@ -203,27 +203,33 @@ class MinerProtocol {
 
     async _setRandomPool(){
 
-        if (!VersionCheckerHelper.detectMobile())
-            return false;
+        try {
 
-        if ( Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED )
-            return false;
+            if (!VersionCheckerHelper.detectMobile())
+                throw "no mobile";
 
-        let pools = 0;
-        for (let key in this.minerPoolSettings.poolsList)
-            pools++;
+            if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+                throw "it is sync";
 
-        let random = Math.floor( Math.random() * pools );
+            let pools = 0;
+            for (let key in this.minerPoolSettings.poolsList)
+                pools++;
 
-        let c = 0;
-        for (let key in this.minerPoolSettings.poolsList) {
+            let random = Math.floor(Math.random() * pools);
 
-            if ( c === random ) {
-                await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL, true, true);
-                break;
+            let c = 0;
+            for (let key in this.minerPoolSettings.poolsList) {
+
+                if (c === random) {
+                    await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL, true, true);
+                    break;
+                }
+
+                c++;
             }
 
-            c++;
+        } catch (exception){
+
         }
 
         setTimeout( this._setRandomPool.bind(this), 5000);
