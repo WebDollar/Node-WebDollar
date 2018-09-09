@@ -9,22 +9,7 @@ export default {
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
-        // {"addr": ["https://amsterdam.wdpool.io:443"]},
-        // {"addr": ["https://strasbourg.wdpool.io:443"]},
-        // {"addr": ["https://paris.wdpool.io:443"]},
-
-        // {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
-        // {"addr": ["https://nodecstl.ddns.net:80"]},
         {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
-        // {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
-
-        // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX
-        // {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
-        // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
-        // {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
-
-        //{"addr": ["https://pool1.cuckoo-pool.com:8443"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
@@ -40,19 +25,9 @@ export default {
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
-        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet
+        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet        
 
-        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
-
-        // {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
-        // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
-        //
-
-        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
-
-        //{"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
+        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000        
 
         {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
         {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
@@ -79,12 +54,36 @@ export default {
         {"addr": ["https://node7.int-webd.com:5003"]}, // Thanks to @int_webd
         {"addr": ["https://node7.int-webd.com:5004"]}, // Thanks to @int_webd
         {"addr": ["https://node7.int-webd.com:5005"]}, // Thanks to @int_webd
-
+        {"addr": ["https://node3.int-webd.com:80"]}, // Thanks to @int_webd
+        {"addr": ["https://node4.int-webd.com:80"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:80"]}, // Thanks to @int_webd
+        {"addr": ["https://node5.int-webd.com:80"]}, // Thanks to @int_webd
+        {"addr": ["https://node6.int-webd.com:80"]}, // Thanks to @int_webd
+        
+        // ----------------------------------------- inactive nodes        
+        // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
+        // {"addr": ["https://amsterdam.wdpool.io:443"]},
+        // {"addr": ["https://strasbourg.wdpool.io:443"]},
+        // {"addr": ["https://paris.wdpool.io:443"]},
+        // {"addr": ["https://wb.ciuc.ro:443"]}, // Thanks to Adi Clar
+        // {"addr": ["https://nodecstl.ddns.net:80"]},        
         // {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
         // {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
-        // {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia*/
+        // {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia        
+        // {"addr": ["https://shpool.ml:443"]}, // Thanks to @Amahte
+        // {"addr": ["https://titan.serg.at:80/"]}, // Thanks to @SergiuWX
+        // {"addr": ["https://titan.serg.at:8080/"]}, // Thanks to @SergiuWX
+        // {"addr": ["https://titan.serg.at:8081/"]}, // Thanks to @SergiuWX
+        // {"addr": ["https://titan.serg.at:8082/"]}, // Thanks to @SergiuWX
+        // {"addr": ["https://pool1.cuckoo-pool.com:8443"]},
+        // {"addr": ["https://nodecstl.ddns.net:81/"]}, // Thanks to @taralungaCostel
+        // {"addr": ["https://robitza.ddns.net:443"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8080"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8081"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://robitza.ddns.net:8082"]}, // Thanks to @robertclaudiu
+        // {"addr": ["https://webdollar.network:5000"]}, // Thanks to @ader1990
 
 
         //---------------------------------------------------------

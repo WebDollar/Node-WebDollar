@@ -3,11 +3,11 @@ import NodesList from 'node/lists/Nodes-List'
 import Log from 'common/utils/logging/Log';
 
 class PoolDataConnectedMinerInstances extends PoolProtocolList{
-    
+
     constructor(poolManagement){
 
         super();
-        
+
         this.poolManagement = poolManagement;
         this.connectedMinerInstances = this.list;
 
@@ -34,8 +34,10 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
                 try {
 
                     let socket = this.connectedMinerInstances[i].socket;
-                    if (!this.poolManagement.poolSettings.poolUsePoolServers)
+                    if (!this.poolManagement.poolSettings.poolUsePoolServers) {
+                        Log.info("Socket was disconnected for not having activity: " + time - this.connectedMinerInstances[i].dateActivity, Log.LOG_TYPE.POOLS  );
                         this.connectedMinerInstances[i].socket.disconnect();
+                    }
 
                     if (socket === this.connectedMinerInstances[i].socket)
                         this.connectedMinerInstances.splice(i, 1);
@@ -69,7 +71,7 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
     }
 
-    
+
 }
 
 export default PoolDataConnectedMinerInstances
