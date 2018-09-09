@@ -48,7 +48,7 @@ class Workers {
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
             this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_CPP_FILENAME;
 
-            this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
+            this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
 
@@ -93,7 +93,8 @@ class Workers {
         this._run_timeout = false;
 
 
-        setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
+        if (!this.makeUnresponsiveThreadsTimeout)
+            this.makeUnresponsiveThreadsTimeout = setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
 
     }
 
@@ -250,8 +251,8 @@ class Workers {
 
         }
 
+        worker.date = new Date().getTime();
         if ( !started ) {
-            worker.date = new Date().getTime();
             this.workers_list[index] = worker;
             return worker;
         }
@@ -428,8 +429,8 @@ class Workers {
 
             let batch  = this._final_batch ? this._final_batch : this.worker_batch;
 
-
             worker.date = new Date().getTime();
+
             this._current += this.worker_batch;
             worker._is_batching = true;
 
