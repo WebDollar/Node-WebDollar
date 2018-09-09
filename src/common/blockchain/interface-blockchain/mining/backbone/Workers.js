@@ -104,7 +104,7 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
             for (let i=this.workers_list.length-1; i>=0; i--)
-                if ( (date  - this.workers_list[i].date ) > 30000 ) {
+                if ( (date  - this.workers_list[i].date ) > 60*1000 ) {
 
                     await this.workers_list[i].restartWorker();
                     this.workers_list[i].date = new Date().getTime();
@@ -114,8 +114,8 @@ class Workers {
 
                 }
 
-        if ( this._current >= this._current_max )
-            this._stopAndResolve();
+        // if ( this._current >= this._current_max )
+        //     this._stopAndResolve();
 
     }
 
