@@ -11,6 +11,9 @@ import Blockchain from "main-blockchain/Blockchain";
 import NodesList from 'node/lists/Nodes-List'
 import Log from 'common/utils/logging/Log';
 import NodeDiscoveryService from 'node/sockets/node-clients/service/discovery/Node-Clients-Discovery-Service'
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
+
+import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
 class MinerProtocol {
 
@@ -43,7 +46,7 @@ class MinerProtocol {
         return answer;
     }
 
-    async startMinerPool(poolURL, forceStartMinerPool = false ){
+    async startMinerPool(poolURL, forceStartMinerPool = false, skipSaving = false ){
 
         try {
 
@@ -53,11 +56,11 @@ class MinerProtocol {
             }
 
             if (poolURL !== undefined)
-                await this.minerPoolSettings.setPoolURL(poolURL);
+                await this.minerPoolSettings.setPoolURL(poolURL, skipSaving);
 
             if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '') {
                 this._minerPoolStarted = false;
-                return await this.setMinerPoolStarted(true, forceStartMinerPool);
+                return await this.setMinerPoolStarted(true, forceStartMinerPool, skipSaving);
             }
             else {
                 console.error("Couldn't start MinerPool");
@@ -93,7 +96,7 @@ class MinerProtocol {
         StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Opened changed" });
     }
 
-    async setMinerPoolStarted(value, forceStartMinerPool = false){
+    async setMinerPoolStarted(value, forceStartMinerPool = false, skipSaving = false){
 
         try {
 
@@ -108,7 +111,7 @@ class MinerProtocol {
 
                 this._minerPoolStarted = value;
 
-                await this.minerPoolSettings.setMinerPoolActivated(value);
+                await this.minerPoolSettings.setMinerPoolActivated(value, skipSaving);
 
                 NodesList.disconnectAllNodes("all");
 
@@ -184,6 +187,48 @@ class MinerProtocol {
         }
     }
 
+    //be sure the URL of the webpage was read
+    async setMinerInitialPoolURL(newURL){
+
+        if (newURL !== '' && newURL !== undefined) {
+            await this.minerPoolSettings.setPoolURL(newURL);
+            await this.setMinerPoolStarted(true, true);
+        }
+
+        if (this._setRandomPoolTimeout === undefined)
+            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 10);
+
+        return true;
+    }
+
+    async _setRandomPool(){
+
+        if (!VersionCheckerHelper.detectMobile())
+            return false;
+
+        if ( Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_POOL || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED )
+            return false;
+
+        let pools = 0;
+        for (let key in this.minerPoolSettings.poolsList)
+            pools++;
+
+        let random = Math.floor( Math.random() * pools );
+
+        let c = 0;
+        for (let key in this.minerPoolSettings.poolsList) {
+
+            if ( c === random ) {
+                await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL, true, true);
+                break;
+            }
+
+            c++;
+        }
+
+        setTimeout( this._setRandomPool.bind(this), 5000);
+
+    }
 
 }
 
