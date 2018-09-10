@@ -126,11 +126,16 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         let data = this.computedBlockPrefix;
 
-        let address =  Blockchain.Wallet.getAddress(this.posMinerAddress || this.data.minerAddress );
+        let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.posMinerAddress || this.data.minerAddress } );
 
         if (address === null) throw {message: "Can not sign POS because the address doesn't exist in your wallet"};
 
-        return await address.signMessage ( data, undefined, true );
+        let answer = await address.signMessage ( data, undefined, true );
+
+        //storing the publicKey
+        this.posMinerPublicKey = answer.publicKey;
+
+        return answer.signature;
 
     }
 

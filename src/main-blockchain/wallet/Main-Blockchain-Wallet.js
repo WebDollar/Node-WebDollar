@@ -194,7 +194,7 @@ class MainBlockchainWallet {
             if (address === this.addresses[i].address || address === this.addresses[i])
                 return returnPos ? i : this.addresses[i];
             else
-            if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress === address.unencodedAddress))
+            if (typeof address ==="object" && (this.addresses[i].address === address.address || this.addresses[i].unencodedAddress.equals(address.unencodedAddress)))
                 return returnPos ? i : this.addresses[i];
 
         return returnPos ? -1 : null;
