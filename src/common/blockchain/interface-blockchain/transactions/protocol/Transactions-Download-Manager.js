@@ -101,30 +101,41 @@ class TransactionsDownloadManager{
 
     async _processTransactions(){
 
-        let pos = this._findFirstUndeletedTransaction();
+        try{
 
-        let tx;
-        if (pos !== -1)
-            tx = this._transactionsQueue[pos];
+            let pos = this._findFirstUndeletedTransaction();
 
-        if (tx !== undefined) {
+            let tx;
+            if (pos !== -1)
+                tx = this._transactionsQueue[pos];
 
-            console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
+            if (tx !== undefined) {
 
-            if (tx.buffer === undefined)
-                tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
+                console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
 
-            let transaction;
+                let transaction;
 
-            if (Buffer.isBuffer(tx.buffer))
-                transaction = this._createTransaction(tx.buffer, tx.socket);
+                try {
 
-            this._transactionsQueue[pos].deleted = true;
+                    if (tx.buffer === undefined)
+                        tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
-            tx.buffer = undefined;
+                    if (Buffer.isBuffer(tx.buffer))
+                        transaction = this._createTransaction(tx.buffer, tx.socket);
 
+                } catch (exception){
+
+                }
+
+                this._transactionsQueue[pos].deleted = true;
+
+                tx.buffer = undefined;
+
+            }
+
+        } catch (exception){
+            console.error("_processTransactions raised an error", exception);
         }
-
 
         setTimeout( this._processTransactions.bind(this), 1000 );
 
