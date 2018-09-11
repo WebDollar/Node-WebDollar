@@ -116,6 +116,9 @@ class BlockchainDifficulty{
 
         let prevBlockDifficulty;
 
+        if ( blockNumber >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION && blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )  //first part
+            prevBlockDifficulty = BlockchainGenesis.difficultyTargetPOS;
+        else
         if (blockNumber % 30 < 10)  //first part
             prevBlockDifficulty = getDifficultyCallback( blockNumber - 20);
         if (blockNumber % 30 < 20)  //first part

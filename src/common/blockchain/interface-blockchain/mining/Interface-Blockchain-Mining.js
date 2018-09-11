@@ -177,6 +177,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "difficulty prev: ", block.difficultyTargetPrev.toString("hex") );
                 console.warn( "----------------------------------------------------------------------------");
 
                 //check if I mined all the last K blocks
