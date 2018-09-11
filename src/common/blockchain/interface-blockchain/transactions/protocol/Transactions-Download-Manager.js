@@ -58,7 +58,8 @@ class TransactionsDownloadManager{
             return false; //too many;
         }
 
-        if (this.findTransactionById(txId) === null) {
+        let transactionFound = this.findTransactionById(txId);
+        if ( transactionFound  === null) {
 
             this._transactionsQueue.push({
                 txId: txId,
@@ -67,7 +68,12 @@ class TransactionsDownloadManager{
                 dateInitial: new Date().getTime(),
                 deleted: false,
             });
+
             return true;
+
+        } else {
+
+            transactionFound.socket = socket;
 
         }
 
@@ -76,14 +82,24 @@ class TransactionsDownloadManager{
 
     async _processSockets(){
 
-        let socket;
-        if (this._socketsQueue.length > 0){
-            socket = this._socketsQueue[0];
-            this._socketsQueue.splice(0,1);
-        }
+        try{
 
-        if (socket !== undefined)
-            await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+            for (let i=0; i < 20; i++){
+
+                let socket;
+                if (this._socketsQueue.length > 0) {
+                    socket = this._socketsQueue[0];
+                    this._socketsQueue.splice(0,1);
+                }
+
+                if (socket !== undefined)
+                    await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+
+            }
+
+        } catch (exception){
+
+        }
 
         setTimeout( this._processSockets.bind(this), 2000 );
 
@@ -101,32 +117,43 @@ class TransactionsDownloadManager{
 
     async _processTransactions(){
 
-        let pos = this._findFirstUndeletedTransaction();
+        try{
 
-        let tx;
-        if (pos !== -1)
-            tx = this._transactionsQueue[pos];
+            let pos = this._findFirstUndeletedTransaction();
 
-        if (tx !== undefined) {
+            let tx;
+            if (pos !== -1)
+                tx = this._transactionsQueue[pos];
 
-            console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
+            if (tx !== undefined) {
 
-            if (tx.buffer === undefined)
-                tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
+                console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
 
-            let transaction;
+                let transaction;
 
-            if (Buffer.isBuffer(tx.buffer))
-                transaction = this._createTransaction(tx.buffer, tx.socket);
+                try {
 
-            this._transactionsQueue[pos].deleted = true;
+                    if ( tx.buffer === undefined )
+                        tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
-            tx.buffer = undefined;
+                    if (Buffer.isBuffer(tx.buffer))
+                        transaction = this._createTransaction(tx.buffer, tx.socket);
 
+                } catch (exception){
+
+                }
+
+                this._transactionsQueue[pos].deleted = true;
+
+                tx.buffer = undefined;
+
+            }
+
+        } catch (exception){
+            console.error("_processTransactions raised an error", exception);
         }
 
-
-        setTimeout( this._processTransactions.bind(this), 1000 );
+        setTimeout( this._processTransactions.bind(this), Math.random() < 0.3 ? 1000 : 5 );
 
     }
 
@@ -137,7 +164,7 @@ class TransactionsDownloadManager{
         try {
 
             for (let i = this._transactionsQueue.length - 1; i >= 0; i--)
-                if ( ( (date - this._transactionsQueue[i].dateInitial) > 20 * 60 * 1000) && this._transactionsQueue[i].deleted )
+                if ( ( (date - this._transactionsQueue[i].dateInitial) > 4 * 60 * 60 * 1000) && this._transactionsQueue[i].deleted )
                     this._transactionsQueue.splice(i, 1);
 
         } catch (exception){
@@ -185,10 +212,10 @@ class TransactionsDownloadManager{
             if ( this._transactionsQueue[i].socket === socket) {
                 this._transactionsQueue[i].socket = undefined;
 
-                if (!this._transactionsQueue[i].deleted) {
-                    this._transactionsQueue[i].deleted = true;
-                    this._transactionsQueue.splice(i, 1);
-                }
+                // if (!this._transactionsQueue[i].deleted) {
+                //     this._transactionsQueue[i].deleted = true;
+                //     this._transactionsQueue.splice(i, 1);
+                // }
 
             }
 
