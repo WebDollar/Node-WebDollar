@@ -43,7 +43,7 @@ class BlockchainDifficulty{
         if ( blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
             prevBlockDifficulty = getDifficultyCallback( blockNumber );
         else
-            prevBlockDifficulty = getDifficultyCallback( blockNumber - consts.BLOCKCHAIN.HARD_FORKS - 20 );
+            prevBlockDifficulty = getDifficultyCallback( blockNumber - consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION - 20 );
 
 
 

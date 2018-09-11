@@ -255,9 +255,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
 
             // try all timestamps
-            let medianTimestamp = Math.floor( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
+            let medianTimestamp = Math.round( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
 
-            let i = 0;
+            let i = 1;
 
             try {
 

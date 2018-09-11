@@ -94,7 +94,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             ]);
 
             if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
-                buffer.push( this.blockValidation.getBlockCallBack(this.height).posSignature );
+                buffer = Buffer.concat([ buffer, this.blockValidation.getBlockCallBack(this.height).posSignature ]);
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
@@ -190,8 +190,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 this.posSignature,
             ];
 
-            if ( this.posMinerAddress.length === 0 )
-                buffers.push(new Buffer(0));
+            if ( this.posMinerAddress === undefined)
+                buffers.push(new Buffer(1));
             else {
 
                 buffers.push(Serialization.serializeNumber1Byte(this.posMinerAddress));
@@ -224,7 +224,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             if (minerAddressLength !== 0 && minerAddressLength !== consts.ADDRESSES.ADDRESS.LENGTH) throw {message: "minerAddress is invalid"};
 
-            if (minerAddressLength === 0) this.posMinerAddress = new Buffer(0);
+            if (minerAddressLength === 0) this.posMinerAddress = undefined;
             else this.posMinerAddress = BufferExtended.substr(buffer, offset, minerAddressLength);
 
             offset += minerAddressLength;
