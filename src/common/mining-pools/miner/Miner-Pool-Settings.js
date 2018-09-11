@@ -7,6 +7,7 @@ import StatusEvents from "common/events/Status-Events"
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import Blockchain from "main-blockchain/Blockchain";
+import AGENT_STATUS from "../../blockchain/interface-blockchain/agents/Agent-Status";
 
 
 const sanitizer = require('sanitizer');
@@ -20,6 +21,8 @@ class MinerPoolSettings {
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
         this._poolURL = '';
+        this.poolDedicated = false;
+
         this.poolsList = {};
 
         this.poolName = "";
@@ -47,6 +50,8 @@ class MinerPoolSettings {
         });
 
     }
+
+
 
     async initializeMinerPoolSettings(poolURL){
 
