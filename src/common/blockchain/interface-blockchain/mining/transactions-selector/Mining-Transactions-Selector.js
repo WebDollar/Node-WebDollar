@@ -74,8 +74,11 @@ class MiningTransactionsSelector{
                         "take-transactions-list-in-consideration": {
                             //validation: true allows to complex transactions flow
                             //                  like the following: tx1: A=>B,  tx2: B=>C; tx3 C=>D
-                            validation: true,
-                            transactions: this._transactions,
+                            // validation: true,
+                            // transactions: this._transactions,
+
+                            validation: false,
+                            transactions: [],
                         }
                     };
 
