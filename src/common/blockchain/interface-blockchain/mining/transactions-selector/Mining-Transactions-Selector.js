@@ -6,8 +6,10 @@ import InterfaceBlockchainAddressHelper from "../../addresses/Interface-Blockcha
 class MiningTransactionsSelector{
 
     constructor(blockchain){
+
         this.blockchain = blockchain;
         this._transactions = [];
+
     }
 
     validateTransaction(transaction, miningFeePerByte){
@@ -60,9 +62,9 @@ class MiningTransactionsSelector{
 
             try {
                 
-                console.log(transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
+                console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
 
-                this.validateTransaction(transaction, miningFeePerByte);
+                this.validateTransaction( transaction, miningFeePerByte );
 
                 let bRemoveTransaction = false;
 
@@ -70,12 +72,14 @@ class MiningTransactionsSelector{
 
                     let blockValidationType = {
                         "take-transactions-list-in-consideration": {
+                            //validation: true allows to complex transactions flow
+                            //                  like the following: tx1: A=>B,  tx2: B=>C; tx3 C=>D
                             validation: true,
                             transactions: this._transactions,
                         }
                     };
 
-                    if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
+                    if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
 
                         size -= transaction.serializeTransaction().length;
 

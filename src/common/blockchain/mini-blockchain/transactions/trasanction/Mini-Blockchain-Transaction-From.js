@@ -16,10 +16,13 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
             if (transactionsList === undefined)
                 transactionsList = this.transaction.blockchain.transactions.pendingQueue.list;
 
-            transactionsList.forEach((transaction)=>{
+            for (let i=0; i < transactionsList.length; i++){
+
+                let transaction = transactionsList[i];
 
                 if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId))
                     return false; // transaction is not taken in consideration
+
 
                 transaction.from.addresses.forEach((address)=>{
 
@@ -41,7 +44,8 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                 });
 
-            });
+
+            }
 
         }
 
