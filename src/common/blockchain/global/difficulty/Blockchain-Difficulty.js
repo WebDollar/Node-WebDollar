@@ -12,16 +12,10 @@ class BlockchainDifficulty{
         if ( typeof blockNumber !== "number" )
             throw {message: "invalid block number"};
 
-        if (blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+        if (BlockchainGenesis.isPoSActivated( blockNumber ))
+            return this.getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
+        else
             return this.getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
-        else {
-
-            if (blockTimestamp % 30 < 10)
-                return this.getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
-            else
-                return this.getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber);
-
-        }
 
     }
 
@@ -43,7 +37,7 @@ class BlockchainDifficulty{
         if ( blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
             prevBlockDifficulty = getDifficultyCallback( blockNumber );
         else
-            prevBlockDifficulty = getDifficultyCallback( blockNumber - consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION - 20 );
+            prevBlockDifficulty = getDifficultyCallback( blockNumber - 30 );
 
 
 
@@ -84,7 +78,7 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
 
 
-            if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION) {
+            if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION && blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
                 if ( how_much_it_took_to_mine_X_Blocks <= (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER ? consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK : 5 * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ) )
                     throw { message: "how_much_it_took_to_mine_X_Blocks less than consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK", how_much_it_took_to_mine_X_Blocks: how_much_it_took_to_mine_X_Blocks };
             }
@@ -122,14 +116,10 @@ class BlockchainDifficulty{
 
         let prevBlockDifficulty;
 
-        if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + 10) // Genesis POS
-            prevBlockDifficulty = BlockchainGenesis.difficultyTargetPOS;
-        else {
-            if (blockNumber % 30 < 10)  //first part
-                prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS - 10);
-            else
-                prevBlockDifficulty = getDifficultyCallback(consts.BLOCKCHAIN.HARD_FORKS);
-        }
+        if (blockNumber % 30 < 10)  //first part
+            prevBlockDifficulty = getDifficultyCallback( blockNumber - 20);
+        if (blockNumber % 30 < 20)  //first part
+            prevBlockDifficulty = getDifficultyCallback( blockNumber - 10);
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex

@@ -40,8 +40,8 @@ class BlockchainGenesis{
             return false;
         else {
 
-            if (height % 30 < 10) return false;
-            else return true;
+            if (height % 30 < 20) return true;
+            else return false;
         }
 
 

@@ -65,7 +65,7 @@ consts.BLOCKCHAIN = {
 
         DIFFICULTY_REMOVED_CONDITION: 161990,
 
-        POS_ACTIVATION: 80,
+        POS_ACTIVATION: 100,
 
     }
 
