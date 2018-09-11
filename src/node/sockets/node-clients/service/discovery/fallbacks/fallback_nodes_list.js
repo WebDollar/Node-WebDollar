@@ -29,36 +29,16 @@ export default {
 
         {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000        
 
-        {"addr": ["https://node3.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node3.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node3.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node3.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node3.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node7.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node7.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node7.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node7.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node7.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node3.int-webd.com:80"]}, // Thanks to @int_webd
-        {"addr": ["https://node4.int-webd.com:80"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:80"]}, // Thanks to @int_webd
-        {"addr": ["https://node5.int-webd.com:80"]}, // Thanks to @int_webd
-        {"addr": ["https://node6.int-webd.com:80"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5003"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5004"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5005"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5006"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5007"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5008"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
+        {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd        
         
         // ----------------------------------------- inactive nodes        
         // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
