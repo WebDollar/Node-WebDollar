@@ -4,6 +4,7 @@ import consts from 'consts/const_global'
 import Serialization from 'common/utils/Serialization'
 import InterfaceBlockchainTransaction from "../transactions/transaction/Interface-Blockchain-Transaction";
 import Blockchain from "main-blockchain/Blockchain";
+import Log from 'common/utils/logging/Log';
 
 class InterfaceBlockchainBlockDataTransactions {
 
@@ -24,6 +25,23 @@ class InterfaceBlockchainBlockDataTransactions {
         this.transactions.forEach((transaction) => {
             transaction.confirmed = true;
             this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+        });
+
+    }
+
+    unconfirmTransactions(){
+
+        this.transactions.forEach((transaction) => {
+
+            transaction.confirmed = false;
+
+            try {
+                this.blockData.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
+            }
+            catch (exception) {
+                Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
+            }
+
         });
 
     }
