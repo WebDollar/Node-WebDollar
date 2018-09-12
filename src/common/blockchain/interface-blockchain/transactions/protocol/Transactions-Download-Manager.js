@@ -105,11 +105,23 @@ class TransactionsDownloadManager{
 
     }
 
-    _findFirstUndeletedTransaction(){
+    _findFirstUndeletedTransaction(socketsAlready = []){
 
         for (let i=0; i < this._transactionsQueue.length; i++)
-            if ( !this._transactionsQueue[i].deleted )
+            if ( !this._transactionsQueue[i].deleted && this._transactionsQueue[i].socket !== undefined ) {
+
+                let found = false;
+                for ( let j=0; j < socketsAlready.length; j++ )
+                    if (socketsAlready[j] === this._transactionsQueue[i].socket){
+                        found = true;
+                        break;
+                    }
+
+                if (found)
+                    continue;
+
                 return i;
+            }
 
         return -1;
 
@@ -117,43 +129,51 @@ class TransactionsDownloadManager{
 
     async _processTransactions(){
 
-        try{
+        let socketsAlready = [];
+        for (let count = 0; count < 20; count++){
 
-            let pos = this._findFirstUndeletedTransaction();
+            try{
 
-            let tx;
-            if (pos !== -1)
-                tx = this._transactionsQueue[pos];
+                let pos = this._findFirstUndeletedTransaction(socketsAlready);
 
-            if (tx !== undefined) {
+                let tx;
+                if (pos !== -1)
+                    tx = this._transactionsQueue[pos];
 
-                console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
+                if (tx !== undefined) {
 
-                let transaction;
+                    console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
 
-                try {
+                    let transaction;
 
-                    if ( tx.buffer === undefined )
-                        tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
+                    try {
 
-                    if (Buffer.isBuffer(tx.buffer))
-                        transaction = this._createTransaction(tx.buffer, tx.socket);
+                        if ( tx.buffer === undefined )
+                            tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
-                } catch (exception){
+                        if (Buffer.isBuffer(tx.buffer))
+                            transaction = this._createTransaction(tx.buffer, tx.socket);
+
+                    } catch (exception){
+
+                    }
+
+                    this._transactionsQueue[pos].deleted = true;
+
+                    tx.buffer = undefined;
+
+                    if (tx.socket !== undefined)
+                        socketsAlready.push( tx.socket );
 
                 }
 
-                this._transactionsQueue[pos].deleted = true;
-
-                tx.buffer = undefined;
-
+            } catch (exception){
+                console.error("_processTransactions raised an error", exception);
             }
 
-        } catch (exception){
-            console.error("_processTransactions raised an error", exception);
         }
 
-        setTimeout( this._processTransactions.bind(this), Math.random() < 0.3 ? 1000 : 5 );
+        setTimeout( this._processTransactions.bind(this), 300);
 
     }
 
