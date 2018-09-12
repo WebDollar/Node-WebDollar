@@ -204,7 +204,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height <= 0)
             return BlockchainGenesis.difficultyTarget;
         else
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+        if (height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION && height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )
             return BlockchainGenesis.difficultyTargetPOS;
         else{
             if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
