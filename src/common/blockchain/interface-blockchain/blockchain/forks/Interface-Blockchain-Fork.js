@@ -613,29 +613,14 @@ class InterfaceBlockchainFork {
             this._blocksCopy.forEach((block) => {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
+                    block.data.transactions.unconfirmTransactions();
 
-                        transaction.confirmed = false;
-
-                        try {
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                        }
-                        catch (exception) {
-                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
-                        }
-
-                    });
             });
 
             this.forkBlocks.forEach((block)=> {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-
-                    });
+                    block.data.transactions.confirmTransactions();
 
             });
 
@@ -644,29 +629,15 @@ class InterfaceBlockchainFork {
             this.forkBlocks.forEach((block)=>{
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction)=>{
-                        transaction.confirmed = false;
+                    block.data.transactions.unconfirmTransactions();
 
-                        try {
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                        }
-                        catch (exception) {
-                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
-                        }
-
-                    });
             });
 
 
             this._blocksCopy.forEach( (block) => {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-
-                    });
+                    block.data.transactions.confirmTransactions();
 
             });
 
