@@ -92,7 +92,7 @@ class NodeClient {
                             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
                             nodeConsensusType: waitlist.nodeConsensusType,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
-                            domain: process.env.BROWSER ? "browser" : await NodeExpress.getServerHTTPAddress(),
+                            domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
                         },
 
                     });
