@@ -533,11 +533,16 @@ class CLI {
 
                     let response = await AdvancedMessages.confirm('Do you want to use external pool servers?: ');
 
-                    if (response){
+                    if (response)
                         poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
+                    else
+                        poolServers = await NodeServer.getServerHTTPAddress(true);
+
+                    console.info("Pool Servers:", poolServers);
+
+                    if (response){
                         await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
                     } else {
-                        poolServers = await NodeServer.getServerHTTPAddress(true);
                         await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( false ) ;
                         await Blockchain.PoolManagement.poolSettings.setPoolUseSignatures( false ) ;
                     }
