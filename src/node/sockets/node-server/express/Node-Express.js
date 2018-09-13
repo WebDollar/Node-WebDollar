@@ -6,6 +6,9 @@ const path = require('path')
 const express = require('express')
 const cors = require('cors');
 const fs = require('fs')
+
+const publicIp = require('public-ip');
+
 import consts from 'consts/const_global'
 
 import NodeAPIRouter from "../API-router/Node-API-Router"
@@ -38,6 +41,26 @@ class NodeExpress{
         domain = domain.replace( "*.", "" );
 
         return domain;
+    }
+
+    async getServerHTTPAddress(getIP) {
+
+        if ( !this.loaded )
+            await this.startExpress();
+
+
+        if (this.port === 0) return '';
+        if (this.domain  === '') return '';
+
+        if ( getIP ){
+
+            return 'http' + ( this.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + this.port;
+
+        }
+
+        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + this.domain  + ":" + this.port;
+
+
     }
 
     startExpress(){

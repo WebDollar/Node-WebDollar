@@ -2,7 +2,6 @@ import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
 
 const io = require('socket.io');
-const publicIp = require('public-ip');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
@@ -60,27 +59,6 @@ class NodeServer {
             },
 
         };
-
-    }
-
-    getServerHTTPAddress(getIP) {
-
-        if ( !this.loaded || !NodeExpress.loaded ) return '';
-        if (NodeExpress.port === 0) return '';
-        if (NodeExpress.domain  === '') return '';
-
-        if ( getIP ){
-
-            return new Promise(async (resolve)=>{
-
-                resolve (  'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port );
-
-            })
-
-        }
-
-        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
-
 
     }
 
