@@ -536,7 +536,7 @@ class CLI {
                     if (response)
                         poolServers = await AdvancedMessages.input('Pool Servers (separated by comma): ');
                     else
-                        poolServers = await NodeServer.getServerHTTPAddress(true);
+                        poolServers = await NodeExpress.getServerHTTPAddress(true);
 
                     console.info("Pool Servers:", poolServers);
 

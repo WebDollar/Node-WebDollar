@@ -47,7 +47,7 @@ class NodeClient {
         port = sckAddress.port;
 
 
-        return new Promise( (resolve) => {
+        return new Promise( async (resolve) => {
 
             let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
             let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
@@ -92,7 +92,7 @@ class NodeClient {
                             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
                             nodeConsensusType: waitlist.nodeConsensusType,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
-                            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
+                            domain: process.env.BROWSER ? "browser" : await NodeExpress.getServerHTTPAddress(),
                         },
 
                     });
