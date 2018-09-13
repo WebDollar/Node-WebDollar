@@ -82,7 +82,7 @@ class MinerPoolSettings {
 
     async setPoolURL(newValue, skipSaving = false){
 
-        newValue = this._replacePoolURL(newValue);
+        newValue = await this._replacePoolURL(newValue);
 
         newValue = sanitizer.sanitize(newValue);
 

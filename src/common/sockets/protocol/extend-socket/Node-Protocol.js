@@ -25,7 +25,7 @@ class NodeProtocol {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
-            domain: process.env.BROWSER ? "browser" : await NodeExpress.getServerHTTPAddress(),
+            domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
         }, undefined, 5000);
 

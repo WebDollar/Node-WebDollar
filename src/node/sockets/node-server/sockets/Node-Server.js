@@ -14,6 +14,8 @@ import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
+const publicIp = require('public-ip');
+
 const TIME_DISCONNECT_TERMINAL = 5*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
@@ -291,6 +293,29 @@ class NodeServer {
 
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.signaling.server.initializeSignalingServerService();
+    }
+
+    async getServerHTTPAddress(getIP) {
+
+
+        if (NodeExpress === undefined) return '';
+
+        if ( !this.loaded )
+            await NodeExpress.startExpress();
+
+
+        if (NodeExpress.port === 0) return '';
+        if (NodeExpress.domain  === '') return '';
+
+        if ( getIP ){
+
+            return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port;
+
+        }
+
+        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
+
+
     }
 
     _disconenctOldSockets() {
