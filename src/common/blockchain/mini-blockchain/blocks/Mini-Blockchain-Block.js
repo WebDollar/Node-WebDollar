@@ -199,6 +199,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             }
 
+            buffers.push(this.computedBlockPrefix);
+
             return Buffer.concat(buffers);
 
         } else
