@@ -10,6 +10,9 @@ export default {
         //---------------------------------------------------------
 
         {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
+    
+        {"addr": ["https://ez.cnbacolt.com:443"]},
+        {"addr": ["https://server.cnbacolt.com:443"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
