@@ -32,21 +32,14 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
-        let prevBlockDifficulty;
-
-        if ( blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
-            prevBlockDifficulty = getDifficultyCallback( blockNumber );
-        else
-            prevBlockDifficulty = getDifficultyCallback( blockNumber - 30 );
-
-
+        let prevBlockDifficulty = getDifficultyCallback( blockNumber );
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex
 
         //let's suppose BLOCKCHAIN.DIFFICULTY.NO_BLOCKS === 10
         //              blockNumber === 9
-        // it should recalcule using [0...9]
+        // it should recalculate using [0...9]
 
 
         if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION) {
@@ -114,15 +107,7 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber ){
 
-        let prevBlockDifficulty;
-
-        if ( blockNumber >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION && blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION + consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS )  //first part
-            prevBlockDifficulty = BlockchainGenesis.difficultyTargetPOS;
-        else
-        if (blockNumber % 30 < 10)  //first part
-            prevBlockDifficulty = getDifficultyCallback( blockNumber - 20);
-        if (blockNumber % 30 < 20)  //first part
-            prevBlockDifficulty = getDifficultyCallback( blockNumber - 10);
+        let prevBlockDifficulty = getDifficultyCallback( blockNumber);
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex

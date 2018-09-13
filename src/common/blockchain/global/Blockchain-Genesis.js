@@ -40,8 +40,19 @@ class BlockchainGenesis{
             return false;
         else {
 
-            if (height % 30 < 20) return true;
+
+            //0..19  pos
+            //20..29 pow
+            if ( height % 30 < 20) return true;
             else return false;
+
+            //29,0..18  pos
+            //19..28 pow
+
+            // if ( (height+1) % 30 < 20) return true;
+            // else return false;
+
+
         }
 
 

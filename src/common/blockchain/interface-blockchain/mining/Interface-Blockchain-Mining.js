@@ -157,7 +157,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async mineBlock( block,  difficulty, start, end, height){
 
         console.log("");
-        console.log(" ----------- mineBlock-------------", height);
+        console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
 
         try{
 
