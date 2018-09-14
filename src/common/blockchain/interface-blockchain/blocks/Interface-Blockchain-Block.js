@@ -83,11 +83,6 @@ class InterfaceBlockchainBlock {
 
     }
 
-    _getTimestamp(){
-
-
-    }
-
     destroyBlock(){
 
         if (this.blockchain === undefined) return;
@@ -323,10 +318,6 @@ class InterfaceBlockchainBlock {
         return await WebDollarCrypto.hashPOW( buffer );
     }
 
-    aserializeBlock(){
-
-    }
-
     _calculateSerializedBlock(){
 
         return Buffer.concat( [
@@ -371,7 +362,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
@@ -382,7 +373,7 @@ class InterfaceBlockchainBlock {
 
         if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
 
-        if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
+        if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
 
         try {

@@ -94,28 +94,35 @@ class Workers {
 
 
         if (!this.makeUnresponsiveThreadsTimeout)
-            this.makeUnresponsiveThreadsTimeout = setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
+            this.makeUnresponsiveThreadsTimeout = setTimeout( this._makeUnresponsiveThreads.bind(this), 5000 );
 
     }
 
     async _makeUnresponsiveThreads(){
 
-        let date = new Date().getTime();
+        try {
+            
+            let date = new Date().getTime();
 
-        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
-            for (let i=this.workers_list.length-1; i>=0; i--)
-                if ( (date  - this.workers_list[i].date ) > 60*1000 ) {
+            if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu")
+                for (let i = this.workers_list.length - 1; i >= 0; i--)
+                    if ((date - this.workers_list[i].date ) > 60 * 1000) {
 
-                    await this.workers_list[i].restartWorker();
-                    this.workers_list[i].date = new Date().getTime();
-                    Log.info("Restarting Worker", Log.LOG_TYPE.default);
+                        await this.workers_list[i].restartWorker();
+                        this.workers_list[i].date = new Date().getTime();
+                        Log.info("Restarting Worker", Log.LOG_TYPE.default);
 
-                    this.workers_list.splice(i, 1);
+                        this.workers_list.splice(i, 1);
 
-                }
+                    }
 
-        // if ( this._current >= this._current_max )
-        //     this._stopAndResolve();
+            // if ( this._current >= this._current_max )
+            //     this._stopAndResolve();
+        } catch (exception){
+
+        }
+
+        this.makeUnresponsiveThreadsTimeout = setTimeout( this._makeUnresponsiveThreads.bind(this), 5000 );
 
     }
 
