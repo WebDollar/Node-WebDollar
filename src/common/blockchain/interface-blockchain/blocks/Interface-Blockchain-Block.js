@@ -346,7 +346,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -358,7 +358,7 @@ class InterfaceBlockchainBlock {
 
         if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
 
-        if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
+        if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
 
         try {
