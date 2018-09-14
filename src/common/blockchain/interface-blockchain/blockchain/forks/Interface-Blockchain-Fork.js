@@ -219,19 +219,33 @@ class InterfaceBlockchainFork {
 
         if (height === 0)
             return BlockchainGenesis.difficultyTarget; // based on genesis block
-        else if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return BlockchainGenesis.difficultyTargetPOS;
-        else if ( forkHeight === 0)
+
+        if ( forkHeight === 0)
             return this.blockchain.getDifficultyTarget(height);
-        else if ( forkHeight > 0) {
+
+        if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
+
+            if (height % 30 === 0 && height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
+            else if (height % 30 === 0) height = height - 10;  //first POS, get the last proof of Stake
+            else if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
+
+        }
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if ( forkHeight > 0) {
 
             if ( forkHeight-1 >= this.forkBlocks.length )
                 Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
         }
-        else
-            return this.blockchain.getDifficultyTarget(height) // the blockchain
+
+        return this.blockchain.getDifficultyTarget(height) // the blockchain
+
     }
 
     getForkTimeStamp(height){
