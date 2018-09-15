@@ -118,7 +118,7 @@ class TransactionsPendingQueue {
         return null;
     }
 
-    _removePendingTransaction (transaction){
+    _removePendingTransaction (transaction, forcedDeletion){
 
         if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
 
@@ -137,7 +137,10 @@ class TransactionsPendingQueue {
         }
 
         if (transaction !== undefined && transaction !== null) {
-            this.transactions.emitTransactionChangeEvent(transaction, true);
+
+            if (!forcedDeletion)
+                this.transactions.emitTransactionChangeEvent(transaction, true, index);
+
             transaction.destroyTransaction();
         }
 
