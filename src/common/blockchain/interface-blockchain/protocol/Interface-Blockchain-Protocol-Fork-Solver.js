@@ -387,6 +387,7 @@ class InterfaceBlockchainProtocolForkSolver{
             try {
                 await finished;
             } catch (exception){
+                console.error("Downloading blocks raised an error", exception);
                 resolved = true;
                 finished = false;
             }
