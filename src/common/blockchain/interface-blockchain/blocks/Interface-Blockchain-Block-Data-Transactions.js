@@ -14,8 +14,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.transactions = transactions||[];
 
-        this.transactionsLoaded = undefined;
-        this.pendingTransactionsWereIncluded = undefined;
+        // transactionsLoaded
+        // pendingTransactionsWereIncluded
 
         if (hashTransactions === undefined)
             hashTransactions = this.calculateHashTransactions();
@@ -57,8 +57,7 @@ class InterfaceBlockchainBlockDataTransactions {
             if (this.pendingTransactionsWereIncluded)
                 this.transactions[i].pendingTransactionsIncluded--;
 
-            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
-                this.transactions[i].destroyTransaction();
+            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(this.transactions[i]);
 
             this.transactions[i] = undefined;
 
@@ -232,7 +231,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         }
 
-        this.transactionsLoaded = undefined;
+        delete this.transactionsLoaded;
 
         this.transactions = [];
 

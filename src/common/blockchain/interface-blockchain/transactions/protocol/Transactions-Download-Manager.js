@@ -210,10 +210,11 @@ class TransactionsDownloadManager{
             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket);
 
             return transaction
+
         } catch (exception) {
 
             if (transaction !== undefined && transaction !== null)
-                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction) === -1)
+                if (this.blockchain.transactions.pendingQueue.findPendingIdenticalTransaction(transaction, true) === -1)
                     transaction.destroyTransaction();
 
         }

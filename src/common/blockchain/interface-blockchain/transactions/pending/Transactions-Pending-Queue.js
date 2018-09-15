@@ -98,6 +98,15 @@ class TransactionsPendingQueue {
         return -1;
     }
 
+    findPendingIdenticalTransaction(transaction){
+
+        for (let i = 0; i < this.list.length; i++)
+            if (  this.list[i] === transaction.txId) //it is not required to use BufferExtended.safeCompare
+                return i;
+
+        return -1;
+    }
+
     searchPendingTransactionByTxId(transactionId){
 
         if (typeof transactionId === "string") transactionId = new Buffer(transactionId, 16);

@@ -30,13 +30,13 @@ class InterfaceBlockchainTransaction{
 
         this._confirmed = false;
 
-        if(validateTimeLock)
+        if (validateTimeLock)
             if (timeLock === undefined)
                 this.timeLock = blockchain.blocks.length-1;
             else
                 this.timeLock = timeLock;
 
-        if(validateVersion)
+        if (validateVersion)
             if (version === undefined){
 
                 if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
@@ -118,6 +118,8 @@ class InterfaceBlockchainTransaction{
 
     destroyTransaction(){
         this.blockchain = undefined;
+        this.from.transaction = undefined;
+        this.to.transaction = undefined;
     }
 
     _createTransactionFrom(from){
