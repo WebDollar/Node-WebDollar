@@ -117,6 +117,7 @@ class InterfaceBlockchainTransaction{
     }
 
     destroyTransaction(){
+
         this.blockchain = undefined;
         this.from.transaction = undefined;
         this.to.transaction = undefined;

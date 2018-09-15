@@ -17,6 +17,7 @@ class InterfaceBlockchainTransactionsEvents{
 
         if (typeof txId === "string")
             txId = new Buffer(txId, "hex");
+        if (!Buffer.isBuffer(txId)) return null;
 
         for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
 

@@ -63,6 +63,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
         }
 
+        this.transactions = [];
+
         delete this.pendingTransactionsWereIncluded;
 
     }
@@ -224,16 +226,9 @@ class InterfaceBlockchainBlockDataTransactions {
 
     freeTransactionsFromMemory(){
 
-        for (let i=this.transactions.length-1;  i>=0; i--){
-
-            this.transactions[i].destroyTransaction();
-            delete this.transactions[i];
-
-        }
+        this.destroyBlockDataTransactions();
 
         delete this.transactionsLoaded;
-
-        this.transactions = [];
 
     }
 
