@@ -1,5 +1,6 @@
 import NodesList from 'node/lists/Nodes-List';
 import consts from "consts/const_global"
+import NodesList from 'node/lists/Nodes-List'
 
 const MAX_TRANSACTIONS_LENGTH = 5000;
 
@@ -13,6 +14,10 @@ class TransactionsDownloadManager{
         this._socketsQueue = [];
         this._transactionsQueue = [];
 
+        NodesList.emitter.on("nodes-list/connected", async (nodesListObject) => {
+            nodesListObject.socket.node.protocol.transactionsDownloadingManager = {penaltyPoints: 0};
+        });
+
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._unsubscribeSocket(result.socket)
         });
@@ -20,6 +25,7 @@ class TransactionsDownloadManager{
         setTimeout( this._processSockets.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
         setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
+        setTimeout( this._clearBannedList.bind(this), 30*1000 );
 
     }
 
@@ -105,23 +111,12 @@ class TransactionsDownloadManager{
 
     }
 
-    _findFirstUndeletedTransaction(socketsAlready = []){
+    _findFirstUndeletedTransaction(){
 
         for (let i=0; i < this._transactionsQueue.length; i++)
-            if ( !this._transactionsQueue[i].deleted && this._transactionsQueue[i].socket !== undefined ) {
-
-                let found = false;
-                for ( let j=0; j < socketsAlready.length; j++ )
-                    if (socketsAlready[j] === this._transactionsQueue[i].socket){
-                        found = true;
-                        break;
-                    }
-
-                if (found)
-                    continue;
-
+            if ( !this._transactionsQueue[i].deleted && this._transactionsQueue[i].socket !== undefined && (this._transactionsQueue[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints < 10) )
                 return i;
-            }
+
 
         return -1;
 
@@ -129,51 +124,57 @@ class TransactionsDownloadManager{
 
     async _processTransactions(){
 
-        let socketsAlready = [];
-        for (let count = 0; count < 20; count++){
+        try{
 
-            try{
+            let pos = this._findFirstUndeletedTransaction();
 
-                let pos = this._findFirstUndeletedTransaction(socketsAlready);
+            let tx;
+            if (pos !== -1)
+                tx = this._transactionsQueue[pos];
 
-                let tx;
-                if (pos !== -1)
-                    tx = this._transactionsQueue[pos];
+            if (tx !== undefined) {
 
-                if (tx !== undefined) {
+                console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
 
-                    console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
+                let transaction;
 
-                    let transaction;
+                try {
 
-                    try {
+                    if ( tx.buffer === undefined )
+                        tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
 
-                        if ( tx.buffer === undefined )
-                            tx.buffer = await this.transactionsProtocol.downloadTransaction(tx.socket, tx.txId );
+                    if (Buffer.isBuffer(tx.buffer))
+                        transaction = this._createTransaction(tx.buffer, tx.socket);
 
-                        if (Buffer.isBuffer(tx.buffer))
-                            transaction = this._createTransaction(tx.buffer, tx.socket);
-
-                    } catch (exception){
-
-                    }
-
-                    this._transactionsQueue[pos].deleted = true;
-
-                    tx.buffer = undefined;
-
-                    if (tx.socket !== undefined)
-                        socketsAlready.push( tx.socket );
+                } catch (exception){
 
                 }
 
-            } catch (exception){
-                console.error("_processTransactions raised an error", exception);
+                if (transaction === undefined || transaction === null)
+                    this._increaseSocketPenalty(tx.socket);
+
+                tx.deleted = true;
+                delete tx.buffer;
+
             }
 
+        } catch (exception){
+            console.error("_processTransactions raised an error", exception);
         }
 
-        setTimeout( this._processTransactions.bind(this), 300);
+
+        setTimeout( this._processTransactions.bind(this), 500);
+
+    }
+
+    _increaseSocketPenalty(socket){
+
+        if (socket === undefined) return;
+
+        socket.node.protocol.transactionsDownloadingManager.penaltyPoints ++;
+
+        if ( socket.node.protocol.transactionsDownloadingManager.penaltyPoints === 10 )
+            socket.node.protocol.transactionsDownloadingManager.penaltyDate = new Date().getTime();
 
     }
 
@@ -184,7 +185,7 @@ class TransactionsDownloadManager{
         try {
 
             for (let i = this._transactionsQueue.length - 1; i >= 0; i--)
-                if ( ( (date - this._transactionsQueue[i].dateInitial) > 4 * 60 * 60 * 1000) && this._transactionsQueue[i].deleted )
+                if ( (date - this._transactionsQueue[i].dateInitial) > 1 * 60 * 60 * 1000 )
                     this._transactionsQueue.splice(i, 1);
 
         } catch (exception){
@@ -214,7 +215,7 @@ class TransactionsDownloadManager{
         } catch (exception) {
 
             if (transaction !== undefined && transaction !== null)
-                if (this.blockchain.transactions.pendingQueue.findPendingIdenticalTransaction(transaction, true) === -1)
+                if (this.blockchain.transactions.pendingQueue.findPendingIdenticalTransaction(transaction) === -1)
                     transaction.destroyTransaction();
 
         }
@@ -240,6 +241,30 @@ class TransactionsDownloadManager{
 
             }
 
+    }
+
+    _clearBannedList(){
+
+        try{
+
+            for (let i=0; i<NodesList.nodes.length; i++) {
+
+                //console.log(NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints);
+                //console.log(new Date().getTime() - NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate);
+
+                if (NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints >= 10 && (new Date().getTime() - NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate) > 30 * 1000) {
+                    NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate = new Date().getTime();
+                    NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints--;
+                }
+            }
+
+        } catch (exception){
+
+        }
+
+
+
+        setTimeout( this._clearBannedList.bind(this), 30*1000 );
     }
 
 }
