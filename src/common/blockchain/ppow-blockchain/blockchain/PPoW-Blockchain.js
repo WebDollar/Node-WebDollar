@@ -26,7 +26,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         if ( !this.agent.light )
             for (let i=startingHeight; i<endingPosition; i++)
-                this.prover.provesCalculated.deleteBlock(this.blocks[i])
+                this.prover.provesCalculated.deleteBlockCalculated(this.blocks[i])
 
     }
 

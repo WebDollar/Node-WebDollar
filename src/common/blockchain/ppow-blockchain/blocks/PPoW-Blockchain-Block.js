@@ -24,7 +24,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         //in case it was already included
         if (this.blockchain === undefined) return;
         
-        this.blockchain.prover.provesCalculated.deleteBlock(this);
+        this.blockchain.prover.provesCalculated.deleteBlockCalculated(this);
 
         InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
     }

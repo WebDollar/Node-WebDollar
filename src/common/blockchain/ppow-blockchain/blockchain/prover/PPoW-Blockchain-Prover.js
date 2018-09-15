@@ -53,7 +53,7 @@ class PPoWBlockchainProver{
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
 
-                    // // C[: −k]{B :}
+                    // C[: −k]{B :}
                     for (let level = miu; level < 256; level++){
 
                         //C[: −k] ↑µ
@@ -62,6 +62,9 @@ class PPoWBlockchainProver{
                         // {B :}
                         let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
 
+                        if (index === -1)
+                            console.error("!!! provesCalculated didn't work", index);
+                        else
                         for (let i=index; i<chainBlocks.length; i++)
                             if ( chainBlocks[i].height < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i].height >= B.height ){
 
@@ -81,7 +84,7 @@ class PPoWBlockchainProver{
                         return a.height - b.height;
                     });
 
-                    // //slow version
+                    // // //slow version
                     // for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                     //     if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
                     //         chain.blocks[i].getLevel() >= miu) {

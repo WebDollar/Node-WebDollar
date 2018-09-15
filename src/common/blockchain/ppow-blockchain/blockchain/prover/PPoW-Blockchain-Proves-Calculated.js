@@ -14,13 +14,17 @@ class PPoWBlockchainProvesCalculated{
             this.levels[i] = [];
         }
 
+        //all blocks stores levels of each blocks
+        // block 0: level
+        // block 1: level
+        // block 2: level
         this.allBlocks = {};
 
     }
 
-    deleteBlock(block, level){
+    deleteBlockCalculated(block, level){
 
-        if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
+        if ( level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null) )
             return;
 
         try {
@@ -31,22 +35,20 @@ class PPoWBlockchainProvesCalculated{
             return;
         }
 
+        let oldPos = this._binarySearch( level , block);
+        if (oldPos !==-1 && this.levels[level][oldPos] === block) {
+            this.levels[level].splice(oldPos, 1);
 
+            this.levelsLengths[level]--;
 
-        //deleting old ones if they have a different level
-        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] === block && this.allBlocks[block.height] !== level) {
+            //deleting old ones if they have a different level
+            if ( this.allBlocks[block.height] !== undefined )
+                this.allBlocks[block.height] = undefined;
 
-            let oldlevel = this.allBlocks[block.height];
-            this.levelsLengths[oldlevel]--;
-
-            this.allBlocks[block.height] = undefined;
-
-            let oldPos = this._binarySearch(this.levels[oldlevel], block);
-            if (this.levels[oldlevel][oldPos] === block)
-                this.levels[oldlevel].splice(oldPos, 1);
         }
 
     }
+
 
     updateBlock(block){
 
@@ -63,7 +65,7 @@ class PPoWBlockchainProvesCalculated{
             pos = this._binarySearch(this.levels[level], block);
 
 
-            this.deleteBlock(block);
+            this.deleteBlockCalculated(block, level);
 
 
             if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
@@ -103,7 +105,7 @@ class PPoWBlockchainProvesCalculated{
     /**
      * Return 0 <= i <= array.length such that !pred(array[i - 1]) && pred(array[i]).
      */
-    _binarySearch (array, value) {
+    _binarySearch = (array, value) => {
 
         if (array === undefined) return -1;
 
@@ -113,13 +115,17 @@ class PPoWBlockchainProvesCalculated{
 
         while(min <= max){
             guess = Math.floor((min + max) /2);
-            if(array[guess].height === value.height)
-                return guess;
+            if(array[guess].height === value.height){
+                min = guess;
+                break;
+            }
             else if(array[guess].height < value.height)
                 min = guess + 1;
             else
                 max = guess - 1;
         }
+
+        if (array[min].height !== value.height) return -1;
 
         return min;
     }
