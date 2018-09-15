@@ -88,6 +88,9 @@ class CLI {
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
+            case '21': // Disable Forks Immutability
+                await this.disableForksImmutability();
+                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -636,6 +639,19 @@ class CLI {
 
     }
 
+
+    disableForksImmutability(){
+
+        consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH += 10000;
+
+        setTimeout( ()=>{
+
+            consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH -= 10000;
+
+        }, 10*60*1000);
+
+    }
+
 }
 
 const commands = [
@@ -654,6 +670,7 @@ const commands = [
         '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
+        '21. Disable Node Immutability',
     ];
 
 const lineSeparator =
