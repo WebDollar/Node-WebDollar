@@ -60,6 +60,8 @@ class InterfaceBlockchainBlockDataTransactions {
             this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(this.transactions[i]);
 
             this.transactions[i] = undefined;
+            this.transactions.splice(i,1);
+            i--;
 
         }
 

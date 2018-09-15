@@ -405,7 +405,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 }
 
             } catch (exception){
-                console.error("Error loading block", index);
+                console.error("Error loading block", index, exception);
 
                 if ( this.blocks.length < 10)
                     answer = false;
