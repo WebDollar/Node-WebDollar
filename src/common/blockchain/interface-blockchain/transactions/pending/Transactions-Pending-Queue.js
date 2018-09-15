@@ -130,16 +130,17 @@ class TransactionsPendingQueue {
             transaction = this.list[index];
         }
 
-        if (index === -1)
-            return true;
+        if (index === -1){
+
+            this.list.splice(index, 1);
+
+        }
 
         if (transaction !== undefined && transaction !== null)
             this.transactions.emitTransactionChangeEvent(transaction, true);
 
-        if (this.list[index] !== undefined)
-            this.list[index].destroyTransaction();
-
-        this.list.splice(index, 1);
+        if (transaction !== undefined)
+            transaction.destroyTransaction();
 
     }
 
