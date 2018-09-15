@@ -310,7 +310,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let howManyBlocks = Math.min( fork.forkChainLength - (fork.forkStartingHeight + fork.forkBlocks.length), consts.SETTINGS.PARAMS.CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER);
             let downloadingList = [];
-            let trialsList = [];
+            let trialsList = {};
             let alreadyDownloaded = 0;
             let resolved = false;
 
@@ -377,6 +377,10 @@ class InterfaceBlockchainProtocolForkSolver{
                 };
 
                 console.info("Downloading Blocks...", howManyBlocks);
+
+                for (let i=0; i < howManyBlocks; i++)
+                    trialsList[i] = 0;
+
                 for (let i=0; i < howManyBlocks; i++)
                     if (downloadingList[i] === undefined)
                         downloadingBlock(i);

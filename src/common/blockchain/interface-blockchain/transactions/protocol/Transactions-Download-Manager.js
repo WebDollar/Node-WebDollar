@@ -171,9 +171,9 @@ class TransactionsDownloadManager{
 
         if (socket === undefined) return;
 
-        socket.node.protocol.transactionsDownloadingManager.penaltyPoints ++;
+        socket.node.protocol.transactionsDownloadingManager.penaltyPoints += 2;
 
-        if ( socket.node.protocol.transactionsDownloadingManager.penaltyPoints === 10 )
+        if ( socket.node.protocol.transactionsDownloadingManager.penaltyPoints >= 10 )
             socket.node.protocol.transactionsDownloadingManager.penaltyDate = new Date().getTime();
 
     }
