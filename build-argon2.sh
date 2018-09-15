@@ -39,17 +39,25 @@ showport="$yellow[PORT]$stand"
 ##
 
 ### GENERAL_VARS
+is_Linux=$(expr substr $(uname -s) 1 5)
 get_const_global="src/consts/const_global.js"
+if [[ $is_Linux == Linux ]]; then
 get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list libtool | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list autoconf | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --version | grep 3.10* || cmake --version | grep 3.12* > /dev/null; then echo "Installed"; elif ! cmake --version | grep 3.5* > /dev/null; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_openclheaders=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list opencl-headers | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
 get_libopencl=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list ocl-icd | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+get_pciutils=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list pciutils | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+fi
 ###
 
 #### Dependencies START
 function deps() {
+if [[ $is_Linux == Linux ]]; then
+
 if [[ "$get_libtool" == none ]]; then
 	echo "$showinfo We need to install ${blue}libtool$stand";
 	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
@@ -70,7 +78,67 @@ else
 fi
 if [[ "$get_cmake" == none ]]; then
         echo "$showinfo We need to install ${blue}cmake$stand"
-        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y cmake; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y cmake; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y cmake; fi
+
+        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
+
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
+
+			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
+
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
+
+			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
+
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
+
+			echo "$showinfo CMAKE SETUP"
+			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
+			echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+			echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
+			echo "$showexecute Entering ${yellow}cmake$stand folder" && cd cmake-3.12.1
+			echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
+			echo "$showexecute Running make..." && make
+			echo "$showexecute Running sudo make install" && sudo make install
+			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
+			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+		fi
+
+	elif cat /etc/*release | grep -q -o -m 1 Debian; then
+
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
+
+			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
+
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
+
+			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
+		fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
+
+			function cmake_centos() {
+				echo "$showinfo CMAKE SETUP"
+				echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo yum remove cmake -y
+				echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+				echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
+				echo "$showexecute Entering ${yellow}cmake$stand folder" && cd cmake-3.12.1
+				echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
+				echo "$showexecute Running make..." && make
+				echo "$showexecute Running sudo make install" && sudo make install
+				echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+				echo "$showexecute Going back to WebDollar folder..." && cd ..
+				echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+			}
+			cmake_centos
+
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
+
+			cmake_centos
+		fi
+	fi
 else
         if [[ "$get_cmake" == * ]]; then
                 echo "$showok ${blue}cmake$stand is already installed!"
@@ -104,6 +172,16 @@ else
 		echo "$showok ${blue}ocl-icd$stand is already installed!";
 	fi
 fi
+if [[ "$get_pciutils" == none ]]; then
+	echo "$showinfo We need to install ${blue}pciutils$stand";
+	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
+		sudo apt install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y pciutils;
+	fi
+else
+	if [[ "$get_pciutils" == * ]]; then
+		echo "$showok ${blue}pciutils$stand is already installed!";
+	fi
+fi
 
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib64/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi fi
 
@@ -116,12 +194,21 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18.* ]]; then
-			echo "$showerror CUDA for Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') not supported for the moment."
-#do not change this atm#echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
+			echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3*;  then # check for NVIDIA drivers
+				echo "$showok ${blue}nvidia-driver-390$stand and ${blue}nvidia-modprobe$stand already installed."
+			else
+				echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-driver-390 nvidia-modprobe
+			fi
+			if apt-cache policy nvidia-cuda-toolkit | grep Installed | grep 9* > /dev/null;  then # check for CUDA toolkit
+				echo "$showok ${blue}nvidia-cuda-toolkit$stand already installed."
+			else
+				echo "$showexecute Installing nVidia CUDA..." && sudo apt-get install -y nvidia-cuda-toolkit
+			fi
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17.* ]]; then
-        	        echo "$showerror Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
+        	        echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -131,7 +218,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute Running sudo apt-get install -y cuda..." && sudo apt-get install -y cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16.* ]]; then
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
         	        echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 			echo "$showinfo CMAKE SETUP"
 			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
@@ -143,6 +230,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute Running sudo make install" && sudo make install
 			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
 			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+			echo "$showexecute Going back to WebDollar folder..." && cd ..
 			echo "$showexecute CUDA SETUP"
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-375 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.2.148-1_amd64.deb
@@ -160,8 +248,8 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9.* ]]; then
-			echo "$showerror Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
+			echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -171,8 +259,8 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 			echo "$showexecute Running sudo apt-get install -y cuda..." && sudo apt-get install -y cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8.* ]]; then
-        	        echo "$showerror Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
+        	        echo "$showok Debian $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-384 nvidia-modprobe
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1710/x86_64/cuda-repo-ubuntu1710_9.2.148-1_amd64.deb
@@ -190,8 +278,8 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
 
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7.* ]]; then
-			echo "$showerror Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
+		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
+			echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support."
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/cuda-repo-rhel7-9.2.148-1.x86_64.rpm
 			echo "$showexecute Installing REPO..." && sudo rpm -i cuda-repo-rhel7-9.2.148-1.x86_64.rpm
@@ -199,8 +287,8 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 			echo "$showexecute Running sudo yum install cuda..." && sudo yum install cuda
 			sudo touch "/usr/local/build-argon2-cuda-install"
 
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6.* ]]; then
-        	        echo "$showerror Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
+		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
+        	        echo "$showok Centos $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
 
 			echo "$showexecute Downloading CUDA REPO..." && wget http://developer.download.nvidia.com/compute/cuda/repos/rhel6/x86_64/cuda-repo-rhel6-9.2.148-1.x86_64.rpm
 			echo "$showexecute Installing REPO..." && sudo sudo rpm -i cuda-repo-rhel6-9.2.148-1.x86_64.rpm
@@ -215,6 +303,40 @@ fi
 ### CUDA_CHECK_FILE
 fi
 ### CUDA_INSTALLER_END
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+
+	if [[ $(wmic path win32_VideoController get name | grep -o -m 1 NVIDIA) == NVIDIA ]]; then
+		function Windows_CUDA() {
+		read -r -e -p "$showinfo NVIDIA video card detected!\\nDo you want to install CUDA? " yn_windows_cuda
+
+		if [[ $yn_windows_cuda == [nN] ]]; then
+			echo "$showinfo OK..."
+
+		elif [[ $yn_windows_cuda == [yY] ]]; then
+
+			if [[ ! -d "C:/ProgramData/NVIDIA Corporation/" ]]; then
+				echo "$showexecute Checking browser..."
+				if [[ -a $(ls "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe") ]]; then
+					echo "$showok Chrome Browser Detected"
+					start chrome --new-window "https://developer.nvidia.com/compute/cuda/9.2/Prod2/network_installers/cuda_9.2.148_win10_network"
+				elif [[ -a $(ls "C:\Program Files\Mozilla Firefox\firefox.exe") ]]; then
+					echo "$showok Firefox Browser Detected"
+					start firefox --new-window "https://developer.nvidia.com/compute/cuda/9.2/Prod2/network_installers/cuda_9.2.148_win10_network"
+				fi
+			else
+				echo "$showinfo NVIDIA CUDA is probably already installed!"
+			fi
+
+		elif [[ $yn_windows_cuda == * ]]; then
+			echo -e "$showerror Possible options are: yY or nN." && Windows_CUDA
+		fi
+		}
+		Windows_CUDA
+	else
+		echo "$showerror No NVIDIA GPU found! Proceeding..."
+	fi # Detect GPU
+fi # Detect OS
 }
 #### Dependencies check END
 
@@ -387,10 +509,47 @@ function set_gpu_opencl() {
 }
 ### GPU_OPENCL_FUNCTION_END
 
+### ASK_USER_FUNCTION_START
+function ask_user() {
+### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
+if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+
+	if [[ ! -d $get_const_global ]]; then
+		echo "$showinfo ${yellow}const_global.js$stand found!"
+		echo "+----------------+"
+		echo -e "| 1. ${yellow}CPU$stand         |\\n| 2. ${yellow}GPU(cuda)$stand   |\\n| 3. ${yellow}GPU(opencl)$stand |"
+		echo "+----------------+"
+		read -r -e -p "$showinput Enter number of device you'll want to mine with: " select_device
+
+		if [[ $select_device == 1 ]]; then
+
+			set_cpucpp
+
+		elif [[ $select_device == 2 ]]; then
+
+			set_gpu_cuda
+
+		elif [[ $select_device == 3 ]]; then
+
+			set_gpu_opencl
+
+		elif [[ $select_device == * ]]; then
+
+			echo "$showerror Possible options are 1, 2 or 3!"
+		fi
+	else
+		echo "$showerror ${yellow}$get_const_global$stand not found! Something is wrong..."
+	fi
+fi
+}
+### ASK_USER_FUNCTION_END
+
 ### NODE_WEBDOLLAR_START
 if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
-	echo "$showinfo We're inside a Node-WebDollar folder."
+if [[ $is_Linux == Linux ]]; then
+
+	echo "$showinfo We're inside a ${yellow}Node-WebDollar$stand folder."
 
 	### ARGON2_CPU_START
 	if [[ $(ls -d argon2) == argon2 ]]; then
@@ -462,6 +621,8 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 	### ARGON2_CPU_END
 
 	### ARGON2_GPU_START
+if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA || $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == Advanced ]]; then
+
 	if [[ $(ls -d argon2-gpu) == argon2-gpu ]]; then
 
 		echo "$showinfo ${yellow}argon2-gpu$stand folder found!"
@@ -471,19 +632,19 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 			echo -e "$showinfo OK..."
 
 		elif [[ $yn_compile_argon2gpu == [yY] ]]; then
-			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}argon2$stand"; else echo "$showerror Couldn't cd to argon2 folder!"; fi
-			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
+			if cd argon2-gpu; then echo "$showexecute Changing dir to ${yellow}argon2-gpu$stand"; else echo "$showerror Couldn't cd to argon2-gpu folder!"; fi
+			echo "$showexecute Compiling argon2-gpu..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
 			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
 
 			if [[ -d dist_bundle/GPU  ]]; then
 
-				echo "$showok CPU folder inside dist_bundle exists!"
-				echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/GPU/
+				echo "$showok GPU folder inside dist_bundle exists!"
+				echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 			else
 				if [[ ! -d dist_bundle/GPU ]]; then
-					echo "$showerror CPU folder inside dist_bundle not found!"
+					echo "$showerror GPU folder inside dist_bundle not found!"
 					echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
-					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/GPU/
+					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 				fi
 			fi
 
@@ -507,12 +668,12 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 				if [[ -d dist_bundle/GPU  ]]; then
 
 					echo "$showok GPU folder inside dist_bundle exists!"
-					echo "$showexecute Copying argon2/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 				else
 					if [[ ! -d dist_bundle/GPU ]]; then
 						echo "$showerror GPU folder inside dist_bundle not found!"
 						echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
-						echo "$showexecute Copying argon2/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+						echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 					fi
 				fi
 			else
@@ -524,41 +685,18 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 		fi
 	fi
 	### ARGON2_GPU_END
-
-### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
-if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
-
-	if [[ ! -d $get_const_global ]]; then
-		echo "$showinfo ${yellow}const_global.js$stand found!"
-		echo "+----------------+"
-		echo -e "| 1. ${yellow}CPU$stand         |\\n| 2. ${yellow}GPU(cuda)$stand   |\\n| 3. ${yellow}GPU(opencl)$stand |"
-		echo "+----------------+"
-		read -r -e -p "$showinput Enter number of device you'll want to mine with: " select_device
-
-		if [[ $select_device == 1 ]]; then
-
-			set_cpucpp
-
-		elif [[ $select_device == 2 ]]; then
-
-			set_gpu_cuda
-
-		elif [[ $select_device == 3 ]]; then
-
-			set_gpu_opencl
-
-		elif [[ $select_device == * ]]; then
-
-			echo "$showerror Possible options are 1 or 2!"
-		fi
-
-	else
-		echo "$showerror ${yellow}$get_const_global$stand not found! Something is wrong..."
-	fi
-fi
-###
-
 else
+	echo "$showinfo Proceeding..." # to skip cloning of argon2-gpu if user doesn't have NVIDIA or AMD gpu ^_^
+fi
+	ask_user
+
+elif [[ $is_Linux == MINGW ]]; then
+	echo "$showwarning Windows Detected..."
+	ask_user
+
+fi ### Detect OS
+
+else ### Node
 	if [[ $(ls -d argon2) == argon2 ]]; then
 
 		echo "$showinfo argon2 folder found.."
@@ -582,5 +720,4 @@ else
 	               	echo "$showinfo Run this script inside ${yellow}Node-WebDollar$stand folder to compile ${yellow}argon2$stand."
 	        fi
 	fi
-fi
-### NODE_WEBDOLLAR_END
+fi ### NODE_WEBDOLLAR_END

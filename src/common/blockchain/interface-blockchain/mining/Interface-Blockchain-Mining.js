@@ -52,6 +52,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             nextBlock.updateInterlink();
 
+            for (let i=0; i<nextTransactions.length; i++) {
+                if (nextTransactions[i].pendingTransactionsIncluded === undefined) nextTransactions[i].pendingTransactionsIncluded = 0;
+                nextTransactions[i].pendingTransactionsIncluded++;
+            }
+
+            nextBlock.data.transactions.pendingTransactionsWereIncluded = true;
 
         } catch (Exception){
             console.error("Error creating next block ", Exception, nextBlock);
@@ -104,9 +110,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             //mining next blocks
 
-            let nextBlock = await this.getNextBlock();
-
             try {
+
+                let nextBlock = await this.getNextBlock();
 
                 let difficulty = await this.blockchain.getDifficultyTarget();
 
@@ -229,7 +235,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
 
-            console.error( "Error mining block ", Exception, block.toJSON() );
+            console.error( "Error mining block ", Exception, (block !== null ? block.toJSON() : '') );
 
             throw Exception;
         }

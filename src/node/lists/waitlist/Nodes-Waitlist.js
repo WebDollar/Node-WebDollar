@@ -243,16 +243,16 @@ class NodesWaitlist {
      */
     async _deleteUselessWaitlist(listType){
 
+        
         let list, max;
 
 
         if (listType === NODE_TYPE.NODE_TERMINAL ) {
             list = this.waitListFullNodes;
             max = this.MAX_FULLNODE_WAITLIST_CONNECTIONS;
-        }
-
+        } else
         if (listType === NODE_TYPE.NODE_WEB_PEER ) {
-            list = this.waitListFullNodes;
+            list = this.waitListLightNodes;
             max = this.MAX_LIGHTNODE_WAITLIST_CONNECTIONS;
         }
 

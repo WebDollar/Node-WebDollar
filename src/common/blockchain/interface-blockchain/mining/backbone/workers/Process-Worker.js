@@ -3,6 +3,7 @@ var fs = require('fs');
 
 import consts from "consts/const_global"
 const uuid = require('uuid');
+import  Utils from "common/utils/helpers/Utils"
 
 const EventEmitter = require('events');
 import Blockchain from "main-blockchain/Blockchain"
@@ -14,11 +15,11 @@ class ProcessWorker{
     constructor(id, noncesWorkBatch, allowSendBeforeReadPreviously=true){
 
 
-         this.id = id||0;
+        this.id = id||0;
         this.noncesWorkBatch = noncesWorkBatch;
         this.allowSendBeforeReadPreviously = allowSendBeforeReadPreviously;
 
-        this._filename = './dist_bundle/CPU/input.txt';
+        this._outputFilename = 'input.txt';
 
         this.suffix = this.id;
 
@@ -41,27 +42,32 @@ class ProcessWorker{
 
     _getProcessParams(){
 
-        return this._path+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._filename + this.suffix;
+        return this._path+ ' -b '+ this.noncesWorkBatch + ' -f ' + this._outputFilename + this.suffix;
 
     }
 
-    get isWin(){
-        return /^win/.test(process.platform);
+    restartWorker(){
+        this._is_batching = false;
     }
 
-    async start(path) {
+    async start(path, filename) {
 
-        if (path !== undefined)
-            this._path = path + this.isWin ? '.exe' : '';
+
+        if (path !== undefined) {
+            this._path = path + filename;
+            this._outputFilename = path + this._outputFilename;
+        }
 
         try {
+
             await this._deleteFile();
             await this._deleteFile("output");
+
         } catch (exception) {
 
         }
 
-        this._child = exec((this.isWin ? 'cmd' : '') + ' ' + this.isWin ? this._getProcessParams().replace("./",'') : this._getProcessParams(), async (e, stdout, stderr) => {
+        this._child = exec(( Utils.isWin ? '' : '') + ' ' + this._getProcessParams(), async (e, stdout, stderr) => {
 
             //console.log(stdout);
             console.log(stderr);
@@ -148,7 +154,7 @@ class ProcessWorker{
 
         try {
 
-            await fs.writeFileSync( this._filename + this.suffix, data, "binary");
+            await fs.writeFileSync( this._outputFilename + this.suffix, data, "binary");
         } catch (exception){
             console.error("Error sending the data to GPU", exception);
             this._sendDataTimeout = setTimeout( this._writeWork.bind(this,data), 10 );
@@ -160,11 +166,11 @@ class ProcessWorker{
 
     async _deleteFile(prefix = ''){
 
-        if (false === await fs.existsSync(this._filename + this.suffix + prefix ))
+        if (false === await fs.existsSync(this._outputFilename + this.suffix + prefix ))
             return;
 
         try {
-            await fs.unlinkSync(this._filename + this.suffix + prefix );
+            await fs.unlinkSync(this._outputFilename + this.suffix + prefix );
         } catch (exception){
         }
 
@@ -177,7 +183,7 @@ class ProcessWorker{
     //
     //             await this._deleteFile();
     //
-    //             await fs.writeFileSync( this._filename + this.suffix, this._data, "binary");
+    //             await fs.writeFileSync( this._outputFilename + this.suffix, this._data, "binary");
     //             this._data = undefined;
     //
     //         } catch (exception){
@@ -193,7 +199,7 @@ class ProcessWorker{
         let data;
 
         try {
-            data = await fs.readFileSync( this._filename+ this.suffix + 'output');
+            data = await fs.readFileSync( this._outputFilename + this.suffix + 'output');
         } catch (exception){
             this._timeoutValidation = setTimeout( this._validateWork.bind(this), 10);
             return;
