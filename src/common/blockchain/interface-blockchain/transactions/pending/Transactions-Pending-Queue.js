@@ -136,11 +136,10 @@ class TransactionsPendingQueue {
 
         }
 
-        if (transaction !== undefined && transaction !== null)
+        if (transaction !== undefined && transaction !== null) {
             this.transactions.emitTransactionChangeEvent(transaction, true);
-
-        if (transaction !== undefined)
             transaction.destroyTransaction();
+        }
 
     }
 

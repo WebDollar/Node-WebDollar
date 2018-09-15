@@ -25,7 +25,7 @@ class InterfaceBlockchainTransactionsEvents{
             if (block === undefined) continue;
 
             for (let i=0; i<block.data.transactions.transactions.length; i++){
-                if (BufferExtended.safeCompare(block.data.transactions.transactions[i].txId, txId))
+                if (block.data.transactions.transactions[i].txId !== undefined && block.data.transactions.transactions[i].txId.equals(txId))
                     return block.data.transactions.transactions[i];
             }
 
