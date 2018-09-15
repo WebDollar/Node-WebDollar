@@ -88,6 +88,9 @@ class CLI {
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
+            case '21': // Disable Forks Immutability
+                await this.disableForksImmutability();
+                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -436,7 +439,7 @@ class CLI {
     }
 
     async startMiningInsidePool(){
-        
+
         Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
 
         consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
@@ -636,25 +639,39 @@ class CLI {
 
     }
 
+
+    disableForksImmutability(){
+
+        consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH += 10000;
+
+        setTimeout( ()=>{
+
+            consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH -= 10000;
+
+        }, 10*60*1000);
+
+    }
+
 }
 
 const commands = [
-        '1. List addresses',
-        '2. Create new address',
-        '3. Delete address',
-        '4. Import address',
-        '5. Export address',
-        '6. Encrypt address',
-        '7. Set mining address',
-        '8. Solo: Start Mining',
-        '9. Solo: Start Mining Instantly Even Unsynchronized',
-        '10. Mining Pool: Start Mining',
-        '11. Mining Pool: Create a New Pool',
-        '11-1. Mining Pool: Process Remaining Payment',
-        '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
-        '13. Create Offline Transaction',
-        '20. HTTPS Express Start',
-    ];
+    '1. List addresses',
+    '2. Create new address',
+    '3. Delete address',
+    '4. Import address',
+    '5. Export address',
+    '6. Encrypt address',
+    '7. Set mining address',
+    '8. Solo: Start Mining',
+    '9. Solo: Start Mining Instantly Even Unsynchronized',
+    '10. Mining Pool: Start Mining',
+    '11. Mining Pool: Create a New Pool',
+    '11-1. Mining Pool: Process Remaining Payment',
+    '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
+    '13. Create Offline Transaction',
+    '20. HTTPS Express Start',
+    '21. Disable Node Immutability',
+];
 
 const lineSeparator =
     "\n|_______|____________________________________________|_________________|";
