@@ -228,9 +228,10 @@ class InterfaceBlockchainBlockDataTransactions {
 
     freeTransactionsFromMemory(){
 
-        this.destroyBlockDataTransactions(true);
-
-        delete this.transactionsLoaded;
+        //
+        // this.destroyBlockDataTransactions(true);
+        //
+        // delete this.transactionsLoaded;
 
     }
 

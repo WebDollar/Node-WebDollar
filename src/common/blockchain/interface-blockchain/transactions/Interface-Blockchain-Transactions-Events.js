@@ -160,10 +160,10 @@ class InterfaceBlockchainTransactionsEvents{
         return false;
     }
 
-    emitTransactionChangeEvent(transaction, deleted=false ){
+    emitTransactionChangeEvent(transaction, deleted=false, index ){
 
         if (deleted){
-            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
+            if (index === undefined && this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
                 return false;
         }
 

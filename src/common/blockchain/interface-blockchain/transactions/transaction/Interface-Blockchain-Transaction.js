@@ -278,6 +278,8 @@ class InterfaceBlockchainTransaction{
 
     serializeTransaction(rewrite = false){
 
+        return this._serializeTransaction();
+
         if ( !this._serializated || rewrite )
             this._serializated = this._serializeTransaction();
 

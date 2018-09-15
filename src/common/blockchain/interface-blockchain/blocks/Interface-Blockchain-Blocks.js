@@ -174,8 +174,10 @@ class InterfaceBlockchainBlocks{
     freeAllBlocksTransactionsFromMemory(){
 
         try {
+
             for (let i = Math.max(0, this.length - 2 * consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE); i < this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE; i++)
                 this[i].data.transactions.freeTransactionsFromMemory();
+
         } catch (exception){
 
         }
