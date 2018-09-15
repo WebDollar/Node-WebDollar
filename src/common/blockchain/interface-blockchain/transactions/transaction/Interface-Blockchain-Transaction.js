@@ -120,6 +120,12 @@ class InterfaceBlockchainTransaction{
         this.blockchain = undefined;
         this.from.transaction = undefined;
         this.to.transaction = undefined;
+
+        delete this._serializated;
+        delete this.from.addresses;
+        delete this.to.addresses;
+        delete this.txId;
+
     }
 
     _createTransactionFrom(from){
