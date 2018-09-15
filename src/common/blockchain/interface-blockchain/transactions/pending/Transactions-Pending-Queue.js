@@ -156,6 +156,9 @@ class TransactionsPendingQueue {
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
+            if (this.list[i].blockchain === undefined)
+                this._removePendingTransaction(i, true);
+
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
             try{

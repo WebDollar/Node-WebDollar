@@ -216,7 +216,7 @@ class TransactionsDownloadManager{
 
             if (transaction !== undefined && transaction !== null)
                 if (this.blockchain.transactions.pendingQueue.findPendingIdenticalTransaction(transaction) === -1)
-                    transaction.destroyTransaction();
+                    this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction, true);
 
         }
 

@@ -22,7 +22,7 @@ class InterfaceBlockchainTransaction{
      * @param txId - usually null
      */
 
-    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, validateTxId = true ){
+    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, calculateTxId = true ){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -107,13 +107,13 @@ class InterfaceBlockchainTransaction{
 
         this.nonce = nonce; //1 bytes
 
-        if(validateTxId)
+        if (calculateTxId)
             if (txId === undefined || txId === null)
                 txId = this._computeTxId();
 
-        this.txId = txId;
+        this._txId = txId;
 
-        this._serializated = undefined;
+        //this._serializated;
     }
 
     destroyTransaction(){
@@ -125,7 +125,7 @@ class InterfaceBlockchainTransaction{
         delete this._serializated;
         delete this.from.addresses;
         delete this.to.addresses;
-        delete this.txId;
+        delete this._txId;
 
     }
 
@@ -147,7 +147,7 @@ class InterfaceBlockchainTransaction{
     }
 
     recalculateTxId(){
-        this.txId = this._computeTxId();
+        this._txId = this._computeTxId();
     }
 
     /**
@@ -303,8 +303,11 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    serializeTransactionId(){
-        return this.txId;
+    txId(){
+        if (!this._txId)
+            this._txId = this._computeTxId();
+
+        return this._txId;
     }
 
     deserializeTransaction(buffer, offset, returnTransaction=false){
@@ -340,8 +343,6 @@ class InterfaceBlockchainTransaction{
             throw exception;
 
         }
-
-        this.recalculateTxId();
 
         return offset;
 
