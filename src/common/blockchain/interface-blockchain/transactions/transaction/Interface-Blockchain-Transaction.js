@@ -303,7 +303,8 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    txId(){
+    get txId(){
+
         if (!this._txId)
             this._txId = this._computeTxId();
 
