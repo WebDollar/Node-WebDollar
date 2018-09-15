@@ -170,6 +170,13 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
+    freeAllBlocksTransactionsFromMemory(){
+
+        for (let i=0; i < this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE; i++)
+            this[i].data.transactions.freeTransactionsFromMemory();
+
+    }
+
 }
 
 export default InterfaceBlockchainBlocks;

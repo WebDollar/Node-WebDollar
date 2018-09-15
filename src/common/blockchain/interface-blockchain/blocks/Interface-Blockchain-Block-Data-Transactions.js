@@ -11,7 +11,11 @@ class InterfaceBlockchainBlockDataTransactions {
     constructor(blockData, transactions, hashTransactions){
 
         this.blockData = blockData;
+
         this.transactions = transactions||[];
+
+        this.transactionsLoaded = undefined;
+        this.pendingTransactionsWereIncluded = undefined;
 
         if (hashTransactions === undefined)
             hashTransactions = this.calculateHashTransactions();
@@ -180,6 +184,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
                 this.transactions.push(transaction);
             }
+
+            this.transactionsLoaded = true;
         }
 
         return offset;
@@ -215,6 +221,21 @@ class InterfaceBlockchainBlockDataTransactions {
             fee += this.transactions[i].fee;
 
         return fee;
+    }
+
+    freeTransactionsFromMemory(){
+
+        for (let i=this.transactions.length;  i>=0; i--){
+
+            this.transactions[i].destroyTransaction();
+            delete this.transactions[i];
+
+        }
+
+        this.transactionsLoaded = undefined;
+
+        this.transactions = [];
+
     }
 
 }

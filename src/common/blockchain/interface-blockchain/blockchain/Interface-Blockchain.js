@@ -423,6 +423,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             answer = false;
         }
 
+        console.info("Free All Memory...");
+        this.blocks.freeAllBlocksTransactionsFromMemory();
+        console.info("Free All Memory... successfully");
+
         global.INTERFACE_BLOCKCHAIN_LOADING = false;
 
         return answer;

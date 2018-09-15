@@ -84,7 +84,7 @@ class TransactionsDownloadManager{
 
         try{
 
-            for (let i=0; i < 20; i++){
+            for (let i=0; i < 10; i++){
 
                 let socket;
                 if (this._socketsQueue.length > 0) {
