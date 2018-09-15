@@ -319,7 +319,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let downloadingBlock = (index)=>{
 
-                    if (trialsList[index] > 5 && !resolved){
+                    if ( (trialsList[index] > 5 || global.TERMINATED) && !resolved ) {
                         resolved = true;
                         resolve(false);
                         return;
@@ -359,7 +359,7 @@ class InterfaceBlockchainProtocolForkSolver{
                             alreadyDownloaded++;
                             downloadingList[index] = result;
 
-                            if ( (alreadyDownloaded === howManyBlocks) || global.TERMINATED && !resolved) {
+                            if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
                                 resolved = true;
                                 resolve(true);
                             }
