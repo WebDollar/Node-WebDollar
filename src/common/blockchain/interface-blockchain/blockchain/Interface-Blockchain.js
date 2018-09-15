@@ -398,6 +398,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     block.blockValidation.blockValidationType = {};
 
+                    if (index < numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE)
+                        block.data.transactions.freeTransactionsFromMemory();
+
+
                 }
 
             } catch (exception){
@@ -422,10 +426,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             answer = false;
         }
-
-        console.info("Free All Memory...");
-        this.blocks.freeAllBlocksTransactionsFromMemory();
-        console.info("Free All Memory... successfully");
 
         global.INTERFACE_BLOCKCHAIN_LOADING = false;
 

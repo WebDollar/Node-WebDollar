@@ -225,7 +225,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     freeTransactionsFromMemory(){
 
-        for (let i=this.transactions.length;  i>=0; i--){
+        for (let i=this.transactions.length-1;  i>=0; i--){
 
             this.transactions[i].destroyTransaction();
             delete this.transactions[i];
