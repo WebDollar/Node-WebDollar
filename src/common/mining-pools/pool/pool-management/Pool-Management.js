@@ -136,7 +136,7 @@ class PoolManagement{
 
             this._poolStarted = value;
 
-            await this.poolSettings.setPoolActivated(value);
+            await this.poolSettings.setPoolActivated( value);
 
             if (value) {
 

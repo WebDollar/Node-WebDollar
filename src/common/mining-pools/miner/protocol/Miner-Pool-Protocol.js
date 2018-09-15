@@ -222,13 +222,23 @@ class MinerProtocol extends PoolProtocolList{
 
             try {
 
+                let suffix = '';
+
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                socket.node.sendRequest("mining-pool/new-work/answer", {
-                    hash: this.minerPoolManagement.minerPoolMining.bestHash,
-                    nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                    id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
-                });
+                Log.info("Sending Partial Work: ("+this.minerPoolManagement.minerPoolMining._miningWork.height+")"+ this.minerPoolManagement.minerPoolMining.bestHash.toString("hex") , Log.LOG_TYPE.POOLS);
+
+                if ( (this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 && this.minerPoolManagement.minerPoolMining.bestHashNonce !== -1) || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
+                    socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
+                        work: {
+                            result: false,
+                            hash: new Buffer(this.minerPoolManagement.minerPoolMining.bestHash),
+                            nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
+                            id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
+                        }
+                    });
+                else
+                    Log.warn("Sending Partial Work was skipped" , Log.LOG_TYPE.POOLS);
 
                 this._validateRequestWork(data.work, socket);
 
@@ -449,7 +459,7 @@ class MinerProtocol extends PoolProtocolList{
             }
 
         }
-         catch (exception){
+        catch (exception){
 
             console.error("Couldn't change the wallet", exception);
             return {result:false, message: exception.message}

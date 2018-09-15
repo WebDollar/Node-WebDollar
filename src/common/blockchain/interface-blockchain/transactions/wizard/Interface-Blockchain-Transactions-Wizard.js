@@ -1,4 +1,5 @@
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
@@ -11,8 +12,28 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
+    async deserializeValidateTransaction(transaction){
+
+        let myTransaction = new MiniBlockchainTransactions(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
+
+        await myTransaction.deserializeTransaction(transaction.data,0,true);
+
+        return myTransaction;
+
+    }
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+
+        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, undefined);
+
+        if(process.result)
+            return await this.propagateTransaction( process.signature , process.transaction );
+        else
+            return process;
+
+    }
+
+    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce, skipValidationNonce=false){
 
         try {
 
@@ -21,15 +42,22 @@ class InterfaceBlockchainTransactionsWizard{
 
         } catch (exception){
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
+
             return { result:false,  message: "Amount is not a valid number", reason: exception }
         }
 
         try {
-            if (typeof fee ==='string') fee = parseInt(fee);
+
+            if (typeof fee ==='string')
+                fee = parseInt(fee);
+
         } catch (exception){
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
+
             return { result:false,  message: "Fee is not a valid number", reason: exception }
         }
 
@@ -38,12 +66,15 @@ class InterfaceBlockchainTransactionsWizard{
             address = this.wallet.getAddress(address);
 
         } catch (exception){
+
             console.error("Creating a new transaction raised an exception - Getting Address", exception);
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
-            return { result:false,  message: "Get Address failed", reason: exception }
-        }
+            if (typeof exception === "object" && exception.message !== undefined)
+                exception = exception.message;
 
+            return { result:false,  message: "Get Address failed", reason: exception }
+
+        }
 
         let transaction = undefined;
 
@@ -61,7 +92,7 @@ class InterfaceBlockchainTransactionsWizard{
                         unencodedAddress: toAddress,
                         amount: toAmount
                     },
-                    ]};
+                ]};
 
             } else if (Array.isArray(toAddress)) {
 
@@ -77,8 +108,6 @@ class InterfaceBlockchainTransactionsWizard{
 
             }
 
-
-
             let from = {
                 addresses: [
                     {
@@ -93,16 +122,13 @@ class InterfaceBlockchainTransactionsWizard{
 
             transaction = this.transactions._createTransaction(
 
-                //from
-                from,
-
-                //to
-                to,
-                undefined, //nonce
+                from, //from
+                to, //to
+                nonce, //nonce
                 timeLock, //timeLock
                 undefined, //version
                 undefined, //txId
-                false, false
+                false, false, false
             );
 
         } catch (exception) {
@@ -130,14 +156,19 @@ class InterfaceBlockchainTransactionsWizard{
         }
 
         try{
-            let blockValidationType = {
-                "take-transactions-list-in-consideration": {
-                    validation: true
-                }
-            };
 
-            if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
-                throw {message: "Transaction is invalid"};
+            if(!skipValidationNonce){
+
+                let blockValidationType = {
+                    "take-transactions-list-in-consideration": {
+                        validation: true
+                    }
+                };
+
+                if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
+                    throw {message: "Transaction is invalid"};
+
+            }
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Validating Transaction", exception);
@@ -145,6 +176,18 @@ class InterfaceBlockchainTransactionsWizard{
             if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
             return { result:false,  message: "Failed Signing the transaction", reason: exception }
         }
+
+        return {
+
+            result: true,
+            transaction: transaction,
+            signature: signature
+
+        };
+
+    }
+
+    async propagateTransaction(signature,transaction){
 
         try{
 
@@ -171,8 +214,8 @@ class InterfaceBlockchainTransactionsWizard{
         if (webdPerByte === undefined)
             webdPerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
 
-        let factor = Math.trunc( serialization.length / 200) + 1;
-        webdPerByte = factor * Math.max(1, Math.floor( Math.log2( webdPerByte) ));
+        // let factor = Math.trunc( serialization.length / 230 ) + 1;
+        // webdPerByte = factor * webdPerByte;
 
         return serialization.length * webdPerByte;
 

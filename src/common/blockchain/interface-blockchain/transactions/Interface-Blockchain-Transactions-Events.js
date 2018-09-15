@@ -17,6 +17,7 @@ class InterfaceBlockchainTransactionsEvents{
 
         if (typeof txId === "string")
             txId = new Buffer(txId, "hex");
+        if (!Buffer.isBuffer(txId)) return null;
 
         for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
 
@@ -24,7 +25,7 @@ class InterfaceBlockchainTransactionsEvents{
             if (block === undefined) continue;
 
             for (let i=0; i<block.data.transactions.transactions.length; i++){
-                if (BufferExtended.safeCompare(block.data.transactions.transactions[i].txId, txId))
+                if (block.data.transactions.transactions[i].txId !== undefined && block.data.transactions.transactions[i].txId.equals(txId))
                     return block.data.transactions.transactions[i];
             }
 
@@ -159,10 +160,10 @@ class InterfaceBlockchainTransactionsEvents{
         return false;
     }
 
-    emitTransactionChangeEvent(transaction, deleted=false){
+    emitTransactionChangeEvent(transaction, deleted=false, index ){
 
         if (deleted){
-            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
+            if (index === undefined && this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
                 return false;
         }
 

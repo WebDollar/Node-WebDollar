@@ -24,6 +24,7 @@ class InterfaceBlockchainBlocks{
         this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
 
+        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 80000 );
     }
 
     addBlock(block, revertActions, saveBlock, showUpdate = true){
@@ -168,6 +169,21 @@ class InterfaceBlockchainBlocks{
 
     get chainWork(){
         return this._chainWork;
+    }
+
+    freeAllBlocksTransactionsFromMemory(){
+
+        try {
+
+            for (let i = Math.max(0, this.length - 2 * consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE); i < this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE; i++)
+                this[i].data.transactions.freeTransactionsFromMemory();
+
+        } catch (exception){
+
+        }
+
+        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 80000 );
+
     }
 
 }

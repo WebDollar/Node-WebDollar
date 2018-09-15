@@ -36,7 +36,7 @@ class PoolWork {
     findBlockById(blockId, blockHeight){
 
         for (let i=0; i<this._blocksList.length; i++)
-            if ( (blockId !== undefined && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight)){
+            if ( (blockId !== undefined && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
                 return this._blocksList[i].block;
             }
 
@@ -60,7 +60,7 @@ class PoolWork {
             this.lastBlockNonce = 0;
 
 
-            if (this.lastBlock.computedBlockPrefix === null )
+            if (this.lastBlock.computedBlockPrefix === undefined )
                 this.lastBlock._computeBlockHeaderPrefix();
 
             this.lastBlockSerialization = Buffer.concat( [
@@ -115,10 +115,10 @@ class PoolWork {
 
             if (!found)
                 //delete block
-                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK)) {
+                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 20*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) && this._blocksList[i].block.height < this.blockchain.blocks.length - 20 ) {
 
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
-                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+ this._blocksList[i].blockId +" height "+this._blocksList[i].block.height, Log.LOG_TYPE.POOLS);
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                     for (let key in this._blocksList[i].instances)

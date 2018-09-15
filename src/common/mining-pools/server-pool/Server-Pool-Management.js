@@ -46,7 +46,7 @@ class ServerPoolManagement{
 
         await this.setServerPoolStarted(true, forceServerPool);
 
-        console.info("The url is just your domain: "+ NodeServer.getServerHTTPAddress() );
+        console.info("The url is just your domain: "+ await NodeServer.getServerHTTPAddress() );
 
     }
 

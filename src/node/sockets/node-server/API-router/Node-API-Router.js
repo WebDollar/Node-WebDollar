@@ -51,11 +51,11 @@ class NodeAPIRouter{
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, nodeApiType, 100, app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import', NodeAPIPrivate.walletImport, nodeApiType, nodeApiType, 100, app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import/:address/:publicKey/:privateKey', NodeAPIPrivate.walletImport, nodeApiType, 100, app, prefix, middleWare );
 
-            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction/:from/:to/:amount/:fee', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare );
 

@@ -16,19 +16,19 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         let db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.TRANSACTIONS_DATABASE);
 
         //the Queue is an inverted Queue, because elements are added at the end of the List (queue)
-        this.pendingQueue = new TransactionsPendingQueue(this, blockchain, db);
+        this.pendingQueue = new TransactionsPendingQueue( this, blockchain, db );
 
         this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
     }
 
 
-    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo){
-        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo);
+    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo, validateNonce){
+        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo, validateNonce, );
     }
 
     _createTransactionFromBuffer(buffer, offset = 0){
 
-        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false );
+        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, undefined, false, false, false, false, false, false );
         offset = transaction.deserializeTransaction(buffer, offset);
         return {transaction: transaction, offset: offset};
     }

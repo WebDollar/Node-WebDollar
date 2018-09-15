@@ -22,7 +22,7 @@ class InterfaceBlockchainTransaction{
      * @param txId - usually null
      */
 
-    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true){
+    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, calculateTxId = true ){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -30,19 +30,21 @@ class InterfaceBlockchainTransaction{
 
         this._confirmed = false;
 
-        if (timeLock === undefined)
-            this.timeLock = blockchain.blocks.length-1;
-        else
-            this.timeLock = timeLock;
-
-        if (version === undefined){
-
-            if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+        if (validateTimeLock)
+            if (timeLock === undefined)
+                this.timeLock = blockchain.blocks.length-1;
             else
-            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
-            else version = 0x02;
+                this.timeLock = timeLock;
 
-        }
+        if (validateVersion)
+            if (version === undefined){
+
+                if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+                else
+                if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
+                else version = 0x02;
+
+            }
 
         this.version = version; //version
 
@@ -73,8 +75,6 @@ class InterfaceBlockchainTransaction{
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
-
-
         try {
 
             if (validateFrom)
@@ -97,25 +97,36 @@ class InterfaceBlockchainTransaction{
 
         }
 
+        if(validateNonce)
+            if (nonce === undefined || nonce === null)
+                nonce = this._computeNonce();
 
-        if (nonce === undefined || nonce === null)
-            nonce = this._computeNonce();
-
-        if (version === 0x00) nonce = nonce % 0x100;
-        else if (version >= 0x01) nonce = nonce % 0X10000;
+        if(validateVersion)
+            if (version === 0x00) nonce = nonce % 0x100;
+            else if (version >= 0x01) nonce = nonce % 0X10000;
 
         this.nonce = nonce; //1 bytes
 
-        if (txId === undefined || txId === null)
-            txId = this._computeTxId();
+        if (calculateTxId)
+            if (txId === undefined || txId === null)
+                txId = this._computeTxId();
 
-        this.txId = txId;
+        this._txId = txId;
 
-        this._serializated = undefined;
+        //this._serializated;
     }
 
     destroyTransaction(){
+
         this.blockchain = undefined;
+        this.from.transaction = undefined;
+        this.to.transaction = undefined;
+
+        delete this._serializated;
+        delete this.from.addresses;
+        delete this.to.addresses;
+        delete this._txId;
+
     }
 
     _createTransactionFrom(from){
@@ -136,7 +147,7 @@ class InterfaceBlockchainTransaction{
     }
 
     recalculateTxId(){
-        this.txId = this._computeTxId();
+        this._txId = this._computeTxId();
     }
 
     /**
@@ -267,6 +278,8 @@ class InterfaceBlockchainTransaction{
 
     serializeTransaction(rewrite = false){
 
+        return this._serializeTransaction();
+
         if ( !this._serializated || rewrite )
             this._serializated = this._serializeTransaction();
 
@@ -292,11 +305,15 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    serializeTransactionId(){
-        return this.txId;
+    get txId(){
+
+        if (!this._txId)
+            this._txId = this._computeTxId();
+
+        return this._txId;
     }
 
-    deserializeTransaction(buffer, offset){
+    deserializeTransaction(buffer, offset, returnTransaction=false){
 
         offset = offset || 0;
 
@@ -329,8 +346,6 @@ class InterfaceBlockchainTransaction{
             throw exception;
 
         }
-
-        this.recalculateTxId();
 
         return offset;
 

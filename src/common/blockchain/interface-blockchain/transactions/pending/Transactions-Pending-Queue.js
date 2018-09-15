@@ -25,7 +25,7 @@ class TransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
-        if (this.findPendingTransaction(transaction) !== -1)
+        if ( this.findPendingTransaction(transaction) !== -1 )
             return false;
 
         let blockValidationType = {
@@ -98,6 +98,15 @@ class TransactionsPendingQueue {
         return -1;
     }
 
+    findPendingIdenticalTransaction(transaction){
+
+        for (let i = 0; i < this.list.length; i++)
+            if (  this.list[i] === transaction.txId) //it is not required to use BufferExtended.safeCompare
+                return i;
+
+        return -1;
+    }
+
     searchPendingTransactionByTxId(transactionId){
 
         if (typeof transactionId === "string") transactionId = new Buffer(transactionId, 16);
@@ -109,7 +118,9 @@ class TransactionsPendingQueue {
         return null;
     }
 
-    _removePendingTransaction (transaction){
+    _removePendingTransaction (transaction, forcedDeletion){
+
+        if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
 
         let index;
 
@@ -119,13 +130,20 @@ class TransactionsPendingQueue {
             transaction = this.list[index];
         }
 
-        if (index === -1)
-            return true;
+        if (index !== -1){
 
-        this.list[index].destroyTransaction();
-        this.list.splice(index, 1);
+            this.list.splice(index, 1);
 
-        this.transactions.emitTransactionChangeEvent(transaction, true);
+        }
+
+        if (transaction !== undefined && transaction !== null) {
+
+            if (!forcedDeletion)
+                this.transactions.emitTransactionChangeEvent(transaction, true, index);
+
+            transaction.destroyTransaction();
+        }
+
     }
 
     _removeOldTransactions (){
@@ -138,17 +156,25 @@ class TransactionsPendingQueue {
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
+            if (this.list[i].blockchain === undefined) {
+                this._removePendingTransaction(i, true);
+                continue;
+            }
+
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
             try{
 
-                if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  ( Blockchain.blockchain.agent.consensus && !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
-                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )) {
+                if ( ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||  ( Blockchain.blockchain.agent.consensus && !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
+                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
                     this._removePendingTransaction(i);
                 }
 
             } catch (exception){
-                console.warn("Old Transaction removed because of exception ", exception);
+
+                if ( Math.random() < 0.1)
+                    console.warn("Old Transaction removed because of exception ", exception);
+
                 this._removePendingTransaction(i)
             }
 
