@@ -330,8 +330,13 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     let socket = fork.getForkSocket(socketIndex);
 
-                    if (socket === undefined)
-                        return downloadingBlock(index);
+                    if (socket === undefined) {
+
+                        if (!resolved)
+                            downloadingBlock(index);
+
+                        return;
+                    }
 
                     let waitingTime = socket.latency === 0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : ( socket.latency + Math.random()*2000 );
 
@@ -341,6 +346,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     answer.then( (result)=>{
 
                         if (result === undefined || result === null) {
+
                             downloadingList[index] = undefined;
                             socket.latency += Math.random()*1500;
 
@@ -349,6 +355,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         }
                         else {
+
                             alreadyDownloaded++;
                             downloadingList[index] = result;
 
@@ -359,9 +366,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         }
 
+                    }).catch( (exception)=>{
+
+                        if (!resolved)
+                            downloadingBlock(index);
+
                     });
                 };
 
+                console.info("Downloading Blocks...", howManyBlocks);
                 for (let i=0; i < howManyBlocks; i++)
                     if (downloadingList[i] === undefined)
                         downloadingBlock(i);
