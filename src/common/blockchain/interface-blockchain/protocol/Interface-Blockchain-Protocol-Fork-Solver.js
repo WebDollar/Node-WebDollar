@@ -317,7 +317,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let socketIndex = 0;
             let finished = new Promise((resolve)=>{
 
-                let downloadingBlock = (index)=>{
+                let downloadingBlock = async (index)=>{
 
                     if ( (trialsList[index] > 5 || global.TERMINATED) && !resolved ) {
                         resolved = true;
@@ -331,6 +331,8 @@ class InterfaceBlockchainProtocolForkSolver{
                     let socket = fork.getForkSocket(socketIndex);
 
                     if (socket === undefined) {
+
+                        await this.blockchain.sleep(5);
 
                         if (!resolved)
                             downloadingBlock(index);
@@ -382,7 +384,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
             });
 
-            await finished;
+            try {
+                await finished;
+            } catch (exception){
+                resolved = true;
+                finished = false;
+            }
 
             //verify if all blocks were downloaded
 
