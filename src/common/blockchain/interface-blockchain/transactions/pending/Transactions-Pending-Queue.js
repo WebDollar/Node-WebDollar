@@ -130,7 +130,7 @@ class TransactionsPendingQueue {
             transaction = this.list[index];
         }
 
-        if (index === -1){
+        if (index !== -1){
 
             this.list.splice(index, 1);
 
