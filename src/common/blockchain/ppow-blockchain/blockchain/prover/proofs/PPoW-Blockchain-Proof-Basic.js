@@ -62,7 +62,7 @@ class PPoWBlockchainProofBasic{
 
             try {
 
-                let block = await this.blockchain.loadingManager.getBlock(i);
+                let block = await this.blockchain.getBlock(i);
                 list.push(block.getBlockHeader());
 
             } catch (exception){
@@ -86,7 +86,7 @@ class PPoWBlockchainProofBasic{
         let list = [];
 
         for (let i=0; i<this.blocks.length; i++){
-            let block = await this.blockchain.loadingManager.getBlock(i);
+            let block = await this.blockchain.getBlock(i);
             list.push(this.serializeProof(block.getBlockHeader()));
         }
 

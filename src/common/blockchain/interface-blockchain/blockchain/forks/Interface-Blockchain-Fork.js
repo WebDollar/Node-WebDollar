@@ -28,12 +28,12 @@ class InterfaceBlockchainFork {
 
     }
 
-    destroyFork(){
+    async destroyFork(){
 
         try {
 
             for (let i = 0; i < this.forkBlocks.length; i++)
-                if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null && this.blockchain.blocks[this.forkBlocks[i].height] !== this.forkBlocks[i]) {
+                if (this.forkBlocks[i] !== undefined && this.forkBlocks[i] !== null && (await this.blockchain.getBlock(this.forkBlocks[i].height)) !== this.forkBlocks[i]) {
 
                     this.forkBlocks[i].destroyBlock();
 
@@ -114,7 +114,7 @@ class InterfaceBlockchainFork {
         return true;
     }
 
-    validateForkImmutability(){
+    async validateForkImmutability(){
 
         //detecting there is a fork in my blockchain
         if ( this.blockchain.blocks.blocksStartingPoint < this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH )
@@ -125,17 +125,19 @@ class InterfaceBlockchainFork {
 
                 for (let i=this.forkStartingHeight; i<this.blockchain.blocks.length; i++){
 
-                    if (this.blockchain.blocks[i].data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
+                    let block = await this.blockchain.getBlock(i);
+
+                    if ( block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
 
                     let found = false;
                     for (let j=0; j<addresses.length; j++)
-                        if (addresses[j].equals(this.blockchain.blocks[i].data.minerAddress)){
+                        if (addresses[j].equals(block.data.minerAddress)){
                             found = true;
                             break;
                         }
 
                     if (!found)
-                        addresses.push(this.blockchain.blocks[i].data.minerAddress)
+                        addresses.push( block.data.minerAddress)
 
                 }
 
@@ -150,11 +152,11 @@ class InterfaceBlockchainFork {
 
     }
 
-    _validateChainWork(){
+    async _validateChainWork(){
 
         let chainWork = new BigInteger(0);
         for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++)
-            chainWork = chainWork.plus( this.blockchain.blocks[i].workDone );
+            chainWork = chainWork.plus( (await this.blockchain.getBlock(i)).workDone );
 
         let forkWork = new BigInteger(0);
         for (let i=0; i< this.forkBlocks.length; i++ )
@@ -287,16 +289,19 @@ class InterfaceBlockchainFork {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    deleteAlreadyIncludedBlocks(){
+    async deleteAlreadyIncludedBlocks(){
 
         //verify if now, I have some blocks already in my the blockchain that are similar with the fork
         let pos = -1;
-        for (let i=0; i<this.forkBlocks.length-1; i++)
-            if ( this.blockchain.blocks[ this.forkBlocks[i].height ] !== undefined && this.blockchain.blocks[ this.forkBlocks[i].height ].hash.equals(this.forkBlocks[i].hash)  ){
+        for (let i=0; i<this.forkBlocks.length-1; i++) {
+
+            let block = await this.blockchain.getBlock(this.forkBlocks[i].height);
+            if ( block !== undefined && block.hash.equals(this.forkBlocks[i].hash)) {
 
                 pos = i;
 
             } else break;
+        }
 
         if (pos >= 0){
 
@@ -304,7 +309,7 @@ class InterfaceBlockchainFork {
             this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
 
             for (let j=0; j<=pos; j++)
-                if (this.blockchain.blocks[ this.forkBlocks[j].height ] !== this.forkBlocks[j])
+                if ( (await this.blockchain.getBlock( this.forkBlocks[j].height )) !== this.forkBlocks[j])
                     this.forkBlocks[j].destroyBlock();
                 else
                     this.forkBlocks[j] = undefined;
@@ -376,7 +381,7 @@ class InterfaceBlockchainFork {
 
                 try {
 
-                    this.preFork(revertActions);
+                    await this.preFork(revertActions);
 
                 } catch (exception){
 
@@ -536,7 +541,7 @@ class InterfaceBlockchainFork {
                 this._deleteBackupBlocks();
 
                 //propagate last block
-                NodeBlockchainPropagation.propagateBlock(this.blockchain.blocks[this.blockchain.blocks.length - 1], this.sockets);
+                NodeBlockchainPropagation.propagateBlock( await this.blockchain.getBlock(this.blockchain.blocks.length - 1), this.sockets);
 
                 if (this.downloadAllBlocks) {
 
@@ -554,7 +559,7 @@ class InterfaceBlockchainFork {
         return success;
     }
 
-    preForkClone(cloneBlocks=true){
+    async preForkClone(cloneBlocks=true){
 
         try {
 
@@ -563,7 +568,7 @@ class InterfaceBlockchainFork {
             if (!cloneBlocks) return true;
 
             for (let i = this.forkStartingHeight; i < this.blockchain.blocks.length; i++)
-                this._blocksCopy.push(this.blockchain.blocks[i]);
+                this._blocksCopy.push( await this.blockchain.getBlock(i));
 
         } catch (exception){
             Log.error("_blockCopy raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
@@ -661,11 +666,11 @@ class InterfaceBlockchainFork {
         return true;
     }
 
-    _deleteBackupBlocks(){
+    async _deleteBackupBlocks(){
 
 
         for (let i = 0; i < this._blocksCopy.length; i++)
-            if ( this._blocksCopy[i] !== undefined && this._blocksCopy[i] !== null && this.blockchain.blocks[ this._blocksCopy[i].height ] !== this._blocksCopy[i] ) {
+            if ( this._blocksCopy[i] !== undefined && this._blocksCopy[i] !== null && (await this.blockchain.getBlock(this._blocksCopy[i].height) ) !== this._blocksCopy[i] ) {
                 this._blocksCopy[i].destroyBlock();
                 this._blocksCopy[i] = undefined;
             }

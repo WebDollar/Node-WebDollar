@@ -161,7 +161,7 @@ class InterfaceBlockchainProtocol {
                         return;
                     }
 
-                    let block = this.blockchain.blocks[h];
+                    let block = await this.blockchain.getBlock(h);
                     if (block === undefined) socket.node.sendRequest("head/hash", null);
 
                     socket.node.sendRequest("head/hash/" + h, {hash: block.hash});
@@ -188,7 +188,7 @@ class InterfaceBlockchainProtocol {
                     if (this.blockchain.blocks.length <= data.height)
                         throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
 
-                    let block = this.blockchain.blocks[data.height];
+                    let block = await this.blockchain.getBlock(data.height);
 
                     if (block === undefined)
                         throw {message: "block is empty", height: data.height};

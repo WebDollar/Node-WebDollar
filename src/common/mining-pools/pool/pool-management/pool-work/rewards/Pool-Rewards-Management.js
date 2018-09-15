@@ -79,11 +79,12 @@ class PoolRewardsManagement{
 
                 for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
 
-                    if (this.blockchain.mining.unencodedMinerAddress.equals(this.blockchain.blocks[i].data.minerAddress))
+                    let block = await this.blockchain.getBlock(i);
+                    if (this.blockchain.mining.unencodedMinerAddress.equals( block.data.minerAddress))
                         confirmationsPool++;
                     else {
-                        if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined) {
-                            uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
+                        if (uniques[ block.data.minerAddress.toString("hex")] === undefined) {
+                            uniques[ block.data.minerAddress.toString("hex")] = true;
                             confirmationsOthersUnique++;
                         } else
                             confirmationsOthers++;
@@ -156,9 +157,10 @@ class PoolRewardsManagement{
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
 
-                if (this.blockchain.blocks[blockInfo.height] === undefined) continue;
+                let block = await this.blockchain.getBlock(blockInfo.height);
+                if (  block === undefined) continue;
 
-                if ( BufferExtended.safeCompare( blockInfo.hash, this.blockchain.blocks[blockInfo.height].hash  ) ){
+                if ( BufferExtended.safeCompare( blockInfo.hash, block.hash  ) ){
 
                     found = true;
 

@@ -6,6 +6,9 @@ const BigNumber = require('bignumber.js');
 
 import Serialization from "common/utils/Serialization";
 
+import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
+import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
+
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
@@ -23,6 +26,10 @@ class InterfaceBlockchainBlocks{
 
         this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
+
+
+        this.savingManager = new SavingManager(this);
+        this.loadingManager = new LoadingManager(this);
 
     }
 
@@ -116,7 +123,7 @@ class InterfaceBlockchainBlocks{
         return this[ this.blocksStartingPoint ];
     }
 
-    recalculateNetworkHashRate(){
+    async recalculateNetworkHashRate(){
 
         let MaxTarget = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
         let SumDiff = new BigNumber( 0 );
@@ -126,9 +133,10 @@ class InterfaceBlockchainBlocks{
         for (let i=this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; i<this.blockchain.blocks.endingPosition; i++) {
 
             if (i < 0) continue;
-            if (this.blockchain.blocks[i] === undefined) continue;
+            let block = await this.blockchain.getBlock(i);
+            if (block === undefined) continue;
 
-            let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+            let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ block.difficultyTarget.toString("hex") ) );
             SumDiff = SumDiff.plus(Diff);
 
             how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i+1) - this.blockchain.getTimeStamp(i);

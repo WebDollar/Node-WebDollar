@@ -81,7 +81,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
     it('test links validity', async () => {
 
         for (let i = 0; i < blockchain.blocks.length; ++i){
-            let block = blockchain.blocks[i];
+            let block = blockchain.getBlock(i);
 
             console.log('interlink=', block.interlink);
             assert(block.interlink[0].height === -1, "Genesis height !== -1, height=" + block.interlink[0].height);
@@ -89,7 +89,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
 
             for (let j = 1; j < block.interlink.length; ++j){
                 let link = block.interlink[j];
-                let prevBlock = blockchain.blocks[link.height];
+                let prevBlock = blockchain.getBlock(link.height);
                 assert(prevBlock.hash.equals(link.blockId), "prevHash differ: " + prevBlock.hash.toString('hex') + "!==" + link.blockId.toString('hex'));
             }
         }

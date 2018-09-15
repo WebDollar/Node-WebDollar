@@ -58,7 +58,7 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
     async saveVirtualizedDificulties(){
 
         for (let i=0; i<this.blocks.length; i++)
-             await this.blocks[i].saveBlockDifficulty();
+            await (await this.getBlock(i)).saveBlockDifficulty();
 
     }
 

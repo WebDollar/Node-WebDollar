@@ -43,10 +43,10 @@ describe('test Interface-Blockchain save/load/remove to/from local storage', () 
 
 
         assert(blockchain.blocks.length === 4, 'blockchain should have 4 blocks ' + blockchain.blocks.length);
-        assert(blockchain.blocks[0].equals(b0), 'load: blocks0 differ after load');
-        assert(blockchain.blocks[1].equals(b1), 'load: blocks1 differ after load');
-        assert(blockchain.blocks[2].equals(b2), 'load: blocks2 differ after load');
-        assert(blockchain.blocks[3].equals(b3), 'load: blocks3 differ after load');
+        assert(await blockchain.getBlock(0).equals(b0), 'load: blocks0 differ after load');
+        assert(await blockchain.getBlock(1).equals(b1), 'load: blocks1 differ after load');
+        assert(await blockchain.getBlock(2).equals(b2), 'load: blocks2 differ after load');
+        assert(await blockchain.getBlock(3).equals(b3), 'load: blocks3 differ after load');
 
         assert(blockchain.blocks.length === 4, 'load: blocks.length=' + blockchain.blocks.length);
         

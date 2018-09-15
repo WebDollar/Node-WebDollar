@@ -11,7 +11,7 @@ class RevertActions {
         this._actions .push(data);
     }
 
-    revertOperations(actionName='', all=''){
+    async revertOperations(actionName='', all=''){
 
         for (let i=this._actions .length-1; i>=0; i--) {
 
@@ -44,9 +44,10 @@ class RevertActions {
                         this.blockchain.lightPrevTimeStamps.splice(action.height);
                         this.blockchain.lightPrevDifficultyTargets.splice(action.height);
 
-                        this.blockchain.lightPrevHashPrevs[action.height] = this.blockchain.blocks[action.height-1].hash;
-                        this.blockchain.lightPrevTimeStamps[action.height] = this.blockchain.blocks[action.height-1].timeStamp;
-                        this.blockchain.lightPrevDifficultyTargets[action.height] = this.blockchain.blocks[action.height-1].difficultyTarget;
+                        let block = await this.blockchain.getBlock(action.height-1);
+                        this.blockchain.lightPrevHashPrevs[action.height] = block.hash;
+                        this.blockchain.lightPrevTimeStamps[action.height] = block.timeStamp;
+                        this.blockchain.lightPrevDifficultyTargets[action.height] = block.difficultyTarget;
 
                     }
 

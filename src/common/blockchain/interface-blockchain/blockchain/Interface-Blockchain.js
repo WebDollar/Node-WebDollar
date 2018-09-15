@@ -105,7 +105,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (saveBlock) {
 
-            this.savingManager.addBlockToSave(block);
+            this.blocks.savingManager.addBlockToSave(block);
 
             // propagating a new block in the network
             NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
@@ -184,7 +184,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
-    getBlock(height){
+    async getBlock(height){
+
         if (height === undefined)
             height = this.blocks.length;
 
@@ -192,9 +193,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return BlockchainGenesis;
         else{
             if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
 
-            return this.blocks[height-1];
+            let block = await this.blocks.loadingManager.getBlock(height-1);
+            if ( block === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+
+            return block ;
         }
 
     }
@@ -209,27 +212,31 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         else{
 
             if (height > this.blocks.length && !skipLengthValidation) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined) return await this.loadingManager.getBlockDifficulty(height);
 
-            return this.blocks[height-1].difficultyTarget;
+            let difficultyTarget = await this.getDifficultyTarget(height-1);
+            if ( difficultyTarget === undefined) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
+
+            return difficultyTarget;
         }
 
     }
 
-    getTimeStamp(height){
+    async getTimeStamp(height){
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0)
             return BlockchainGenesis.timeStamp;
         else{
             if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
-            if (this.blocks[height-1] === undefined) return this.loadingManager._loadBlock(height).timeStamp;
 
-            return this.blocks[height-1].timeStamp;
+            let block = await this.getBlock(height-1);
+            if ( block === undefined) throw {message: "getTimeStamp invalid height ", height: height}; else
+
+            return block.timeStamp;
         }
     }
 
-    getHashPrev(height){
+    async getHashPrev(height){
 
         if (height === undefined) height = this.blocks.length;
 
@@ -238,9 +245,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         else {
 
             if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height}; else
-            if (this.blocks[height-1] === undefined) throw {message: "getHashPrev invalid height", height: height};
 
-            return this.blocks[height-1].hash;
+            let block = await this.getBlock(height-1);
+            if ( block === undefined) throw {message: "getHashPrev invalid height", height: height};
+
+            return block.hash;
         }
     }
 
@@ -273,9 +282,12 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
         if (endingHeight === undefined) endingHeight = this.blocks.length;
 
-        for (let i = startingHeight; i < endingHeight; i++ )
-            if (this.blocks[i] !== undefined && this.blocks[i] !== null)
-                this.savingManager.addBlockToSave(this.blocks[i]);
+        for (let i = startingHeight; i < endingHeight; i++ ) {
+
+            let block  = await this.getBlock(i);
+            if ( block !== undefined)
+                this.blocks.savingManager.addBlockToSave( block );
+        }
 
         console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
         console.warn("Successfully saving blocks ", startingHeight, endingHeight);
@@ -506,7 +518,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (removeFiles === true) {
             for (let i = index; i < this.blocks.length; ++i){
-                let response = await this.blocks[i].removeBlock();
+                let response = await (await this.getBlock(i)).removeBlock();
 
                 if (response !== true)
                     return response;
