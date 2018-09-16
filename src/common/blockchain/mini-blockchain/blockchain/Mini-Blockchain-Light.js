@@ -112,7 +112,8 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if (serialization === undefined){
             serialization = this.accountantTree.serializeMiniAccountant();
-            serializationGzip = await GZip.zip(serialization);
+            serializationGzip = undefined; //await GZip.zip(serialization);
+
             //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
         }
 
