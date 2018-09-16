@@ -91,10 +91,10 @@ class TransactionsPendingQueue {
 
     findPendingTransaction(transaction){
 
-        if (transaction.txId === undefined) return -1;
+        if ( transaction === undefined || !Buffer.isBuffer(transaction.txId)) return -1;
 
         for (let i = 0; i < this.list.length; i++)
-            if ( this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
+            if ( this.list[i].txId !== undefined && this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
                 return i;
 
         return -1;
