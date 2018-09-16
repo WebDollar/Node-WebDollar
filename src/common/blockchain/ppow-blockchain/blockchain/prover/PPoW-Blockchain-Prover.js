@@ -60,11 +60,8 @@ class PPoWBlockchainProver{
                         let chainBlocks = this.provesCalculated.levels[level];
 
                         // {B :}
-                        let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
+                        let index = this.provesCalculated._binarySearch( chainBlocks, B.height, false );
 
-                        if (index === -1)
-                            console.error("!!! provesCalculated didn't work", index);
-                        else
                         for (let i=index; i<chainBlocks.length; i++)
                             if ( chainBlocks[i].height < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i].height >= B.height ){
 

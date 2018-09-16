@@ -104,7 +104,7 @@ class PPoWBlockchainProvesCalculated{
     /**
      * Return 0 <= i <= array.length such that !pred(array[i - 1]) && pred(array[i]).
      */
-    _binarySearch (array, value) {
+    _binarySearch (array, value, findSpecificValue=true) {
 
         if (array === undefined) return -1;
         if (value === undefined) return -1;
@@ -125,7 +125,7 @@ class PPoWBlockchainProvesCalculated{
                 max = guess - 1;
         }
 
-        if (array[min] === undefined || array[min].height !== value.height) return -1;
+        if (findSpecificValue && (array[min] === undefined || array[min].height !== value.height)) return -1;
 
         return min;
     }
