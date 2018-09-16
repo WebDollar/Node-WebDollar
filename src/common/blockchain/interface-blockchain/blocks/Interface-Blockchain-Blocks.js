@@ -177,7 +177,8 @@ class InterfaceBlockchainBlocks{
         try {
 
             for (let i = 0; i < Math.max(0, Math.floor( this.length - 30000 ) ); i++)
-                this[i].data.transactions.freeTransactionsFromMemory();
+                if (this[i] !== undefined)
+                    this[i].data.transactions.freeTransactionsFromMemory();
 
         } catch (exception){
             console.error("freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
