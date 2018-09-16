@@ -47,7 +47,7 @@ class NodeClient {
         port = sckAddress.port;
 
 
-        return new Promise( (resolve) => {
+        return new Promise( async (resolve) => {
 
             let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
             let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
@@ -92,7 +92,7 @@ class NodeClient {
                             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
                             nodeConsensusType: waitlist.nodeConsensusType,
                             UTC: Blockchain.blockchain.timestamp.timeUTC,
-                            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
+                            domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
                         },
 
                     });
@@ -138,18 +138,18 @@ class NodeClient {
 
                 });
 
-                socket.once("connect_error", (response) =>{
+                socket.once("connect_error", async (response) =>{
 
                     //console.log("Client error connecting", address, response);
-                    NodesList.disconnectSocket(this.socket);
+                    await NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
 
-                socket.once("connect_failed", (response) =>{
+                socket.once("connect_failed", async (response) =>{
 
                     //console.log("Client error connecting (connect_failed) ", address, response);
-                    NodesList.disconnectSocket(this.socket);
+                    await NodesList.disconnectSocket(this.socket);
 
                     resolve(false);
                 });
@@ -190,13 +190,15 @@ class NodeClient {
 
         console.log('Socket Client Initialized ' + this.socket.node.sckAddress.getAddress(true));
 
-        this.socket.on("disconnect", () => {
+        this.socket.on("disconnect", async () => {
 
             //disconnect over the time, so it was connected before
 
             try {
                 console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
-                NodesList.disconnectSocket(this.socket);
+
+                await NodesList.disconnectSocket(this.socket);
+
             } catch (exception){
 
             }

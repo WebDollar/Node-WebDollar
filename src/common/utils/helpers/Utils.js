@@ -2,6 +2,16 @@ const BigInteger = require('big-integer');
 
 class Utils{
 
+    maxBigNumber(a,b){
+        if ( a.isGreaterThanOrEqualTo(b) ) return a;
+        else return b;
+    }
+
+    minBigNumber(a,b){
+        if ( a.isGreaterThanOrEqualTo(b) ) return b;
+        else return a;
+    }
+
     get isWin(){
         return /^win/.test(process.platform);
     }

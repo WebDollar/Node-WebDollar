@@ -35,22 +35,31 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
     }
 
+    _validatePoolMiner(socket){
+
+        if (  (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0) ||
+              (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )){
+
+            return true;
+
+        }
+
+        return false;
+
+    }
 
     async _subscribePoolConnectedMiners(socket){
 
         if (!this.poolManagement._poolStarted) return;
 
-        if ( !( (socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0) ||
-                (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER && [NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER_FOR_MINER, NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER].indexOf( socket.node.protocol.nodeConsensusType) >= 0 )) ){
-
-            return false;
-
-        }
+        if (!this._validatePoolMiner(socket)) return false;
 
 
         socket.node.on("mining-pool/hello-pool", async (data) => {
 
             if (!this.poolManagement._poolStarted) return;
+            if (!this._validatePoolMiner(socket)) return;
+            if (typeof socket.node.protocol.minerPool === "object" && socket.node.protocol.minerPool.socketAddress !== undefined && socket.node.protocol.minerPool.minerInstance !== undefined) return;
 
             try{
 
@@ -176,7 +185,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
-            return false;
+            return;
 
         });
 
@@ -242,6 +251,32 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         });
 
+        socket.node.on("mining-pool/work-partially-done", async (data) => {
+
+            if (!this.poolManagement._poolStarted) return;
+
+            if ( data === null || data === undefined ) return;
+
+            //in case there is an suffix in the answer
+            let suffix = "";
+            if ( typeof data.suffix === "string")
+                suffix = '/'+data.suffix;
+
+            try{
+
+                if (socket.node.protocol.minerPool === undefined) return;
+
+                let minerInstance = socket.node.protocol.minerPool.minerInstance;
+                if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
+
+                await this.poolManagement.receivePoolWork(minerInstance, data.work);
+
+            } catch (exception){
+                socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {result: false, message: exception.message } )
+            }
+
+
+        });
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
@@ -400,6 +435,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
     _addConnectedMinerPool(socket, socketAddress, minerInstance){
 
+        if (typeof socket.node.protocol.minerPool === "object" && socket.node.protocol.minerPool.socketAddress !== undefined && socket.node.protocol.minerPool.minerInstance !== undefined) return;
+
         socket.node.protocol.minerPool = {
             socketAddress: socketAddress,
             minerInstance: minerInstance
@@ -407,13 +444,21 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.protocol.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL;
 
-        this.addElement(socket);
-
-        minerInstance.dateActivity = new Date().getTime()/1000;
-        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
+        this.addElement(socket, minerInstance);
 
     }
 
+
+    addElement(socket, minerInstance){
+
+        if (!PoolProtocolList.prototype.addElement.call(this, socket)){
+            minerInstance.dateActivity = new Date().getTime()/1000;
+        }
+
+        minerInstance.socket = socket;
+        this.poolManagement.poolData.connectedMinerInstances.addElement(minerInstance);
+
+    }
 
 }
 

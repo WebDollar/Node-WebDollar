@@ -51,7 +51,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 10,
+        IMMUTABILITY_LENGTH: 20,
 
     },
 
@@ -232,13 +232,16 @@ consts.MINING_POOL = {
 
     MINING:{
         MINING_POOL_MINIMUM_PAYOUT: 200000,
-        FEE_PER_BYTE: 600, // in WEBD
+        FEE_PER_BYTE: 580, // in WEBD
+
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
     CONNECTIONS:{
 
         NO_OF_IDENTICAL_IPS: 101,
+        PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE: 0,       //0  - means unlimited, it requires a lot of bandwidth
+                                                        //30 - means after sending to 30 pool miners, it will do a sleep of 10 ms
 
     },
 
@@ -254,7 +257,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.197.3",
+        VERSION: "1.197.9",
 
         VERSION_COMPATIBILITY: "1.174",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
@@ -389,6 +392,8 @@ consts.SETTINGS = {
         },
 
         MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
+
+        MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
 
     }
 };
