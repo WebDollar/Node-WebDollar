@@ -220,6 +220,12 @@ consts.MINING_POOL_TYPE = {
 
 };
 
+consts.BAZAAR = {
+
+    PRODUCTS_PURGE_INTERVAL: 1000*60*60*24*3 //3 days
+
+}
+
 consts.MINING_POOL = {
 
     MINING_POOL_STATUS : (process.env.MINING_POOL_STATUS || consts.MINING_POOL_TYPE.MINING_POOL_DISABLED),
