@@ -15,12 +15,29 @@ class InterfaceSatoshminDB {
     constructor(databaseName = consts.DATABASE_NAMES.DEFAULT_DATABASE) {
 
         this.dbName = databaseName;
+        this._start();
+
+    }
+
+    _start(){
 
         try {
             this.db = new pounchdb(this.dbName);
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
+
+    }
+
+    sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async restart(){
+
+        this.close();
+        await this.sleep(2000);
+        this._start();
 
     }
 

@@ -398,7 +398,16 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     block.blockValidation.blockValidationType = {};
 
+                    if (index < numBlocks - 30000)
+                        block.data.transactions.freeTransactionsFromMemory();
+
+                    if (index % 10000 === 0) {
+                        await this.db.restart();
+                    }
+
                 }
+
+                await this.db.restart();
 
             } catch (exception){
                 console.error("Error loading block", index);

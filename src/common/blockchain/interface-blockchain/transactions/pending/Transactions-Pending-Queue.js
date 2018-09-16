@@ -124,10 +124,13 @@ class TransactionsPendingQueue {
         if (index === -1)
             return true;
 
-        this.list[index].destroyTransaction();
+        if (transaction.blockchain !== undefined){
+            this.transactions.emitTransactionChangeEvent(transaction, true);
+            this.list[index].destroyTransaction();
+        }
+
         this.list.splice(index, 1);
 
-        this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
     _removeOldTransactions (){
@@ -139,6 +142,11 @@ class TransactionsPendingQueue {
         };
 
         for (let i=this.list.length-1; i >= 0; i--) {
+
+            if (this.list[i].blockchain === undefined) {
+                this._removePendingTransaction(i, true);
+                continue;
+            }
 
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
