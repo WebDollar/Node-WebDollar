@@ -1,5 +1,7 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
+import  Utils from "common/utils/helpers/Utils"
+
 const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
@@ -38,7 +40,7 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
-        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 60, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
@@ -49,7 +51,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 10,
+        IMMUTABILITY_LENGTH: 20,
 
     },
 
@@ -224,13 +226,16 @@ consts.MINING_POOL = {
 
     MINING:{
         MINING_POOL_MINIMUM_PAYOUT: 200000,
-        FEE_PER_BYTE: 600, // in WEBD
+        FEE_PER_BYTE: 580, // in WEBD
+
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
     CONNECTIONS:{
 
         NO_OF_IDENTICAL_IPS: 101,
+        PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE: 0,       //0  - means unlimited, it requires a lot of bandwidth
+                                                        //30 - means after sending to 30 pool miners, it will do a sleep of 10 ms
 
     },
 
@@ -382,6 +387,8 @@ consts.SETTINGS = {
 
         MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
 
+        MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
+
     }
 };
 
@@ -409,8 +416,12 @@ consts.TERMINAL_WORKERS = {
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
-    PATH_CPP: './dist_bundle/CPU/argon2-bench2',
-    PATH_GPU: './dist_bundle/GPU/argon2-gpu-test',
+
+    PATH_CPP: Utils.isWin ? '' : './dist_bundle/CPU/', //Unix are in folders, Win32 is in root
+    PATH_CPP_FILENAME: 'argon2-bench2' + (Utils.isWin ? '.exe' : ''),
+
+    PATH_GPU: Utils.isWin ? '' : './dist_bundle/GPU/', //Unix are in folders, Win32 is in root
+    PATH_GPU_FILENAME: 'argon2-gpu-test' + (Utils.isWin ? '.exe' : ''),
 
     GPU_MODE: "opencl", //opencl
     GPU_MAX: 1,

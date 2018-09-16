@@ -14,6 +14,8 @@ class MiniBlockchainAdvancedGZipManager{
 
     async processAllAccountantTrees(){
 
+        console.info("GZipping all accountant trees");
+
         let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
 
         for (let i = this.blockchain.blocks.length - 1; i >= index; i--) {
@@ -33,20 +35,25 @@ class MiniBlockchainAdvancedGZipManager{
             if (consts.BLOCKCHAIN.LIGHT.GZIPPED)
                 if (this.blockchain.semaphoreProcessing._list.length === 0 && this.blockchain.forksAdministrator.forks.length === 0) {
 
-                    let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES - 2;
+                    let index = this.blockchain.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
                     let position;
+                    let positionInitial;
 
-                    for (let i = index; i < this.blockchain.blocks.length; i++) {
-
+                    for (let i = this.blockchain.blocks.length - 1; i >= index; i--) {
                         if (this.blockchain.lightAccountantTreeSerializationsGzipped[i] === undefined && this.blockchain.lightAccountantTreeSerializations[i] !== undefined)
-                            position = i;
+                            positionInitial = i;
 
+                        if (this.blockchain.lightAccountantTreeSerializationsGzipped[i] !== undefined && this.blockchain.lightAccountantTreeSerializations[i] !== undefined) {
+                            position = i;
+                            break;
+                        }
                     }
 
+                    if (position === undefined && positionInitial !== undefined){
+                        position = positionInitial;
+                    }
 
                     if (position !== undefined) {
-
-                        console.info("processing gzip");
 
                         if (this.blockchain.lightAccountantTreeSerializationsGzipped[position] !== undefined)
                             position++;
@@ -61,7 +68,7 @@ class MiniBlockchainAdvancedGZipManager{
 
         }
 
-        setTimeout(this.processGZIP.bind(this), 5000);
+        setTimeout(this.processGZIP.bind(this), 10000);
 
     }
 

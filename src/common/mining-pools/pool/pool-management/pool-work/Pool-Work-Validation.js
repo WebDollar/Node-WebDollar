@@ -33,20 +33,22 @@ class PoolWorkValidation{
 
         }
 
-        work = {
+        minerInstance.dateActivity = new Date().getTime()/1000;
+
+        let workData = {
             work: work,
             minerInstance: minerInstance
         };
 
 
-        if (work.work.result || forced){
+        if (work.result || forced){
 
-            await this._validateWork(work);
+            await this._validateWork(workData);
 
             return;
         }
 
-        this._works.push(work);
+        this._works.push(workData);
 
     }
 
@@ -82,6 +84,8 @@ class PoolWorkValidation{
 
         if (prevBlock !== undefined)
             await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+        else
+            Log.error("_validateWork didn't work as the block " + work.work.id + " was not found", Log.LOG_TYPE.POOLS, work.work );
 
     }
 

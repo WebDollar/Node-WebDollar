@@ -16,7 +16,7 @@ import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
 import InterfaceBlockchainHardForks from "./../blocks/hard-forks/Interface-Blockchain-Hard-Forks"
 import Log from 'common/utils/logging/Log';
-
+import InterfaceBlockchainFreeMemory from "./../free-memory/Interface-Blockchain-Free-Memory"
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -28,6 +28,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         super(agent);
 
         this.hardForks = new InterfaceBlockchainHardForks(this);
+
+        this.freeMemory = new InterfaceBlockchainFreeMemory(this);
 
     }
 

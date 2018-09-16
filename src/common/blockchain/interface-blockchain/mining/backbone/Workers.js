@@ -35,6 +35,8 @@ class Workers {
         if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH;
+            this._worker_path_file_name = '';
+
             this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_WORKER_NONCES_WORK || 500;
             this.worker_batch_thread = this.worker_batch;
@@ -42,8 +44,11 @@ class Workers {
             this.ibb._intervalPerMinute = false;
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
+
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
-            this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || 1;
+            this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_CPP_FILENAME;
+
+            this.workers_max = consts.TERMINAL_WORKERS.CPU_MAX || this._maxWorkersDefault() || 1;
             this.worker_batch = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.CPU_CPP_WORKER_NONCES_WORK_BATCH || 500;
 
@@ -54,7 +59,10 @@ class Workers {
             this.ibb._intervalPerMinute = true;
         }
         else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
+
             this._worker_path = consts.TERMINAL_WORKERS.PATH_GPU;
+            this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_GPU_FILENAME;
+
             this.workers_max = (consts.TERMINAL_WORKERS.GPU_MAX * consts.TERMINAL_WORKERS.GPU_INSTANCES)||1;
             this.worker_batch = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK;
             this.worker_batch_thread = consts.TERMINAL_WORKERS.GPU_WORKER_NONCES_WORK_BATCH;
@@ -67,11 +75,8 @@ class Workers {
         }
 
 
-        if (!FS.existsSync(this._worker_path)) {
+        if (!FS.existsSync(this._worker_path + this._worker_path_file_name))
             Log.error('Worker build is missing.', Log.LOG_TYPE.default);
-
-            return false;
-        }
 
         this._working = 0;
         this._silent = consts.TERMINAL_WORKERS.SILENT;
@@ -88,24 +93,36 @@ class Workers {
         this._run_timeout = false;
 
 
-        setInterval( this._makeUnresponsiveThreads.bind(this), 5000 );
+        if (!this.makeUnresponsiveThreadsTimeout)
+            this.makeUnresponsiveThreadsTimeout = setTimeout( this._makeUnresponsiveThreads.bind(this), 5000 );
 
     }
 
-    _makeUnresponsiveThreads(){
+    async _makeUnresponsiveThreads(){
 
-        let date = new Date().getTime();
+        try {
+            
+            let date = new Date().getTime();
 
-        if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu" )
-            for (let i=0; i< this.workers_list.length; i++)
-                if ( (date  - this.workers_list[i].date ) > 30000 ) {
-                    this.workers_list[i]._is_batching = false;
-                    this.workers_list[i].date = new Date().getTime();
-                    Log.info("Restarting Worker", Log.LOG_TYPE.default);
-                }
+            if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu")
+                for (let i = this.workers_list.length - 1; i >= 0; i--)
+                    if ((date - this.workers_list[i].date ) > 60 * 1000) {
 
-        if ( this._current >= this._current_max )
-            this._stopAndResolve();
+                        await this.workers_list[i].restartWorker();
+                        this.workers_list[i].date = new Date().getTime();
+                        Log.info("Restarting Worker", Log.LOG_TYPE.default);
+
+                        this.workers_list.splice(i, 1);
+
+                    }
+
+            // if ( this._current >= this._current_max )
+            //     this._stopAndResolve();
+        } catch (exception){
+
+        }
+
+        this.makeUnresponsiveThreadsTimeout = setTimeout( this._makeUnresponsiveThreads.bind(this), 5000 );
 
     }
 
@@ -154,6 +171,7 @@ class Workers {
         this.block = this.ibb.block;
         this.difficulty = this.ibb.difficulty;
         this.height = this.ibb.block.height;
+        this.blockId = this.ibb.blockId || this.ibb.block.height;
 
         this._from_pool = true;
         if (this.block.height) {
@@ -181,7 +199,8 @@ class Workers {
 
         await this._initiateWorkers();
 
-        this._loop(loop_delay);
+        if (this._loopTimeout === undefined)
+            this._loopTimeout = setTimeout( this._loop.bind(this, loop_delay), 1);
     }
 
     _maxWorkersDefault() {
@@ -226,21 +245,21 @@ class Workers {
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
 
             worker = new ProcessWorkerCPP( index,  this.worker_batch, this.workers_max );
-            started = await worker.start(this._worker_path);
+            started = await worker.start(this._worker_path , this._worker_path_file_name);
 
             Log.info("CPU CPP worker created", Log.LOG_TYPE.defaultLogger );
 
         } else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
 
             worker = new ProcessWorkerGPU( index,  this.worker_batch );
-            started = await worker.start(this._worker_path);
+            started = await worker.start(this._worker_path, this._worker_path_file_name);
 
             Log.info("GPU worker created", Log.LOG_TYPE.defaultLogger );
 
         }
 
+        worker.date = new Date().getTime();
         if ( !started ) {
-            worker.date = new Date().getTime();
             this.workers_list[index] = worker;
             return worker;
         }
@@ -258,7 +277,7 @@ class Workers {
             if (msg.type === 'h') {
                 this.ibb._hashesPerSecond += 3;
 
-                return false;
+                return true;
             }
 
             // solved: stop and resolve but with a solution
@@ -266,8 +285,12 @@ class Workers {
 
                 this._finished = true;
 
-                if (msg.h !== undefined)
+                if ( msg.h )
                     this.ibb._hashesPerSecond += parseInt(msg.h);
+
+                //the blockId is not matching
+                if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
+                    return false;
 
                 let hash;
 
@@ -280,15 +303,11 @@ class Workers {
 
                 worker._is_batching = false;
 
-                this.ibb._workerResolve({
-                    result: true,
-                    nonce: parseInt(msg.nonce),
-                    hash: hash,
-                });
+                this._stop();
 
                 // console.log("sol",new Buffer(msg.hash).toString("hex"));
 
-                return false;
+                return true;
             }
 
             // batching: finished a batch of nonces
@@ -297,6 +316,9 @@ class Workers {
                 if (msg.h !== undefined)
                     this.ibb._hashesPerSecond += parseInt(msg.h);
 
+                //the blockId is not matching
+                if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
+                    return false;
 
                 let bestHash;
 
@@ -330,7 +352,7 @@ class Workers {
                 if (consts.DEBUG)
                     await this._validateHash(bestHash, parseInt(msg.bestNonce));
 
-                return false;
+                return true;
             }
         });
 
@@ -358,13 +380,20 @@ class Workers {
         return true;
     }
 
-    _stopAndResolve() {
+    _stop(){
 
         this._finished = true;
 
-        if (this._run_timeout) {
-            clearTimeout(this._run_timeout);
+        if (this._loopTimeout) {
+            clearTimeout(this._loopTimeout);
+            this._loopTimeout = undefined;
         }
+
+    }
+
+    _stopAndResolve() {
+
+        this._stop();
 
         this.ibb._workerResolve({
             result: false,
@@ -377,9 +406,7 @@ class Workers {
 
     async _loop(_delay) {
 
-        const ibb_halt = !this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus);
-
-        if (ibb_halt) {
+        if (!this.ibb.started || this.ibb.resetForced || (this.ibb.reset && this.ibb.useResetConsensus)) {
 
             if (!this._finished)
                 this._stopAndResolve();
@@ -409,8 +436,8 @@ class Workers {
 
             let batch  = this._final_batch ? this._final_batch : this.worker_batch;
 
-
             worker.date = new Date().getTime();
+
             this._current += this.worker_batch;
             worker._is_batching = true;
 
@@ -422,6 +449,7 @@ class Workers {
                         difficulty: this.difficulty,
                         start: this._current,
                         batch: batch,
+                        blockId: this.blockId,
                     }
                 });
             } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
@@ -434,9 +462,8 @@ class Workers {
         });
 
         // healthy loop delay
-        this._run_timeout = setTimeout( this._loop.bind(this) , _delay);
+        this._loopTimeout = setTimeout( this._loop.bind(this, _delay), _delay);
 
-        return this;
     }
 }
 

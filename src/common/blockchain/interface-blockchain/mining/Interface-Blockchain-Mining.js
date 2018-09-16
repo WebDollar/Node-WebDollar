@@ -110,9 +110,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             //mining next blocks
 
-            let nextBlock = await this.getNextBlock();
-
             try {
+
+                let nextBlock = await this.getNextBlock();
 
                 let difficulty = this.blockchain.getDifficultyTarget();
 
@@ -235,7 +235,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
 
-            console.error( "Error mining block ", Exception, block.toJSON() );
+            console.error( "Error mining block ", Exception, (block !== null ? block.toJSON() : '') );
 
             throw Exception;
         }
