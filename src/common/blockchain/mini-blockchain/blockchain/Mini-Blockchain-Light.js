@@ -360,7 +360,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         if ( (i + 1) % consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS  === 0 && i === indexStart){
 
-            block.difficultyTargetPrev = block.difficultyTarget;
+
             block.difficultyTarget = this._lightLoadingDifficultyNextDifficulty;
 
             this.lightPrevDifficultyTargets[i+1] = this._lightLoadingDifficultyNextDifficulty;

@@ -160,8 +160,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
-        block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
-
 
         //validate difficulty & hash
         if (! (await block.validateBlock( block.height )))
