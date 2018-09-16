@@ -115,7 +115,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         }
 
         this._miniBlockchainSaveBlocks = this.blocks.length;
-        await this.lightGZipManager.processAllAccountantTrees();
+
+        if (consts.BLOCKCHAIN.LIGHT.GZIPPED)
+            await this.lightGZipManager.processAllAccountantTrees();
 
         return false;
 

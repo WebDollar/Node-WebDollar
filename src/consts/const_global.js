@@ -44,7 +44,7 @@ consts.BLOCKCHAIN = {
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
-        GZIPPED: true,
+        GZIPPED: false,
 
     },
 
