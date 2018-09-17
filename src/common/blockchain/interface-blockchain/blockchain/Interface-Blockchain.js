@@ -160,7 +160,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
-        block.difficultyTargetPrev = block.blockValidation.getDifficultyCallback(block.height);
 
 
         //validate difficulty & hash
@@ -240,14 +239,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    async saveNewBlock(block, saveLength = false){
+    async saveNewBlock(block, saveLength = false, saveInfinitum=false){
 
         if (process.env.BROWSER)
             return true;
 
 
         if (saveLength)
-            if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
+            if (await this.db.save(this._blockchainFileName, this.blocks.length, 20000, saveInfinitum ? 1000000 : 10) !== true){
                 Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
                 return false;
             }
@@ -330,30 +329,29 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async _loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined ){
+    async _loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined, numBlocks ){
 
         if (process.env.BROWSER)
             return true;
 
-        let numBlocks = 0;
+        if ( numBlocks === undefined)
+            try {
+                //load the number of blocks
+                numBlocks = await this.db.get(this._blockchainFileName);
+                if (numBlocks === null) {
+                    Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
+                    return false;
+                }
 
-        try {
-            //load the number of blocks
-            numBlocks = await this.db.get(this._blockchainFileName);
-            if (numBlocks === null) {
-                Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
-                return false;
+                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
+                Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
+                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
+
+            } catch (exception){
+
+                numBlocks = 0;
+
             }
-
-            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-            Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
-            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-
-        } catch (exception){
-
-            numBlocks = 0;
-
-        }
 
         this.blocks.clear();
 
@@ -361,13 +359,15 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         let answer = true;
 
-        let indexStart = 0;
         try {
 
-            if (indexStartLoadingOffset )
+            let indexStart = 0;
+
+            if (indexStartLoadingOffset !== undefined)
                 indexStart = numBlocks - indexStartLoadingOffset;
 
             if (indexStartProcessingOffset !== undefined) {
+
                 indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
 
                 console.warn("===========================================================");
@@ -394,7 +394,16 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     block.blockValidation.blockValidationType = {};
 
+                    if (index < numBlocks - 50000)
+                        block.data.transactions.freeTransactionsFromMemory();
+
+                    if (index > 0 && index % 10000 === 0) {
+                        await this.db.restart();
+                    }
+
                 }
+
+                await this.db.restart();
 
             } catch (exception){
                 console.error("Error loading block", index);
@@ -406,9 +415,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     answer = false;
 
             }
-
-
-            await this.blockchainBlocksAdded(indexStart, true);
 
         } catch (exception){
 
@@ -504,13 +510,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    blockchainBlocksRemoved(startingHeight, endingPosition){
-
-    }
-
-    blockchainBlocksAdded(startingHeight){
-
-    }
 
 }
 

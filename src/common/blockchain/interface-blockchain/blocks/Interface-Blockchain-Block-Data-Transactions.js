@@ -57,10 +57,14 @@ class InterfaceBlockchainBlockDataTransactions {
                 this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;
+            this.transactions.splice(i,1);
+            i--;
 
         }
 
         delete this.pendingTransactionsWereIncluded;
+
+        this.transactions = [];
 
     }
 
@@ -180,6 +184,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
                 this.transactions.push(transaction);
             }
+
+            this.transactionsLoaded = true;
         }
 
         return offset;
@@ -216,6 +222,14 @@ class InterfaceBlockchainBlockDataTransactions {
 
         return fee;
     }
+
+    freeTransactionsFromMemory(){
+
+        this.destroyBlockDataTransactions(true);
+        delete this.transactionsLoaded;
+
+    }
+
 
 }
 

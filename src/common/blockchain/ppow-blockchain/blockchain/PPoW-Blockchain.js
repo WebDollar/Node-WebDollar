@@ -46,11 +46,11 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     }
 
-    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset ){
+    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset, numBlocks ){
 
         let answer = false;
         try {
-            answer = await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset );
+            answer = await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset, numBlocks );
         } catch (exception){
 
             console.error("loadBlockchain raised an error", exception);

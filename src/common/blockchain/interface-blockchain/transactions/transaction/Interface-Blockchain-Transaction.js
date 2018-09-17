@@ -107,7 +107,7 @@ class InterfaceBlockchainTransaction{
 
         this.nonce = nonce; //1 bytes
 
-        if(validateTxId)
+        if (validateTxId)
             if (txId === undefined || txId === null)
                 txId = this._computeTxId();
 
@@ -117,7 +117,15 @@ class InterfaceBlockchainTransaction{
     }
 
     destroyTransaction(){
+
         this.blockchain = undefined;
+
+        delete this._serializated;
+        delete this.from.addresses;
+        delete this.from.currencyTokenId;
+        delete this.to.addresses;
+        delete this.txId;
+
     }
 
     _createTransactionFrom(from){

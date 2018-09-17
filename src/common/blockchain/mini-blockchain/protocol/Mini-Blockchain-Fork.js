@@ -14,7 +14,6 @@ class MiniBlockchainFork extends inheritFork{
 
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
-
     }
 
     /**
@@ -36,6 +35,7 @@ class MiniBlockchainFork extends inheritFork{
     preForkClone(cloneBlocks=true, cloneAccountantTree=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
+
 
 
     }

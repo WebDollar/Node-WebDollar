@@ -190,8 +190,14 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
         //console.log("Before ungziped");
         //console.log(buffer.toString('hex'));
 
+        try {
+            buffer = gzippedCommunication ? await GZip.unzip(buffer) : buffer;
+        } catch (exception){
+            gzippedCommunication = false;
+        }
+
         return {
-            buffer: gzippedCommunication  ? await GZip.unzip(buffer) : buffer,
+            buffer: buffer,
             gzipped: gzippedCommunication ? buffer : undefined
         };
 

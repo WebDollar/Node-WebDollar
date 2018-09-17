@@ -37,12 +37,14 @@ class Log{
         this.poolsLogger = new Logger("pools", LOG_TYPE.POOLS);
         this.blockchainLogger = new Logger("blockchain", LOG_TYPE.BLOCKCHAIN);
         this.blockchainForksLogger = new Logger("blockchainForks", LOG_TYPE.BLOCKCHAIN_FORKS);
+        this.savingManagerLogger = new Logger("savingManager", LOG_TYPE.SAVING_MANAGER);
         this.menuLogger = new Logger("cli_menu", LOG_TYPE.CLI_MENU);
 
         this.loggers = {};
         this.loggers[LOG_TYPE.DEFAULT] = this.defaultLogger;
         this.loggers[LOG_TYPE.POOLS] = this.poolsLogger;
         this.loggers[LOG_TYPE.BLOCKCHAIN] = this.blockchainLogger;
+        this.loggers[LOG_TYPE.SAVING_MANAGER] = this.savingManagerLogger;
         this.loggers[LOG_TYPE.BLOCKCHAIN_FORKS] = this.blockchainForksLogger;
         this.loggers[LOG_TYPE.CLI_MENU] = this.menuLogger;
 

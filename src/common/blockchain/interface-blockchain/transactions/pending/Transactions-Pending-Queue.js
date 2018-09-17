@@ -91,8 +91,10 @@ class TransactionsPendingQueue {
 
     findPendingTransaction(transaction){
 
+        if ( transaction === undefined || !Buffer.isBuffer(transaction.txId)) return -1;
+
         for (let i = 0; i < this.list.length; i++)
-            if (  this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
+            if ( this.list[i].txId !== undefined && this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
                 return i;
 
         return -1;
@@ -124,10 +126,13 @@ class TransactionsPendingQueue {
         if (index === -1)
             return true;
 
-        this.list[index].destroyTransaction();
+        if (transaction.blockchain !== undefined){
+            this.transactions.emitTransactionChangeEvent(transaction, true);
+            this.list[index].destroyTransaction();
+        }
+
         this.list.splice(index, 1);
 
-        this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
     _removeOldTransactions (){
@@ -139,6 +144,11 @@ class TransactionsPendingQueue {
         };
 
         for (let i=this.list.length-1; i >= 0; i--) {
+
+            if (this.list[i].blockchain === undefined) {
+                this._removePendingTransaction(i, true);
+                continue;
+            }
 
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 

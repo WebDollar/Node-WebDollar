@@ -205,8 +205,8 @@ class MinerProtocol {
 
         try {
 
-            if (!VersionCheckerHelper.detectMobile())
-                throw "no mobile";
+            // if (!VersionCheckerHelper.detectMobile())
+            //     throw "no mobile";
 
             if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
                 throw "it is sync";
