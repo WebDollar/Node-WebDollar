@@ -105,8 +105,11 @@ class NanoWalletProtocol{
                 if (data.balances === null) currentVal = 0;
                 else currentVal = data.balances["0x01"];
 
+                try {
+                    Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
+                } catch (exception){
 
-                Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true );
+                }
 
                 let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
                 if (prevNonce === null ) prevNonce = 0;
@@ -119,6 +122,8 @@ class NanoWalletProtocol{
                 } catch (exception){
 
                 }
+
+                //TODO use SPV
 
                 trials = 0;
                 resolve(true);
@@ -161,6 +166,25 @@ class NanoWalletProtocol{
 
                     let transaction = data.transactions[k];
 
+                    //making the transactions valid...
+
+                    for (let i=0; i<transaction.from.addresses.length; i++){
+
+                        let address = transaction.from.addresses[i].unencodedAddress;
+
+                        let prevVal = Blockchain.AccountantTree.getBalance(address);
+                        if (prevVal === null ) prevVal = 0;
+
+                        let currentVal = transaction.from.addresses[i].amount;
+
+                        try {
+                            Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
+                        } catch (exception){
+
+                        }
+                    }
+
+
                     let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
                     if (prevNonce === null ) prevNonce = 0;
 
@@ -173,6 +197,7 @@ class NanoWalletProtocol{
 
                     }
 
+                    //TODO use SPV
 
                     let tx = null;
                     if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
