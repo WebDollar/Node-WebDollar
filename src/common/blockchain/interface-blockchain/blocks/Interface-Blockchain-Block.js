@@ -86,6 +86,7 @@ class InterfaceBlockchainBlock {
     get difficultyTargetPrev(){
 
         if (this._difficultyTargetPrev  !== undefined) return this._difficultyTargetPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getDifficultyTarget(this.height);
 
         return this.blockValidation.getDifficultyCallback(this.height);
 
@@ -94,6 +95,7 @@ class InterfaceBlockchainBlock {
     get hashPrev(){
 
         if (this._hashPrev !== undefined) return this._hashPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getHashPrev(this.height);
 
         return this.blockValidation.getHashPrevCallback(this.height);
 
