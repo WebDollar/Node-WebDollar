@@ -27,7 +27,7 @@ class NodeProtocol {
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
             domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
             UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 6000);
+        }, undefined, 100000);
 
     }
 
@@ -90,21 +90,14 @@ class NodeProtocol {
     }
 
     async sendHello ( validationDoubleConnectionsTypes, process = true ) {
-
-
+        
         // Waiting for Protocol Confirmation
 
         let response;
-        for (let i=0; i < 3; i++) {
 
-            if (this.connected === false) return false;
+        if (this.connected === false) return false;
 
-            response = await this.node.protocol.justSendHello();
-
-            if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
-                break;
-
-        }
+        response = await this.node.protocol.justSendHello();
 
         if (!process)
             return true;
