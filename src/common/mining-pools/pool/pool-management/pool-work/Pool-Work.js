@@ -59,7 +59,7 @@ class PoolWork {
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
             this.lastBlock._hashPrev = this.lastBlock.hashPrev;
-            
+
             this.lastBlockNonce = 0;
 
 
