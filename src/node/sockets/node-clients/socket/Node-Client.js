@@ -119,6 +119,7 @@ class NodeClient {
 
                     let timeout = setTimeout(()=>{
 
+                        console.error("Disconnected for timeout hello");
                         socket.disconnect();
                         resolve(false);
 
@@ -177,6 +178,7 @@ class NodeClient {
         //it is not unique... then I have to disconnect
 
         if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+            console.error("socket disconnected by not being minerPool");
             this.socket.disconnect();
             delete this.socket;
             return false;

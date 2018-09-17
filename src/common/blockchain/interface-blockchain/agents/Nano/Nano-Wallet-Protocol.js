@@ -27,6 +27,14 @@ class NanoWalletProtocol{
 
     }
 
+    initializeNanoProtocolWallet(wallet){
+
+        wallet.emitter.on('wallet/address-changes', (address)=>{
+            this.virtualizeAddress(address);
+        });
+
+    }
+
     async initializeNanoProtocol(){
 
         for (let i=0; i<NodesList.nodes.length; i++)
@@ -165,17 +173,18 @@ class NanoWalletProtocol{
                 for (let k in data.transactions){
 
                     let transaction = data.transactions[k];
+                    let from = transaction.from;
 
                     //making the transactions valid...
 
-                    for (let i=0; i<transaction.from.addresses.length; i++){
+                    for (let i=0; i<from.addresses.length; i++){
 
-                        let address = transaction.from.addresses[i].unencodedAddress;
+                        let address = from.addresses[i].unencodedAddress;
 
                         let prevVal = Blockchain.AccountantTree.getBalance(address);
                         if (prevVal === null ) prevVal = 0;
 
-                        let currentVal = transaction.from.addresses[i].amount;
+                        let currentVal = from.addresses[i].amount;
 
                         try {
                             Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
