@@ -28,7 +28,7 @@ class InterfaceBlockchainBlock {
 
         this.height = (typeof height === "number" ? height : null); // index set by me
 
-        if (blockValidation === undefined)
+        if (blockValidation === undefined || blockValidation === null)
             blockValidation = this.blockchain.createBlockValidation();
 
         this.blockValidation = blockValidation;
