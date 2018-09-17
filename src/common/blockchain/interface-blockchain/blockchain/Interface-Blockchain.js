@@ -399,7 +399,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     if (index < numBlocks - 50000)
                         block.data.transactions.freeTransactionsFromMemory();
 
-                    if (index % 10000 === 0) {
+                    if (index > 0 && index % 10000 === 0) {
                         await this.db.restart();
                     }
 

@@ -21,6 +21,8 @@ class SavingManager{
 
     addBlockToSave(block, height){
 
+        if (process.env.BROWSER) return;
+
         if (block === undefined || block === null) return false;
 
         if (height === undefined)
@@ -55,6 +57,8 @@ class SavingManager{
     }
 
     async _saveNextBlock(){
+
+        if (process.env.BROWSER) return;
 
         for (let key in this._pendingBlocksList){
 
