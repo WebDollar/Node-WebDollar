@@ -49,8 +49,8 @@ class NodeClient {
 
         return new Promise( async (resolve) => {
 
-            let timeoutConnection = 7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
-            let timeoutTotal =  7*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
+            let timeoutConnection = 8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
+            let timeoutTotal =  8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
 
             try
             {

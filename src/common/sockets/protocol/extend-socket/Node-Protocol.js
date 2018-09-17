@@ -19,15 +19,16 @@ class NodeProtocol {
         HELLO PROTOCOL
      */
 
+
     async justSendHello(){
 
-        return this.node.sendRequestWaitOnce("HelloNode", {
-            version: consts.SETTINGS.NODE.VERSION,
-            uuid: consts.SETTINGS.UUID,
-            nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
-            domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
-            UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 100000);
+        this.node.sendRequest("HelloNode", {
+                version: consts.SETTINGS.NODE.VERSION,
+                uuid: consts.SETTINGS.UUID,
+                nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
+                domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
+                UTC: Blockchain.blockchain.timestamp.timeUTC,
+        });
 
     }
 
@@ -90,14 +91,38 @@ class NodeProtocol {
     }
 
     async sendHello ( validationDoubleConnectionsTypes, process = true ) {
-        
-        // Waiting for Protocol Confirmation
 
-        let response;
+        // Waiting for Protocol Confirmation
 
         if (this.connected === false) return false;
 
-        response = await this.node.protocol.justSendHello();
+        let response = await new Promise( (resolve)=> {
+
+            let interval, timeout;
+
+            this.node.once("HelloNode", (data) => {
+
+                resolve(data);
+                clearInterval(interval);
+                clearTimeout(timeout)
+
+            });
+
+            interval = setInterval(async () => {
+
+                this.node.protocol.justSendHello();
+
+            }, 3000);
+
+            this.node.protocol.justSendHello();
+
+            timeout = setTimeout(() => {
+                resolve(false);
+                clearInterval(interval);
+                clearTimeout(timeout)
+            }, 10000);
+
+        });
 
         if (!process)
             return true;
