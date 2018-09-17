@@ -100,8 +100,8 @@ class SavingManager{
                 }
 
                 //saving Accountant Tree
-                if (block.block.height === this.blockchain.blocks.length-1)
-                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false), this.blockchain.blocks.length );
+                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % 100 === 0)
+                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false, 5000), this.blockchain.blocks.length );
 
 
                 block.saving = false;

@@ -5,6 +5,7 @@ import global from "consts/global"
 import Log from 'common/utils/logging/Log';
 import GZip from "common/utils/GZip";
 import MiniBlockchainAdvancedGZipManager from "./Mini-Blockchain-Advanced-GZip-Manager"
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -207,6 +208,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
     async saveBlockchainTerminated(){
 
         Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
+
+        if (!this.agent.consensus)
+            return false;
 
         await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);
 
