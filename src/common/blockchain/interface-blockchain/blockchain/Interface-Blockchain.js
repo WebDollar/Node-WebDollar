@@ -416,6 +416,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             }
 
+
+            await this.blockchainBlocksAdded(indexStart, true);
+
         } catch (exception){
 
             if (this.accountantTree !== undefined)
@@ -510,6 +513,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
+    blockchainBlocksRemoved(startingHeight, endingPosition){
+
+    }
+
+    blockchainBlocksAdded(startingHeight){
+
+    }
 
 }
 
