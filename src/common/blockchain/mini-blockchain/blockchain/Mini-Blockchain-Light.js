@@ -110,14 +110,14 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         this.lightPrevTimeStamps[height+1] =  block.timeStamp;
         this.lightPrevHashPrevs[height+1] =  block.hash;
 
-        if (serialization === undefined){
-            serialization = this.accountantTree.serializeMiniAccountant();
-            serializationGzip = await GZip.zip(serialization);
-            //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
-        }
-
-        this.lightAccountantTreeSerializations[height+1] = serialization;
-        this.lightAccountantTreeSerializationsGzipped[height+1] = serializationGzip;
+        // if (serialization === undefined){
+        //     serialization = this.accountantTree.serializeMiniAccountant();
+        //     serializationGzip = await GZip.zip(serialization);
+        //     //console.log("serializationAccountantTree", diffIndex, "   ", serialization.toString("hex"));
+        // }
+        //
+        // this.lightAccountantTreeSerializations[height+1] = serialization;
+        // this.lightAccountantTreeSerializationsGzipped[height+1] = serializationGzip;
 
         this._deleteOldLightSettings();
 

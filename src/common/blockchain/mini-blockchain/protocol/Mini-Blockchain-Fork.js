@@ -14,8 +14,6 @@ class MiniBlockchainFork extends inheritFork{
 
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
-        this._accountantTreeClone = null;
-
     }
 
     /**
@@ -38,17 +36,7 @@ class MiniBlockchainFork extends inheritFork{
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
-        if (cloneAccountantTree) {
 
-            try {
-                //clone the Accountant Tree
-                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
-            } catch (exception){
-                console.error("Error cloding Accountant Tree", exception);
-                return false;
-            }
-        } else
-            this._accountantTreeClone = null;
 
     }
 
@@ -73,10 +61,6 @@ class MiniBlockchainFork extends inheritFork{
     }
 
     revertFork(){
-
-        //recover to the original Accountant Tree
-        if (this._accountantTreeClone !== null)
-            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
 
         return inheritFork.prototype.revertFork.call(this);
 

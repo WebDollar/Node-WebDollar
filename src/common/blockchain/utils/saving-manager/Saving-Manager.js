@@ -12,22 +12,11 @@ class SavingManager{
         this.blockchain = blockchain;
 
         this._pendingBlocksList = {};
-        this._pendingAccountantTrees = {};
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
     }
 
-    _addAccountantTreeToSave(block, height){
-
-        if (height % 100 === 0) {
-
-            Log.info('Accountant Tree Saved Pending', Log.LOG_TYPE.SAVING_MANAGER);
-            this._pendingAccountantTrees[height] = this.blockchain.lightAccountantTreeSerializations[height + 1 - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
-
-        }
-
-    }
 
     addBlockToSave(block, height){
 
@@ -61,8 +50,6 @@ class SavingManager{
         }
 
 
-
-        this._addAccountantTreeToSave(block, height);
 
     }
 
@@ -104,7 +91,7 @@ class SavingManager{
                     if (block.block.height % 5000 === 0)
                         await this.blockchain.db.restart();
 
-                    await this.blockchain.saveNewBlock(block.block);
+                    await this.blockchain.saveNewBlock(block.block, false, true);
 
                 } catch (exception){
 
@@ -113,10 +100,9 @@ class SavingManager{
                 }
 
                 //saving Accountant Tree
-                if (this._pendingAccountantTrees[block.block.height] !== undefined) {
-                    await this.blockchain.saveAccountantTree(this._pendingAccountantTrees[block.block.height], block.block.height + 1);
-                    delete this._pendingAccountantTrees[block.block.height];
-                }
+                if (block.block.height === this.blockchain.blocks.length-1)
+                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false), this.blockchain.blocks.length );
+
 
                 block.saving = false;
 
@@ -149,13 +135,13 @@ class SavingManager{
 
         this._isBeingSavedAll = true;
 
-        clearTimeout( this._timeoutSaveManager );
-
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
         let answer = 1;
 
         while (answer !== null){
+
+            clearTimeout( this._timeoutSaveManager );
 
             answer = await this._saveNextBlock();
 

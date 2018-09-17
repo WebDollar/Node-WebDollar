@@ -302,7 +302,7 @@ class InterfaceBlockchainBlock {
 
             // hash is hashPow ( block header + nonce )
             if (this.computedBlockPrefix === undefined)
-                return this._computeBlockHeaderPrefix();
+                this._computeBlockHeaderPrefix();
 
             let buffer = Buffer.concat([
                 Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),

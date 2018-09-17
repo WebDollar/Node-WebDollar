@@ -246,6 +246,8 @@ class InterfaceSatoshminDB {
             } catch (exception) {
                 console.error("db.save error " + key, exception);
 
+                if (Math.random() < 0.1) console.error(key, value);
+
                 if (exception.status === 500)
                     StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
@@ -271,7 +273,7 @@ class InterfaceSatoshminDB {
         return null;
     }
 
-    get(key, timeout=6000, freeze=false) {
+    get(key, timeout=7000, freeze=false) {
 
         return new Promise((resolve)=>{
 
