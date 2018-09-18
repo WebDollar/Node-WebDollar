@@ -54,7 +54,7 @@ class MiningTransactionsSelector{
         this._transactions = [];
 
         //let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
-        let size = 200 * 1024 - 600;
+        let size = 200 * 1024 - 800;
         let i = 0;
 
         while (size > 0 && i < this.blockchain.transactions.pendingQueue.list.length ){
@@ -63,11 +63,14 @@ class MiningTransactionsSelector{
 
             try {
 
-                if (transaction.blockchain === undefined) continue;
+                if (transaction.blockchain === undefined) {
+                    i++;
+                    continue;
+                }
 
                 console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
 
-                this.validateTransaction( transaction, miningFeePerByte );
+                this.validateTransaction( transaction, miningFeePerByte, true );
 
                 let bRemoveTransaction = false;
 
@@ -89,8 +92,9 @@ class MiningTransactionsSelector{
 
                         size -= transaction.serializeTransaction().length;
 
-                        if (size >= 0)
+                        if (size >= 0) {
                             this._transactions.push(transaction);
+                        }
 
                     } else
                         bRemoveTransaction = true;
