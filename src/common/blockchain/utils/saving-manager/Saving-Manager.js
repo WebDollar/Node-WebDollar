@@ -101,6 +101,9 @@ class SavingManager{
 
                     block.saving = true;
 
+                    if (block.block.height % 5000 === 0)
+                        await this.blockchain.db.restart();
+
                     await this.blockchain.saveNewBlock(block.block);
 
                 } catch (exception){

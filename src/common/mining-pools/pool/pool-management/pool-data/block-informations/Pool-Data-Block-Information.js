@@ -191,7 +191,6 @@ class PoolDataBlockInformation {
             try {
 
                 offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset, false);
-                this.block.difficultyTargetPrev = difficultyTargetPrev;
 
                 await this.block.computeHash();
 
