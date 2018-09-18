@@ -37,6 +37,7 @@ const config = merge(base, {
                 WALLET_SECRET_URL: "'" + process.env.WALLET_SECRET_URL + "'",
                 ANON_STATS: process.env.ANON_STATS,
                 SENTRY_URL: "'" + process.env.SENTRY_URL + "'",
+            }
         })
     ]
 
