@@ -106,6 +106,8 @@ class NanoWalletProtocol{
 
                 if (data === null || !data.result) return false;
 
+                trials = 0;
+
                 let prevVal = Blockchain.AccountantTree.getBalance(address);
                 if (prevVal=== null ) prevVal = 0;
 
@@ -161,7 +163,7 @@ class NanoWalletProtocol{
         return new Promise( async (resolve)=>{
 
 
-           let trials = 5;
+            let trials = 5;
 
             socket.node.on("api/subscribe/address/transactions/answer/"+address, async (data)=>{
 
@@ -170,6 +172,8 @@ class NanoWalletProtocol{
 
                 if (data === null || !data.result) return false;
 
+                trials = 0;
+
                 for (let k in data.transactions){
 
                     let transaction = data.transactions[k];
@@ -177,31 +181,30 @@ class NanoWalletProtocol{
 
                     //making the transactions valid...
 
-                    for (let i=0; i<from.addresses.length; i++){
+                    from.addresses.forEach( address =>{
 
-                        let address = from.addresses[i].unencodedAddress;
+                        address.amountPrev = Blockchain.AccountantTree.getAccountNonce(address.address);
+                        if (address.amountPrev === null ) address.amountPrev = 0;
 
-                        let prevVal = Blockchain.AccountantTree.getBalance(address);
-                        if (prevVal === null ) prevVal = 0;
-
-                        let currentVal = from.addresses[i].amount;
+                        let currentVal = parseInt(address.amount);
 
                         try {
-                            Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
+                            Blockchain.AccountantTree.updateAccount(address.address, currentVal - address.amountPrev, undefined, undefined, true);
                         } catch (exception){
 
                         }
-                    }
+
+                    });
 
 
-                    let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
-                    if (prevNonce === null ) prevNonce = 0;
+                    transaction.noncePrev = Blockchain.AccountantTree.getAccountNonce(address);
+                    if (transaction.noncePrev === null ) transaction.noncePrev = 0;
 
-                    let currentNonce = data.nonce;
+                    let currentNonce = transaction.nonce;
                     if (currentNonce === null) currentNonce = 0;
 
                     try {
-                        Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].unencodedAddress, currentNonce - prevNonce, undefined, undefined, true);
+                        Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, currentNonce - transaction.noncePrev, undefined, undefined, true);
                     } catch (exception){
 
                     }
@@ -209,18 +212,38 @@ class NanoWalletProtocol{
                     //TODO use SPV
 
                     let tx = null;
-                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
+                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined);
 
                     let foundTx = Blockchain.Transactions.pendingQueue.searchPendingTransactionByTxId( transaction.txId );
 
                     if ( foundTx === null) {
-                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
+                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all");
                         foundTx = transaction;
                     }
 
-                    foundTx .confirmed = transaction.confirmed;
+                    tx._confirmed = transaction.confirmed;
 
-                    trials = 0;
+                    //restore to the original values
+                    try{
+
+                        let currentNonce = Blockchain.AccountantTree.getAccountNonce(address);
+                        if (currentNonce === null) currentNonce = 0;
+
+                        Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, transaction.noncePrev - currentNonce , undefined, undefined, true);
+
+                        from.addresses.forEach( address =>{
+
+                            let currentVal = Blockchain.AccountantTree.getBalance(address.address);
+                            if (currentVal === null) currentVal = 0;
+
+                            Blockchain.AccountantTree.updateAccount(address.address, address.amountPrev - currentVal , undefined, undefined, true);
+
+                        });
+
+                    } catch (exception){
+
+                    }
+
                     resolve(true);
 
                 }

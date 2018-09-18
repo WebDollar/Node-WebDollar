@@ -75,6 +75,18 @@ class InterfaceBlockchainTransaction{
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
+
+        if(validateNonce)
+            if (nonce === undefined || nonce === null)
+                nonce = this._computeNonce();
+
+        if(validateVersion)
+            if (version === 0x00) nonce = nonce % 0x100;
+            else if (version >= 0x01) nonce = nonce % 0X10000;
+
+        this.nonce = nonce; //1 bytes
+
+
         try {
 
             if (validateFrom)
@@ -96,16 +108,6 @@ class InterfaceBlockchainTransaction{
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
 
         }
-
-        if(validateNonce)
-            if (nonce === undefined || nonce === null)
-                nonce = this._computeNonce();
-
-        if(validateVersion)
-            if (version === 0x00) nonce = nonce % 0x100;
-            else if (version >= 0x01) nonce = nonce % 0X10000;
-
-        this.nonce = nonce; //1 bytes
 
         if (validateTxId)
             if (txId === undefined || txId === null)

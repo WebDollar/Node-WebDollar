@@ -94,7 +94,7 @@ class NodeAPICallbacks{
 
             let subscription = data.subscription;
 
-            this._addSubscribedEvent(subscription, "addressTransactionsSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent(subscrTraiption, "addressTransactionsSubscribe"+address, res, callback, nodeApiType);
 
             return {result: true, transactions: data.transactions, _suffix: address}
 
