@@ -41,7 +41,7 @@ class MiningTransactionsSelector{
             return true;
 
         //verify fee
-        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
+        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard( transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};
 
         return true;
@@ -70,7 +70,7 @@ class MiningTransactionsSelector{
 
                 console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
 
-                this.validateTransaction( transaction, miningFeePerByte, true );
+                this.validateTransaction( transaction, miningFeePerByte );
 
                 let bRemoveTransaction = false;
 
@@ -134,17 +134,19 @@ class MiningTransactionsSelector{
 
         let count = 0;
 
+        //safe compare is not necessary
+        
         this._transactions.forEach((transaction)=>{
 
             if (from)
                 transaction.from.addresses.forEach((address)=>{
-                    if (BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if (address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 });
 
             if (to)
                 transaction.to.addresses.forEach((address)=>{
-                    if ( BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if ( address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 })
 
