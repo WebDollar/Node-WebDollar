@@ -1,0 +1,65 @@
+box: ubuntu:16.04
+
+build:
+  steps:
+    - install-packages:
+        packages: linuxbrew-wrapper clang wget software-properties-common cmake libtool autoconf psmisc opencl-headers ocl-icd-libopencl1 pciutils
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: npm install
+        code: npm install
+    - script:
+        name: clone argon2
+        code: git clone https://github.com/WebDollar/argon2
+    - script:
+        name: install argon2
+        cwd: argon2
+        code: |
+          autoreconf -i
+          bash configure
+          cmake -DCMAKE_BUILD_TYPE=Release .
+          make
+    - script:
+        name: finalize argon2 install
+        code: cp -a argon2/* dist_bundle/CPU/
+
+deploy_branch:
+  steps:
+    - install-packages:
+        packages: curl
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: $WERCKER_GIT_BRANCH
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+
+deploy_commit:
+  steps:
+    - install-packages:
+        packages: curl
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: $WERCKER_GIT_COMMIT
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
