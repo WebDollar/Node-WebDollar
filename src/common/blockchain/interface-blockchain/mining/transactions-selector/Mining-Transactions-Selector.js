@@ -62,7 +62,9 @@ class MiningTransactionsSelector{
             let transaction = this.blockchain.transactions.pendingQueue.list[i];
 
             try {
-                
+
+                if (transaction.blockchain === undefined) continue;
+
                 console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
 
                 this.validateTransaction( transaction, miningFeePerByte );
