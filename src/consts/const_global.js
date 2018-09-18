@@ -464,5 +464,10 @@ if ( consts.DEBUG === true ){
 
 }
 
+if ( consts.ANON_STATS === true && consts.SENTRY_URL ){
+    var Raven = require('raven');
+    Raven.config(consts.SENTRY_URL).install();
+}
+
 
 export default consts
