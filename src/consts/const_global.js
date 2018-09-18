@@ -460,9 +460,11 @@ if ( consts.DEBUG === true ){
     FallBackNodesList.nodes = [{
         "addr": ["http://127.0.0.1:8085"],
     }];
-
-
+    
 }
+
+if (process.env.NETWORK !== undefined && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet; 
 
 
 export default consts

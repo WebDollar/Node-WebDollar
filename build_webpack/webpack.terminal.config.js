@@ -35,6 +35,7 @@ const config = merge(base, {
                 FORCE_LOAD: process.env.FORCE_LOAD,
                 DOMAIN: "'" + process.env.DOMAIN + "'",
                 WALLET_SECRET_URL: "'" + process.env.WALLET_SECRET_URL + "'",
+                NETWORK: "'" + process.env.NETWORK + "'",
             }
         })
     ]
