@@ -63,3 +63,51 @@ deploy_commit:
         repository: webdollarcoin/node-webdollar
         working-dir: /pipeline/source
         cmd: npm run commands
+
+deploy_branch_genesis:
+  steps:
+    - install-packages:
+        packages: curl unzip
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: download and extract genesis
+        code: |
+          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          unzip blockchainDB3.zip
+          export SUFFIX="_genesis"
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: "$WERCKER_GIT_BRANCH$SUFFIX"
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+
+deploy_commit_genesis:
+  steps:
+    - install-packages:
+        packages: curl unzip
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: download and extract genesis
+        code: |
+          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          unzip blockchainDB3.zip
+          export SUFFIX="_genesis"
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: "$WERCKER_GIT_COMMIT$SUFFIX"
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
