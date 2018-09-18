@@ -412,7 +412,7 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: "cpu", //cpu-cpp
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu", //cpu-cpp
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
@@ -436,7 +436,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
-    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
