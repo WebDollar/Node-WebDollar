@@ -85,7 +85,8 @@ class MiningTransactionsSelector{
 
                             // validation: false,
                             //transactions: [],
-                        }
+                        },
+                        "validate-fast-transactions": true,
                     };
 
                     if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
