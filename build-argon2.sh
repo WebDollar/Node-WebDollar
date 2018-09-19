@@ -351,10 +351,11 @@ function set_cputhreads() {
 
 	elif [[ $setcputhreads =~ [[:digit:]] ]]; then
 
-		if [[ $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1 | awk '{print $2}') == "$setcputhreads" ]]; then
+		if [[ $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1 | awk '{print $4}') == "$setcputhreads" ]]; then
 			echo "$showok ${yellow}$(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1)$stand is already set."
 		else
-			echo "$showexecute Setting terminal CPU_MAX to ${yellow}$setcputhreads$stand" && sed -i -- "s/CPU_MAX: $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1 | awk '{print $2}')/CPU_MAX: $setcputhreads/g" $get_const_global && echo "$showinfo Result: $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal CPU_MAX to ${yellow}$setcputhreads$stand" && \
+			sed -i -- "s/CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1 | awk '{print $4}')/CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || $setcputhreads/g" $get_const_global && echo "$showinfo Result: $(grep "CPU_MAX:" $get_const_global | cut -d ',' -f1)"
 		fi
 
 	elif [[ $setcputhreads == * ]]; then
@@ -369,8 +370,8 @@ function set_cpucpp() {
 
 	if [[ $yn_cpucpp == [nN] ]]; then
 
-		if [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "cpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1)"
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo -e "$showinfo Reverting CPU-CPP to CPU..." && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 		else
 			echo "$showinfo Ok...."
@@ -379,16 +380,16 @@ function set_cpucpp() {
 
         elif [[ $yn_cpucpp == [yY] ]]; then
 
-		if [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
 			echo "$showok ${yellow}cpu-cpp$stand miner is already set."
 			set_cputhreads
 
-		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: cpu-cpp$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: cpu-cpp$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 
-		elif [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: cpu-cpp$stand" && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: process.env.TERMINAL_WORKERS_TYPE || cpu-cpp$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 		fi
 
