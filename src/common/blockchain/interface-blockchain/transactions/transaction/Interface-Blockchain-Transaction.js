@@ -118,7 +118,14 @@ class InterfaceBlockchainTransaction{
         this._serializated = undefined;
     }
 
-    destroyTransaction(){
+    destroyTransaction(pendingTransactionsWereIncluded){
+
+        //avoid to delete
+        if (pendingTransactionsWereIncluded)
+            this.pendingTransactionsIncluded--;
+
+        if (this.pendingTransactionsIncluded !== undefined && this.pendingTransactionsIncluded > 0)
+            return;
 
         this.blockchain = undefined;
 

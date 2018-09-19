@@ -46,15 +46,25 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
+    markBlockDataTransactionsToBeInPending(){
+
+        if (this.pendingTransactionsWereIncluded)
+            return;
+
+        for (let i=0; i<this.transactions.length; i++) {
+            if (this.transactions[i].pendingTransactionsIncluded === undefined) this.transactions[i].pendingTransactionsIncluded = 0;
+            this.transactions[i].pendingTransactionsIncluded++;
+        }
+
+        this.pendingTransactionsWereIncluded = true;
+
+    }
+
     destroyBlockDataTransactions(){
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if (this.pendingTransactionsWereIncluded)
-                this.transactions[i].pendingTransactionsIncluded--;
-
-            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
-                this.transactions[i].destroyTransaction();
+            this.transactions[i].destroyTransaction(this.pendingTransactionsWereIncluded);
 
             this.transactions[i] = undefined;
             this.transactions.splice(i,1);
@@ -62,9 +72,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
         }
 
-        delete this.pendingTransactionsWereIncluded;
-
         this.transactions = [];
+        delete this.pendingTransactionsWereIncluded;
 
     }
 

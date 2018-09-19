@@ -135,7 +135,7 @@ class MiningTransactionsSelector{
         let count = 0;
 
         //safe compare is not necessary
-        
+
         this._transactions.forEach((transaction)=>{
 
             if (from)
