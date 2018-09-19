@@ -123,7 +123,7 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 	read -r -e -p "$showinput Do you want to start a SCREEN instance in this ${yellow}$(pwd)$stand foler? (y or n): " startnodeyn
 
 	if [[ "$startnodeyn" =~ ^(y|yes|Y|YES|Yes)$ ]]; then
-		echo "$showexecute Starting SCREEN Daemon for PORT=$readport" && screen -dmS $readport
+		echo "$showexecute Starting SCREEN Daemon for PORT=${green}$readport$stand" && screen -dmS $readport
 		echo "$showexecute Seding command to start NPM inside SCREEN..." && screen -S $readport -p 0 -X stuff "MAXIMUM_CONNECTIONS_FROM_BROWSER=$get_browser_conn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$get_term_conn SERVER_PORT=$readport npm run start^M"
 		sleep 1;
 
@@ -155,7 +155,7 @@ else
 			if cd "$nodewebdloc"; then echo "$showinfo Changing DIR to $yellow$(pwd)$stand"; else echo "$showerror Couldn't change DIR to $nodewebdloc"; fi
 			echo "$showinfo Folder location changed to $nodewebdloc"
 
-			echo "$showexecute Starting SCREEN Daemon for PORT=$readport" && screen -dmS $readport
+			echo "$showexecute Starting SCREEN Daemon for PORT=$green$readport$stand" && screen -dmS $readport
 			echo "$showexecute Seding command to start NPM inside SCREEN..." && screen -S $readport -p 0 -X stuff "MAXIMUM_CONNECTIONS_FROM_BROWSER=$get_browser_conn MAXIMUM_CONNECTIONS_FROM_TERMINAL=$get_term_conn SERVER_PORT=$readport npm run start^M"
 			sleep 1;
 		else
@@ -174,7 +174,7 @@ fi
 	get_browser_conn=$(grep BROWSER_CONN $fullnode_conf | cut -d '=' -f2)
 	###
 
-		echo "$showok FULLNODE_CONF found! TERM_CONN=$green$get_term_conn$stand | BROWSER_CONN=$green$get_browser_conn$stand"
+		echo "$showok FULLNODE_CONF found! TERM_CONN=${green}$get_term_conn$stand | BROWSER_CONN=${green}$get_browser_conn$stand"
 		read -r -e -p "$showinput How many $ports to you want to use for the full node (1,2,3,4,5 and 10 or $abortte): " nrofports
 		echo -e "${yellow}1. Use PM2 instances\\n2. Use SCREEN instances$stand"
 		read -r -e -p "$showinput Choose: " set_instance
@@ -240,7 +240,7 @@ if [[ "$nrofports" =~ ^[[:digit:]]+$ ]]; then
 
 		if [[ "$readport" =~ ^[[:digit:]]+$ ]]; then
 
-			echo "$showinfo Setting IP Table rule for PORT $readport"
+			echo "$showinfo Setting IP Table rule for PORT ${green}$readport$stand"
 			if [[ $(sudo iptables -nL | grep -w "$readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$readport" ]]; then echo "$showok Port $readport is already accepted in Firewall!"; elif [[ ! $(sudo iptables -nL | grep -w "$readport" | awk 'NR==1{print$7}' | cut -d ':' -f2) == "$readport" ]]; then echo "$showdone Setting Firewall rule for PORT $readport."; sudo iptables -A INPUT -p tcp --dport "$readport" -j ACCEPT; fi # set port firewall rule
 
 			echo "$showinfo The system will use port $readport"
