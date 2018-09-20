@@ -412,7 +412,7 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu", //cpu-cpp, or gpu
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp", //cpu-cpp, or gpu
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
