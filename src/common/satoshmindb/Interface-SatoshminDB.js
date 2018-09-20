@@ -36,7 +36,7 @@ class InterfaceSatoshminDB {
     async restart(){
 
         this.close();
-        await this.sleep(2000);
+        await this.sleep(1500);
         this._start();
 
     }
@@ -246,6 +246,8 @@ class InterfaceSatoshminDB {
             } catch (exception) {
                 console.error("db.save error " + key, exception);
 
+                if (Math.random() < 0.1) console.error(key, value);
+
                 if (exception.status === 500)
                     StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
@@ -263,15 +265,20 @@ class InterfaceSatoshminDB {
 
             if (answer !== null)
                 return answer;
-            else
+            else {
+
+                if (trials % 5 === 0) //it was observed that a restart
+                    await this.restart();
+
                 await Utils.sleep(100);
+            }
 
         }
 
         return null;
     }
 
-    get(key, timeout=6000, freeze=false) {
+    get(key, timeout=7000, freeze=false) {
 
         return new Promise((resolve)=>{
 

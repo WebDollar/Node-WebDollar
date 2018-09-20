@@ -194,8 +194,8 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     */
 
 
-    serializeMiniAccountant(includeHashes = true) {
-        return this._serializeTree(includeHashes);
+    serializeMiniAccountant(includeHashes = true, sleepNodes) {
+        return this._serializeTree(includeHashes, sleepNodes);
     }
 
 

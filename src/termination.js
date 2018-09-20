@@ -1,8 +1,10 @@
 import global from "consts/global";
 import NodesList from 'node/lists/Nodes-List'
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
+import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecting'
 
 let alreadySaved = false;
+
 
 
 export default async (Blockchain) => {
@@ -13,11 +15,14 @@ export default async (Blockchain) => {
     if (alreadySaved) return;
     alreadySaved = true;
 
+    Blockchain.Mining.stopMining();
+
     console.warn("Disconnecting All Nodes...");
     NodesList.disconnectAllNodes("all");
+
+    NodesWaitlistConnecting.stopConnecting();
     NodesWaitlist.waitListFullNodes = [];
     NodesWaitlist.waitListLightNodes = [];
-
 
     console.log("Closing Express");
     try {
@@ -28,7 +33,11 @@ export default async (Blockchain) => {
             NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
         }
 
-        NodeExpress.app.close();
+        if (NodeExpress !== undefined)
+            NodeExpress.app.close();
+
+        if (NodeServer !== undefined && NodeServer.nodeServer !== null)
+            NodeServer.nodeServer.close();
 
     } catch (exception){
 
@@ -42,24 +51,30 @@ export default async (Blockchain) => {
 
     }
 
-    if (!global.INTERFACE_BLOCKCHAIN_LOADING)
-        await Blockchain.blockchain.saveBlockchainTerminated();
+    let interval = async ()=>{
 
-    let interval = setInterval(()=>{
         if ( global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED &&
             global.SEMAPHORE_PROCESS_DONE &&
             global.MINIBLOCKCHAIN_LIGHT_SAVED &&
             global.MINIBLOCKCHAIN_ADVANCED_SAVED &&
             global.MINIBLOCKCHAIN_SAVED &&
             global.INTERFACE_BLOCKCHAIN_SAVED &&
-            global.POOL_SAVED) {
+            global.POOL_SAVED ) {
+
+            try {
+                if (!global.INTERFACE_BLOCKCHAIN_LOADING)
+                    await Blockchain.blockchain.saveBlockchainTerminated();
+            } catch (exception){
+
+                console.error("Exception saving", exception);
+
+            }
 
             console.log(global.MINIBLOCKCHAIN_LIGHT_CONFIGURATION_SAVED);
             console.log(global.SEMAPHORE_PROCESS_DONE);
             console.log(global.MINIBLOCKCHAIN_LIGHT_SAVED);
 
             console.warn("process.exit(0)");
-            clearInterval(interval);
 
             if (!process.env.BROWSER) {
 
@@ -73,9 +88,14 @@ export default async (Blockchain) => {
 
             }
 
+            return;
 
 
         }
-    }, 100)
+
+        setTimeout( interval, 100);
+    };
+
+    setTimeout( interval, 100);
 
 }

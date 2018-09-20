@@ -57,17 +57,30 @@ class PoolWork {
         this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
+            this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
+            this.lastBlock._hashPrev = this.lastBlock.hashPrev;
+
             this.lastBlockNonce = 0;
 
 
-            if (this.lastBlock.computedBlockPrefix === undefined )
-                this.lastBlock._computeBlockHeaderPrefix();
+            let error = false;
+            try{
 
-            this.lastBlockSerialization = Buffer.concat( [
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock.computedBlockPrefix
-            ]);
+                if (this.lastBlock.computedBlockPrefix === undefined )
+                    this.lastBlock._computeBlockHeaderPrefix();
+
+                this.lastBlockSerialization = Buffer.concat( [
+                    Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
+                    Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
+                    this.lastBlock.computedBlockPrefix
+                ]);
+
+            } catch (exception){
+
+                error = true;
+
+            }
+
 
             this.lastBlockId ++ ;
 
@@ -82,6 +95,12 @@ class PoolWork {
             };
 
             this._blocksList.push( this.lastBlockElement );
+
+            if (error) {
+                resolve(false);
+                console.error("Error creating Pool block");
+                return;
+            }
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");

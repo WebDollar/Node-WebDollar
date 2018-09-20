@@ -163,7 +163,7 @@ class TransactionsDownloadManager{
         }
 
 
-        setTimeout( this._processTransactions.bind(this), 500);
+        setTimeout( this._processTransactions.bind(this), 800);
 
     }
 

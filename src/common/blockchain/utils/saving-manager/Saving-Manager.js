@@ -12,24 +12,16 @@ class SavingManager{
         this.blockchain = blockchain;
 
         this._pendingBlocksList = {};
-        this._pendingAccountantTrees = {};
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
+        this._factor = Math.floor( Math.random()*10 );
     }
 
-    _addAccountantTreeToSave(block, height){
-
-        if (height % 100 === 0) {
-
-            Log.info('Accountant Tree Saved Pending', Log.LOG_TYPE.SAVING_MANAGER);
-            this._pendingAccountantTrees[height] = this.blockchain.lightAccountantTreeSerializations[height + 1 - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
-
-        }
-
-    }
 
     addBlockToSave(block, height){
+
+        if (process.env.BROWSER) return;
 
         if (block === undefined || block === null) return false;
 
@@ -62,11 +54,11 @@ class SavingManager{
 
 
 
-        this._addAccountantTreeToSave(block, height);
-
     }
 
     async _saveNextBlock(){
+
+        if (process.env.BROWSER) return;
 
         for (let key in this._pendingBlocksList){
 
@@ -104,7 +96,7 @@ class SavingManager{
                     if (block.block.height % 5000 === 0)
                         await this.blockchain.db.restart();
 
-                    await this.blockchain.saveNewBlock(block.block);
+                    await this.blockchain.saveNewBlock(block.block, false, true);
 
                 } catch (exception){
 
@@ -113,10 +105,9 @@ class SavingManager{
                 }
 
                 //saving Accountant Tree
-                if (this._pendingAccountantTrees[block.block.height] !== undefined) {
-                    await this.blockchain.saveAccountantTree(this._pendingAccountantTrees[block.block.height], block.block.height + 1);
-                    delete this._pendingAccountantTrees[block.block.height];
-                }
+                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0)
+                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false, 5000), this.blockchain.blocks.length );
+
 
                 block.saving = false;
 
@@ -149,13 +140,13 @@ class SavingManager{
 
         this._isBeingSavedAll = true;
 
-        clearTimeout( this._timeoutSaveManager );
-
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
         let answer = 1;
 
         while (answer !== null){
+
+            clearTimeout( this._timeoutSaveManager );
 
             answer = await this._saveNextBlock();
 

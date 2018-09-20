@@ -24,6 +24,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
         if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {
             block.level = block.getLevel(); //computing the level
             this.prover.provesCalculated.updateBlock(block);
+            block._provesClculatedInserted = true;
         }
 
         //TODO generate proofs as a LightNode
@@ -37,14 +38,14 @@ class PPoWBlockchain extends InterfaceBlockchain {
     }
 
 
-    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset ){
+    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset, numBlocks ){
 
         let oldProofActivated = this.prover.proofActivated;
         this.prover.proofActivated = false;
 
         let answer = false;
         try {
-            answer = await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset );
+            answer = await InterfaceBlockchain.prototype._loadBlockchain.call(this, indexStartLoadingOffset , indexStartProcessingOffset, numBlocks );
         } catch (exception){
 
             console.error("loadBlockchain raised an error", exception);

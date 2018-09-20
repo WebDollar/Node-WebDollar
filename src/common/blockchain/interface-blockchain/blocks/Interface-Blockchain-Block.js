@@ -28,7 +28,7 @@ class InterfaceBlockchainBlock {
 
         this.height = (typeof height === "number" ? height : null); // index set by me
 
-        if (blockValidation === undefined)
+        if (blockValidation === undefined || blockValidation === null)
             blockValidation = this.blockchain.createBlockValidation();
 
         this.blockValidation = blockValidation;
@@ -68,7 +68,6 @@ class InterfaceBlockchainBlock {
         
         //computed data
         this.computedBlockPrefix = undefined;
-        this.computedSerialization = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
         //this._difficultyTargetPrev;
@@ -86,6 +85,7 @@ class InterfaceBlockchainBlock {
     get difficultyTargetPrev(){
 
         if (this._difficultyTargetPrev  !== undefined) return this._difficultyTargetPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getDifficultyTarget(this.height);
 
         return this.blockValidation.getDifficultyCallback(this.height);
 
@@ -94,6 +94,7 @@ class InterfaceBlockchainBlock {
     get hashPrev(){
 
         if (this._hashPrev !== undefined) return this._hashPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getHashPrev(this.height);
 
         return this.blockValidation.getHashPrevCallback(this.height);
 
@@ -302,7 +303,7 @@ class InterfaceBlockchainBlock {
 
             // hash is hashPow ( block header + nonce )
             if (this.computedBlockPrefix === undefined)
-                return this._computeBlockHeaderPrefix();
+                this._computeBlockHeaderPrefix();
 
             let buffer = Buffer.concat([
                 Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),
@@ -342,8 +343,6 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
-        if (requestHeader === true && this.computedSerialization !== undefined ) return this.computedSerialization;
-
         this._computeBlockHeaderPrefix(true, requestHeader);
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
@@ -355,13 +354,11 @@ class InterfaceBlockchainBlock {
                                      this.computedBlockPrefix,
                                   ]);
 
-        if ( requestHeader === true && this.computedSerialization === undefined ) this.computedSerialization = data;
-
         return data;
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, usePrevHash = false){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -388,7 +385,8 @@ class InterfaceBlockchainBlock {
             offset += 2;
 
             //TODO  put hashPrev into block.data
-            //this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            if (usePrevHash)
+                this._hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
