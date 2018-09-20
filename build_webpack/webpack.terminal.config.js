@@ -33,11 +33,11 @@ const config = merge(base, {
                 MAXIMUM_CONNECTIONS_FROM_BROWSER: process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER,
                 MAXIMUM_CONNECTIONS_FROM_TERMINAL: process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL,
                 FORCE_LOAD: process.env.FORCE_LOAD,
-                DOMAIN: "'" + (process.env.DOMAIN||'') + "'",
-                WALLET_SECRET_URL: "'" + (process.env.WALLET_SECRET_URL||'') + "'",
-                NETWORK: "'" + process.env.NETWORK + "'",
-                TERMINAL_WORKERS_TYPE: "'" + (process.env.TERMINAL_WORKERS_TYPE || "cpu") + "'",
-                TERMINAL_WORKERS_CPU_MAX: "'" + (process.env.TERMINAL_WORKERS_CPU_MAX || 0) + "'",
+                DOMAIN: process.env.DOMAIN,
+                WALLET_SECRET_URL: process.env.WALLET_SECRET_URL,
+                NETWORK: process.env.NETWORK,
+                TERMINAL_WORKERS_TYPE:  process.env.TERMINAL_WORKERS_TYPE,
+                TERMINAL_WORKERS_CPU_MAX: process.env.TERMINAL_WORKERS_CPU_MAX,
             }
         })
     ]
