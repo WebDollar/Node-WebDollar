@@ -68,7 +68,6 @@ class InterfaceBlockchainBlock {
         
         //computed data
         this.computedBlockPrefix = undefined;
-        this.computedSerialization = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
         //this._difficultyTargetPrev;
@@ -344,8 +343,6 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
-        if (requestHeader === true && this.computedSerialization !== undefined ) return this.computedSerialization;
-
         this._computeBlockHeaderPrefix(true, requestHeader);
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
@@ -356,8 +353,6 @@ class InterfaceBlockchainBlock {
                                      Serialization.serializeNumber4Bytes( this.nonce ),
                                      this.computedBlockPrefix,
                                   ]);
-
-        if ( requestHeader === true && this.computedSerialization === undefined ) this.computedSerialization = data;
 
         return data;
 

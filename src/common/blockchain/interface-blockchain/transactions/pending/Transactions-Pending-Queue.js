@@ -89,6 +89,18 @@ class TransactionsPendingQueue {
         this.transactions.emitTransactionChangeEvent( transaction );
     }
 
+    findPendingIdenticalTransaction(transaction){
+
+        if ( transaction === undefined) return -1;
+
+        for (let i = 0; i < this.list.length; i++)
+            if ( this.list[i] === transaction ) //it is not required to use BufferExtended.safeCompare
+                return i;
+
+        return -1;
+
+    }
+
     findPendingTransaction(transaction){
 
         if ( transaction === undefined || !Buffer.isBuffer(transaction.txId)) return -1;

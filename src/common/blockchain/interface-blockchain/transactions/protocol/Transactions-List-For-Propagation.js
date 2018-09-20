@@ -43,10 +43,11 @@ class TransactionsListForPropagation{
 
     findTransactionForPropagationList(transaction){
 
-        for (let i=0; i< this.list.length; i++)
-            if (this.list[i].txId.equals( transaction.txId )){
+        if ( transaction === undefined || !Buffer.isBuffer(transaction.txId)) return -1;
+
+        for (let i = 0; i < this.list.length; i++)
+            if ( this.list[i].txId !== undefined && this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
                 return i;
-            }
 
         return -1;
     }

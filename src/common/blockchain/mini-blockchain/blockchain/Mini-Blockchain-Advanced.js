@@ -209,7 +209,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
 
-        if (!this.agent.consensus)
+        if (this.agent === undefined || !this.agent.consensus)
             return false;
 
         await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);

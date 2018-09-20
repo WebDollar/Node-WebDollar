@@ -100,12 +100,17 @@ class NodePropagationList{
 
         let timeout;
         if (disconnectSocket)
-            timeout = setTimeout( ()=>{ socket.disconnect() }, 7000 + Math.floor(Math.random() * 5*1000));
+            timeout = setTimeout( ()=>{
+                console.error("Disconnected by simple waitlist1");
+                socket.disconnect()
+            }, 7000 + Math.floor(Math.random() * 5*1000));
 
         socket.emit( "propagation/simple-waitlist-nodes", { op: "new-full-nodes", addresses: list }, (data)=>{
 
-            if ( disconnectSocket )
+            if ( disconnectSocket ) {
+                console.error("Disconnected by simple waitlist");
                 socket.disconnect();
+            }
 
             clearTimeout(timeout);
 
