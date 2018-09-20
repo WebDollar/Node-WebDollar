@@ -297,13 +297,15 @@ class Workers {
                 if (msg.hash.length === 64) hash = Buffer.from(msg.hash, "hex");
                 else hash = new Buffer(msg.hash);
 
-                if ( consts.DEBUG && !Blockchain.MinerPoolManagement.minerPoolStarted)
-                    if (false === await this._validateHash(hash, msg.nonce))
-                        return false;
+                let nonce = parseInt(msg.nonce);
 
                 worker._is_batching = false;
 
-                this._stop();
+                if ( consts.DEBUG && !Blockchain.MinerPoolManagement.minerPoolStarted)
+                    if (false === await this._validateHash( hash, nonce ))
+                        return false;
+
+                this._stopAndResolve(true, hash, nonce);
 
                 // console.log("sol",new Buffer(msg.hash).toString("hex"));
 
@@ -391,14 +393,14 @@ class Workers {
 
     }
 
-    _stopAndResolve() {
+    _stopAndResolve( result = false, hash = undefined, nonce = undefined ) {
 
         this._stop();
 
         this.ibb._workerResolve({
-            result: false,
-            hash: this.ibb.bestHash,
-            nonce: this.ibb.bestHashNonce
+            result: result,
+            hash: hash || this.ibb.bestHash,
+            nonce: nonce || this.ibb.bestHashNonce
         });
 
         return this;
