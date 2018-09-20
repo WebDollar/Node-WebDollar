@@ -291,7 +291,8 @@ class Workers {
                     this.ibb._hashesPerSecond += parseInt(msg.h);
 
 
-            } else 
+            }
+            
             // solved: stop and resolve but with a solution
             if (msg.type === 's') {
 
