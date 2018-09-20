@@ -280,13 +280,22 @@ class Workers {
                 return true;
             }
 
-            // solved: stop and resolve but with a solution
-            if (msg.type === 's') {
+            if (msg.type === 's' || msg.type === 'b'){
+                                //worker is batching now
+                worker._is_batching = false;
 
-                this._finished = true;
+                // keep track of the ones that are working
+                this._working--;
 
                 if ( msg.h )
                     this.ibb._hashesPerSecond += parseInt(msg.h);
+
+
+            } else 
+            // solved: stop and resolve but with a solution
+            if (msg.type === 's') {
+
+                this._finished = true;        
 
                 //the blockId is not matching
                 if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
@@ -297,9 +306,7 @@ class Workers {
                 if (msg.hash.length === 64) hash = Buffer.from(msg.hash, "hex");
                 else hash = new Buffer(msg.hash);
 
-                let nonce = parseInt(msg.nonce);
-
-                worker._is_batching = false;
+                let nonce = parseInt(msg.nonce);                
 
                 if ( consts.DEBUG && !Blockchain.MinerPoolManagement.minerPoolStarted)
                     if (false === await this._validateHash( hash, nonce ))
@@ -314,9 +321,6 @@ class Workers {
 
             // batching: finished a batch of nonces
             if (msg.type === 'b') {
-
-                if (msg.h !== undefined)
-                    this.ibb._hashesPerSecond += parseInt(msg.h);
 
                 //the blockId is not matching
                 if (msg.blockId && parseInt(msg.blockId) !== (this.ibb.blockId || this.ibb.block.height))
@@ -340,16 +344,11 @@ class Workers {
                     this.ibb.bestHash = bestHash;
                     this.ibb.bestHashNonce = parseInt(msg.bestNonce)
                 }
-
-
-                // keep track of the ones that are working
-                this._working--;
+                
 
                 // if none of the threads are working and we finished the range, then we should stop and resolve
                 if (!this._working && this._current >= this._current_max)
-                    this._stopAndResolve();
-
-                worker._is_batching = false;
+                    this._stopAndResolve();        
 
                 if (consts.DEBUG)
                     await this._validateHash(bestHash, parseInt(msg.bestNonce));
