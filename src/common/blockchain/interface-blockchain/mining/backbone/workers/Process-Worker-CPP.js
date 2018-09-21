@@ -31,6 +31,8 @@ class ProcessWorkerCPP extends ProcessWorker{
         await this._writeWork("0 0");
 
         return await Blockchain.blockchain.sleep(5000);
+
+        ProcessWorker.prototype.kill.call( this );
     }
 
 
