@@ -366,9 +366,6 @@ class Serialization{
         }
     }
 
-
-
-
     deserializeNumber(buffer){
 
         if(buffer.length === 1) return buffer[0]; else
@@ -380,7 +377,6 @@ class Serialization{
         if (buffer.length === 4) return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
 
     }
-
 
 }
 
