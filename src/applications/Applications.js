@@ -12,6 +12,8 @@ import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import AdvancedMessages from "node/menu/Advanced-Messages";
 
+import TestBazaar from "common/bazaar/products/ProductsManager"
+
 class Applications {
 
     constructor() {
@@ -35,6 +37,15 @@ class Applications {
         this.CONNECTIONS_TYPE = CONNECTIONS_TYPE;
 
         this.AdvancedMessages = AdvancedMessages;
+
+        this.TestBazaar = TestBazaar;
+
+    }
+
+    async testLoadProdcuts(){
+
+        await this.TestBazaar.loadAllProducts();
+
     }
 
 }
