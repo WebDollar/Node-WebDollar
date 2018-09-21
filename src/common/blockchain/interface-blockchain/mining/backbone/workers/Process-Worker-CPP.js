@@ -5,12 +5,16 @@
 import Blockchain from "main-blockchain/Blockchain"
 import ProcessWorker from "./Process-Worker"
 
+const uuid = require('uuid');
+
 class ProcessWorkerCPP extends ProcessWorker{
 
     constructor(id, noncesWorkBatch, cores){
 
         super(id, noncesWorkBatch, false);
         this.cores = cores;
+
+        this._outputFilename = this._outputFilename+uuid.v4();
 
     }
 
@@ -29,14 +33,14 @@ class ProcessWorkerCPP extends ProcessWorker{
         ProcessWorker.prototype.kill.call( this );
     }
 
-    async restartWorker(){
-
-        this._is_batching = false;
-
-        await this._writeWork("0 0");
-
-        return await Blockchain.blockchain.sleep(5000);
-    }
+    // async restartWorker(){
+    //
+    //     this._is_batching = false;
+    //
+    //     await this._writeWork("0 0");
+    //
+    //     return await Blockchain.blockchain.sleep(5000);
+    // }
 
 
 }
