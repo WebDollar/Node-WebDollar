@@ -234,6 +234,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
     freeTransactionsFromMemory(){
 
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY === false) return;
+
         this.destroyBlockDataTransactions(true);
         delete this.transactionsLoaded;
 
