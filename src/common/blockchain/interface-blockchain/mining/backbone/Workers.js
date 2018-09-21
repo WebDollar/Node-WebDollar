@@ -108,11 +108,14 @@ class Workers {
                 for (let i = this.workers_list.length - 1; i >= 0; i--)
                     if ((date - this.workers_list[i].date ) > 60 * 1000) {
 
-                        await this.workers_list[i].restartWorker();
-                        this.workers_list[i].date = new Date().getTime();
+                        //await this.workers_list[i].restartWorker();
+                        //this.workers_list[i].date = new Date().getTime();
+
+                        await this.workers_list[i].kill();
+                        this.workers_list.splice(i, 1);
+
                         Log.info("Restarting Worker", Log.LOG_TYPE.default);
 
-                        this.workers_list.splice(i, 1);
 
                     }
 

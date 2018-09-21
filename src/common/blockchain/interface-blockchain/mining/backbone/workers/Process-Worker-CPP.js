@@ -21,18 +21,21 @@ class ProcessWorkerCPP extends ProcessWorker{
     }
 
     async kill(param){
+
         console.info("KILL!!");
-        return await this._writeWork("0 0");
+        await this._writeWork("0 0");
+        await Blockchain.blockchain.sleep(5000);
+
+        ProcessWorker.prototype.kill.call( this );
     }
 
     async restartWorker(){
+
         this._is_batching = false;
 
         await this._writeWork("0 0");
 
         return await Blockchain.blockchain.sleep(5000);
-
-        ProcessWorker.prototype.kill.call( this );
     }
 
 
