@@ -14,7 +14,7 @@ class ProcessWorkerCPP extends ProcessWorker{
         super(id, noncesWorkBatch, false);
         this.cores = cores;
 
-        this._outputFilename = this._outputFilename+uuid.v4();
+        this._outputFilename = this._outputFilename+Math.random()+Math.random();
 
     }
 
