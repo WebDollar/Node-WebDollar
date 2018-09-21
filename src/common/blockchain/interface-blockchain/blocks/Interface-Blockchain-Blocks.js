@@ -24,7 +24,8 @@ class InterfaceBlockchainBlocks{
         this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
 
-        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
+            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
 
     }
 
@@ -172,7 +173,9 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
-    freeAllBlocksTransactionsFromMemory(){
+    _freeAllBlocksTransactionsFromMemory(){
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
 
         try {
 
@@ -181,10 +184,10 @@ class InterfaceBlockchainBlocks{
                     this[i].data.transactions.freeTransactionsFromMemory();
 
         } catch (exception){
-            console.error("freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
+            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
         }
 
-        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
 
     }
 

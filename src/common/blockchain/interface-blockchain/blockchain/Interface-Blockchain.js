@@ -396,7 +396,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     block.blockValidation.blockValidationType = {};
 
-                    if (index < numBlocks - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER)
+
+                    if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0 && index < numBlocks )
                         block.data.transactions.freeTransactionsFromMemory();
 
                     if (index > 0 && index % 10000 === 0) {
