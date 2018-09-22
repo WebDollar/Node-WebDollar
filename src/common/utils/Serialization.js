@@ -366,9 +366,55 @@ class Serialization{
         }
     }
 
+    serializeString( string, lengthBytes ){
+
+        let buffer = [];
+
+        if(lengthBytes===1)
+            buffer = this.serializeNumber1Byte(string.length);
+        if(lengthBytes===2)
+            buffer = this.serializeNumber2Bytes(string.length);
+
+        for (let i=0; i<string.length; i++){
+            let character = new Buffer(string[i],'ascii');
+            buffer = Buffer.concat([ new Buffer(buffer), character ]);
+        }
+
+        return buffer;
+
+    }
+
+    deserializeString( buffer, offset, lengthBytes ){
+
+        let length = 0;
+
+        if(lengthBytes===1){
+            length = this.deserializeNumber1Bytes( buffer, offset );
+            offset += 1;
+        }
+
+        if(lengthBytes===2){
+            length = this.deserializeNumber2Bytes( buffer, offset );
+            offset += 2;
+        }
+
+        let string = '';
+        for (let i=0; i<length; i++){
+            let character = this.deserializeNumber1Bytes( buffer, offset );
+            string += String.fromCharCode(character);
+            offset ++;
+        }
+
+        return {
+            data: string,
+            offset: offset
+        };
+
+    }
+
     deserializeNumber(buffer){
 
-        if(buffer.length === 1) return buffer[0]; else
+        if (buffer.length === 1) return buffer[0]; else
 
         if (buffer.length === 2) return buffer[1] | (buffer[0] << 8); else
 

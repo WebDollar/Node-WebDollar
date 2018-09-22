@@ -77,10 +77,24 @@ class Product {
                 return false;
             }
 
-            return({
-                resultStatus: await this.deserializeProduct(buffer),
-                result: this
-            });
+            let deserializedProduct = await this.deserializeProduct(buffer);
+
+            if( deserializedProduct ){
+
+                return({
+                    resultStatus: true,
+                    result: this
+                });
+
+            }
+            else{
+
+                return({
+                    resultStatus: false,
+                    result: this
+                });
+
+            }
 
         }
         catch(exception) {
@@ -114,46 +128,14 @@ class Product {
 
         let buffer = [];
 
-        //Serialize Title
-        let length = this.title.length;
-        buffer = Buffer.concat([Serialization.serializeNumber1Byte(length)]);
-
-        for (let i=0; i<length; i++){
-            let character = new Buffer(this.title[i],'ascii');
-            buffer = Buffer.concat([ new Buffer(buffer),character]);
-        }
-
-        //Serialize meta description
-        length = this.meta.length;
-        buffer = Buffer.concat([ new Buffer(buffer),Serialization.serializeNumber2Bytes(length)]);
-
-        for (let i=0; i<length; i++){
-            let character = new Buffer(this.meta[i],'ascii');
-            buffer = Buffer.concat([ new Buffer(buffer),character]);
-        }
-
-        //Serialize Image Url
-        length = this.imageURL.length;
-        buffer = Buffer.concat([ new Buffer(buffer),Serialization.serializeNumber2Bytes(length)]);
-
-        for (let i=0; i<length; i++){
-            let character = new Buffer(this.imageURL[i],'ascii');
-            buffer = Buffer.concat([ new Buffer(buffer),character]);
-        }
-
-        //Serialize Vendor P2P
-        length = this.vendorP2PAddress.length;
-        buffer = Buffer.concat([ new Buffer(buffer),Serialization.serializeNumber2Bytes(length)]);
-
-        for (let i=0; i<length; i++){
-            let character = new Buffer(this.vendorP2PAddress[i],'ascii');
-            buffer = Buffer.concat([ new Buffer(buffer),character]);
-        }
-
-        //Serialize tax proof
-        buffer =  Buffer.concat([ new Buffer(buffer), new Buffer( this.taxProof,"hex" )]);
+        //Serialize Strings
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.title, 1) ]);
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.meta, 2) ]);
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.imageURL, 2) ]);
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.vendorP2PAddress, 2) ]);
 
         //Serialize other data
+        buffer = Buffer.concat([ new Buffer(buffer), new Buffer( this.taxProof,"hex" )]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeNumber7Bytes( this.lastTimeAvaiable/10000 )]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeNumber1Byte ( this.status ? 1 : 0)]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeNumber7Bytes( this.price)]);
@@ -162,63 +144,33 @@ class Product {
 
     }
 
-    //TODO - Create String serialization & deserialization function for all following operations
     async deserializeProduct(buffer){
 
+        let offset = 0;
+        let result;
+
         //Deserialize title
-        let length = Serialization.deserializeNumber1Bytes( buffer, 0 );
-        let offset = 1;
-
-        let string = '';
-        for (let i=0; i<length; i++){
-            let character = Serialization.deserializeNumber1Bytes( buffer, offset );
-            string += String.fromCharCode(character);
-            offset += 1;
-        }
-
-        this.title = string;
+        result = Serialization.deserializeString( buffer, 0, 1);
+        this.title = result.data;
+        offset = result.offset;
 
         //Deserialize meta description
-        length = Serialization.deserializeNumber2Bytes( buffer, offset );
-        offset += 2;
-
-        string = '';
-        for (let i=0; i<length; i++){
-            let character = Serialization.deserializeNumber1Bytes( buffer, offset );
-            string += String.fromCharCode(character);
-            offset += 1;
-        }
-
-        this.meta = string.toString();
+        result = Serialization.deserializeString( buffer, offset, 2);
+        this.meta = result.data;
+        offset = result.offset;
 
         //Deserialize image URL
-        length = Serialization.deserializeNumber2Bytes( buffer, offset );
-        offset += 2;
-
-        string = '';
-        for (let i=0; i<length; i++){
-            let character = Serialization.deserializeNumber1Bytes( buffer, offset );
-            string += String.fromCharCode(character);
-            offset += 1;
-        }
-
-        this.imageURL = string.toString();
+        result = Serialization.deserializeString( buffer, offset, 2);
+        this.imageURL = result.data;
+        offset = result.offset;
 
         //Deserialize Vendor P2P
-        length = Serialization.deserializeNumber2Bytes( buffer, offset );
-        offset += 1;
-
-        string = '';
-        for (let i=0; i<length; i++){
-            let character = Serialization.deserializeNumber1Bytes( buffer, offset );
-            string += String.fromCharCode(character);
-            offset += 1;
-        }
-
-        this.vendorP2PAddress = string.toString();
+        result = Serialization.deserializeString( buffer, offset, 2);
+        this.vendorP2PAddress = result.data;
+        offset = result.offset;
 
         //Deserialize tax proof
-        this.taxProof = BufferExtended.substr(buffer, offset, 32);
+        this.taxProof = BufferExtended.substr(buffer, offset, 32).toString('hex');
         offset += 32;
 
         //Deserialize other data
