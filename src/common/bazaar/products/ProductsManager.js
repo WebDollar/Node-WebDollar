@@ -75,6 +75,7 @@ class ProductsManager {
             return false;
 
         }
+
     }
 
     async saveProductsListInDB(){

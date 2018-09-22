@@ -77,12 +77,9 @@ class Product {
                 return false;
             }
 
-            let product = undefined;
-            product = await this.deserializeProduct(buffer);
-
             return({
-                resultStatus: (product !== undefined || product !== null) ? true : false,
-                result: product
+                resultStatus: await this.deserializeProduct(buffer),
+                result: this
             });
 
         }
@@ -154,7 +151,7 @@ class Product {
         }
 
         //Serialize tax proof
-        buffer = new Buffer( this.taxProof,"hex" );
+        buffer =  Buffer.concat([ new Buffer(buffer), new Buffer( this.taxProof,"hex" )]);
 
         //Serialize other data
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeNumber7Bytes( this.lastTimeAvaiable/10000 )]);
@@ -234,7 +231,7 @@ class Product {
         this.price = Serialization.deserializeNumber7Bytes( buffer, offset );
         offset += 7;
 
-        return;
+        return true;
 
     }
 
