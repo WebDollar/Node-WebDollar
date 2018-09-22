@@ -92,6 +92,7 @@ class NodeExpress{
                         break;
                     }
 
+                if (privateKey === '' && cert === '' && caBundle === '') throw {message: "HTTPS server couldn't be started. Starting HTTP"};            
                 if (privateKey === '') throw {message: "HTTPS server couldn't be started because certificate private.key was not found"};
                 if (cert === '') throw {message: "HTTPS server couldn't be started because certificate certificate.crt was not found"};
                 if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};

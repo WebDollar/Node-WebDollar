@@ -24,7 +24,8 @@ class InterfaceBlockchainBlocks{
         this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
 
-        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
+            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
 
     }
 
@@ -120,20 +121,20 @@ class InterfaceBlockchainBlocks{
 
     recalculateNetworkHashRate(){
 
-        let MaxTarget = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+        let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
         let SumDiff = new BigNumber( 0 );
 
         let how_much_it_took_to_mine_X_Blocks = 0;
 
-        for (let i=this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; i<this.blockchain.blocks.endingPosition; i++) {
+        for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS); i<this.blockchain.blocks.endingPosition; i++) {
 
-            if (i < 0) continue;
             if (this.blockchain.blocks[i] === undefined) continue;
 
-            let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
-            SumDiff = SumDiff.plus(Diff);
+            let diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+            SumDiff = SumDiff.plus( diff );
 
             how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i+1) - this.blockchain.getTimeStamp(i);
+
         }
 
         let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
@@ -172,19 +173,21 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
-    freeAllBlocksTransactionsFromMemory(){
+    _freeAllBlocksTransactionsFromMemory(){
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
 
         try {
 
-            for (let i = 0; i < Math.max(0, Math.floor( this.length - 50000 ) ); i++)
+            for (let i = 0; i < Math.max(0, Math.floor( this.length - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER ) ); i++)
                 if (this[i] !== undefined)
                     this[i].data.transactions.freeTransactionsFromMemory();
 
         } catch (exception){
-            console.error("freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
+            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
         }
 
-        setTimeout( this.freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
 
     }
 

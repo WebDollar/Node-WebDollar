@@ -132,7 +132,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (forkFound !== null && forkFound !== fork) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
-                        forkFound.pushHeaders( fork.forkHeaders ); //this lead to a new fork
+                        forkFound.pushHeaders( fork.forkHeaders ); //this leads to a new fork
                         forkFound.pushSocket(socket, forkProof);
 
                         this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
@@ -252,7 +252,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (this.blockchain.agent.light)
                 if ([ "FORK is empty", "fork is something new",
                         "discoverAndProcessFork - fork already found by socket",
-                        "same proof, but your blockchain is smaller than mine", "Your proof is worst than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
+                        "same proof, but your blockchain is smaller than mine", "Your proof is worse than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
                     bIncludeBan = false;
 
             if (bIncludeBan) {
@@ -418,7 +418,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     await this.blockchain.sleep(15);
 
                 if (this.blockchain.blocks[block.height] !== undefined && block.hash.equals(this.blockchain.blocks[block.height].hash) )
-                    throw {message: "You gave me a block which I already have have the same block"};
+                    throw {message: "You gave me a block which I already have"};
 
                 let result;
 
@@ -439,7 +439,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (result){
 
                     if (nextBlockHeight % 10 === 0)
-                        console.log("Block " + nextBlockHeight + " successful downloaded!");
+                        console.log("Block " + nextBlockHeight + " successfully downloaded!");
 
                     nextBlockHeight++;
                 }

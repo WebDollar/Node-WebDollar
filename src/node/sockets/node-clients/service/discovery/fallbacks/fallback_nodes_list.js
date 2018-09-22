@@ -10,6 +10,9 @@ export default {
         //---------------------------------------------------------
 
         {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
+    
+        {"addr": ["https://ez.cnbacolt.com:443"]},
+        {"addr": ["https://server.cnbacolt.com:443"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
@@ -98,5 +101,11 @@ export default {
         {"addr": ["https://webdollar.csland.ro:8442"]}, // Thanks to @mariotheodor
         {"addr": ["https://webdollar.csland.ro:8443"]}, // Thanks to @mariotheodor
 
+    ],
+    
+    "nodes_testnet": [
+        {"addr": ["http://testnet1.hoste.ro:8000"]}, // Thanks to Dani Petreus
+        {"addr": ["http://testnet2.hoste.ro:8001"]}, // Thanks to Dani Petreus
+        {"addr": ["http://testnet2.hoste.ro:8002"]}, // Thanks to Dani Petreus
     ]
 }
