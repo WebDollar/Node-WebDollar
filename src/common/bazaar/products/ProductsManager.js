@@ -124,34 +124,77 @@ class ProductsManager {
 
     }
 
-    async createNewProduct(title,metaDescription,imageURL,price,vendorP2P,vendorSignature,status,description,contact,vendorAddress,taxProof){
+    async storeProduct( buffer ){
 
-        let newProduct = new singleProduct( this.db, title, metaDescription, imageURL,vendorSignature, price, vendorP2P, status, description, contact, vendorAddress, taxProof);
+        let newProduct = new singleProduct( this.db );
+        await newProduct.deserializeProduct( buffer, false );
 
-        let isDuplicate = ProductsValidation.isDuplicate( this.products, newProduct.hash );
-        let isValidProduct = ProductsValidation.validateProductFormat( newProduct );
+        return await this.processProduct( newProduct );
+
+    }
+
+    async createNewProduct(title,metaDescription,imageURL,price,vendorP2P,status,description,contact,vendorAddress,taxProof){
+
+        let newProduct = new singleProduct( this.db, title, metaDescription, imageURL, price, vendorP2P, status, description, contact, vendorAddress, taxProof);
+
+        return await this.processProduct( newProduct );
+
+    }
+
+    async processProduct( product ){
+
+        let isDuplicate = ProductsValidation.isDuplicate( this.products, product.hash );
+        let isValidProduct = ProductsValidation.validateProductFormat( product );
 
         if( isDuplicate.result ){
 
             console.error( isDuplicate.message );
+            return false;
 
         }
         else {
 
             if ( isValidProduct.result ) {
 
-                let saveResult = await newProduct.saveProduct();
+                let saveResult = await product.saveProduct();
 
                 if ( saveResult.resultStatus ){
 
-                    this.products.push( newProduct );
+                    this.products.push( product );
                     this.saveProductsListInDB();
+                    return true;
+
+                }else{
+
+                    console.error( "Save did not succeed" );
+                    return false;
 
                 }
 
             }else{
 
                 console.error( isValidProduct.message );
+                return false;
+
+            }
+
+        }
+
+    }
+
+    //TODO - Activate the products cleaner
+    async deleteOldProducts() {
+
+        for (let i = 0; i < this.products.length; i++) {
+
+            let currentdate = new Date();
+
+            if (this.products[i].lastTimeAvaiable + consts.BAZAAR.PRODUCTS_PURGE_INTERVAL >= currentdate) {
+
+                let deleteResponse = await this.products[i].removeProduct();
+
+                if( typeof deleteResponse !== "string" )
+                    this.products[i].splice(i, 1);
 
             }
 
