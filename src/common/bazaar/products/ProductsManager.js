@@ -16,17 +16,6 @@ class ProductsManager {
 
     }
 
-    serializeProductsHashesList(){
-
-        let buffer = [];
-
-        for( let i=0; i<this.products.length; i++ )
-            buffer = Buffer.concat([ new Buffer(buffer), new Buffer(this.products[i].hash,"hex") ]);
-
-        return buffer;
-
-    }
-
     async loadAllProducts(){
 
         let buffer = await this.loadProductsListFromDB();
@@ -114,6 +103,17 @@ class ProductsManager {
 
     }
 
+    serializeProductsHashesList(){
+
+        let buffer = [];
+
+        for( let i=0; i<this.products.length; i++ )
+            buffer = Buffer.concat([ new Buffer(buffer), new Buffer(this.products[i].hash,"hex") ]);
+
+        return buffer;
+
+    }
+
     async getProductByHash(hash){
 
         for(let i=0; i<this.products.length; i++)
@@ -124,9 +124,9 @@ class ProductsManager {
 
     }
 
-    async createNewProduct(title,metaDescription,description,price,imageURL,contact,vendorAddress,vendorP2P,status,taxProof){
+    async createNewProduct(title,metaDescription,imageURL,price,vendorP2P,vendorSignature,status,description,contact,vendorAddress,taxProof){
 
-        let newProduct = new singleProduct(this.db,title,metaDescription,description,price,imageURL,contact,vendorAddress,vendorP2P,status,taxProof);
+        let newProduct = new singleProduct( this.db, title, metaDescription, imageURL,vendorSignature, price, vendorP2P, status, description, contact, vendorAddress, taxProof);
 
         let isDuplicate = ProductsValidation.isDuplicate( this.products, newProduct.hash );
         let isValidProduct = ProductsValidation.validateProductFormat( newProduct );
@@ -142,8 +142,12 @@ class ProductsManager {
 
                 let saveResult = await newProduct.saveProduct();
 
-                if ( saveResult.resultStatus )
+                if ( saveResult.resultStatus ){
+
                     this.products.push( newProduct );
+                    this.saveProductsListInDB();
+
+                }
 
             }else{
 

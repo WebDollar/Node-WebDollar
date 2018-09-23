@@ -4,25 +4,31 @@ import BufferExtended from "common/utils/BufferExtended";
 
 class Product {
 
-    constructor(db,title='',metaDescription='',description='',price=0,imageURL='',contact='',vendorAddress='',vendorP2P='',status=false, taxProof) {
+    constructor(db,title='',metaDescription='', imageURL='', price=0, vendorSignature, vendorP2P='',status=false ,description='', contact='', vendorAddress='', taxProof) {
 
         //Data stored in the whole network
         this.db = db;
         this.title = title;
-        this.meta = metaDescription;
+        this.meta = metaDescription; // Product short description
         this.price = price;
-        this.imageURL = imageURL;
-        this.status = status;
-        this.lastTimeAvaiable = new Date().getTime();
-        this.vendorP2PAddress = vendorP2P;
-        this.taxProof = taxProof;
+        this.imageURL = imageURL; // Product image url
+        this.status = status; // If vendor is avaiable or not
+        this.lastTimeAvaiable = new Date().getTime(); // When the product wass added
+        this.vendorP2PAddress = vendorP2P; // Where buyer should connect p2p
+        this.taxProof = taxProof; // Transaction tax for being able to propagate product
 
         //Data stored only at vendor
-        this.description = description;
-        this.contact = contact;
-        this.vendorAddress = vendorAddress;
+        this.description = description; // Product full description
+        this.contact = contact; // Vendor contact
+        this.vendorSignature = vendorSignature; // Digital Signature from the provider
 
-        this.hash = WebDollarCrypto.SHA256(
+        this.hash = this.getProductHash();
+
+    }
+
+    getProductHash(){
+
+        return WebDollarCrypto.SHA256(
             Buffer.concat ([
                 Buffer.from(this.title, "ascii"),
                 Buffer.from(this.meta, "ascii"),
@@ -133,6 +139,8 @@ class Product {
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.meta, 2) ]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.imageURL, 2) ]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.vendorP2PAddress, 2) ]);
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.description, 2) ]);
+        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.contact, 1) ]);
 
         //Serialize other data
         buffer = Buffer.concat([ new Buffer(buffer), new Buffer( this.taxProof,"hex" )]);
@@ -167,6 +175,16 @@ class Product {
         //Deserialize Vendor P2P
         result = Serialization.deserializeString( buffer, offset, 2);
         this.vendorP2PAddress = result.data;
+        offset = result.offset;
+
+        //Deserialize Vendor P2P
+        result = Serialization.deserializeString( buffer, offset, 2);
+        this.description = result.data;
+        offset = result.offset;
+
+        //Deserialize Vendor P2P
+        result = Serialization.deserializeString( buffer, offset, 1);
+        this.contact = result.data;
         offset = result.offset;
 
         //Deserialize tax proof
