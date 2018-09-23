@@ -4,7 +4,7 @@ import BufferExtended from "common/utils/BufferExtended";
 
 class Product {
 
-    constructor(db,title='',metaDescription='', imageURL='', price=0, vendorSignature, vendorP2P='',status=false ,description='', contact='', vendorAddress='', taxProof) {
+    constructor(db,title='',metaDescription='', imageURL='', price=0, vendorP2P='',status=false ,description='', contact='', vendorAddress='', taxProof='') {
 
         //Data stored in the whole network
         this.db = db;
@@ -68,7 +68,12 @@ class Product {
 
     }
 
-    //TODO If product is expired don't include it back.
+    /**
+     * This will load a product from DB
+     * @param fullSerialisation - If will return serialisation for the whole product (used only for vendors) or only the sharable datas
+     * @returns { ResultStatus: Boolean, Result: Product }
+     */
+    //TODO If product is expired remove it.
     async loadProduct(){
 
         let key = "product-" + this.hash;
@@ -108,13 +113,16 @@ class Product {
         }
     }
 
+    /**
+     * This will delete the product from DB
+     */
     async removeProduct() {
 
         let key = "product-" + this.hash;
 
         try{
 
-            return (await this.db.remove(key));
+            return ( await this.db.remove(key) );
 
         }
         catch(exception) {
@@ -129,7 +137,11 @@ class Product {
     //
     // }
 
-    async serializeProduct(){
+    /**
+     * This will serialize the product
+     * @param fullSerialisation - If will return serialisation for the whole product (used only for vendors) or only the sharable datas
+     */
+    async serializeProduct( fullSerialisation=true ){
 
         let buffer = [];
 
@@ -138,8 +150,13 @@ class Product {
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.meta, 2) ]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.imageURL, 2) ]);
         buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.vendorP2PAddress, 2) ]);
-        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.description, 2) ]);
-        buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.contact, 1) ]);
+
+        if(fullSerialisation){
+
+            buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.description, 2) ]);
+            buffer = Buffer.concat([ new Buffer(buffer), Serialization.serializeString(this.contact, 1) ]);
+
+        }
 
         //Serialize other data
         buffer = Buffer.concat([ new Buffer(buffer), new Buffer( this.taxProof,"hex" )]);
@@ -151,7 +168,7 @@ class Product {
 
     }
 
-    async deserializeProduct(buffer){
+    async deserializeProduct( buffer, fullSerialisation=true ){
 
         let offset = 0;
         let result;
@@ -176,15 +193,19 @@ class Product {
         this.vendorP2PAddress = result.data;
         offset = result.offset;
 
-        //Deserialize Vendor P2P
-        result = Serialization.deserializeString( buffer, offset, 2);
-        this.description = result.data;
-        offset = result.offset;
+        if(fullSerialisation){
 
-        //Deserialize Vendor P2P
-        result = Serialization.deserializeString( buffer, offset, 1);
-        this.contact = result.data;
-        offset = result.offset;
+            //Deserialize Full Description
+            result = Serialization.deserializeString( buffer, offset, 2);
+            this.description = result.data;
+            offset = result.offset;
+
+            //Deserialize Contact
+            result = Serialization.deserializeString( buffer, offset, 1);
+            this.contact = result.data;
+            offset = result.offset;
+
+        }
 
         //Deserialize tax proof
         this.taxProof = BufferExtended.substr(buffer, offset, 32).toString('hex');
