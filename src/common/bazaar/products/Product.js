@@ -20,7 +20,6 @@ class Product {
         //Data stored only at vendor
         this.description = description; // Product full description
         this.contact = contact; // Vendor contact
-        this.vendorSignature = vendorSignature; // Digital Signature from the provider
 
         this.hash = this.getProductHash();
 
