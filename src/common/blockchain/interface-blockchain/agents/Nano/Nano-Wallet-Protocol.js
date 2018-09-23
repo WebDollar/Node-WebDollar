@@ -252,7 +252,7 @@ class NanoWalletProtocol{
 
             while (trials > 0 ){
 
-                let answer = await socket.node.sendRequest("api/subscribe/address/transactions", { address: address  });
+                let answer = await socket.node.sendRequestWaitOnce("api/subscribe/address/transactions", { address: address  }, undefined, 5000 );
 
                 if (typeof answer === "object" && answer !== null && answer.result){
                     resolve(true);
