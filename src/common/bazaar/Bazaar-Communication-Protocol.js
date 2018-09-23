@@ -1,28 +1,57 @@
-import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import consts from 'consts/const_global';
+import ProductsManager from "common/bazaar/products/ProductsManager";
 
 class BazaarCommunicationProtocol{
 
     constructor(){
 
-        let db = new InterfaceSatoshminDB();
-        let products = [];
+        this.lastSearchResults = []
 
     }
 
-    initializeBazaar(){
+    openBazaar(socket){
 
-        socket.node.on("bazaar/addNewProduct", response =>{
+        //----------------------
+        //-------Product--------
+        //----------------------
 
-            this.addProduct(response.product)
+        socket.node.on("bazaar/newProductHash", async (response) =>{
+
+           await this.processNewProductHash( response.hash, socket )
+
+        });
+
+        socket.node.on("bazaar/getProduct", async (response) =>{
+
+            await this.sendProductByHash( response.hash, socket );
 
         });
 
-        socket.node.on("bazaar/searchProduct", response =>{
+        socket.node.on("bazaar/getProductResponse", async (response) =>{
 
-            this.searchProduct(response.product)
+            await this.processNewProduct( response.buffer );
 
         });
+
+        //---------------------
+        //-------Search--------
+        //---------------------
+
+        socket.node.on("bazaar/searchProduct", async (response) =>{
+
+            await this.searchProduct( response.keyword, socket )
+
+        });
+
+        socket.node.on("bazaar/searchProductResponse", async (response) =>{
+
+            await this.processSearchResult( response.buffer );
+
+        });
+
+        //---------------------------
+        //-------VendorStatus--------
+        //---------------------------
 
         socket.node.on("bazaar/vendorConnected", response =>{
 
@@ -38,110 +67,91 @@ class BazaarCommunicationProtocol{
 
     }
 
+    processNewProductHash( hash, socket ){
+
+        let product = ProductsManager.getProductByHash( hash );
+
+        if(!product)
+            socket.node.sendRequest("bazaar/getProduct", { hash: hash });
+
+    }
+
+    sendProductByHash( hash, socket ){
+
+        let product = ProductsManager.getProductByHash( hash );
+
+        if(product)
+            socket.node.sendRequest("bazaar/sendProduct", { buffer: product.serializeProduct(false) });
+
+    }
+
+    async processNewProduct(newProduct){
+
+        let storeResult = await ProductsManager.storeProduct( newProduct );
+
+        if(storeResult.resultStatus)
+            this.propagateToTheNetword("bazaar/newProductHash",{ hash: storeResult.result.hash });
+
+    }
+
+    searchProduct( keyword, socket ){
+
+        let searchResult = ProductsManager.searchProductByKey( keyword );
+
+        if(!searchResult.resultStatus)
+            socket.node.sendRequest("bazaar/searchProductResponse", { buffer: false });
+        else
+            socket.node.sendRequest("bazaar/searchProductResponse", { buffer: searchResult.result });
+
+    }
+
+    processSearchResult( buffer ){
+
+        if(!buffer)
+            this.lastSearchResults = [];
+        else
+            this.lastSearchResults = ProductsManager.deserializeSearchResult( buffer );
+
+    }
+
     propagateToTheNetword(type,data){
 
-        //To DO send to all connected sockets
+        //TODO send to all connected sockets
         socket.node.sendRequest(type, data);
 
     }
 
-    async addProduct(newProduct){
-
-        if( this.verifyProduct(newProduct) ){
-
-            let serializedProduct;
-            let productID;
-
-            try{
-
-                serializedProduct = this.serializeProduct(newProduct);
-                let response = await db.save("Product-"+productID, serializedProduct);
-                this.products.push(newProduct);
-
-            }catch(exc){
-
-                throw {message: "Error while saving Product to DB"};
-
-            }
-
-            this.propagateToTheNetword("bazaar/addNewProduct",{ product: serializedProduct, id: productID });
-
-        }
-
-    }
-
-    async searchProduct(keyWord){
-
-        let resuls = [];
-
-        for(var i=0; i<=this.products.length; i++){
-
-            let foundItem = {};
-
-            if(this.products[i].title.includes(keyWord)){
-                foundItem.foundInTitle=true;
-                foundItem.product=this.products[i];
-                resuls.push(foundItem);
-            }
-
-            if(this.products[i].meta.includes(keyWord)){
-                foundItem.foundInTitle=false;
-                foundItem.product=this.products[i];
-                resuls.push(foundItem);
-            }
-
-        }
-
-        return resuls;
-
-    }
-
-    async vendorConnected(vendorAddress){
-
-        for(var i=0; i<=this.products.length; i++){
-
-            if(this.products[i].vendorAddress === vendorAddress){
-
-                this.products[i].status=true;
-                this.propagateToTheNetword("bazaar/vendorConnected",{ vendorAddress: vendorAddress });
-
-            }
-
-        }
-
-    }
-
-    async vendorDisconnected(vendorAddress){
-
-        for(var i=0; i<=this.products.length; i++){
-
-            if(this.products[i].vendorAddress === vendorAddress){
-
-                this.products[i].status=false;
-                this.products[i].lastTimeAvaiable=new Date();
-
-                this.propagateToTheNetword("bazaar/vendorDisconnected",{ vendorAddress: vendorAddress });
-
-            }
-
-        }
-
-    }
-
-    deleteOldProducts(){
-
-        for(var i=0; i<=this.products.length; i++) {
-
-            let currentdate = new Date();
-
-            if ( this.products[i].lastTimeAvaiable + consts.BAZAAR.PRODUCTS_PURGE_INTERVAL >= currentdate ) {
-
-                this.products[i].splice(i,1);
-                // Remove from DB
-
-            }
-
-    }
+    // async vendorConnected(vendorAddress){
+    //
+    //     for(var i=0; i<=this.products.length; i++){
+    //
+    //         if(this.products[i].vendorAddress === vendorAddress){
+    //
+    //             this.products[i].status=true;
+    //             this.propagateToTheNetword("bazaar/vendorConnected",{ vendorAddress: vendorAddress });
+    //
+    //         }
+    //
+    //     }
+    //
+    // }
+    //
+    // async vendorDisconnected(vendorAddress){
+    //
+    //     for(var i=0; i<=this.products.length; i++){
+    //
+    //         if(this.products[i].vendorAddress === vendorAddress){
+    //
+    //             this.products[i].status=false;
+    //             this.products[i].lastTimeAvaiable=new Date();
+    //
+    //             this.propagateToTheNetword("bazaar/vendorDisconnected",{ vendorAddress: vendorAddress });
+    //
+    //         }
+    //
+    //     }
+    //
+    // }
 
 }
 

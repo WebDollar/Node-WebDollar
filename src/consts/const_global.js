@@ -222,7 +222,8 @@ consts.MINING_POOL_TYPE = {
 
 consts.BAZAAR = {
 
-    PRODUCTS_PURGE_INTERVAL: 1000*60*60*24*3 //3 days
+    PRODUCTS_PURGE_INTERVAL: 1000*60*60*24*3, //3 days
+    MAXIMUM_SEARCH_RESULTS: 20 // Never set it more than 255
 
 }
 

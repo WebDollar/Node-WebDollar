@@ -4,7 +4,7 @@ import BufferExtended from "common/utils/BufferExtended";
 
 class Product {
 
-    constructor(db,title='',metaDescription='', imageURL='', price=0, vendorP2P='',status=false ,description='', contact='', vendorAddress='', taxProof='') {
+    constructor(db='',title='',metaDescription='', imageURL='', price=0, vendorP2P='',status=false ,description='', contact='', vendorAddress='', taxProof='') {
 
         //Data stored in the whole network
         this.db = db;
@@ -141,7 +141,7 @@ class Product {
      * This will serialize the product
      * @param fullSerialisation - If will return serialisation for the whole product (used only for vendors) or only the sharable datas
      */
-    async serializeProduct( fullSerialisation=true ){
+    serializeProduct( fullSerialisation=true ){
 
         let buffer = [];
 
@@ -168,7 +168,7 @@ class Product {
 
     }
 
-    async deserializeProduct( buffer, fullSerialisation=true ){
+    deserializeProduct( buffer, fullSerialisation=true, offset ){
 
         let offset = 0;
         let result;
