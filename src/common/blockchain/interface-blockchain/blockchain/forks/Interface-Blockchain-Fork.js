@@ -234,7 +234,7 @@ class InterfaceBlockchainFork {
 
             //calculating the virtualization of the POS
             if (height % 30 === 0) height = height - 10;  //first POS, get the last proof of Stake
-            if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
+            else if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
 
             forkHeight = height - this.forkStartingHeight;
         }
