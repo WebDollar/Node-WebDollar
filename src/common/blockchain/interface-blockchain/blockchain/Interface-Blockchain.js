@@ -182,28 +182,24 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     getBlock(height){
-        if (height === undefined)
-            height = this.blocks.length;
 
-        if (height <= 0)
-            return BlockchainGenesis;
-        else{
-            if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
-            if (this.blocks[height-1] === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+        if (height === undefined) height = this.blocks.length;
 
-            return this.blocks[height-1];
-        }
+        if (height <= 0) return BlockchainGenesis;
+
+        if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
+        if (this.blocks[height-1] === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+
+        return this.blocks[height-1];
 
     }
 
     getDifficultyTarget(height){
 
-        if (height === undefined)
-            height = this.blocks.length;
+        if (height === undefined) height = this.blocks.length;
 
-        if (height <= 0)
-            return BlockchainGenesis.difficultyTarget;
-        else
+        if (height <= 0) return BlockchainGenesis.difficultyTarget;
+
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
             if (height % 30 === 0 && height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
@@ -228,16 +224,16 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     getTimeStamp(height){
+
         if (height === undefined) height = this.blocks.length;
 
-        if (height <= 0)
-            return BlockchainGenesis.timeStamp;
-        else{
-            if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
-            if (this.blocks[height-1] === undefined) throw {message: "getTimeStamp invalid height ", height: height};
+        if (height <= 0) return BlockchainGenesis.timeStamp;
 
-            return this.blocks[height-1].timeStamp;
-        }
+        if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
+        if (this.blocks[height-1] === undefined) throw {message: "getTimeStamp invalid height ", height: height};
+
+        return this.blocks[height-1].timeStamp;
+
     }
 
     getHashPrev(height){

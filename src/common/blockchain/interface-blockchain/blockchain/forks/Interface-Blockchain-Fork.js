@@ -203,15 +203,31 @@ class InterfaceBlockchainFork {
         return true;
     }
 
-    _getForkInformation(height, callback, propertyName){
+    getForkBlock(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (height <= 0)
+            return BlockchainGenesis; // based on genesis block
+
+        if ( forkHeight === 0) return this.blockchain.getBlock(height);
+
+        if ( forkHeight > 0) return this.forkBlocks[forkHeight - 1]; // just the fork
+        return this.blockchain.getBlock(height) // the blockchain
+
+    }
+
+    // return the difficultly target for ForkBlock
+    getForkDifficultyTarget(height){
+
 
         let forkHeight = height - this.forkStartingHeight;
 
         if (height === 0) return BlockchainGenesis.difficultyTarget; // based on genesis block
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return callback(height);
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
 
-        if ( forkHeight === 0 )
-            return callback(height);
+        if ( forkHeight === 0)
+            return this.blockchain.getDifficultyTarget(height);
 
         let heightPrePOS = height;
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
@@ -221,7 +237,6 @@ class InterfaceBlockchainFork {
             if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
 
             forkHeight = height - this.forkStartingHeight;
-
         }
 
 
@@ -230,38 +245,35 @@ class InterfaceBlockchainFork {
             if ( forkHeight - 1 >= this.forkBlocks.length )
                 Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
-            if ( !propertyName )
-                return this.forkBlocks[forkHeight - 1]; // just the fork
-            else
-                return this.forkBlocks[forkHeight - 1][propertyName]; // just the fork
+            return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
         }
 
-        return callback(heightPrePOS); // the blockchain
-    }
-
-    getForkBlock(height){
-
-        return this._getForkInformation(height, this.blockchain.getBlock(height).bind(this.blockchain), undefined )
-
-    }
-
-    // return the difficultly target for ForkBlock
-    getForkDifficultyTarget(height){
-
-        return  this._getForkInformation( height, this.blockchain.getDifficultyTarget.bind(this.blockchain), 'difficultyTarget');
+        return this.blockchain.getDifficultyTarget(heightPrePOS) // the blockchain
 
     }
 
     getForkTimeStamp(height){
 
-        return this._getForkInformation(height, this.blockchain.getTimeStamp.bind(this.blockchain), "timeStamp");
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (height === 0) return BlockchainGenesis.timeStamp; // based on genesis block
+
+        if ( forkHeight === 0) return this.blockchain.getTimeStamp(height); // based on previous block from blockchain
+        if ( forkHeight > 0) return this.forkBlocks[forkHeight - 1].timeStamp; // just the fork
+
+        return this.blockchain.getTimeStamp(height) // the blockchain
 
     }
 
     getForkPrevHash(height){
+        let forkHeight = height - this.forkStartingHeight;
 
-        return this._getForkInformation(height, this.blockchain.getHashPrev.bind(this.blockchain), "hash");
+        if (height === 0) return BlockchainGenesis.hashPrev; // based on genesis block
 
+        if ( forkHeight === 0) return this.blockchain.getHashPrev(height); // based on previous block from blockchain
+        if ( forkHeight > 0) return this.forkBlocks[forkHeight - 1].hash; // just the fork
+
+        return this.blockchain.getHashPrev(height) // the blockchain
     }
 
     _createBlockValidation_ForkValidation(height, forkHeight){
