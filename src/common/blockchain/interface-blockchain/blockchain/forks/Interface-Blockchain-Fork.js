@@ -208,7 +208,7 @@ class InterfaceBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (height === 0) return BlockchainGenesis.difficultyTarget; // based on genesis block
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return callback(height);
 
         if ( forkHeight === 0 )
             return callback(height);
