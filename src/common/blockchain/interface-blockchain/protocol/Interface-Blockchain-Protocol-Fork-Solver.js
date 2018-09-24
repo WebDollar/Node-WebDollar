@@ -37,7 +37,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (left >= right) {
 
                 //it the block actually is the same
-                if (answer.hash.equals( this.blockchain.getHashBlock( mid ) ) )
+                if (answer.hash.equals( this.blockchain.getHashBlock( mid + 1 ) ) )
                     return {position: mid, header: answer.hash };
                 else {
 
@@ -49,7 +49,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         if (answer === null || !Buffer.isBuffer(answer.hash))
                             return {position: null, header: answer }; // timeout
 
-                        if (answer.hash.equals( this.blockchain.getHashBlock(mid-1 ) ) ) // it is a match
+                        if (answer.hash.equals( this.blockchain.getHashBlock(mid -1 + 1 ) ) ) // it is a match
                             return {position: mid-1, header: answer.hash };
 
                     }
@@ -60,7 +60,7 @@ class InterfaceBlockchainProtocolForkSolver{
             }
 
             //was not not found, search left because it must be there
-            if (! answer.hash.equals( this.blockchain.getHashBlock(mid)  ) )
+            if (! answer.hash.equals( this.blockchain.getHashBlock(mid + 1)  ) )
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there

@@ -136,6 +136,7 @@ class InterfaceBlockchainBlocks{
 
         }
 
+        console.log("how_much_it_took_to_mine_X_Blocks", how_much_it_took_to_mine_X_Blocks);
         let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toFixed(15);
         answer = parseFloat(answer);
 
