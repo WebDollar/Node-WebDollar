@@ -222,39 +222,36 @@ class InterfaceBlockchainFork {
 
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height === 0)
-            return BlockchainGenesis.difficultyTarget; // based on genesis block
-
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
-            return BlockchainGenesis.difficultyTargetPOS;
+        if (height === 0) return BlockchainGenesis.difficultyTarget; // based on genesis block
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
 
         if ( forkHeight === 0)
             return this.blockchain.getDifficultyTarget(height);
 
+        let heightPrePOS = height;
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
 
             //calculating the virtualization of the POS
+            if (height % 30 === 0) height = height - 10;  //first POS, get the last proof of Stake
+            if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
 
-            let heightPOS = height;
-
-            if (heightPOS % 30 === 0 && heightPOS === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
-            else if (heightPOS % 30 === 0) heightPOS = heightPOS - 10;  //first POS, get the last proof of Stake
-            else if (heightPOS % 30 === 20) heightPOS = heightPOS - 20; //first POW, get the last proof of Work
-
-            let forkHeightPOS = heightPOS - this.forkStartingHeight;
-
-            if ( forkHeightPOS > 0) {
-
-                if ( forkHeightPOS - 1 >= this.forkBlocks.length )
-                    Log.warn("getForkDifficultyTarget FAILED: "+  forkHeightPOS, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
-
-                return this.forkBlocks[forkHeightPOS - 1].difficultyTarget; // just the fork
-            }
-
+            forkHeight = height - this.forkStartingHeight;
         }
 
 
-        return this.blockchain.getDifficultyTarget(height) // the blockchain
+        if ( forkHeight > 0) {
+
+            if ( forkHeight - 1 >= this.forkBlocks.length )
+                Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+
+            return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
+        } else {
+            height = heightPrePOS;
+            forkHeight = height - this.forkStartingHeight;
+        }
+
+
+        return this.blockchain.getDifficultyTarget(heightPrePOS) // the blockchain
 
     }
 
