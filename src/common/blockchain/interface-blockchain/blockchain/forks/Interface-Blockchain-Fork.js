@@ -234,7 +234,7 @@ class InterfaceBlockchainFork {
 
         }
 
-        let forkHeight = height - this.forkStartingHeight;
+        forkHeight = height - this.forkStartingHeight;
 
         if ( forkHeight > 0) {
 
