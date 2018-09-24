@@ -164,7 +164,7 @@ class InterfaceBlockchainProtocol {
                     let block = this.blockchain.blocks[h];
                     if (block === undefined) socket.node.sendRequest("head/hash", null);
 
-                    socket.node.sendRequest("head/hash/" + h, {hash: block.hash});
+                    socket.node.sendRequest("head/hash/" + h, {hash: block.blockHash});
 
                 } catch (exception){
 

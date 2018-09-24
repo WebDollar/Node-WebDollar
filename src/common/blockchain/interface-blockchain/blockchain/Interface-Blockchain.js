@@ -255,6 +255,22 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
+    getHashBlock(height){
+
+        if (height === undefined) height = this.blocks.length;
+
+        if (height <= 0)
+            return BlockchainGenesis.hashPrev;
+        else {
+
+            if (height > this.blocks.length ) throw {message: "getHashBlock invalid height", height: height}; else
+            if (this.blocks[height] === undefined) throw {message: "getHashBlock invalid height", height: height};
+
+            return this.blocks[height].blockHash;
+        }
+    }
+
+
     async saveNewBlock(block, saveLength = false){
 
         if (process.env.BROWSER)

@@ -240,15 +240,14 @@ class InterfaceBlockchainBlock {
 
         //in case I have calculated  the computedBlockPrefix before
 
-
         return Buffer.concat ( [
-                                                     Serialization.serializeNumber2Bytes( this.version),
-                                                     Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
-                                                     Serialization.serializeNumber4Bytes( this.timeStamp ),
-                                                     //data contains addressMiner, transactions history, contracts, etc
-                                                     this.data.serializeData(requestHeader),
+                                  Serialization.serializeNumber2Bytes( this.version),
+                                  Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
+                                  Serialization.serializeNumber4Bytes( this.timeStamp ),
+                                  //data contains addressMiner, transactions history, contracts, etc
+                                  this.data.serializeData(requestHeader),
 
-                                                    ]);
+                               ]);
     }
 
 
@@ -531,6 +530,10 @@ class InterfaceBlockchainBlock {
 
         return this._workDone;
 
+    }
+
+    get blockHash(){
+        return this.hash;
     }
 
 }

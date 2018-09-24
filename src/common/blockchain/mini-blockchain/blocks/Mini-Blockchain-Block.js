@@ -231,6 +231,13 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             return inheritBlockchainBlock.prototype._deserializeBlock.call(this, buffer, offset);
     }
 
+    get blockHash(){
+        if (BlockchainGenesis.isPoSActivated(this.height))
+            return WebDollarCrypto.SHA256(this._computeBlockHeaderPrefix());
+        else
+            return this.hash;
+    }
+
 }
 
 export default MiniBlockchainBlock
