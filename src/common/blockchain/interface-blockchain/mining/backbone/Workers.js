@@ -185,7 +185,7 @@ class Workers {
             this.block = Buffer.concat([
                 Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.block.height)),
                 Serialization.serializeBufferRemovingLeadingZeros(this.block.difficultyTargetPrev),
-                this.block.computedBlockPrefix,
+                this.block._computeBlockHeaderPrefix(),
             ]) ;
 
         }

@@ -67,7 +67,6 @@ class InterfaceBlockchainBlock {
 
         
         //computed data
-        this.computedBlockPrefix = undefined;
         this.computedSerialization = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
@@ -164,14 +163,11 @@ class InterfaceBlockchainBlock {
         //skip the validation, if the blockValidationType is provided
         if (!this.blockValidation.blockValidationType['skip-validation-PoW-hash']) {
 
-            if (this.computedBlockPrefix === undefined)
-                this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
-
             let hash = await this.computeHash();
 
             if (! BufferExtended.safeCompare(hash, this.hash))
                 throw {message: "block hash is not right", nonce: this.nonce, height: this.height, myHash:this.hash.toString("hex"), hash:hash.toString("hex"),
-                       difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this.computedBlockPrefix, Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
+                       difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this._computeBlockHeaderPrefix(), Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
 
         }
 
@@ -244,10 +240,8 @@ class InterfaceBlockchainBlock {
 
         //in case I have calculated  the computedBlockPrefix before
 
-        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
-            return this.computedBlockPrefix;
 
-        this.computedBlockPrefix = Buffer.concat ( [
+        return Buffer.concat ( [
                                                      Serialization.serializeNumber2Bytes( this.version),
                                                      Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
                                                      Serialization.serializeNumber4Bytes( this.timeStamp ),
@@ -255,8 +249,6 @@ class InterfaceBlockchainBlock {
                                                      this.data.serializeData(requestHeader),
 
                                                     ]);
-
-        return this.computedBlockPrefix;
     }
 
 
@@ -275,7 +267,7 @@ class InterfaceBlockchainBlock {
         return Buffer.concat([
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
             Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev),
-            this.computedBlockPrefix,
+            this._computeBlockHeaderPrefix(),
             Serialization.serializeNumber4Bytes(newNonce || this.nonce),
         ]);
     }
@@ -285,8 +277,6 @@ class InterfaceBlockchainBlock {
         try {
 
             // hash is hashPow ( block header + nonce )
-            if (this.computedBlockPrefix === undefined)
-                return this._computeBlockHeaderPrefix();
 
             return await WebDollarCrypto.hashPOW( this._getHashPOWData(newNonce) );
 
@@ -324,7 +314,7 @@ class InterfaceBlockchainBlock {
 
             this.hash,
             Serialization.serializeNumber4Bytes( this.nonce ),
-            this.computedBlockPrefix,
+            this._computeBlockHeaderPrefix(),
 
         ]);
 

@@ -121,15 +121,11 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _signPOSSignature(){
 
-        if (this.computedBlockPrefix === null)
-            this._computeBlockHeaderPrefix();
-
-        let data = this.computedBlockPrefix;
-
         let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.posMinerAddress || this.data.minerAddress } );
 
         if (address === null) throw {message: "Can not sign POS because the address doesn't exist in your wallet"};
 
+        let data = this._computeBlockHeaderPrefix();
         let answer = await address.signMessage ( data, undefined, true );
 
         //storing the publicKey
@@ -151,14 +147,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.posMinerAddress))
                 throw { message: "posPublicKey doesn't match with the posMinerAddress" };
 
-        if (this.computedBlockPrefix === null)
-            this._computeBlockHeaderPrefix();
-
-        let data = this.computedBlockPrefix;
+        let data = this._computeBlockHeaderPrefix();
 
         let answer = await ed25519.verify( this.posSignature, data , this.posMinerPublicKey );
 
-        if (!answer) throw {message: "POS Signature is invalid"};
+        if (!answer)
+            throw {message: "POS Signature is invalid"};
 
         return true;
 
@@ -199,7 +193,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             }
 
-            buffers.push(this.computedBlockPrefix);
+            buffers.push(this._computeBlockHeaderPrefix());
 
             return Buffer.concat(buffers);
 

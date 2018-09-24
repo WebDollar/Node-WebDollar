@@ -30,11 +30,11 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     mine (block, difficultyTarget, start, end, height){
 
         //serialize the block
-        if ( !Buffer.isBuffer( block ) && typeof block === 'object' && block.computedBlockPrefix !== undefined) {
+        if ( !Buffer.isBuffer( block ) && typeof block === 'object' ) {
             block = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( block.difficultyTargetPrev ),
-                block.computedBlockPrefix
+                this._computeBlockHeaderPrefix()
             ]);
         }
 

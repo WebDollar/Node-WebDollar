@@ -188,6 +188,11 @@ class InterfaceBlockchainFork {
         if (block.height < this.forkStartingHeight) throw {message: 'block height is smaller than the fork itself', blockHeight: block.height, forkStartingHeight:this.forkStartingHeight };
         if (block.height !== height) throw {message:"block height is different than block's height", blockHeight: block.height, height:height};
 
+
+        //if it is a POS block, I can't validate the block
+        if (BlockchainGenesis.isPoSActivated(block.height))
+            block.blockValidation.blockValidationType["skip-validation-PoW-hash"] = true;
+
         let result = await this.blockchain.validateBlockchainBlock( block );
 
         return result;

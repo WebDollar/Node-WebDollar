@@ -152,15 +152,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
     _computeBlockHeaderPrefix(skipPrefix, requestHeader){
 
-        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
-            return this.computedBlockPrefix;
-
-        this.computedBlockPrefix = Buffer.concat ( [
+        return Buffer.concat ( [
             InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false, requestHeader),
             this._serializeInterlink(),
         ]);
-
-        return this.computedBlockPrefix;
 
     }
 

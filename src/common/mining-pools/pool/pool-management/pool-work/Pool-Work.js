@@ -59,14 +59,10 @@ class PoolWork {
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
 
-
-            if (this.lastBlock.computedBlockPrefix === undefined )
-                this.lastBlock._computeBlockHeaderPrefix();
-
             this.lastBlockSerialization = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock.computedBlockPrefix
+                this.lastBlock.this._computeBlockHeaderPrefix()
             ]);
 
             this.lastBlockId ++ ;

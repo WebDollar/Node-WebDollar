@@ -59,7 +59,7 @@ class PoolWorkManagement{
 
             h: this.poolWork.lastBlock.height,
             t: this.poolWork.lastBlock.difficultyTargetPrev,
-            s: this.poolWork.lastBlock.computedBlockPrefix,
+            s: this.poolWork.lastBlock._computeBlockHeaderPrefix(),
             I: this.poolWork.lastBlockId,
 
             start: this.poolWork.lastBlockNonce,
