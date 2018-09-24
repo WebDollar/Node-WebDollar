@@ -460,7 +460,7 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://127.0.0.1:8085"],
+        "addr": ["http://192.168.2.149:8085"],
     }];
 
 
