@@ -137,7 +137,8 @@ class InterfaceBlockchainBlocks{
 
         }
 
-        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
+        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toFixed(15);
+        answer = parseFloat(answer);
 
         this.networkHashRate = answer;
         
