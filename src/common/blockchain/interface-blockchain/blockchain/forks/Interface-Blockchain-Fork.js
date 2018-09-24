@@ -245,13 +245,10 @@ class InterfaceBlockchainFork {
                 Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
-        } else {
+        } else
             height = heightPrePOS;
-            forkHeight = height - this.forkStartingHeight;
-        }
 
-
-        return this.blockchain.getDifficultyTarget(heightPrePOS) // the blockchain
+        return this.blockchain.getDifficultyTarget(height) // the blockchain
 
     }
 
