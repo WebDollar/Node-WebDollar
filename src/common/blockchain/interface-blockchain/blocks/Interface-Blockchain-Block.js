@@ -316,7 +316,8 @@ class InterfaceBlockchainBlock {
 
         } catch (exception){
             console.error("Error computeHash", exception);
-            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+            //return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+            throw exception;
         }
     }
 
