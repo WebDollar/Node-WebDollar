@@ -51,6 +51,7 @@ deploy_branch:
         repository: webdollarcoin/node-webdollar
         working-dir: /pipeline/source
         cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
 
 deploy_commit:
   steps:
@@ -69,6 +70,7 @@ deploy_commit:
         repository: webdollarcoin/node-webdollar
         working-dir: /pipeline/source
         cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
 
 deploy_branch_genesis:
   steps:
@@ -93,6 +95,7 @@ deploy_branch_genesis:
         repository: webdollarcoin/node-webdollar
         working-dir: /pipeline/source
         cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
 
 deploy_commit_genesis:
   steps:
@@ -117,6 +120,7 @@ deploy_commit_genesis:
         repository: webdollarcoin/node-webdollar
         working-dir: /pipeline/source
         cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
 
 deploy_documentation:
   steps:
