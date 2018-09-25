@@ -283,6 +283,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } catch (exception){
 
+                if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
+                    this.resetForced = true;
+
             }
 
             //this._hashesPerSecond = 1;
@@ -339,6 +342,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (exception){
             console.error("Error _mineNonces", "nonce", nonce, start, end );
+            this.resetForced = true;
         }
 
         return {
