@@ -36,7 +36,10 @@ if ( typeof window !== 'undefined')
 if ( process && !process.env.BROWSER && process.env.COLLECT_STATS ){
     var Raven = require('raven');
 
-    Raven.config('https://8297738fd29f41af94f624cbc4d353bc@sentry.io/1283203').install();
+    Raven.config('https://8297738fd29f41af94f624cbc4d353bc@sentry.io/1283203', {
+      environment: process.env.NETWORK !== undefined && process.env.NETWORK === 'testnet' ? 'testnet' : 'mainnet',
+      release: process.env.GH_COMMIT || ''
+    });
 
     // Override console.error
     var console_error = console.error;
