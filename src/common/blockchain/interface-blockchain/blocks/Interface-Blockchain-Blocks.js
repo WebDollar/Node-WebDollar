@@ -124,8 +124,7 @@ class InterfaceBlockchainBlocks{
         let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
         let SumDiff = new BigNumber( 0 );
 
-        let how_much_it_took_to_mine_X_Blocks = 0;
-
+        let last, first;
         for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS); i<this.blockchain.blocks.endingPosition; i++) {
 
             if (this.blockchain.blocks[i] === undefined) continue;
@@ -133,11 +132,16 @@ class InterfaceBlockchainBlocks{
             let diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
             SumDiff = SumDiff.plus( diff );
 
-            how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i+1) - this.blockchain.getTimeStamp(i);
+
+            if (!first) first = i;
+            last = i;
 
         }
 
-        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
+        let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
+
+        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toFixed(15);
+        answer = parseFloat(answer);
 
         this.networkHashRate = answer;
         
