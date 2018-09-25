@@ -38,6 +38,7 @@ const config = merge(base, {
                 NETWORK: "'" + (process.env.NETWORK||'') + "'",
                 TERMINAL_WORKERS_TYPE: "'" + (process.env.TERMINAL_WORKERS_TYPE || '') + "'",
                 TERMINAL_WORKERS_CPU_MAX: "'" + (process.env.TERMINAL_WORKERS_CPU_MAX || '') + "'",
+                COLLECT_STATS: process.env.COLLECT_STATS,
             }
         })
     ]
