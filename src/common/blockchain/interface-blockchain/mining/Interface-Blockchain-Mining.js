@@ -220,7 +220,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                console.error( "block ", block.height ," was not mined...");
+                console.warn( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
