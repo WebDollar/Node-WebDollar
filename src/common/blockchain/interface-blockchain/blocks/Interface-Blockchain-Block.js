@@ -55,6 +55,7 @@ class InterfaceBlockchainBlock {
                 //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
             }
 
+            timeStamp = Math.floor( timeStamp );
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
