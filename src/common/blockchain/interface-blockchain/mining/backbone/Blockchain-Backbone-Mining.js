@@ -31,7 +31,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
 
             if (start > end ) return {
                 result: false,
-                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: -1,
             };
 
@@ -53,7 +53,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
             console.error("error _mince _nonces Backbone mining error");
             return {
                 result:false,
-                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: -1,
             };
 
