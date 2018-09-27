@@ -251,7 +251,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    getHashBlock(height){
+    getHashBlockPrev(height){
 
         if (height === undefined) height = this.blocks.length;
 
@@ -259,8 +259,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return BlockchainGenesis.hash;
         else {
 
-            if (height > this.blocks.length ) throw {message: "getHashBlock invalid height", height: height}; else
-            if (this.blocks[height-1] === undefined) throw {message: "getHashBlock invalid height", height: height};
+            if (height > this.blocks.length ) throw {message: "getHashBlockPrev invalid height", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getHashBlockPrev invalid height", height: height};
 
             return this.blocks[height-1].blockHash;
         }
