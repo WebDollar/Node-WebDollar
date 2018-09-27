@@ -49,13 +49,10 @@ class NodeAPIPrivate{
     }
 
     async walletCreateTransaction(req, res){
-
-        let fee = req.fee;
-
+        
         if (req.from && req.to && req.amount) {
           let from = req.from;
           let to = req.to;
-          let amount = req.amount;
         } else if(req.from) {
           // fan out
           let from = req.from;
@@ -68,8 +65,8 @@ class NodeAPIPrivate{
           return {result: false, message: 'params are not right'};
         }
 
-        amount = parseInt(amount) * WebDollarCoins.WEBD;
-        fee = parseInt(fee) * WebDollarCoins.WEBD;
+        let amount = req.amount ? parseInt(req.amount) * WebDollarCoins.WEBD : undefined;
+        let fee = parseInt(req.fee) * WebDollarCoins.WEBD;
 
         let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 
