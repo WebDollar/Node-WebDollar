@@ -268,9 +268,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     let answer = await this._mineNonces(0, 0);
 
-                    if (i % 3000 === 0) {
-                        await this.blockchain.sleep( 5 );
+                    if (i % 300 === 0) {
                         console.log(i, answer.hash.toString("hex"));
+                        await this.blockchain.sleep( 5 );
                     }
 
                     if (answer.result) {
