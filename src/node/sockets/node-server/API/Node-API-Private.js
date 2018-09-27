@@ -50,17 +50,19 @@ class NodeAPIPrivate{
 
     async walletCreateTransaction(req, res){
         
-        let from;
-        let to;
+        var from;
+        var to;
 
-        if (req.from && req.to && req.amount) {
+        if (req.from && req.from != 'null' &&
+          req.to && req.to != 'null' &&
+          req.amount && req.amount != 'null') {
           from = req.from;
           to = req.to;
-        } else if(req.from) {
+        } else if(req.from && req.from != 'null') {
           // fan out
           from = req.from;
           to = req.multiple_to;
-        } else if(req.to) {
+        } else if(req.to && req.to != 'null') {
           // fan in
           from = req.multiple_from;
           to = req.to;
