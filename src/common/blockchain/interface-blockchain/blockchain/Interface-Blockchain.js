@@ -194,13 +194,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    getDifficultyTarget(height){
+    getDifficultyTarget(height, POSRecalculation = true){
 
         if (height === undefined) height = this.blocks.length;
 
         if (height <= 0) return BlockchainGenesis.difficultyTarget;
 
-        if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+        if (POSRecalculation && height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
             if (height % 30 === 0 && height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
             else if (height % 30 === 0 ) height = height - 10;  //first POS, get the last proof of Stake

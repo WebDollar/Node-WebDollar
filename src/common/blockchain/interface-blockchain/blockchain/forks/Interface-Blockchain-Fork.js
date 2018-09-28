@@ -218,7 +218,7 @@ class InterfaceBlockchainFork {
     }
 
     // return the difficultly target for ForkBlock
-    getForkDifficultyTarget(height){
+    getForkDifficultyTarget(height, POSRecalculation = true){
 
 
         let forkHeight = height - this.forkStartingHeight;
@@ -243,12 +243,12 @@ class InterfaceBlockchainFork {
         if ( forkHeight > 0) {
 
             if ( forkHeight - 1 >= this.forkBlocks.length )
-                Log.warn("getForkDifficultyTarget FAILED: "+  forkHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                throw { message: "getForkDifficultyTarget FAILED: "+  forkHeight };
 
             return this.forkBlocks[forkHeight - 1].difficultyTarget; // just the fork
         }
 
-        return this.blockchain.getDifficultyTarget(heightPrePOS) // the blockchain
+        return this.blockchain.getDifficultyTarget(heightPrePOS, POSRecalculation) // the blockchain
 
     }
 
