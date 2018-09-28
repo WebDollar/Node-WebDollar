@@ -22,7 +22,7 @@ class InterfaceSatoshminDB {
     _start(){
 
         try {
-            this.db = new pounchdb(this.dbName);
+            this.db = new pounchdb(this.dbName, {revs_limit: 1});
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
