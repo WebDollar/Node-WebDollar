@@ -262,7 +262,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                while (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i) && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
+                while (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i, this.block.height) && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
 
                     this.block.timeStamp = medianTimestamp + i;
 

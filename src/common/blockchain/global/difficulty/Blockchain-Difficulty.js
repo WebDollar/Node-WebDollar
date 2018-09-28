@@ -32,7 +32,9 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOW( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber){
 
-        let prevBlockDifficulty = getDifficultyCallback( blockNumber, false );
+        let prevBlockDifficulty = getDifficultyCallback( blockNumber, true );
+
+        console.log("prevBlockDifficulty", blockNumber, BlockchainGenesis.isPoSActivated(blockNumber) ? "POS" :  "POW",  prevBlockDifficulty.toString("hex"));
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex
@@ -64,8 +66,9 @@ class BlockchainDifficulty{
             for (let i = firstBlock; i < blockNumber; i++) {
                 //the difference between Ti-(Ti-1) is actually the time for Ti
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
+                console.log("block ",i," timestamp ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
             }
-
+            console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
 
             //adding block 9
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
@@ -107,7 +110,9 @@ class BlockchainDifficulty{
 
     static getDifficultyMeanPOS( getDifficultyCallback, getTimeStampCallback, blockTimestamp, blockNumber ){
 
-        let prevBlockDifficulty = getDifficultyCallback( blockNumber, false);
+        let prevBlockDifficulty = getDifficultyCallback( blockNumber, true);
+
+        console.log("prevBlockDifficulty", blockNumber, BlockchainGenesis.isPoSActivated(blockNumber) ? "POS" :  "POW",  prevBlockDifficulty.toString("hex"));
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex
@@ -132,7 +137,9 @@ class BlockchainDifficulty{
             for (let i = firstBlock; i < blockNumber; i++) {
                 //the difference between Ti-(Ti-1) is actually the time for Ti
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
+                console.log("block ",i," timestamp ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
             }
+            console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
 
 
             //adding block 9

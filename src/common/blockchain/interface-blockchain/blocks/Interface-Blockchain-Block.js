@@ -212,7 +212,7 @@ class InterfaceBlockchainBlock {
 
 
         if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true )
-            this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp);
+            this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp, this.height);
 
     }
 
