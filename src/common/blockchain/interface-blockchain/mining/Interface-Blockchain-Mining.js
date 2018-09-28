@@ -268,7 +268,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     let answer = await this._mineNonces(0, 0);
 
-                    if (i % 300 === 0) {
+                    if (consts.DEBUG && i % 300 === 0) {
                         console.log(i, answer.hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
@@ -343,6 +343,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         } catch (exception){
             console.error("Error _mineNonces", "nonce", nonce, start, end );
             this.resetForced = true;
+        }
+
+        if (consts.DEBUG && Math.random() < 0.05 ) {
+            console.log("bestHash", this.bestHash.toString("hex"), "   ", this.difficulty.toString("hex"));
+            await this.blockchain.sleep( 5 );
         }
 
         return {
