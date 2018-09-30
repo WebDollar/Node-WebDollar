@@ -38,8 +38,8 @@ class InterfaceBlockchainBlockTimestamp {
 
         let timestampValue = height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION ? consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET : consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_AFTER_POS;
 
-        if ( timeStamp > this.blockchain.timestamp.networkAdjustedTime - timestampValue )
-            throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: timestampValue }
+        if ( timeStamp > this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset- timestampValue )
+            throw { message: "Timestamp of block is less than the network-adjusted time", timeStamp: timeStamp, " > ": this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset + timestampValue, networkAdjustedTime: this.blockchain.timestamp.networkAdjustedTime, NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: timestampValue }
 
         return true;
     }
