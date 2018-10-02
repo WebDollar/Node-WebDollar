@@ -176,7 +176,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             if (answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", "timestamp", block.timeStamp, answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
                 console.warn( "difficulty prev: ", block.difficultyTargetPrev.toString("hex") );
                 console.warn( "----------------------------------------------------------------------------");
 
@@ -288,7 +288,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             }
 
             //this._hashesPerSecond = 1;
-            await this.blockchain.sleep(300);
+            await this.blockchain.sleep(50);
 
         }
 
