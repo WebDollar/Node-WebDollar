@@ -278,7 +278,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     }
 
                     i++;
-                }
+
+                } else
+                    await this.blockchain.sleep(50);
 
             } catch (exception){
 
@@ -288,7 +290,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             }
 
             //this._hashesPerSecond = 1;
-            await this.blockchain.sleep(50);
 
         }
 
