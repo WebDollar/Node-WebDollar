@@ -41,7 +41,7 @@ class InterfaceBlockchainBlock {
             if (timeStamp === undefined || timeStamp === null)
                 timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
 
-            timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
+            timeStamp += Math.floor( Math.random()*5   );
 
             try {
 
@@ -57,7 +57,7 @@ class InterfaceBlockchainBlock {
             }
 
             
-            timeStamp = Math.floor( timeStamp );
+            timeStamp = Math.ceil( timeStamp );
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
