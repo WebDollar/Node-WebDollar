@@ -50,7 +50,7 @@ npm install
 ###In case you will get errors:
 ## 3. **node-gyp**
 
-In case your will get errors from **node-gyp** especially for **Argon2** or **webrtc**
+In case you get errors from **node-gyp**, especially for **Argon2** or **webrtc**
 
 #### 3.1 node-gyp on Windows
 open a Command Prompt with **Administrator rights**
@@ -67,7 +67,7 @@ Installing Argon2 node.js
 ```shell
 sudo apt install linuxbrew-wrapper
 ```
-In case your receive some errors, try ```sudo apt-get -f install```
+In case you receive some errors, try ```sudo apt-get -f install```
 
 To check the version `gcc --version`
 In case the GCC is not installed, install gcc `brew install gcc`
