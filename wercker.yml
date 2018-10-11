@@ -1,0 +1,201 @@
+box: ubuntu:16.04
+
+build:
+  steps:
+    - install-packages:
+        packages: linuxbrew-wrapper clang wget software-properties-common cmake libtool autoconf psmisc opencl-headers ocl-icd-libopencl1 pciutils
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: npm install
+        code: npm install
+    - script:
+        name: clone argon2
+        code: git clone https://github.com/WebDollar/argon2
+    - script:
+        name: install argon2
+        cwd: argon2
+        code: |
+          autoreconf -i
+          bash configure
+          cmake -DCMAKE_BUILD_TYPE=Release .
+          make
+    - script:
+        name: finalize argon2 install
+        code: cp -a argon2/* dist_bundle/CPU/
+    - script:
+        name: build menu
+        code: npm run build_terminal_menu
+    - script:
+        name: build worker
+        code: npm run build_terminal_worker
+
+deploy_branch:
+  steps:
+    - install-packages:
+        packages: curl
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: $WERCKER_GIT_BRANCH
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
+
+deploy_commit:
+  steps:
+    - install-packages:
+        packages: curl
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: $WERCKER_GIT_COMMIT
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
+
+deploy_branch_genesis:
+  steps:
+    - install-packages:
+        packages: curl unzip
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: download and extract genesis
+        code: |
+          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          unzip blockchainDB3.zip
+          export SUFFIX="_genesis"
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: "$WERCKER_GIT_BRANCH$SUFFIX"
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
+
+deploy_commit_genesis:
+  steps:
+    - install-packages:
+        packages: curl unzip
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: download and extract genesis
+        code: |
+          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          unzip blockchainDB3.zip
+          export SUFFIX="_genesis"
+    - internal/docker-push:
+        username: $DOCKER_USER
+        password: $DOCKER_PASSWORD
+        tag: "$WERCKER_GIT_COMMIT$SUFFIX"
+        repository: webdollarcoin/node-webdollar
+        working-dir: /pipeline/source
+        cmd: npm run commands
+        env: "GH_COMMIT=$WERCKER_GIT_COMMIT"
+
+deploy_documentation:
+  steps:
+    - install-packages:
+        packages: curl openssh-client sshpass
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: install esdoc
+        code: npm install esdoc esdoc-standard-plugin
+    - script:
+        name: create configuration
+        code: |
+          echo '{
+            "source": "./src",
+            "destination": "./out",
+            "plugins": [{"name": "esdoc-standard-plugin"}]
+          }' > .esdoc.json
+    - script:
+        name: build documentation
+        code: ./node_modules/.bin/esdoc
+    - script:
+        name: upload documentation
+        code: sshpass -p $SCP_PASSWORD scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r out root@data.hoste.ro:/var/www/html/docs
+
+deploy_commit_binary:
+  steps:
+    - install-packages:
+        packages: curl zip openssh-client sshpass
+    - script:
+        name: install node
+        code: |
+          curl -sL https://deb.nodesource.com/setup_8.x -o nodesource_setup.sh
+          bash nodesource_setup.sh
+          apt-get install -y nodejs
+    - script:
+        name: install pkg
+        code: npm install -g pkg
+    - script:
+        name: run pkg
+        code: pkg dist_bundle/terminal-menu-bundle.js --options max_old_space_size=6144
+    - script:
+        name: package mac
+        code: |
+          export DIR="webdollar-mac-$WERCKER_GIT_COMMIT"
+          mkdir $DIR
+          mv terminal-menu-bundle-macos $DIR
+          curl -sL http://data.hoste.ro/node_binaries/mac/argon2.node -o $DIR/argon2.node
+          curl -sL http://data.hoste.ro/node_binaries/mac/leveldown.node -o $DIR/leveldown.node
+          zip -r "$DIR.zip" $DIR
+    - script:
+        name: package linux
+        code: |
+          export DIR="webdollar-linux-$WERCKER_GIT_COMMIT"
+          mkdir $DIR
+          mv terminal-menu-bundle-linux $DIR
+          curl -sL http://data.hoste.ro/node_binaries/linux/argon2.node -o $DIR/argon2.node
+          curl -sL http://data.hoste.ro/node_binaries/linux/leveldown.node -o $DIR/leveldown.node
+          zip -r "$DIR.zip" $DIR
+    - script:
+        name: package windows
+        code: |
+          export DIR="webdollar-windows-$WERCKER_GIT_COMMIT"
+          mkdir $DIR
+          mv terminal-menu-bundle-win.exe $DIR
+          curl -sL http://data.hoste.ro/node_binaries/windows/argon2.node -o $DIR/argon2.node
+          curl -sL http://data.hoste.ro/node_binaries/windows/leveldown.node -o $DIR/leveldown.node
+          zip -r "$DIR.zip" $DIR
+    - script:
+        name: upload archives
+        code: |
+          sshpass -p $SCP_PASSWORD scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "webdollar-mac-$WERCKER_GIT_COMMIT.zip" root@data.hoste.ro:/var/www/html/builds
+          sshpass -p $SCP_PASSWORD scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "webdollar-linux-$WERCKER_GIT_COMMIT.zip" root@data.hoste.ro:/var/www/html/builds
+          sshpass -p $SCP_PASSWORD scp -v -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "webdollar-windows-$WERCKER_GIT_COMMIT.zip" root@data.hoste.ro:/var/www/html/builds
