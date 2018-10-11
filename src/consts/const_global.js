@@ -469,5 +469,7 @@ if ( consts.DEBUG === true ){
 
 }
 
+if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet; 
 
 export default consts
