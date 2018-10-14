@@ -54,29 +54,28 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 20,
+        IMMUTABILITY_LENGTH: 200,
 
     },
 
     HARD_FORKS : {
 
-        TRANSACTIONS_BUG_2_BYTES: 90,
+        TRANSACTIONS_BUG_2_BYTES: 60,
 
-        TRANSACTIONS_OPTIMIZATION: 90,
-        DIFFICULTY_TIME_BIGGER: 90,
-        WALLET_RECOVERY: 90,
+        TRANSACTIONS_OPTIMIZATION: 70,
+        DIFFICULTY_TIME_BIGGER: 70,
+        WALLET_RECOVERY: 153060,
 
-        DIFFICULTY_REMOVED_CONDITION: 90,
+        DIFFICULTY_REMOVED_CONDITION: 80,
 
         // TRANSACTIONS_BUG_2_BYTES: 46950,
         //
         // TRANSACTIONS_OPTIMIZATION: 153060,
         // DIFFICULTY_TIME_BIGGER: 153060,
-        // WALLET_RECOVERY: 153060,
-        //
+
         // DIFFICULTY_REMOVED_CONDITION: 161990,
 
-        POS_ACTIVATION: 90,
+        POS_ACTIVATION: 80,
 
     }
 
@@ -471,7 +470,7 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://192.168.2.149:8085"],
+        "addr": ["http://testnet1.hoste.ro:8000"],
     }];
 
 
