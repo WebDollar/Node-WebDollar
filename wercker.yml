@@ -85,7 +85,7 @@ deploy_branch_genesis:
     - script:
         name: download and extract genesis
         code: |
-          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          curl -sL -H 'Cache-Control: no-cache' http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
           unzip blockchainDB3.zip
           export SUFFIX="_genesis"
     - internal/docker-push:
@@ -110,7 +110,7 @@ deploy_commit_genesis:
     - script:
         name: download and extract genesis
         code: |
-          curl -sL http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
+          curl -sL -H 'Cache-Control: no-cache' http://data.webd.hoste.ro/blockchainDB3.zip -o blockchainDB3.zip
           unzip blockchainDB3.zip
           export SUFFIX="_genesis"
     - internal/docker-push:
