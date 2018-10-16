@@ -256,8 +256,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         // try all timestamps
         let medianTimestamp = Math.ceil( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
 
-        let i = 0;
-        while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus)){
+        let i = 0, done = false;
+        while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
             try {
 
@@ -285,7 +285,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             } catch (exception){
 
                 if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
-                    this.resetForced = true;
+                    done = true;
 
             }
 

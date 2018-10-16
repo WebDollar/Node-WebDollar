@@ -107,7 +107,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             }
 
             if (balance === null || balance === 0)
-                return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER;
+                return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
 
             let number = new BigInteger(hash.toString("hex"), 16);
 
