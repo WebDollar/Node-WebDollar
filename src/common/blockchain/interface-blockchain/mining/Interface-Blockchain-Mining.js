@@ -287,6 +287,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
                     done = true;
 
+                await this.blockchain.sleep(50);
+                
             }
 
             //this._hashesPerSecond = 1;
