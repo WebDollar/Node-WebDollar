@@ -314,9 +314,6 @@ class PoolRewardsManagement{
         if ( height < this._serverBlocksDifficultyCalculation.difficultyCalculationStarts)
             validationType["skip-difficulty-recalculation"] = true;
 
-        if ( height === this.blockchain.blocks.length-1)
-            validationType["validation-timestamp-adjusted-time"] = true;
-
         //it's a new light fork && i have less than forkHeight
         if ( blockInfoHeight < consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS )
             validationType["skip-validation-timestamp"] = true;

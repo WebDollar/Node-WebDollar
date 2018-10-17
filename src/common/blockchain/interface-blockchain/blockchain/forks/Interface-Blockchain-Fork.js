@@ -280,18 +280,12 @@ class InterfaceBlockchainFork {
 
         let validationType = {};
 
-        if (height === this.forkChainLength-1)
-            validationType["validation-timestamp-adjusted-time"] = true;
-
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
 
         let validationType = {};
-
-        if (height === this.forkChainLength-1)
-            validationType["validation-timestamp-adjusted-time"] = true;
 
         if (height !== this.forkChainLength-1)
             validationType["skip-calculating-proofs"] = true;

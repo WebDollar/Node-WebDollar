@@ -211,8 +211,7 @@ class InterfaceBlockchainBlock {
             this.blockchain.blocks.timestampBlocks.validateMedianTimestamp(this.timeStamp, this.height, this.blockValidation);
 
 
-        if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true )
-            this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp, this.height);
+        this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp, this.height);
 
     }
 
