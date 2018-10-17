@@ -142,7 +142,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     fork.pushHeader(answer.hash);
 
-                    if (this.blockchain.blocks[i].hash.equals(answer.hash)){
+                    if (this.blockchain.blocks[i].blockHash.equals(answer.hash)){
 
                         binarySearchResult = {
                             position: (i === currentBlockchainLength-1)  ? currentBlockchainLength :  i+1,
