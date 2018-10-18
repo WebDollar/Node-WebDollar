@@ -6,6 +6,7 @@ import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import Blockchain from "main-blockchain/Blockchain"
 import NODE_TYPE from "../types/Node-Type";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import BansList from "common/utils/bans/BansList";
 
 class NodesStats {
 
@@ -39,6 +40,7 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
 
+        BansList._listBans();
 
         let string1 = "";
         let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);

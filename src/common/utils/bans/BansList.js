@@ -88,6 +88,7 @@ class BansList{
         
         if (this.bans.length > 0)
             console.info("BANNNNNNNNNNNNNNS");
+
         for (let i=0; i<this.bans.length; i++) {
 
 
