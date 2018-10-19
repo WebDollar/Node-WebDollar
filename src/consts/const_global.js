@@ -470,7 +470,7 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://testnet1.hoste.ro:8000"],
+        "addr": ["http://testnet2.hoste.ro:8001"],
     }];
 
 
