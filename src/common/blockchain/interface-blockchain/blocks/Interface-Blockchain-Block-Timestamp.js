@@ -20,10 +20,12 @@ class InterfaceBlockchainBlockTimestamp {
 
         let medianTimestamp = 0;
 
-        for (let i = height-1; i >= height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
+        const no_blocks = 2; //consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS
+
+        for (let i = height-1; i >= height - no_blocks; i--)
             medianTimestamp += callback(i+1);
 
-        return medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
+        return medianTimestamp / no_blocks;
     }
 
     validateMedianTimestamp (timestamp, height, blockValidation){
@@ -33,12 +35,6 @@ class InterfaceBlockchainBlockTimestamp {
         if ( timestamp < medianTimestamp )
             throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp };
 
-        let callback;
-        if (blockValidation !== undefined)  callback = blockValidation.getTimeStampCallback;
-        else callback = this.blockchain.getTimeStamp;
-
-        if ( timestamp < callback( height ) )
-            throw {message: "Block timestamp is not valid;", medianTimestamp: callback( height ) };
 
         return true;
     }
