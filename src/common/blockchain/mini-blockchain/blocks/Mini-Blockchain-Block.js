@@ -89,7 +89,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.posMinerAddress || this.data.minerAddress ),
-                //Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.timeStamp) ),
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.timeStamp) ),
 
             ]);
 
@@ -111,8 +111,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             let number = new BigInteger(hash.toString("hex"), 16);
 
-            return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).divide(this.timeStamp).toString(16) , "hex")  );
-            // return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).toString(16) , "hex")  );
+            //return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).divide(this.timeStamp).toString(16) , "hex")  );
+            return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).toString(16) , "hex")  );
 
         } catch (exception){
             console.error("Error computeHash", exception);
