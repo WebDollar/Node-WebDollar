@@ -3,6 +3,7 @@ import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blo
 import consts from "consts/const_global"
 
 // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
+
 class InterfaceBlockchainBlockTimestamp {
 
     constructor(blockchain){
@@ -31,6 +32,13 @@ class InterfaceBlockchainBlockTimestamp {
 
         if ( timestamp < medianTimestamp )
             throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp };
+
+        let callback;
+        if (blockValidation !== undefined)  callback = blockValidation.getTimeStampCallback;
+        else callback = this.blockchain.getTimeStamp;
+
+        if ( timestamp < callback( height ) )
+            throw {message: "Block timestamp is not valid;", medianTimestamp: callback( height ) };
 
         return true;
     }

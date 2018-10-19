@@ -45,8 +45,7 @@ class InterfaceBlockchainBlock {
 
             try {
 
-                if ( this.height === this.blockchain.blocks.length )  //last block
-                    this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
+                this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
 
             } catch (exception){
                 timeStamp = exception.medianTimestamp + 1;
