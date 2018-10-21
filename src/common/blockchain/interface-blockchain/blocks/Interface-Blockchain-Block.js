@@ -309,32 +309,26 @@ class InterfaceBlockchainBlock {
         return await WebDollarCrypto.hashPOW( buffer );
     }
 
-    _calculateSerializedBlock(){
+    _calculateSerializedBlock(requestHeader = false){
 
         return Buffer.concat( [
 
             this.hash,
             Serialization.serializeNumber4Bytes( this.nonce ),
-            this._computeBlockHeaderPrefix(),
+            this._computeBlockHeaderPrefix(requestHeader),
 
         ]);
 
     }
 
-    serializeBlock(requestHeader){
+    serializeBlock( requestHeader = false ){
 
         // serialize block is ( hash + nonce + header )
-
-        if (requestHeader === true && this.computedSerialization !== undefined ) return this.computedSerialization;
-
-        this._computeBlockHeaderPrefix( requestHeader );
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();
 
-        let data = this._calculateSerializedBlock();
-
-        if ( requestHeader === true && this.computedSerialization === undefined ) this.computedSerialization = data;
+        let data = this._calculateSerializedBlock(requestHeader);
 
         return data;
 
@@ -401,7 +395,7 @@ class InterfaceBlockchainBlock {
         let bufferValue;
 
         try {
-            bufferValue = await this.serializeBlock();
+            bufferValue = await this.serializeBlock(false);
         } catch (exception){
             console.error('ERROR serializing block: ',  exception);
             throw exception;
