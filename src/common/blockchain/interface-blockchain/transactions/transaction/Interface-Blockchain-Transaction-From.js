@@ -53,13 +53,10 @@ class InterfaceBlockchainTransactionFrom {
             currencyTokenId = addresses.currencyTokenId;
         }
 
-
         if (!Array.isArray(addresses))
             addresses = [addresses];
 
         addresses.forEach((fromObject, index) => {
-
-            console.log(fromObject);
 
             if (fromObject.unencodedAddress !== undefined) {
 
