@@ -19,9 +19,6 @@ class InterfaceBlockchainBlockData {
 
         this.blockchain = blockchain;
 
-        if( this.blockchain.height >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_INCLUDING_ONLY_HEADER )
-            this._onlyHeader = false;
-
         this._minerAddress = undefined;
 
         if (minerAddress === undefined)
