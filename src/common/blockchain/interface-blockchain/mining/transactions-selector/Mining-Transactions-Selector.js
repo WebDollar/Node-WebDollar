@@ -109,8 +109,8 @@ class MiningTransactionsSelector{
             }
 
 
-            if (this._transactions.length > 60)
-                break;
+            // if (this._transactions.length > 60)
+            //     break;
 
             i++;
         }
