@@ -19,7 +19,7 @@ class TransactionsDownloadManager{
 
         setTimeout( this._processSockets.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
-        setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
+        setTimeout( this._deleteOldTransactions.bind(this), 10*1000 );
 
     }
 
@@ -184,14 +184,14 @@ class TransactionsDownloadManager{
         try {
 
             for (let i = this._transactionsQueue.length - 1; i >= 0; i--)
-                if ( ( (date - this._transactionsQueue[i].dateInitial) > 4 * 60 * 60 * 1000) && this._transactionsQueue[i].deleted )
+                if ( date - this._transactionsQueue[i].dateInitial > 10*1000 && this._transactionsQueue[i].deleted )
                     this._transactionsQueue.splice(i, 1);
 
         } catch (exception){
             console.error("_deleteOldTransactions raised an error", exception);
         }
 
-        setTimeout( this._deleteOldTransactions.bind(this), 2*60*1000 );
+        setTimeout( this._deleteOldTransactions.bind(this), 10*1000 );
     }
 
     _createTransaction(buffer, socket){
