@@ -19,15 +19,15 @@ class InterfaceBlockchainBlockData {
 
         this.blockchain = blockchain;
 
-        this._onlyHeader = false;
+        if( this.blockchain.height >= consts.HARD_FORKS.TRANSACTIONS_INCLUDING_ONLY_HEADER )
+            this._onlyHeader = false;
+
         this._minerAddress = undefined;
 
         if (minerAddress === undefined)
             minerAddress = BlockchainGenesis.address;
 
         this.minerAddress = minerAddress;
-
-
 
         this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions);
 
