@@ -129,7 +129,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     if (nextBlock === undefined || nextBlock === null)
                         throw {message: "block is undefined"};
 
-                    nextBlock._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
+                    nextBlock._computeBlockHeaderPrefix( true ); //calculate the Block Header Prefix
                 }
 
                 //avoid mining the same nonces on every machine that is mining the same address

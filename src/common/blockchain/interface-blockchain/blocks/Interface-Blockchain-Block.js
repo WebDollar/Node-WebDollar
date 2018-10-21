@@ -236,9 +236,10 @@ class InterfaceBlockchainBlock {
         Concat of Hashes to avoid double computation
      */
 
-    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
+    _computeBlockHeaderPrefix( requestHeader = false ){
 
-        //in case I have calculated  the computedBlockPrefix before
+        if (this.height < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_INCLUDING_ONLY_HEADER && requestHeader )
+            requestHeader = false;
 
         return Buffer.concat ( [
                                   Serialization.serializeNumber2Bytes( this.version),
@@ -266,7 +267,7 @@ class InterfaceBlockchainBlock {
         return Buffer.concat([
             Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
             Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev),
-            this._computeBlockHeaderPrefix(),
+            this._computeBlockHeaderPrefix( true ),
             Serialization.serializeNumber4Bytes(newNonce || this.nonce),
         ]);
     }
@@ -326,7 +327,7 @@ class InterfaceBlockchainBlock {
 
         if (requestHeader === true && this.computedSerialization !== undefined ) return this.computedSerialization;
 
-        this._computeBlockHeaderPrefix( true, requestHeader );
+        this._computeBlockHeaderPrefix( requestHeader );
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
             this.hash = this.computeHash();
@@ -502,7 +503,7 @@ class InterfaceBlockchainBlock {
         this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         //calculate Hash
-        this._computeBlockHeaderPrefix(true, true);
+        this._computeBlockHeaderPrefix( true );
         await this.computeHash();
     }
 

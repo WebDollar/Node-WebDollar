@@ -150,10 +150,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return this.validateBlockInterlinks();
     }
 
-    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
+    _computeBlockHeaderPrefix(requestHeader){
 
         return Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false, requestHeader),
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, requestHeader),
             this._serializeInterlink(),
         ]);
 

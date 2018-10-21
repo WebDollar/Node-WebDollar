@@ -62,7 +62,7 @@ class PoolWork {
             this.lastBlockSerialization = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock.this._computeBlockHeaderPrefix()
+                this.lastBlock.this._computeBlockHeaderPrefix( false )
             ]);
 
             this.lastBlockId ++ ;
