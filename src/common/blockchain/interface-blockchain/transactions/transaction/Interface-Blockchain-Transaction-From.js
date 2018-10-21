@@ -59,6 +59,8 @@ class InterfaceBlockchainTransactionFrom {
 
         addresses.forEach((fromObject, index) => {
 
+            console.log(fromObject);
+
             if (fromObject.unencodedAddress !== undefined) {
 
                 if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
