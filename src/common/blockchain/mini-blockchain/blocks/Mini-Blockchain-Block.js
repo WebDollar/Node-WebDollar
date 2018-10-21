@@ -176,7 +176,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
     //used for serialization
-    _calculateSerializedBlock(){
+    _calculateSerializedBlock(requestHeader = false){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
@@ -195,12 +195,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             }
 
-            buffers.push(this._computeBlockHeaderPrefix( true ));
+            buffers.push(this._computeBlockHeaderPrefix( requestHeader ));
 
             return Buffer.concat(buffers);
 
         } else
-            return inheritBlockchainBlock.prototype._calculateSerializedBlock.call( this );
+            return inheritBlockchainBlock.prototype._calculateSerializedBlock.call( this, requestHeader );
 
     }
 
