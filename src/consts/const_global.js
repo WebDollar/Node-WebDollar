@@ -265,10 +265,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.198.2",
+        VERSION: "1.198.3",
 
-        VERSION_COMPATIBILITY: "1.198.2",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.198.2",
+        VERSION_COMPATIBILITY: "1.198.3",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.198.3",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -474,7 +474,6 @@ if ( consts.DEBUG === true ){
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
     }];
-
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
