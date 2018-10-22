@@ -204,10 +204,13 @@ class TransactionsDownloadManager{
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "validation failed"};
 
-            if (!transaction.isTransactionOK(true, false))  //not good
+            var blockValidationType = {};
+            blockValidationType['skip-validation-transactions-from-values'] = true;
+
+            if (!transaction.isTransactionOK(true, false, blockValidationType))  //not good
                 throw {message: "transaction is invalid"};
 
-            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket);
+            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, true);
 
             return transaction
         } catch (exception) {

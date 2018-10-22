@@ -190,7 +190,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 buffers.push(new Buffer(1));
             else {
 
-                buffers.push(Serialization.serializeNumber1Byte(this.posMinerAddress));
+                buffers.push(Serialization.serializeNumber1Byte(this.posMinerAddress.length));
                 buffers.push(this.posMinerAddress);
 
             }
