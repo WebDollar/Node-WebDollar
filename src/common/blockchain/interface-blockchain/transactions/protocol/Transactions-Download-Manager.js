@@ -158,8 +158,7 @@ class TransactionsDownloadManager{
 
                     }
 
-                    this._transactionsQueue[pos].deleted = true;
-
+                    tx.deleted = true;
                     tx.buffer = undefined;
 
                     if (tx.socket !== undefined)
