@@ -149,8 +149,8 @@ class TransactionsPendingQueue {
 
             } catch (exception){
 
-                if ( Math.random() < 0.1)
-                    console.warn("Old Transaction removed because of exception ", exception);
+                // if ( Math.random() < 0.1)
+                //    console.warn("Old Transaction removed because of exception ", exception);
 
                 this._removePendingTransaction(i)
             }
