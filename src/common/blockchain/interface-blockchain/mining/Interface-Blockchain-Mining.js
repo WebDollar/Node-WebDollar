@@ -54,10 +54,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             nextBlock.updateInterlink();
 
-            for (let i=0; i<nextTransactions.length; i++) {
-                if (nextTransactions[i].pendingTransactionsIncluded === undefined) nextTransactions[i].pendingTransactionsIncluded = 0;
-                nextTransactions[i].pendingTransactionsIncluded++;
-            }
+            for (let i=0; i<nextTransactions.length; i++)
+                nextTransactions[i].pendingTransactionsIncluded = (nextTransactions[i].pendingTransactionsIncluded|| 0) + 1
 
             nextBlock.data.transactions.pendingTransactionsWereIncluded = true;
 

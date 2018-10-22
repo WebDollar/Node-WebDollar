@@ -59,6 +59,7 @@ class InterfaceBlockchainBlockDataTransactions {
             this.transactions[i] = undefined;
 
         }
+        this.transactions = [];
 
         delete this.pendingTransactionsWereIncluded;
 
