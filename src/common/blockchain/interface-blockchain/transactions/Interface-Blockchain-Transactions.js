@@ -38,6 +38,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         this.wizard.wallet = newWallet;
     }
 
+
 }
 
 export default InterfaceBlockchainTransactions;
