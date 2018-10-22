@@ -92,8 +92,6 @@ class MiningTransactionsSelector{
                     } else
                         bRemoveTransaction = true;
 
-
-
                 } catch (exception){
                     console.warn('Error Including Transaction', exception);
                     bRemoveTransaction = true;
