@@ -117,6 +117,10 @@ class InterfaceBlockchainTransaction{
     }
 
     destroyTransaction(){
+
+        if ( this.pendingTransactionsIncluded !== undefined && this.pendingTransactionsIncluded > 0)
+            return;
+
         this.blockchain = undefined;
     }
 

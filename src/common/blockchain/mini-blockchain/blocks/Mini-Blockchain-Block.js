@@ -100,10 +100,28 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
 
-            //reward already included
+            //reward already included in the new balance
             if (this.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
-                if (this.posMinerAddress === undefined) //in case it was sent to the minerAddress
-                    balance -= this.reward
+
+                if (this.posMinerAddress === undefined) { //in case it was sent to the minerAddress
+                    balance -= this.reward;
+                    balance -= this.data.transactions.calculateFees();
+                }
+
+                this.data.transactions.transactions.forEach((tx)=>{
+
+                    tx.from.addresses.forEach((from)=>{
+                        if ( from.unencodedAddress.equals( this.data.minerAddress ))
+                            balance += from.amount;
+                    });
+
+                    tx.to.addresses.forEach((to)=>{
+                        if ( to.unencodedAddress.equals( this.data.minerAddress ))
+                            balance -= to.amount;
+                    });
+
+                });
+
             }
 
             if (balance === null || balance === 0)
