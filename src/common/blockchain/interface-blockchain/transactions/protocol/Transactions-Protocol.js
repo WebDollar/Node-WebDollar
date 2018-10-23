@@ -188,23 +188,19 @@ class InterfaceBlockchainTransactionsProtocol {
         try{
 
             let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
-
-            if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) {
-                return false;
-            }
+            if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
 
             let ids = answer.transactions;
 
             for (let i=0; i<ids.length; i++) {
 
-                if (this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( ids[i]) !== null) continue;
+                if (this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( ids[i]) !== null ) continue;
                 this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
 
             }
 
             if (start + count < answer.length)
                 await this.downloadTransactions(socket, start+count, count, max);
-
 
         } catch (exception){
 

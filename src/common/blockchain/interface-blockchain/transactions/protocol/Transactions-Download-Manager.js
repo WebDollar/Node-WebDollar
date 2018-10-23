@@ -71,11 +71,8 @@ class TransactionsDownloadManager{
 
             return true;
 
-        } else {
-
+        }else
             transactionFound.socket = socket;
-
-        }
 
         return false;
     }
@@ -156,7 +153,7 @@ class TransactionsDownloadManager{
 
                     } catch (exception){
 
-                        console.log("Transaction nod downloaded");
+                        console.error("Transaction " + tx.txId.toString("hex") + " not downloaded");
 
                     }
 
