@@ -156,6 +156,8 @@ class TransactionsDownloadManager{
 
                     } catch (exception){
 
+                        console.log("Transaction nod downloaded");
+
                     }
 
                     tx.deleted = true;
