@@ -86,14 +86,8 @@ class TransactionsDownloadManager{
 
             for (let i=0; i < 20; i++){
 
-                let socket;
-                if (this._socketsQueue.length > 0) {
-                    socket = this._socketsQueue[0];
-                    this._socketsQueue.splice(0,1);
-                }
-
-                if (socket !== undefined)
-                    await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+                let socket = this._socketsQueue[ Math.floor( Math.random()*this._socketsQueue.length) ];
+                await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
             }
 
