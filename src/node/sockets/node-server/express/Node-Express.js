@@ -5,7 +5,8 @@ const http = require('http');
 const path = require('path')
 const express = require('express')
 const cors = require('cors');
-const fs = require('fs')
+const fs = require('fs');
+const bodyParser = require('body-parser');
 
 import consts from 'consts/const_global'
 
@@ -50,6 +51,7 @@ class NodeExpress{
 
             this.app = express();
             this.app.use(cors({ credentials: true }));
+            this.app.use(bodyParser.json());
 
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
@@ -174,7 +176,7 @@ class NodeExpress{
 
 
         NodeAPIRouter._routesEnabled = true;
-        NodeAPIRouter.initializeRouter( this.app.get.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouter( this.app.all.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter._routesEnabled = false;
 
@@ -198,7 +200,9 @@ class NodeExpress{
             for (let k in req.params)
                 req.params[k] = decodeURIComponent(req.params[k]);
 
-            let answer = await callback(req.params, res);
+            let merged = req.body ? Object.assign(req.params, req.body) : req.params;
+            
+            let answer = await callback(merged, res);
             res.json(answer);
 
         } catch (exception){
