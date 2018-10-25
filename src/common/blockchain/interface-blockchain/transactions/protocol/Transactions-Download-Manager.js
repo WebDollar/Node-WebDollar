@@ -60,7 +60,7 @@ class TransactionsDownloadManager{
             return false; //too many;
         }
 
-        if ( Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( txId ) !== null )8
+        if ( Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( txId ) !== null )
             return true;
 
         let transactionFound = this.findTransactionById(txId);
