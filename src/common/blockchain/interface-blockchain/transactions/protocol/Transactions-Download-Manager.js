@@ -1,5 +1,7 @@
 import NodesList from 'node/lists/Nodes-List';
 import consts from "consts/const_global"
+import TransactionsPendingQueue from "../pending/Transactions-Pending-Queue";
+import Blockchain from "../../../../../main-blockchain/Blockchain";
 
 const MAX_TRANSACTIONS_LENGTH = 5000;
 
@@ -57,6 +59,9 @@ class TransactionsDownloadManager{
             console.warn("There are way too many transactions in pending");
             return false; //too many;
         }
+
+        if ( Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( txId ) !== null )8
+            return true;
 
         let transactionFound = this.findTransactionById(txId);
         if ( transactionFound  === null) {
