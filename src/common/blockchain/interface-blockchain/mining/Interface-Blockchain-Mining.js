@@ -251,6 +251,20 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         this.end = 0;
 
+        let balance = this.block.blockchain.accountantTree.getBalance(this.block.posMinerAddress || this.block.data.minerAddress);
+        if (balance === null){
+
+            console.error("You can't mine POS because you don't have enough funds");
+            await this.blockchain.sleep(1000);
+
+            return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                nonce: -1,
+            };
+
+        }
+
         // try all timestamps
         let medianTimestamp = Math.ceil( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
 
