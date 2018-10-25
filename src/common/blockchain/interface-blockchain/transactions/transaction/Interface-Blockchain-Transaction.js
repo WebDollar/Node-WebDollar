@@ -242,7 +242,7 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=false, blockValidationType = {}){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
