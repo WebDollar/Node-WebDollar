@@ -140,7 +140,6 @@ class TransactionsPendingQueue {
 
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-
             if ( ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
                  (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
                 this._removePendingTransaction(i);
@@ -153,10 +152,7 @@ class TransactionsPendingQueue {
 
             } catch (exception){
 
-                // if ( Math.random() < 0.1)
-                //    console.warn("Old Transaction removed because of exception ", exception);
-
-                if ( !exception.myNonce || Math.abs( exception.myNonce - exception.nonce) > 20 )
+                if ( !exception.myNonce || Math.abs( exception.myNonce - exception.nonce) > consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
                     this._removePendingTransaction(i)
 
             }
