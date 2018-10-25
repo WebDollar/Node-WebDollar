@@ -218,7 +218,7 @@ class InterfaceBlockchainTransactionsProtocol {
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {
                 format: "buffer",
                 ids: [txId],
-            }, "answer", 5000);
+            }, "answer", 8000);
 
             if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
 

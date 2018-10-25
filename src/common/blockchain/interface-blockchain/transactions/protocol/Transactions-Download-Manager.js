@@ -133,8 +133,6 @@ class TransactionsDownloadManager{
 
                 if (tx !== undefined) {
 
-                    console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"));
-
                     let transaction;
 
                     try {
@@ -150,6 +148,8 @@ class TransactionsDownloadManager{
                         console.error("Transaction " + tx.txId.toString("hex") + " not downloaded");
 
                     }
+
+                    console.info("processing transaction ", pos, "/", this._transactionsQueue.length, tx.txId.toString("hex"), tx.buffer ? "buff" : "NO buffer",  );
 
                     tx.deleted = true;
                     tx.buffer = undefined;
