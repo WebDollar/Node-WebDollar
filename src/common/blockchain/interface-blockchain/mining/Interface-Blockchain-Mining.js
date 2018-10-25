@@ -40,13 +40,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
-    async getNextBlock(){
+    async getNextBlock(showLogsOnlyOnce){
 
         let nextBlock, nextTransactions;
 
         try {
 
-            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte);
+            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
@@ -97,6 +97,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      */
     async mineNextBlock(suspend){
 
+        let showLogsOnlyOnce = true;
+
         while (this.started && !global.TERMINATED){
 
             if (this.minerAddress === undefined){
@@ -112,7 +114,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                let nextBlock = await this.getNextBlock();
+                let nextBlock = await this.getNextBlock(showLogsOnlyOnce);
 
                 let difficulty = this.blockchain.getDifficultyTarget();
 
@@ -134,7 +136,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let start = Math.floor( Math.random() * 3700000000 );
                 let end = 0xFFFFFFFF;
 
-                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height);
+                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height, showLogsOnlyOnce);
 
 
             } catch (exception){
@@ -142,6 +144,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this.stopMining();
             }
 
+            showLogsOnlyOnce = false;
 
         }
 
@@ -152,10 +155,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param block
      * @param difficulty
      */
-    async mineBlock( block,  difficulty, start, end, height){
+    async mineBlock( block,  difficulty, start, end, height, showLogsOnlyOnce){
 
-        console.log("");
-        console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
+        if(showLogsOnlyOnce) {
+            console.log("");
+            console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
+        }
 
         try{
 
@@ -227,7 +232,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                console.error( "block ", block.height ," was not mined...");
+                if(showLogsOnlyOnce)
+                    console.error( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
@@ -254,7 +260,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let balance = this.block.blockchain.accountantTree.getBalance(this.block.posMinerAddress || this.block.data.minerAddress);
         if (balance === null){
 
-            console.error("You can't mine POS because you don't have enough funds");
             await this.blockchain.sleep(1000);
 
             return {
