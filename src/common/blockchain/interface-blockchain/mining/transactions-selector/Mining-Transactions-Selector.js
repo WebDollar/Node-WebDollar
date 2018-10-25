@@ -49,7 +49,7 @@ class MiningTransactionsSelector{
 
     }
 
-    selectNextTransactions(miningFeePerByte){
+    selectNextTransactions(miningFeePerByte,showLogsOnlyOnce){
 
         this._transactions = [];
 
@@ -110,10 +110,12 @@ class MiningTransactionsSelector{
             i++;
         }
 
-        console.warn("--------------------------------");
-        console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.list.length);
-        console.warn("Transactions selected for mining: ", this._transactions.length);
-        console.warn("--------------------------------");
+        if(showLogsOnlyOnce){
+            console.warn("--------------------------------");
+            console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.list.length);
+            console.warn("Transactions selected for mining: ", this._transactions.length);
+            console.warn("--------------------------------");
+        }
 
         return this._transactions;
     }
