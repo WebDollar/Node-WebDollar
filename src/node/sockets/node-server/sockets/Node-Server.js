@@ -215,6 +215,13 @@ class NodeServer {
 
                     console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
 
+                    //BAN CONNECTIONS ON TESTNET
+                    if(process.env.NETWORK === 'testnet')
+                        if( socket.node.sckAddress.getAddress(false,false) === '188.27.199.131' ){
+                            socket.disconnect();
+                            return false;
+                        }
+
                     if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
