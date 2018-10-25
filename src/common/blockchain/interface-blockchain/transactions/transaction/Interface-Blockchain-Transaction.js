@@ -242,7 +242,7 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false, showDebug=false, blockValidationType = {}){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
@@ -258,7 +258,8 @@ class InterfaceBlockchainTransaction{
         } catch (exception){
 
             if (showDebug)
-                console.warn ("Transaction Problem", exception);
+                // console.warn ("Transaction Problem", exception);
+                //Todo remove comment on main net
 
             return false;
         }
