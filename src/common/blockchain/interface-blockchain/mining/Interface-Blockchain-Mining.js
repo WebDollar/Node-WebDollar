@@ -304,8 +304,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
                     done = true;
 
-                if (consts.DEBUG )
-                    console.error(exception);
+                if ( consts.DEBUG )
+                    // console.error(exception);
+                    //Todo remove comment on main net
 
                 await this.blockchain.sleep(100);
                 
