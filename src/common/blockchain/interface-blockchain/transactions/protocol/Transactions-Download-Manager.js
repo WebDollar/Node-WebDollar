@@ -57,7 +57,7 @@ class TransactionsDownloadManager{
             return false;
         }
 
-        if ( Blockchain.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( txId ) !== null )
+        if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction( txId ) !== null )
             return true;
 
         let transactionFound = this.findTransactionById(txId);
@@ -223,7 +223,7 @@ class TransactionsDownloadManager{
         } catch (exception) {
 
             if (transaction !== undefined && transaction !== null)
-                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction) === -1)
+                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction.txId) === null)
                     transaction.destroyTransaction();
 
         }

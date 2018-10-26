@@ -155,7 +155,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 for (let i=0; i<response.ids.length; i++ ){
 
-                    let transaction = this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId(response.ids[i]);
+                    let transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
 
                     if (transaction === null || transaction === undefined) continue;
 
@@ -194,7 +194,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             for (let i=0; i<ids.length; i++) {
 
-                if (this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( ids[i]) !== null ) continue;
+                if (this.blockchain.transactions.pendingQueue.findPendingTransaction( ids[i]) !== null ) continue;
                 this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
 
             }

@@ -120,7 +120,7 @@ class NanoWalletProtocol{
                 let tx = null;
                 if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
 
-                let foundTx = Blockchain.Transactions.pendingQueue.searchPendingTransactionByTxId( transaction.txId );
+                let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
 
                 if ( foundTx === null) {
                     Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);

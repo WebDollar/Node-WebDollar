@@ -39,7 +39,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
                 let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;
 
                 if (transactionsList === undefined)
-                    transactionsList = this.blockchain.transactions.pendingQueue.list;
+                    transactionsList = this.blockchain.transactions.pendingQueue.listArray;
 
                 transactionsList.forEach( (transaction)=>{
 
@@ -71,7 +71,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         //calculate how many transactions we already have to increment the current nonce
         try {
 
-            this.blockchain.transactions.pendingQueue.list.forEach( (pendingTransaction) => {
+            this.blockchain.transactions.pendingQueue.listArray.forEach( (pendingTransaction) => {
 
                 if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
                     nonce++;

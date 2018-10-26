@@ -18,11 +18,11 @@ class TransactionsListForPropagation{
 
             let transactions = [];
 
-            for (let i=0; i< this.blockchain.transactions.pendingQueue.list.length; i++) {
+            for (let i=0; i< this.blockchain.transactions.pendingQueue.listArray.length; i++) {
 
-                if (! this.blockchain.transactions.pendingQueue.list[i].isTransactionOK(true)) continue;
+                if (! this.blockchain.transactions.pendingQueue.listArray[i].isTransactionOK(true)) continue;
 
-                transactions.push( this.blockchain.transactions.pendingQueue.list[i] );
+                transactions.push( this.blockchain.transactions.pendingQueue.listArray[i] );
             }
 
             this.blockHash = this.blockchain.blocks.last.hash;

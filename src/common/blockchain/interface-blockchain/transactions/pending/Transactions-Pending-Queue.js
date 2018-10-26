@@ -14,7 +14,9 @@ class TransactionsPendingQueue {
         this.pendingQueueSavingManager = new TransactionsPendingQueueSavingManager(blockchain, this, db);
 
         this.blockchain = blockchain;
-        this.list = [];
+        this.list = {};
+        this.listArray = [];
+        this.listLength = 0;
 
         this.db = db;
 
@@ -25,7 +27,7 @@ class TransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
-        if ( this.findPendingTransaction(transaction) !== -1 )
+        if ( this.findPendingTransaction(transaction.txId) !== null )
             return false;
 
         let blockValidationType = {
@@ -51,79 +53,70 @@ class TransactionsPendingQueue {
 
         let inserted = false;
 
-        for (let i=0; i<this.list.length && inserted === false; i++ ) {
+        for (let i=0; i<this.listArray.length ; i++ ) {
 
-            let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
+            if(inserted === false){
 
-            if (compare < 0) // next
-                continue;
-            else
-            if (compare === 0){ //order by nonce
+                let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
+                if (compare < 0) // next
+                    continue;
+                else
+                if (compare === 0){ //order by nonce
 
-                if (transaction.nonce === this.list[i].nonce){
-                    inserted = true;
-                    break;
-                } else if (transaction.nonce < this.list[i].nonce){
-                    this.list.splice(i, 0, transaction);
+                    if (transaction.nonce === this.listArray[i].nonce){
+                        inserted = true;
+                        break;
+                    } else if (transaction.nonce < this.listArray[i].nonce){
+                        this.listArray.splice(i, 0, transaction);
+                        this.list[transaction.txId] = transaction;
+                        inserted = true;
+                        break;
+                    }
+
+                }
+                else
+                if (compare > 0) { // i will add it
+                    this.listArray.splice(i, 0, transaction);
+                    this.list[transaction.txId] = transaction;
                     inserted = true;
                     break;
                 }
 
             }
-            else
-            if (compare > 0) { // i will add it
-                this.list.splice(i, 0, transaction);
-                inserted = true;
-                break;
-            }
 
         }
 
-        if ( inserted === false)
-            this.list.push(transaction);
+        if ( inserted === false){
+            this.listArray.push(transaction);
+            this.list[transaction.txId] = transaction;
+            this.listLength++
+        }
 
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
         
         this.transactions.emitTransactionChangeEvent( transaction );
+
     }
 
-    findPendingTransaction(transaction){
+    findPendingTransaction(txId){
 
-        for (let i = 0; i < this.list.length; i++)
-            if (  this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
-                return i;
+        return this.list[txId] ? txId : null;
 
-        return -1;
     }
 
-    searchPendingTransactionByTxId(transactionId){
+    _removePendingTransaction (transaction, txId, index){
 
-        if (typeof transactionId === "string") transactionId = new Buffer(transactionId, 16);
-
-        for (let i=0; i< this.list.length; i++)
-            if (transactionId.equals( this.list[i].txId ))
-                return this.list[i];
-
-        return null;
-    }
-
-    _removePendingTransaction (transaction){
-
-        let index;
-
-        if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
-        else if (typeof transaction === "number") {
-            index = transaction;
-            transaction = this.list[index];
-        }
-
-        if (index === -1)
+        if (index === null)
             return true;
 
-        this.list[index].destroyTransaction();
-        this.list.splice(index, 1);
+        this.list[txId].destroyTransaction();
+
+        delete this.list[txId];
+        this.listLength--;
+
+        this.listArray.splice(index, 1);
 
         this.transactions.emitTransactionChangeEvent(transaction, true);
     }
@@ -136,24 +129,24 @@ class TransactionsPendingQueue {
             }
         };
 
-        for (let i=this.list.length-1; i >= 0; i--) {
+        for (let i=this.listArray.length-1; i >= 0; i--) {
 
-            if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
+            if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-            if ( ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
-                 (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
-                this._removePendingTransaction(i);
+            if ( ( (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
+                 (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
+                this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i);
             }
 
             try{
 
                 if ( Blockchain.blockchain.agent.consensus )
-                    this.list[i].validateTransactionEveryTime(undefined, blockValidationType );
+                    this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType );
 
             } catch (exception){
 
                 if ( !exception.myNonce || Math.abs( exception.myNonce - exception.nonce) > consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
-                    this._removePendingTransaction(i)
+                    this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i)
 
             }
 

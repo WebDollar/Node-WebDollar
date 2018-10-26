@@ -14,7 +14,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
             let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;
 
             if (transactionsList === undefined)
-                transactionsList = this.transaction.blockchain.transactions.pendingQueue.list;
+                transactionsList = this.transaction.blockchain.transactions.pendingQueue.listArray;
 
             for (let i=0; i < transactionsList.length; i++){
 
