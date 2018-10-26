@@ -192,12 +192,8 @@ class InterfaceBlockchainTransactionsProtocol {
 
             let ids = answer.transactions;
 
-            for (let i=0; i<ids.length; i++) {
-
-                if (this.blockchain.transactions.pendingQueue.findPendingTransaction( ids[i]) !== null ) continue;
+            for (let i=0; i<ids.length; i++)
                 this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
-
-            }
 
             if (start + count < answer.length)
                 await this.downloadTransactions(socket, start+count, count, max);
