@@ -133,10 +133,10 @@ class TransactionsPendingQueue {
 
             if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-            if ( ( (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
-                 (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
-                this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i);
-            }
+            // if ( ( (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
+            //      (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
+            //     this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i);
+            // }
 
             try{
 
