@@ -5,7 +5,7 @@ import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
     TUTORIAL BASED ON https://www.npmjs.com/package/ipaddr.js/
  */
 
-class GeoLocationAddressObject  {
+class GeoLocationAddressObject {
 
     /*
         sckAddress = Null
@@ -15,7 +15,7 @@ class GeoLocationAddressObject  {
 
     constructor(sckAddress, port, location){
 
-        if ( location === undefined) location = {};
+        if ( location === undefined ) location = {};
 
         sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
         this.sckAddress = sckAddress;
