@@ -226,7 +226,7 @@ class TransactionsDownloadManager{
             if( this._transactionsQueue[txId].skipeTx === true )
                 delete this._transactionsQueue[txId];
 
-        setTimeout( this._removeOldTransactions.bind(this), 5*60*1000);
+        setTimeout( this._removeOldTransactions.bind(this), 15*60*1000);
 
     }
 
