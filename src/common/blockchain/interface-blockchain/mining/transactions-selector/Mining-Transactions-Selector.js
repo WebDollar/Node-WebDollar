@@ -110,12 +110,12 @@ class MiningTransactionsSelector{
             i++;
         }
 
-        // if(showLogsOnlyOnce){
+        if(showLogsOnlyOnce){
             console.warn("--------------------------------");
             console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.listArray.length);
             console.warn("Transactions selected for mining: ", this._transactions.length);
             console.warn("--------------------------------");
-        // }
+        }
 
         return this._transactions;
     }
