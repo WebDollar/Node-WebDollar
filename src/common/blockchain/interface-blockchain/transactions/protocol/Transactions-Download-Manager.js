@@ -32,7 +32,7 @@ class TransactionsDownloadManager{
     }
 
     createTransaction(txId,socket,buffer){
-        this._transactionsQueue[txId]= { buffer: buffer, socket: [socket], totalSocketsProcessed: 0, dateInitial: new Date().getTime()};
+        this._transactionsQueue[txId]= { buffer: buffer, socket: [socket], totalSocketsProcessed: 0, skipeTx: false, dateInitial: new Date().getTime() };
         this._transactionsQueueLength++;
     }
 
@@ -58,7 +58,7 @@ class TransactionsDownloadManager{
 
             index ++;
 
-            if ( this._transactionsQueue[txId].socket !== undefined )
+            if ( this._transactionsQueue[txId].socket !== undefined && this._transactionsQueue[txId].skipeTx !== true )
                 return {id:txId, index: index, };
             else
                 this.removeTransaction(txId);
@@ -91,12 +91,15 @@ class TransactionsDownloadManager{
 
             let found = false;
 
-            for( let i=0; i<=this._transactionsQueue[txId.toString('hex')].socket.length; i++){
+            //Add socket in socketsList if is from different socket
+            for( let i=0; i<this._transactionsQueue[txId.toString('hex')].socket.length; i++){
 
-                if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
-                    found = true;
-                    break;
-                }
+                if( this._transactionsQueue[txId.toString('hex')].socket.length !==0 )
+                    if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+                        this._transactionsQueue[txId.toString('hex')].skipeTx=false;
+                        found = true;
+                        break;
+                    }
 
             }
 
@@ -141,8 +144,6 @@ class TransactionsDownloadManager{
 
                 if (txId !== undefined) {
 
-                    console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
-
                     try {
 
                         let totalSocketsProcessed = this._transactionsQueue[txId].totalSocketsProcessed;
@@ -150,6 +151,8 @@ class TransactionsDownloadManager{
                         //Try to download transaction by hash
                         if (this._transactionsQueue[txId].buffer === undefined)
                             this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
+
+                        console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
 
                         //If transaction was downloaded
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
@@ -168,7 +171,7 @@ class TransactionsDownloadManager{
                     this._transactionsQueue[txId].totalSocketsProcessed++;
 
                     if (this._transactionsQueue[txId].socket.length <= this._transactionsQueue[txId].totalSocketsProcessed)
-                        this.removeTransaction(txId);
+                        this._transactionsQueue[txId].skipeTx = true;
 
                 }
 
