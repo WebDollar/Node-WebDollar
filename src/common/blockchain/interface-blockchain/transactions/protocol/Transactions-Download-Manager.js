@@ -15,7 +15,6 @@ class TransactionsDownloadManager{
         this._socketsQueue = [];
         this._transactionsQueue = {};
         this._transactionsQueueLength = 0;
-        this.maxDownloadsTryesForTransaction = 3;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
             this._unsubscribeSocket(result.socket)
@@ -67,7 +66,6 @@ class TransactionsDownloadManager{
             this._transactionsQueue[txId]= {
                 buffer: buffer,
                 socket: socket,
-                downloadFails: 0,
                 dateInitial: new Date().getTime(),
             };
 
@@ -159,8 +157,6 @@ class TransactionsDownloadManager{
 
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer))
                             transaction = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket);
-                        else
-                            this._transactionsQueue[txId].downloadFails++;
 
                     } catch (exception){
 
@@ -170,12 +166,8 @@ class TransactionsDownloadManager{
 
                     console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",  );
 
-                    if(this._transactionsQueue[txId].downloadFails > this.maxDownloadsTryesForTransaction){
-
-                        this._transactionsQueue[txId].deleted = true;
-                        this._transactionsQueue[txId].buffer = undefined;
-
-                    }
+                    this._transactionsQueue[txId].deleted = true;
+                    this._transactionsQueue[txId].buffer = undefined;
 
                     if (this._transactionsQueue[txId].socket !== undefined)
                         socketsAlready.push( this._transactionsQueue[txId].socket );
