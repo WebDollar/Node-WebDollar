@@ -69,7 +69,7 @@ class TransactionsPendingQueue {
                         break;
                     } else if (transaction.nonce < this.listArray[i].nonce){
                         this.listArray.splice(i, 0, transaction);
-                        this.list[transaction.txId] = transaction;
+                        this.list[transaction.txId.toString('hex')] = transaction;
                         inserted = true;
                         break;
                     }
@@ -78,7 +78,7 @@ class TransactionsPendingQueue {
                 else
                 if (compare > 0) { // i will add it
                     this.listArray.splice(i, 0, transaction);
-                    this.list[transaction.txId] = transaction;
+                    this.list[transaction.txId.toString('hex')] = transaction;
                     inserted = true;
                     break;
                 }
@@ -89,7 +89,7 @@ class TransactionsPendingQueue {
 
         if ( inserted === false){
             this.listArray.push(transaction);
-            this.list[transaction.txId] = transaction;
+            this.list[transaction.txId.toString('hex')] = transaction;
             this.listLength++
         }
 
@@ -102,18 +102,18 @@ class TransactionsPendingQueue {
 
     findPendingTransaction(txId){
 
-        return this.list[txId] ? txId : null;
+        return this.list[txId.toString('hex')] ? txId : null;
 
     }
 
-    _removePendingTransaction (transaction, txId, index){
+    _removePendingTransaction (transaction, index){
 
         if (index === null)
             return true;
 
-        this.list[txId].destroyTransaction();
+        this.list[transaction.txId.toString('hex')].destroyTransaction();
 
-        delete this.list[txId];
+        delete this.list[transaction.txId.toString('hex')];
         this.listLength--;
 
         this.listArray.splice(index, 1);
@@ -133,10 +133,10 @@ class TransactionsPendingQueue {
 
             if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-            // if ( ( (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ) &&
-            //      (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
-            //     this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i);
-            // }
+            if ( this.listArray[i].timeLock > this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && this.listArray[i].timeLock < this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ){
+                this._removePendingTransaction(this.listArray[i], i);
+                continue;
+            }
 
             try{
 
@@ -146,7 +146,7 @@ class TransactionsPendingQueue {
             } catch (exception){
 
                 if ( !exception.myNonce || Math.abs( exception.myNonce - exception.nonce) > consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
-                    this._removePendingTransaction(this.listArray[i], this.listArray[i].txId, i)
+                    this._removePendingTransaction(this.listArray[i], i)
 
             }
 

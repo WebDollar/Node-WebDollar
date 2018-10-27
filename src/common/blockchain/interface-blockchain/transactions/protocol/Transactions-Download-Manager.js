@@ -12,7 +12,8 @@ class TransactionsDownloadManager{
         this.blockchain = blockchain;
         this.transactionsProtocol = transactionsProtocol;
 
-        this._socketsQueue = [];
+        this._socketsQueue = {};
+        this._socketsQueueLength = 0;
         this._transactionsQueue = {};
         this._transactionsQueueLength = 0;
 
@@ -22,66 +23,74 @@ class TransactionsDownloadManager{
 
         setTimeout( this._processSockets.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
-        setTimeout( this._deleteOldTransactions.bind(this), 10*1000 );
 
     }
 
-    findSocket(socket, returnPos = false){
+    removeTransaction(tx){
+        delete this._transactionsQueue[tx];
+        this._transactionsQueueLength--;
+    }
 
-        for (let i=0; i<this._socketsQueue.length; i++)
-            if (this._socketsQueue[i] === socket)
-                return returnPos ? i :  this._socketsQueue[i];
-
-        return returnPos ? -1 : null;
+    createTransaction(txId,socket,buffer){
+        this._transactionsQueue[txId]= { buffer: buffer, socket: [socket], lastSocketProcessed: 0, dateInitial: new Date().getTime()};
+        this._transactionsQueueLength++;
     }
 
     addSocket(socket){
+        this._socketsQueue[socket.node.sckAddress.uuid] = socket;
+        this._socketsQueueLength++;
+    }
 
-        if (this.findSocket(socket) === null)
-            this._socketsQueue.push(socket);
-
+    removeSocket(socket){
+        delete this._socketsQueue[socket.node.sckAddress.uuid];
+        this._socketsQueueLength--;
     }
 
     findTransactionById(txId){
-
         return this._transactionsQueue[txId] ? this._transactionsQueue[txId] : null;
+    }
+
+    findFirstReadyToDownloadTransaction(){
+
+        let index = 0;
+
+        for (let txId in this._transactionsQueue){
+
+            index ++;
+
+            if ( this._transactionsQueue[txId].socket !== undefined )
+                return {id:txId, index: index, };
+            else
+                this.removeTransaction(txId);
+
+        }
+
+        return undefined;
 
     }
 
     addTransaction(socket, txId, buffer){
 
-        if ( !Buffer.isBuffer(txId) ) throw {message: "txId is not a buffer"};
+        if ( !Buffer.isBuffer(txId) )
+            throw {message: "txId is not a buffer"};
 
         if (this._transactionsQueueLength > MAX_TRANSACTIONS_LENGTH){
             console.warn("There are way too many transactions in pending");
             return false;
         }
 
-        if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction( txId ) !== null )
+        if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction( txId.toString('hex') ) !== null )
             return true;
 
-        let transactionFound = this.findTransactionById(txId);
-        if ( transactionFound  === null) {
+        if ( this.findTransactionById(txId.toString('hex')) === null) {
 
-            this._transactionsQueue[txId]= {
-                buffer: buffer,
-                socket: socket,
-                dateInitial: new Date().getTime(),
-            };
-
-            this._transactionsQueueLength++;
-
+            this.createTransaction(txId.toString('hex'),socket,buffer);
             return true;
 
         }else
-            transactionFound.socket = socket;
+            this._transactionsQueue[txId.toString('hex')].socket.push(socket);
 
         return false;
-    }
-
-    removeTransaction(tx){
-        delete this._transactionsQueue[tx];
-        this._transactionsQueueLength--;
     }
 
     async _processSockets(){
@@ -90,8 +99,8 @@ class TransactionsDownloadManager{
 
             for (let i=0; i < 20; i++){
 
-                let socket = this._socketsQueue[ Math.floor( Math.random()*this._socketsQueue.length) ];
-                await this.transactionsProtocol.downloadTransactions(socket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+                let randomSocket = Object.keys( this._socketsQueue )[ 1 ];
+                await this.transactionsProtocol.downloadTransactions(randomSocket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
             }
 
@@ -103,113 +112,69 @@ class TransactionsDownloadManager{
 
     }
 
-    _findFirstUndeletedTransaction(socketsAlready = []){
-
-        let index = 0;
-
-        for (let txId in this._transactionsQueue){
-
-            index ++;
-
-            if ( !this._transactionsQueue[txId].deleted && this._transactionsQueue[txId].socket !== undefined ) {
-
-                let found = false;
-                for ( let j=0; j < socketsAlready.length; j++ )
-                    if (socketsAlready[j] === this._transactionsQueue[txId].socket){
-                        found = true;
-                        break;
-                    }
-
-                if (found)
-                    continue;
-
-                return {id:txId, index: index};
-
-            }
-
-        }
-
-        return undefined;
-
-    }
-
     async _processTransactions(){
 
-        let socketsAlready = [];
-        for (let count = 0; count < 20; count++){
+        try{
 
-            try{
+            let firstUneleted = this.findFirstReadyToDownloadTransaction();
+            let txId = undefined;
 
-                let firstUneleted = this._findFirstUndeletedTransaction(socketsAlready);
-                let txId = undefined;
+            if(typeof firstUneleted === 'object')
+                txId = firstUneleted.id;
 
-                if(typeof firstUneleted === 'object')
-                    txId = firstUneleted.id;
+            if (txId !== undefined) {
 
-                if (txId !== undefined) {
+                console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",  );
 
-                    let transaction;
+                try {
 
-                    try {
+                    let lastSocketProcessed = this._transactionsQueue[txId].lastSocketProcessed;
 
-                        if ( this._transactionsQueue[txId].buffer === undefined )
-                            this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket, txId);
+                    //Try to download transaction by hash
+                    if ( this._transactionsQueue[txId].buffer === undefined )
+                        this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[lastSocketProcessed], Buffer.from(txId,'hex'));
 
-                        if (Buffer.isBuffer(this._transactionsQueue[txId].buffer))
-                            transaction = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket);
-
-                    } catch (exception){
-
-                        console.error("Transaction " + txId.toString("hex") + " not downloaded");
-
+                    //If transaction was downloaded
+                    if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)){
+                        this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[lastSocketProcessed]);
+                        this.removeTransaction(txId);
+                        setTimeout( this._processTransactions.bind(this), 100);
+                        return;
                     }
 
-                    console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",  );
+                } catch (exception){
 
-                    this._transactionsQueue[txId].deleted = true;
-                    this._transactionsQueue[txId].buffer = undefined;
-
-                    if (this._transactionsQueue[txId].socket !== undefined)
-                        socketsAlready.push( this._transactionsQueue[txId].socket );
+                    console.error("No tx found");
 
                 }
 
-            } catch (exception){
-                console.error("_processTransactions raised an error", exception);
-            }
+                this._transactionsQueue[txId].lastSocketProcessed++;
 
-        }
-
-        setTimeout( this._processTransactions.bind(this), 300);
-
-    }
-
-    _deleteOldTransactions(){
-
-        let date = new Date().getTime();
-
-        try {
-
-            for (let txId in this._transactionsQueue)
-                if ( date - this._transactionsQueue[txId].dateInitial > 10*1000 && this._transactionsQueue[txId].deleted )
+                if(this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].lastSocketProcessed )
                     this.removeTransaction(txId);
 
+                this._transactionsQueue[txId].buffer = undefined;
+
+            }
+
         } catch (exception){
-            console.error("_deleteOldTransactions raised an error", exception);
+            console.error("_processTransactions raised an error", exception);
         }
 
-        setTimeout( this._deleteOldTransactions.bind(this), 10*1000 );
+        setTimeout( this._processTransactions.bind(this), 100);
+
     }
 
     _createTransaction(buffer, socket){
 
         let transaction;
+
         try {
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
-                throw {message: "validation failed"};
+                throw {message: "Transsaction validation failed"};
 
             var blockValidationType = {};
             blockValidationType['skip-validation-transactions-from-values'] = true;
@@ -220,6 +185,7 @@ class TransactionsDownloadManager{
             this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, true);
 
             return transaction
+
         } catch (exception) {
 
             if (transaction !== undefined && transaction !== null)
@@ -234,13 +200,12 @@ class TransactionsDownloadManager{
 
     _unsubscribeSocket(socket){
 
-        for (let i = this._socketsQueue.length-1; i >= 0; i--)
-            if (this._socketsQueue[i] === socket)
-                this._socketsQueue.splice(i, 1);
+        this.removeSocket(socket);
 
         for (let txId in this._transactionsQueue)
-            if ( this._transactionsQueue[txId].socket === socket )
-                this._transactionsQueue[txId].socket = undefined;
+            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
+                if ( this._transactionsQueue[txId].socket[i] === socket )
+                    this._transactionsQueue[txId].socket.splice(i,1);
 
     }
 
