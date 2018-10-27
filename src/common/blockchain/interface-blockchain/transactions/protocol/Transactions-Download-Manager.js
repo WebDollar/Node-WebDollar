@@ -97,12 +97,11 @@ class TransactionsDownloadManager{
 
         try{
 
-            for (let i=0; i < 20; i++){
+            let randomSocket;
 
-                let randomSocket = Object.keys( this._socketsQueue )[ 1 ];
-                await this.transactionsProtocol.downloadTransactions(randomSocket, 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
-
-            }
+            if(this._socketsQueueLength > 0)
+                randomSocket = Object.keys( this._socketsQueue )[ Math.floor( Math.random()*this._socketsQueueLength ) ];
+            await this.transactionsProtocol.downloadTransactions( this._socketsQueue[randomSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
         } catch (exception){
 
