@@ -23,6 +23,7 @@ class TransactionsDownloadManager{
 
         setTimeout( this._processSockets.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
+        setTimeout( this._removeOldTransactions.bind(this), 10*1000);
 
     }
 
@@ -152,13 +153,12 @@ class TransactionsDownloadManager{
                         if (this._transactionsQueue[txId].buffer === undefined)
                             this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
-                        console.info("processing transaction ", firstUneleted.index, "/", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
+                        console.info("processing transaction ", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
 
                         //If transaction was downloaded
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
                             this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
-                            this.removeTransaction(txId);
-                            setTimeout(this._processTransactions.bind(this), 100);
+                            this._transactionsQueue[txId].skipeTx = true;
                             return;
                         }
 
@@ -215,6 +215,16 @@ class TransactionsDownloadManager{
         }
 
         return null;
+
+    }
+
+    _removeOldTransactions(){
+
+        for( let txId in this._transactionsQueue )
+            if( this._transactionsQueue[txId].skipeTx === true )
+                delete this._transactionsQueue[txId];
+
+        setTimeout( this._removeOldTransactions.bind(this), 10*1000);
 
     }
 
