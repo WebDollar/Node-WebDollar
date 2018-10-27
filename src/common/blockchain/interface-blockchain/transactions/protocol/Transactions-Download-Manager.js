@@ -23,7 +23,7 @@ class TransactionsDownloadManager{
 
         setTimeout( this._processSockets.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
-        setTimeout( this._removeOldTransactions.bind(this), 10*1000);
+        setTimeout( this._removeOldTransactions.bind(this), 20*1000);
 
     }
 
@@ -154,12 +154,12 @@ class TransactionsDownloadManager{
                             this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
                         console.info("processing transaction ", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
+                        // await this.sleep(100);
 
                         //If transaction was downloaded
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
                             this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             this._transactionsQueue[txId].skipeTx = true;
-                            return;
                         }
 
                     } catch (exception) {
@@ -170,8 +170,10 @@ class TransactionsDownloadManager{
 
                     this._transactionsQueue[txId].totalSocketsProcessed++;
 
-                    if (this._transactionsQueue[txId].socket.length <= this._transactionsQueue[txId].totalSocketsProcessed)
+                    if (this._transactionsQueue[txId].socket.length <= this._transactionsQueue[txId].totalSocketsProcessed){
                         this._transactionsQueue[txId].skipeTx = true;
+                        this._transactionsQueue[txId].buffer = undefined;
+                    }
 
                 }
 
@@ -181,7 +183,7 @@ class TransactionsDownloadManager{
 
         }
 
-        setTimeout( this._processTransactions.bind(this), 100);
+        setTimeout( this._processTransactions.bind(this), 1000);
 
     }
 
@@ -224,7 +226,7 @@ class TransactionsDownloadManager{
             if( this._transactionsQueue[txId].skipeTx === true )
                 delete this._transactionsQueue[txId];
 
-        setTimeout( this._removeOldTransactions.bind(this), 10*1000);
+        setTimeout( this._removeOldTransactions.bind(this), 5*60*1000);
 
     }
 
