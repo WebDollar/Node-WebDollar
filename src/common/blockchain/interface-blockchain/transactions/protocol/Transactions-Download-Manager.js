@@ -154,7 +154,7 @@ class TransactionsDownloadManager{
                             this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
                         console.info("processing transaction ", txId.toString('hex'), "left", this._transactionsQueueLength-1, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
-                        // await this.sleep(100);
+                        await this.blockchain.sleep(20)
 
                         let wasAdded = null;
 

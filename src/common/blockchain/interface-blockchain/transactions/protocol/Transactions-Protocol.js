@@ -145,6 +145,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
+                await this.blockchain.sleep(20);
                 log += ( " started at" + new Date().getTime() + " - " );
 
                 if (typeof response !== "object") return false;
@@ -166,12 +167,15 @@ class InterfaceBlockchainTransactionsProtocol {
                     let transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
 
                     if (transaction === null || transaction === undefined) {
+                        await this.blockchain.sleep(20);
                         log += ( " tx not found at" + new Date().getTime() + " - ");
                         console.log(log);
                         continue;
                     }
 
                     log += ( " tx found at " + new Date().getTime() + " with ID - " + response.ids[i].toString('hex'));
+                    await this.blockchain.sleep(20);
+                    console.log(log)
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
