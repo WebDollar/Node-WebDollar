@@ -168,18 +168,18 @@ class InterfaceBlockchainTransactionsProtocol {
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
 
-                    if (i % 20 === 0)
-                        await this.blockchain.sleep( 20 );
-
                 }
 
-                await this.blockchain.sleep(25);
+                await this.blockchain.sleep(200);
 
                 console.warn("Sent", list);
 
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
             } catch (exception){
+
+                console.error("error sending tx",exception)
+
             }
 
         });
@@ -226,6 +226,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
 
+            console.info(answerTransactions);
             return answerTransactions.transactions[0];
 
 
