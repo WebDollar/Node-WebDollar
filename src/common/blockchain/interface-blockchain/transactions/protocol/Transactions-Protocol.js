@@ -141,8 +141,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
         socket.node.on("transactions/get-pending-transactions-by-ids", async (response) => {
 
-
-
             try{
 
                 if (typeof response !== "object") return false;
@@ -176,6 +174,8 @@ class InterfaceBlockchainTransactionsProtocol {
                 }
 
                 await this.blockchain.sleep(25);
+
+                console.warn("Sent", list);
 
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
