@@ -10,7 +10,7 @@ class TransactionsListForPropagation{
     }
 
     /**
-     * TODO: this function should not be used everything, but rather anytime something was changed
+     * TODO: Remove this class in order to avoid looping in this.list and repleace instead with this.listA TransactionPendingQueue
      */
     refreshTransactionsForPropagationList(){
 
@@ -34,7 +34,7 @@ class TransactionsListForPropagation{
 
     addTransactionForPropagationList(transaction, avoidValidation = false){
 
-        if (!avoidValidation && !transaction.isTransactionOK(true)) return;
+        if (!avoidValidation && !transaction.isTransactionOK(true,true,{},true)) return;
 
         if (this.findTransactionForPropagationList(transaction) === -1)
             this.list.push(transaction);
