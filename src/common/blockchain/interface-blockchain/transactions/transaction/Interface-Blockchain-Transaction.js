@@ -240,7 +240,7 @@ class InterfaceBlockchainTransaction{
             else
                 if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
-            if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
+            if (! this._validateNonce(blockValidationType,considerImutability) ) throw {message: "Nonce is invalid" };
 
             return this.from.validateFromEnoughMoney(blockValidationType);
         }

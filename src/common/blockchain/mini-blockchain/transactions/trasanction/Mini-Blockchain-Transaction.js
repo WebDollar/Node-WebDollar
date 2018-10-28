@@ -23,9 +23,9 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     }
 
-    _validateNonce(blockValidationType){
+    _validateNonce(blockValidationType, considerImutability=false){
 
-        //Validate nonce
+        //Nonce from the accountant Tree
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
         if (nonce < this.nonce)
@@ -57,6 +57,15 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             }
 
+        if(considerImutability) {
+            if (nonce > this.nonce + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && nonce < this.nonce - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH)
+                throw {
+                    message: "Nonce is not right",
+                    myNonce: this.nonce,
+                    nonce: nonce,
+                    txId: this.txId.toString("hex")
+                };
+        }else
         if (nonce !== this.nonce)
             throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
