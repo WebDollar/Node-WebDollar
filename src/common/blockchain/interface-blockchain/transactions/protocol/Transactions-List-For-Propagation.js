@@ -5,8 +5,8 @@ class TransactionsListForPropagation{
         this.blockchain = blockchain;
 
         this.blockHash = new Buffer(0);
-        this.list = {};
-        this.listArray = [];
+        this.existingList = {};
+        this.list = [];
 
     }
 
@@ -31,8 +31,8 @@ class TransactionsListForPropagation{
             }
 
             this.blockHash = this.blockchain.blocks.last.hash;
-            this.list = transactions;
-            this.listArray = transactionsArray;
+            this.existingList = transactions;
+            this.list = transactionsArray;
 
         }
 
@@ -42,10 +42,10 @@ class TransactionsListForPropagation{
 
         if (!avoidValidation && !transaction.isTransactionOK(true,true,{},true)) return;
 
-        if( this.list[transaction.txId.toString('hex')] === undefined ){
+        if( this.existingList[transaction.txId.toString('hex')] === undefined ){
 
-            this.list[transaction.txId.toString('hex')] = {exist: true};
-            this.listArray.push(transaction);
+            this.existingList[transaction.txId.toString('hex')] = {exist: true};
+            this.list.push(transaction);
 
         }
 
