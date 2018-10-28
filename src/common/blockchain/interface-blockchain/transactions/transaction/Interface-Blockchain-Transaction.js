@@ -242,7 +242,7 @@ class InterfaceBlockchainTransaction{
 
             if (! this._validateNonce(blockValidationType,considerImutability) ) throw {message: "Nonce is invalid" };
 
-            return this.from.validateFromEnoughMoney(blockValidationType);
+            return this.from.validateFromEnoughMoney(blockValidationType,considerImutability);
         }
 
         return true;
