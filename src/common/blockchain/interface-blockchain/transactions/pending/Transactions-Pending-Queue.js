@@ -16,7 +16,6 @@ class TransactionsPendingQueue {
         this.blockchain = blockchain;
         this.list = {};
         this.listArray = [];
-        this.listLength = 0;
 
         this.db = db;
 
@@ -55,28 +54,17 @@ class TransactionsPendingQueue {
 
         for (let i=0; i<this.listArray.length ; i++ ) {
 
-            if(inserted === false){
+            let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
-                let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
+            if (compare < 0) // next
+                continue;
+            else
+            if (compare === 0){ //order by nonce
 
-                if (compare < 0) // next
-                    continue;
-                else
-                if (compare === 0){ //order by nonce
-
-                    if (transaction.nonce === this.listArray[i].nonce){
-                        inserted = true;
-                        break;
-                    } else if (transaction.nonce < this.listArray[i].nonce){
-                        this.listArray.splice(i, 0, transaction);
-                        this.list[transaction.txId.toString('hex')] = transaction;
-                        inserted = true;
-                        break;
-                    }
-
-                }
-                else
-                if (compare > 0) { // i will add it
+                if (transaction.nonce === this.listArray[i].nonce){
+                    inserted = true;
+                    break;
+                } else if (transaction.nonce < this.listArray[i].nonce){
                     this.listArray.splice(i, 0, transaction);
                     this.list[transaction.txId.toString('hex')] = transaction;
                     inserted = true;
@@ -84,16 +72,22 @@ class TransactionsPendingQueue {
                 }
 
             }
+            else
+            if (compare > 0) { // i will add it
+                this.listArray.splice(i, 0, transaction);
+                this.list[transaction.txId.toString('hex')] = transaction;
+                inserted = true;
+                break;
+            }
 
         }
 
         if ( inserted === false){
             this.listArray.push(transaction);
             this.list[transaction.txId.toString('hex')] = transaction;
-            this.listLength++
         }
 
-        console.warn("pending transactions ", this.listLength, this.listArray.length);
+        console.warn("pending transactions ", this.listArray.length);
 
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
@@ -104,11 +98,33 @@ class TransactionsPendingQueue {
 
     findPendingTransaction(txId){
 
-        return this.list[txId.toString('hex')] ? txId : null;
+        return this.list[txId.toString('hex')] ? this.list[txId.toString('hex')] : null;
 
     }
 
     _removePendingTransaction (transaction, index){
+
+        // if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
+        //
+        // let index;
+        //
+        // if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
+        // else if (typeof transaction === "number") {
+        //     index = transaction;
+        //     transaction = this.list[index];
+        // }
+        //
+        // if (index === -1)
+        //     return true;
+        //
+        // if (transaction.blockchain !== undefined){
+        //     this.transactions.emitTransactionChangeEvent(transaction, true);
+        //     this.list[index].destroyTransaction();
+        // }
+        //
+        // this.list.splice(index, 1);
+
+        //44444444444444444444444444444
 
         if (index === null)
             return true;
@@ -116,7 +132,6 @@ class TransactionsPendingQueue {
         this.list[transaction.txId.toString('hex')].destroyTransaction();
 
         delete this.list[transaction.txId.toString('hex')];
-        this.listLength--;
 
         this.listArray.splice(index, 1);
 
