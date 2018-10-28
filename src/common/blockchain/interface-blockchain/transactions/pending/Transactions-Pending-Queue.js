@@ -19,7 +19,6 @@ class TransactionsPendingQueue {
 
         this.db = db;
 
-
         setTimeout( this._removeOldTransactions.bind(this), 20000 );
 
     }

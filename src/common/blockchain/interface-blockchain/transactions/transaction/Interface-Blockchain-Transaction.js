@@ -231,7 +231,7 @@ class InterfaceBlockchainTransaction{
         if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
 
             if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
-            if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+            if (this.timeLock !== 0 && blockHeight < this.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
             if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
 
