@@ -233,7 +233,7 @@ class InterfaceBlockchainTransaction{
             if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
             if(considerImutability)
-                if (this.timeLock !== 0 && blockHeight < this.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+                if (this.timeLock !== 0 && blockHeight - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.timeLock ) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
             else
                 if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
