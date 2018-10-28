@@ -42,8 +42,12 @@ class TransactionsListForPropagation{
 
         if (!avoidValidation && !transaction.isTransactionOK(true,true,{},true)) return;
 
-        this.list[transaction.txId.toString('hex')] = {exist: true};
-        this.listArray.push(transaction);
+        if( this.list[transaction.txId.toString('hex')] === undefined ){
+
+            this.list[transaction.txId.toString('hex')] = {exist: true};
+            this.listArray.push(transaction);
+
+        }
 
     }
 
