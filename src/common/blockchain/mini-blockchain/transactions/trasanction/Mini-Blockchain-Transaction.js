@@ -1,4 +1,5 @@
 import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
+import consts from 'consts/const_global'
 
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
