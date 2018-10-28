@@ -58,7 +58,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
             }
 
         if(considerImutability) {
-            if (nonce > this.nonce + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && nonce < this.nonce - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH)
+            if (nonce < this.nonce + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && nonce > this.nonce - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH)
                 throw {
                     message: "Nonce is not right",
                     myNonce: this.nonce,
