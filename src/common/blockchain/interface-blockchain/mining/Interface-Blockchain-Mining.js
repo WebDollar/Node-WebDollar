@@ -369,7 +369,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         }
 
         if (consts.DEBUG && Math.random() < 0.05 ) {
-            console.log("bestHash", this.bestHash.toString("hex"), "   ", this.difficulty.toString("hex"));
+            console.log("current bestHash -", this.bestHash.toString("hex"), " target -", this.difficulty.toString("hex"));
             await this.blockchain.sleep( 5 );
         }
 
