@@ -141,12 +141,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
         socket.node.on("transactions/get-pending-transactions-by-ids", async (response) => {
 
-            let log = "";
+
 
             try{
-
-                await this.blockchain.sleep(20);
-                log += ( " started at" + new Date().getTime() + " - " );
 
                 if (typeof response !== "object") return false;
 
@@ -154,11 +151,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 if (response.ids === undefined || response.ids === null || !Array.isArray ( response.ids) ) return false;
 
-                log += " good response -";
-
                 let list = [];
-
-                console.log(log);
 
                 await this.blockchain.sleep(20);
 
@@ -168,14 +161,11 @@ class InterfaceBlockchainTransactionsProtocol {
 
                     if (transaction === null || transaction === undefined) {
                         await this.blockchain.sleep(20);
-                        log += ( " tx not found at" + new Date().getTime() + " - ");
-                        console.log(log);
                         continue;
                     }
 
-                    log += ( " tx found at " + new Date().getTime() + " with ID - " + response.ids[i].toString('hex'));
                     await this.blockchain.sleep(20);
-                    console.log(log)
+                    console.log( " tx found at " + new Date().getTime() + " with ID - " + response.ids[i].toString('hex'));
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );

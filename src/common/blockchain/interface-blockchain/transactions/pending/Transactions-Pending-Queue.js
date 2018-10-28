@@ -93,7 +93,7 @@ class TransactionsPendingQueue {
             this.listLength++
         }
 
-        console.warn("pending transactions ", this.listLength, this.listArray.length)
+        console.warn("pending transactions ", this.listLength, this.listArray.length);
 
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
