@@ -103,28 +103,6 @@ class TransactionsPendingQueue {
 
     _removePendingTransaction (transaction, index){
 
-        // if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
-        //
-        // let index;
-        //
-        // if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
-        // else if (typeof transaction === "number") {
-        //     index = transaction;
-        //     transaction = this.list[index];
-        // }
-        //
-        // if (index === -1)
-        //     return true;
-        //
-        // if (transaction.blockchain !== undefined){
-        //     this.transactions.emitTransactionChangeEvent(transaction, true);
-        //     this.list[index].destroyTransaction();
-        // }
-        //
-        // this.list.splice(index, 1);
-
-        //44444444444444444444444444444
-
         if (index === null)
             return true;
 

@@ -20,7 +20,7 @@ class TransactionsListForPropagation{
 
             for (let i=0; i< this.blockchain.transactions.pendingQueue.listArray.length; i++) {
 
-                if (! this.blockchain.transactions.pendingQueue.listArray[i].isTransactionOK(true)) continue;
+                if (! this.blockchain.transactions.pendingQueue.listArray[i].isTransactionOK(true,true,{},true) ) continue;
 
                 transactions.push( this.blockchain.transactions.pendingQueue.listArray[i] );
             }

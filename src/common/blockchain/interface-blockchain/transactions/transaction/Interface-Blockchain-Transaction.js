@@ -224,14 +224,18 @@ class InterfaceBlockchainTransaction{
         return true;
     }
 
-    validateTransactionEveryTime( blockHeight , blockValidationType = {}){
+    validateTransactionEveryTime( blockHeight , blockValidationType = {}, considerImutability=false){
 
         if (this.blockchain === undefined) throw {message: "blockchain is empty"};
 
         if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
 
             if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
-            if (this.timeLock !== 0 && blockHeight < this.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+
+            if(considerImutability)
+                if (this.timeLock !== 0 && blockHeight < this.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+            else
+                if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
             if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
 
@@ -242,7 +246,7 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}, considerImutability = false){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
@@ -253,7 +257,7 @@ class InterfaceBlockchainTransaction{
                 validation: true
             };
 
-            this.validateTransactionEveryTime(undefined, blockValidationType );
+            this.validateTransactionEveryTime(undefined, blockValidationType, considerImutability );
 
         } catch (exception){
 
