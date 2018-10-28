@@ -153,14 +153,19 @@ class TransactionsDownloadManager{
                         if (this._transactionsQueue[txId].buffer === undefined)
                             this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
-                        console.info("processing transaction ", this._transactionsQueueLength, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
+                        console.info("processing transaction ", txId.toString('hex'), "left", this._transactionsQueueLength-1, this._transactionsQueue[txId].buffer ? "Correct" : "Incorrect",);
                         // await this.sleep(100);
+
+                        let wasAdded = null;
 
                         //If transaction was downloaded
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
-                            this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                            wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             this._transactionsQueue[txId].skipeTx = true;
                         }
+
+                        // if(wasAdded !== null)
+                            //TODO ban socket
 
                     } catch (exception) {
 
