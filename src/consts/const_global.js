@@ -54,7 +54,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 200,
+        IMMUTABILITY_LENGTH: 30,
 
     },
 
@@ -266,10 +266,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.200.3",
+        VERSION: "1.200.4",
 
-        VERSION_COMPATIBILITY: "1.200.3",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.3",
+        VERSION_COMPATIBILITY: "1.200.4",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.4",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -473,7 +473,7 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://testnet2.hoste.ro:8001"],
+        "addr": ["http://testnet1.hoste.ro:40000"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
