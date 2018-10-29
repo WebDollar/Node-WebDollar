@@ -49,17 +49,18 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 });
 
-
-                for (let i=nonce; i<this.nonce; i++)
-                    if (!foundNonce[i])
-                        throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
+                if(!considerImutability)
+                    for (let i=nonce; i<this.nonce; i++)
+                        if (!foundNonce[i])
+                            throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
                 return true;
 
             }
 
         if(considerImutability) {
-            if (nonce < this.nonce + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && nonce > this.nonce - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH)
+            let maximumDifference = consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH;
+            if (nonce < this.nonce + maximumDifference && nonce > this.nonce - maximumDifference)
                 throw {
                     message: "Nonce is not right",
                     myNonce: this.nonce,
