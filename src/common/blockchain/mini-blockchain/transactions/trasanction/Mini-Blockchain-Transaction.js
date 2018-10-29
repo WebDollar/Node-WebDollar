@@ -60,7 +60,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         if(considerImutability) {
             let maximumDifference = consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH;
-            if (nonce < this.nonce + maximumDifference && nonce > this.nonce - maximumDifference)
+            if (nonce > this.nonce + maximumDifference && nonce < this.nonce - maximumDifference)
                 throw {
                     message: "Nonce is not right",
                     myNonce: this.nonce,
