@@ -116,6 +116,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 let list = [];
 
+                //Todo Delete transactionsForPropagation class (in order to remove a useless loop ), if validation of transaction at refresh list won't change the transactions from the list comaring to PendingQueue list
                 this.transactionsForPropagation.refreshTransactionsForPropagationList();
 
                 let length = Math.min( response.start + response.count, this.transactionsForPropagation.list.length );
@@ -165,7 +166,6 @@ class InterfaceBlockchainTransactionsProtocol {
                     }
 
                     await this.blockchain.sleep(20);
-                    console.log( " tx found at " + new Date().getTime() + " with ID - " + response.ids[i].toString('hex'));
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
@@ -175,8 +175,6 @@ class InterfaceBlockchainTransactionsProtocol {
                 }
 
                 await this.blockchain.sleep(200);
-
-                console.warn("Sent", list);
 
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
