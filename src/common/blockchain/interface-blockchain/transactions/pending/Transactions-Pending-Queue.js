@@ -86,7 +86,7 @@ class TransactionsPendingQueue {
             this.list[transaction.txId.toString('hex')] = transaction;
         }
 
-        console.warn("Pending transactions ", this.listArray.length);
+        console.warn("Transactions stack -", this.listArray.length);
 
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
