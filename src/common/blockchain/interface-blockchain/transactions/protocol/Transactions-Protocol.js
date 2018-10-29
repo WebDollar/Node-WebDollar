@@ -228,7 +228,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
 
-            console.info(answerTransactions);
             return answerTransactions.transactions[0];
 
 
