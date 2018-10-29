@@ -127,7 +127,7 @@ class TransactionsPendingQueue {
 
             if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-            if ( this.listArray[i].timeLock > this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && this.listArray[i].timeLock < this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH ){
+            if ( this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.listArray[i].timeLock && this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
                 this._removePendingTransaction(this.listArray[i], i);
                 continue;
             }
