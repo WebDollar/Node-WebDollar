@@ -326,6 +326,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     }
 
                     socketIndex++;
+                    if (typeof trialsList[index] === undefined) trialsList[index] = 0
                     trialsList[index] ++ ;
 
                     let socket = fork.getForkSocket(socketIndex);
