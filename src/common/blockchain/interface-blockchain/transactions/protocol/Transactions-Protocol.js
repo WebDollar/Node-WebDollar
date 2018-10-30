@@ -132,8 +132,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
             let transaction = undefined;
 
-            console.log("propagate tx by Id", response)
-
             try{
 
                 if (typeof response !== "object") return false;
