@@ -236,6 +236,8 @@ class InterfaceBlockchainTransactionsProtocol {
 
         } catch (exception){
 
+            console.error("Error sending tx", exception)
+
         }
 
         return null;
@@ -246,6 +248,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         // NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
+        console.warn("broadcasted tx", transaction.txId.toString('hex'));
 
     }
 

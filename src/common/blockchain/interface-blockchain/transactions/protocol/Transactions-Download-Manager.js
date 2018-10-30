@@ -151,15 +151,20 @@ class TransactionsDownloadManager{
 
         try{
 
-            for(let i=0;i<this._socketsQueueLength;i++){
+            let randomSocket;
+            let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
 
-                await this.transactionsProtocol.downloadTransactions( this._socketsQueue[i], 0, 40,consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD);
+            randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
 
-            }
+            if(this._socketsQueueLength > 0)
+                randomSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
+            await this.transactionsProtocol.downloadTransactions( this._socketsQueue[randomSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
         } catch (exception){
 
         }
+
+        setTimeout( this._processSockets.bind(this), 20*1000 );
 
     }
 
@@ -210,15 +215,12 @@ class TransactionsDownloadManager{
 
                     }
 
-                    if(!found){
-
+                    if(!found)
                         this._transactionsQueue[txId].totalSocketsProcessed++;
 
-                        //If already processed all tx sockets start again until will be removed
-                        if (this._transactionsQueue[txId].socket.length >= this._transactionsQueue[txId].totalSocketsProcessed)
-                            this._transactionsQueue[txId].totalSocketsProcessed=0;
-
-                    }
+                    //If already processed all tx sockets start again until will be removed
+                    if (this._transactionsQueue[txId].socket.length >= this._transactionsQueue[txId].totalSocketsProcessed)
+                        this._transactionsQueue[txId].totalSocketsProcessed=0;
 
                 }
 
