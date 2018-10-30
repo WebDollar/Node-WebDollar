@@ -212,8 +212,7 @@ class TransactionsDownloadManager{
                         let totalSocketsProcessed = this._transactionsQueue[txId].totalSocketsProcessed;
 
                         //Try to download transaction by hash
-                        if (this._transactionsQueue[txId].buffer === undefined)
-                            this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
+                        this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
                         await this.blockchain.sleep(20);
                         console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED," : "FAILED,", txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now");
@@ -243,7 +242,7 @@ class TransactionsDownloadManager{
                         this._transactionsQueue[txId].totalSocketsProcessed++;
 
                         //If already processed all tx sockets start again until will be removed
-                        if (this._transactionsQueue[txId].socket.length >= this._transactionsQueue[txId].totalSocketsProcessed)
+                        if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
                             this._transactionsQueue[txId].totalSocketsProcessed=0;
                     }
 
