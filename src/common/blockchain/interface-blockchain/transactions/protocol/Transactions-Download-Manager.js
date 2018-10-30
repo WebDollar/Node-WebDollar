@@ -137,15 +137,16 @@ class TransactionsDownloadManager{
             //Add socket in tx socketsList if is from different socket
             for( let i=0; i<this._transactionsQueue[txId.toString('hex')].socket.length; i++){
 
-                if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+                if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid !== undefined )
+                    if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
 
-                    found = true;
+                        found = true;
 
-                    if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket )
-                        found = false;
+                        if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket )
+                            found = false;
 
-                    break;
-                }
+                        break;
+                    }
 
             }
 
