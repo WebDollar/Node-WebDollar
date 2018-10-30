@@ -59,9 +59,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
+                if ( !Buffer.isBuffer(response.buffer)) throw {message: "Transaction Id is invalid"};
 
-                this.transactionsDownloadingManager.addTransaction(socket, txId, buffer );
+                this.transactionsDownloadingManager._createTransaction(response.buffer,socket);
 
             } catch (exception){
 
@@ -76,9 +76,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                if ( !Buffer.isBuffer(data.buffer)) throw {message: "Transaction Id is invalid"};
+                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
-                this.transactionsDownloadingManager._createTransaction(data.buffer,socket);
+                this.transactionsDownloadingManager.addTransaction(socket, data.txId.toString('hex'), data.txId );
 
             } catch(exception){
                 if (consts.DEBUG)

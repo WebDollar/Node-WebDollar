@@ -93,8 +93,10 @@ class TransactionsDownloadManager{
 
         }
 
+        //If there is any tx to be processed
         if(index!==0){
 
+            //Increase trials limit for processing next time or decrease it
             if(!foundVirginTransaction)
                 this.smallestTrial ++;
             else
@@ -159,7 +161,8 @@ class TransactionsDownloadManager{
                 selectedSocket = socketID;
                 
             }else{
-                
+
+                //Select random socket for being processed
                 let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
                 randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
                 selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
