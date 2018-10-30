@@ -235,7 +235,9 @@ class TransactionsDownloadManager{
                             found = true;
 
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
-                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails--;
+                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
+                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
+                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0
 
                         }else{
                             this._transactionsQueue[txId].fails++;
