@@ -285,6 +285,7 @@ class InterfaceBlockchainBlock {
             //return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
             throw exception;
         }
+
     }
 
 

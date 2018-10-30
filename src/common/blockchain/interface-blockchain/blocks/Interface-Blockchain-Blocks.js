@@ -6,6 +6,7 @@ const BigNumber = require('bignumber.js');
 
 import Serialization from "common/utils/Serialization";
 import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
+import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -23,6 +24,9 @@ class InterfaceBlockchainBlocks{
         this._networkHashRate = 0 ;
 
         this._chainWork =  new BigInteger(0);
+        this._chainHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER );
+
+
         this.chainWorkSerialized = new Buffer(0);
 
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
@@ -61,6 +65,7 @@ class InterfaceBlockchainBlocks{
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
         this.chainWork = this.chainWork.plus( block.workDone );
+        this._chainHash = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256(Buffer.concat( [this._chainHash, block.blockHash]));
 
 
     }
@@ -87,6 +92,8 @@ class InterfaceBlockchainBlocks{
                 else
                     this[i] = undefined;
             }
+
+        this._chainHash =
 
         this.length = after;
 
