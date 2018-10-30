@@ -20,10 +20,14 @@ class TransactionsDownloadManager{
         this.smallestTrial = 0;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribeSocket(result.socket)
+            this.removeSocket(result.socket)
         });
 
-        setTimeout( this._processSocket.bind(this), 5000 );
+        NodesList.emitter.on("nodes-list/connected", (result) => {
+            this.addSocket(result.socket)
+        });
+
+        setTimeout( this._processSocket.bind(this), 10*1000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
 
     }
@@ -33,15 +37,15 @@ class TransactionsDownloadManager{
         this._transactionsQueueLength--;
     }
 
-    createTransaction(txId,socket,buffer){
-        this._transactionsQueue[txId]= { buffer: buffer, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
+    createTransaction(txId,socket){
+        this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
         this._transactionsQueueLength++;
     }
 
     addSocket(socket){
         this._socketsQueue[socket.node.sckAddress.uuid] = socket;
         this._socketsQueueLength++;
-        this._processSocket.bind(this,socket.node.sckAddress.uuid)
+        setTimeout( this._processSocket.bind(this,socket.node.sckAddress.uuid), 5000);
     }
 
     removeSocket(socket){
@@ -108,7 +112,7 @@ class TransactionsDownloadManager{
 
     }
 
-    addTransaction(socket, txId, buffer){
+    addTransaction(socket, txId){
 
         if ( !Buffer.isBuffer(txId) )
             throw {message: "txId is not a buffer"};
@@ -123,7 +127,7 @@ class TransactionsDownloadManager{
 
         if ( this.findTransactionById(txId.toString('hex')) === null) {
 
-            this.createTransaction(txId.toString('hex'),socket,buffer);
+            this.createTransaction(txId.toString('hex'),socket);
             return true;
 
         }else{
@@ -133,11 +137,15 @@ class TransactionsDownloadManager{
             //Add socket in tx socketsList if is from different socket
             for( let i=0; i<this._transactionsQueue[txId.toString('hex')].socket.length; i++){
 
-                if( this._transactionsQueue[txId.toString('hex')].socket.length !==0 )
-                    if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
-                        found = true;
-                        break;
-                    }
+                if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+
+                    found = true;
+
+                    if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket )
+                        found = false;
+
+                    break;
+                }
 
             }
 
@@ -151,6 +159,8 @@ class TransactionsDownloadManager{
     }
 
     async _processSocket(socketID=undefined){
+
+        console.warn("Process Socket");
 
         try{
 
@@ -174,9 +184,11 @@ class TransactionsDownloadManager{
 
         } catch (exception){
 
+            console.warn("Faield to process socket");
+
         }
 
-        setTimeout( this._processSocket.bind(this), 20*1000 );
+        // setTimeout( this._processSocket.bind(this), 40*1000);
 
     }
 
@@ -227,12 +239,13 @@ class TransactionsDownloadManager{
 
                     }
 
-                    if(!found)
+                    if(!found){
                         this._transactionsQueue[txId].totalSocketsProcessed++;
 
-                    //If already processed all tx sockets start again until will be removed
-                    if (this._transactionsQueue[txId].socket.length >= this._transactionsQueue[txId].totalSocketsProcessed)
-                        this._transactionsQueue[txId].totalSocketsProcessed=0;
+                        //If already processed all tx sockets start again until will be removed
+                        if (this._transactionsQueue[txId].socket.length >= this._transactionsQueue[txId].totalSocketsProcessed)
+                            this._transactionsQueue[txId].totalSocketsProcessed=0;
+                    }
 
                 }
 
@@ -276,17 +289,6 @@ class TransactionsDownloadManager{
         }
 
         return null;
-
-    }
-
-    _unsubscribeSocket(socket){
-
-        this.removeSocket(socket);
-
-        for (let txId in this._transactionsQueue)
-            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
-                if ( this._transactionsQueue[txId].socket[i] === socket )
-                    this._transactionsQueue[txId].socket.splice(i,1);
 
     }
 

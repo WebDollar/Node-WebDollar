@@ -78,7 +78,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
-                this.transactionsDownloadingManager.addTransaction(socket, data.txId.toString('hex'), data.txId );
+                this.transactionsDownloadingManager.addTransaction(socket, data.txId );
 
             } catch(exception){
                 if (consts.DEBUG)
@@ -185,9 +185,13 @@ class InterfaceBlockchainTransactionsProtocol {
 
         try{
 
+            console.warn ("Will download tx from", start, "to", start+count);
+
             let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 12*1000);
 
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
+
+            console.warn ("Will process tx from", start, "to", start+count);
 
             for (let i=0; i<answer.transactions.length; i++)
                 this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
