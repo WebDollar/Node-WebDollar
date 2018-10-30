@@ -23,7 +23,7 @@ class TransactionsDownloadManager{
             this._unsubscribeSocket(result.socket)
         });
 
-        setTimeout( this._processSockets.bind(this), 5000 );
+        setTimeout( this._processSocket.bind(this), 5000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
 
     }
@@ -41,6 +41,7 @@ class TransactionsDownloadManager{
     addSocket(socket){
         this._socketsQueue[socket.node.sckAddress.uuid] = socket;
         this._socketsQueueLength++;
+        this._processSocket.bind(this,socket.node.sckAddress.uuid)
     }
 
     removeSocket(socket){
@@ -147,24 +148,32 @@ class TransactionsDownloadManager{
         return false;
     }
 
-    async _processSockets(){
+    async _processSocket(socketID=undefined){
 
         try{
 
-            let randomSocket;
-            let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
+            let selectedSocket;
 
-            randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
+            if(socketID){
+
+                selectedSocket = socketID;
+                
+            }else{
+                
+                let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
+                randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
+                selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
+                
+            }
 
             if(this._socketsQueueLength > 0)
-                randomSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
-            await this.transactionsProtocol.downloadTransactions( this._socketsQueue[randomSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+                await this.transactionsProtocol.downloadTransactions( this._socketsQueue[selectedSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
 
         } catch (exception){
 
         }
 
-        setTimeout( this._processSockets.bind(this), 20*1000 );
+        setTimeout( this._processSocket.bind(this), 20*1000 );
 
     }
 
