@@ -5,7 +5,6 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 
-import TransactionsListForPropagation from "./Transactions-List-For-Propagation";
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 
 import TransactionsDownloadManager from "./Transactions-Download-Manager";
@@ -22,8 +21,6 @@ class InterfaceBlockchainTransactionsProtocol {
         //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
 
         NodesList.emitter.on("nodes-list/connected", (result) => { this._newSocketCreateProtocol(result) } );
-
-        this.transactionsForPropagation = new TransactionsListForPropagation(this.blockchain);
 
         StatusEvents.on('blockchain/status', async (data)=>{
 
@@ -116,26 +113,28 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 let list = [];
 
-                //Todo Delete transactionsForPropagation class (in order to remove a useless loop ), if validation of transaction at refresh list won't change the transactions from the list comaring to PendingQueue list
-                this.transactionsForPropagation.refreshTransactionsForPropagationList();
-
-                let length = Math.min( response.start + response.count, this.transactionsForPropagation.list.length );
+                let length = Math.min( response.start + response.count, Blockchain.blockchain.transactions.pendingQueue.listArray.length );
 
                 await this.blockchain.sleep(20);
 
                 for (let i=response.start; i < length; i++ ){
 
-                    if (response.format === "json") list.push( this.transactionsForPropagation.list[i].txId.toString("hex") ); else
-                    if (response.format === "buffer") list.push( this.transactionsForPropagation.list[i].txId );
+                    if (response.format === "json") list.push( Blockchain.blockchain.transactions.pendingQueue.listArray[i].txId.toString("hex") ); else
+                    if (response.format === "buffer") list.push( Blockchain.blockchain.transactions.pendingQueue.listArray[i].txId );
 
                     if (i % 20 === 0)
                         await this.blockchain.sleep( 20 );
 
                 }
 
-                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.transactionsForPropagation.list.length } );
+                console.warn("Sent hashes list with",list.length,"tx hashes, from", response.start, "to", length);
+
+                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: Blockchain.blockchain.transactions.pendingQueue.listArray.length } );
 
             } catch (exception){
+
+                console.error("Failed to send tx list for download");
+
             }
 
         });
@@ -180,7 +179,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             } catch (exception){
 
-                console.error("error sending tx",exception,transaction)
+                console.error("error sending tx -",transaction, exception)
 
             }
 
@@ -191,27 +190,28 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async downloadTransactions(socket, start, count, max){
 
-        if (start >= max) return;
+        if (start >= max) return false;
 
-        if (socket === undefined) return;
+        if (socket === undefined) return false;
 
         try{
 
-            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
+            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 12*1000);
+
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
 
-            let ids = answer.transactions;
-
-            for (let i=0; i<ids.length; i++)
-                this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
+            for (let i=0; i<answer.transactions.length; i++)
+                this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
 
             if (start + count < answer.length)
-                await this.downloadTransactions(socket, start+count, count, max);
+                return await this.downloadTransactions(socket, start+count, count, max);
 
         } catch (exception){
 
             if (consts.DEBUG)
                 console.error("Error Getting All Pending Transactions", exception);
+
+            return false;
 
         }
 
@@ -226,7 +226,10 @@ class InterfaceBlockchainTransactionsProtocol {
                 ids: [txId],
             }, "answer", 6000);
 
-            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
+            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) {
+                console.warn("Transaction", txId.toString('hex') ,"was not sent");
+                return false;
+            }
 
             return answerTransactions.transactions[0];
 
