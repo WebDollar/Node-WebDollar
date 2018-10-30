@@ -59,18 +59,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                let txId, buffer;
-
-                if (response.format === 'json' || response.format === undefined) {
-
-                    let json = response.json;
-                    txId = json.txId;
-
-                } else
-                if (response.format === 'buffer'){
-                    txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( response.buffer ));
-                    buffer = response.buffer;
-                }
+                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
                 this.transactionsDownloadingManager.addTransaction(socket, txId, buffer );
 
@@ -87,9 +76,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction Id is invalid"};
+                if ( !Buffer.isBuffer(data.buffer)) throw {message: "Transaction Id is invalid"};
 
-                this.transactionsDownloadingManager.addTransaction(socket, data.txId, undefined );
+                this.transactionsDownloadingManager._createTransaction(data.buffer,socket);
 
             } catch(exception){
                 if (consts.DEBUG)

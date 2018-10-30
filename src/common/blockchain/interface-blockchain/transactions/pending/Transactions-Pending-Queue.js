@@ -153,7 +153,6 @@ class TransactionsPendingQueue {
         this.transactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
     }
 
-
 }
 
 export default TransactionsPendingQueue
