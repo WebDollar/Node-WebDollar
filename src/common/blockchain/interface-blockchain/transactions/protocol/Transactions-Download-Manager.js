@@ -216,7 +216,7 @@ class TransactionsDownloadManager{
                         this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
                         await this.blockchain.sleep(20);
-                        console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED," : "FAILED,", txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now");
+                        console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
 
                         let wasAdded = null;
 
