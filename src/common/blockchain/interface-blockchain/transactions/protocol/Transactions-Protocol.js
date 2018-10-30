@@ -242,7 +242,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
     }
 
-
     propagateNewPendingTransaction(transaction, exceptSockets){
 
         // NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
