@@ -129,8 +129,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             let number = new BigInteger(hash.toString("hex"), 16);
 
-            //return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).divide(this.timeStamp).toString(16) , "hex")  );
-            return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( number.divide( balance ).toString(16) , "hex")  );
+            let hex = number.divide( balance ).toString(16);
+            if (hex.length % 2 === 1) hex = hex + "0";
+
+            return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( hex , "hex")  );
 
         } catch (exception){
             console.error("Error computeHash", exception);
