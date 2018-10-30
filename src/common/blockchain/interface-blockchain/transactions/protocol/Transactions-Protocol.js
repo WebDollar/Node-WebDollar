@@ -181,7 +181,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         if (start >= max) return false;
 
-        if (typeof socket === "undefined") return false;
+        if (typeof socket === "undefined") return null;
 
         try{
 
