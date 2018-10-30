@@ -24,7 +24,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         StatusEvents.on('blockchain/status', async (data)=>{
 
-            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+            if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
                 return false;
 
             if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined)
@@ -41,12 +41,12 @@ class InterfaceBlockchainTransactionsProtocol {
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+        if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
             return false;
 
         this.initializeTransactionsPropagation(socket);
 
-        if (Blockchain.loaded)
+        if (this.blockchain.loaded)
             this.transactionsDownloadingManager.addSocket(socket);
 
     }
@@ -113,14 +113,14 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 let list = [];
 
-                let length = Math.min( response.start + response.count, Blockchain.blockchain.transactions.pendingQueue.listArray.length );
+                let length = Math.min( response.start + response.count, this.blockchain.transactions.pendingQueue.listArray.length );
 
                 await this.blockchain.sleep(20);
 
                 for (let i=response.start; i < length; i++ ){
 
-                    if (response.format === "json") list.push( Blockchain.blockchain.transactions.pendingQueue.listArray[i].txId.toString("hex") ); else
-                    if (response.format === "buffer") list.push( Blockchain.blockchain.transactions.pendingQueue.listArray[i].txId );
+                    if (response.format === "json") list.push( this.blockchain.transactions.pendingQueue.listArray[i].txId.toString("hex") ); else
+                    if (response.format === "buffer") list.push( this.blockchain.transactions.pendingQueue.listArray[i].txId );
 
                     if (i % 20 === 0)
                         await this.blockchain.sleep( 20 );
@@ -129,7 +129,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 console.warn("Sent hashes list with",list.length,"tx hashes, from", response.start, "to", length);
 
-                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: Blockchain.blockchain.transactions.pendingQueue.listArray.length } );
+                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.blockchain.transactions.pendingQueue.listArray.length } );
 
             } catch (exception){
 
