@@ -20,7 +20,7 @@ class TransactionsDownloadManager{
         this.smallestTrial = 0;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this.removeSocket(result.socket)
+            this._unsubscribeSocket(result.socket)
         });
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
@@ -43,6 +43,7 @@ class TransactionsDownloadManager{
     }
 
     addSocket(socket){
+        socket.downloadFails = 0;
         this._socketsQueue[socket.node.sckAddress.uuid] = socket;
         this._socketsQueueLength++;
         setTimeout( this._processSocket.bind(this,socket.node.sckAddress.uuid), 5000);
@@ -142,6 +143,12 @@ class TransactionsDownloadManager{
 
                         found = true;
 
+                        let socket1 = this._transactionsQueue[txId.toString('hex')].socket[i];
+                        let socket2 = socket;
+
+                        delete socket1.downloadFails;
+                        delete socket2.downloadFails;
+
                         if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket )
                             found = false;
 
@@ -222,12 +229,23 @@ class TransactionsDownloadManager{
 
                         //If transaction was downloaded
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
+
                             wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             this.removeTransaction(txId);
                             found = true;
+
+                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
+                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails--;
+
                         }else{
                             this._transactionsQueue[txId].fails++;
                             this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
+
+                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
+                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
+
+                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid);
                         }
 
                         // if(wasAdded !== null)
@@ -289,6 +307,17 @@ class TransactionsDownloadManager{
         }
 
         return null;
+
+    }
+
+    _unsubscribeSocket(socket){
+
+        this.removeSocket(socket);
+
+        for (let txId in this._transactionsQueue)
+            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
+                if ( this._transactionsQueue[txId].socket[i] === socket )
+                    this._transactionsQueue[txId].socket.splice(i,1);
 
     }
 
