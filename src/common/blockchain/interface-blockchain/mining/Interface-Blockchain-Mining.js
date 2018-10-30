@@ -19,6 +19,7 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -365,7 +366,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (exception){
             console.error("Error _mineNonces", "nonce", nonce, start, end );
-            this.resetForced = true;
+
+            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                this.resetForced = true;
         }
 
         if (consts.DEBUG && Math.random() < 0.05 ) {
