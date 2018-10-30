@@ -212,7 +212,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async downloadTransaction(socket, txId){
 
-        if (typeof socket === "undefined") return null;
+        if (typeof socket === "undefined") return false;
 
         try {
 
