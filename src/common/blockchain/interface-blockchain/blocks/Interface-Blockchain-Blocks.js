@@ -140,7 +140,7 @@ class InterfaceBlockchainBlocks{
 
         let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
 
-        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toFixed(15);
+        let answer = SumDiff.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks)).toFixed(15);
         answer = parseFloat(answer);
 
         this.networkHashRate = answer;

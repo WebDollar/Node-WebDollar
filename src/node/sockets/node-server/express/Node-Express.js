@@ -178,7 +178,7 @@ class NodeExpress{
 
         NodeAPIRouter._routesEnabled = true;
         NodeAPIRouter.initializeRouter( this.app.all.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
-        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter._routesEnabled = false;
 
     }
@@ -215,8 +215,8 @@ class NodeExpress{
     async _expressMiddlewareCallback(req, res, callback){
 
         try {
-            for (let k in req)
-                req[k] = decodeURIComponent(req[k]);
+            for (let k in req.params)
+                req.params[k] = decodeURIComponent(req.params[k]);
 
             let url = req.url;
 

@@ -76,7 +76,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 }) === false) throw {message: "Mining1 returned False"};
 
         } catch (Exception){
-            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : undefined );
             revertActions.revertOperations();
         }
 

@@ -33,21 +33,22 @@ docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -
 **Required: v8.x**
 It doesn't work with the new version 9.x
 
-**Windows**: just download and install from URL: https://nodejs.org/en/download/
+**Windows**: You can download Node.js from this URL: https://nodejs.org/en/download/
 
-**Linux**: tutorial how to install Node.js using NVM (recommended) [Install Node.js using NVM](/docs/Install-Debian.md)
+**Linux**: It's reccomended you [install Node.js using NVM](/docs/Install-Debian.md)
 
 ## 1. Cloning Repository
 ```
 git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar
 ```
 ## 2. Installing modules
-`cd Node-WebDollar` to enter in the downloaded folder of the repository
+`cd Node-WebDollar` to enter in the directory of the repository
 ```shell
 npm install
 ```
 
-###In case you will get errors:
+### If you get errors in step 2:
+
 ## 3. **node-gyp**
 
 In case you get errors from **node-gyp**, especially for **Argon2** or **webrtc**
@@ -77,7 +78,7 @@ sudo apt-get install clang
 npm install -g node-gyp
 ```
 
-`gcc --version` will help you to find the Version. It worked on gcc 5 and gcc 6
+`gcc --version` will help you to find the version of GCC you have installed. Webdollar is known to work on GCC 5 and GCC 6.
 
 Replace `g++-5` with your version
 Verify if you can access `g++-5` or whatever version you have.
@@ -100,7 +101,7 @@ mkdir C:\OpenSSL-Win64\lib\
 cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
 rm -r -fo .\win32\
 ```
-or cmd
+Or a command prompt (``cmd.exe``): 
 ```shell
 npm install --python=python2.7
 git clone https://github.com/ReadyTalk/win32.git
@@ -109,16 +110,16 @@ copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
 rd /s /q .\win32\
 ```
 
-## 4 SSL (Secured Socket Layer) Certificate
+## 4. SSL (Secure Socket Layer) Certificate
 
 WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Certificate you need a Domain or to generate your own SSL Certificate for your IP
 
-### 4.1 No-IP solution for Free Domain
+### 4.1. No-IP solution for Free Domain
 ###### This is required to get a SSL certificate. If you already have a domain, skip this step.
-Follow the Tutorial [Install No-Ip using ddns.net ](/docs/Install-No-Ip.md)
+Follow the tutorial: [Install No-Ip using ddns.net](/docs/Install-No-Ip.md)
 
 
-### 4.2 Generate your SSL certificate
+### 4.2. Generate your SSL certificate
 ###### Port 80 must not be in use prior to running LetsEncrypt SSL generator!
 
 Inside Node-WebDollar folder, run: 
@@ -148,7 +149,7 @@ npm run commands
 
 #### 5.2 Running Full Node
 
-install pm2
+Install pm2.
 ```shell
 npm install pm2 -g --unsafe-perm
 ```
@@ -208,7 +209,7 @@ npm run start
 
 #### 5.8 PM2 to run the Node run indefinitely
 
-Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
+Follow the tutorial: [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 
 # To do:
 
@@ -219,7 +220,7 @@ Follow the Tutorial [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
 # Resources to learn
 7 Ethereum https://medium.com/@preethikasireddy/how-does-ethereum-work-anyway-22d1df506369
 
-Mining in Bitcoins
+Mining Bitcoin
 1.  http://blog.jameslarisch.com/mining-bitcoin-blocks-yourself-for-fun-and-no-profit
 2. http://www.righto.com/2014/02/bitcoin-mining-hard-way-algorithms.html
 3. https://steemit.com/blockchain/@verifyas/what-you-should-know-about-nonces-and-difficulty
