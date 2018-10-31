@@ -14,16 +14,16 @@ export default {
         {"addr": ["https://ez.cnbacolt.com:443"]},
         {"addr": ["https://server.cnbacolt.com:443"]},
 
-        // {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node9.petreus.ro:443"]}, // Thanks to Dani Petreus
-        // {"addr": ["https://node10.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node4.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node5.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node9.petreus.ro:443"]}, // Thanks to Dani Petreus
+        {"addr": ["https://node10.petreus.ro:443"]}, // Thanks to Dani Petreus
 
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         {"addr": ["https://us.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
