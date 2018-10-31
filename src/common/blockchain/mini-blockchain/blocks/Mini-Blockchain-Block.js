@@ -127,10 +127,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             if (balance === null || balance === 0)
                 return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
 
-            let number = new BigInteger(hash.toString("hex"), 16);
+            let number = new BigInteger( hash.toString("hex"), 16);
 
             let hex = number.divide( balance ).toString(16);
-            if (hex.length % 2 === 1) hex = hex + "0";
+            if (hex.length % 2 === 1) hex = "0"+hex;
 
             return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( hex , "hex")  );
 
