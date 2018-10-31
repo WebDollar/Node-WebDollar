@@ -35,7 +35,8 @@ class GeoHelper {
             }
 
             let list = [];
-            list.push("https://geoip.tools/v1/json/?q="+address);
+            list.push("https://geo.xoip.ro/?address="+address);
+            // list.push("https://geoip.tools/v1/json/?q="+address);
             // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
 
             let data = await DownloadHelper.downloadMultipleFiles( list, 20000 );
