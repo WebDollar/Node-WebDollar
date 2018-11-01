@@ -59,10 +59,10 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 console.warn("searching missing nonce");
 
-                if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid"};
-                if ( !isNaN(response.nonce) ) throw {message: "missing-nonce - nonce is not a number"};
+                if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
+                if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
 
-                let transaction = this.blockchain.transactions.pendingQueue.listArray.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
+                let transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
 
                 console.warn("Sending missing nonce", transaction);
 
@@ -80,7 +80,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                if (!response.response) throw {message:"Response is false"};
+                if (!response.response) throw {message:"missing-nonce - Response is false"};
 
                 this.transactionsDownloadingManager.addTransaction(socket, response.transaction );
 
