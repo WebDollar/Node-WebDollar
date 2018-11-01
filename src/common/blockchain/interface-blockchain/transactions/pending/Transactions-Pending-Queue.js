@@ -65,7 +65,7 @@ class TransactionsPendingQueue {
                 } else if (transaction.nonce < this.listArray[i].nonce){
 
                     if(this.listArray[i].nonce - transaction.nonce > 1)
-                        for( let j=transaction.nonce; j<this.listArray[i].nonce; j++){
+                        for( let j=transaction.nonce+1; j<this.listArray[i].nonce; j++){
                             this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress,this.listArray[i].nonce);
                         }
 
