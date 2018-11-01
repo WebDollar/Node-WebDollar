@@ -110,48 +110,51 @@ class TransactionsPendingQueue {
 
         let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
 
-        //Binary search for address
-        while(Left <= Right)
-        {
-            selected = Math.floor((Left+Right) / 2);
-            compare = this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
+        if(this.listArray.length){
 
-            if(compare === 0)
-                break;
-            if(compare > 0)
-                Right = selected--;
-            if(compare < 0)
-                Left = selected++;
+            //Binary search for address
+            while(Left <= Right)
+            {
+                selected = Math.floor((Left+Right) / 2);
+                compare = this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
 
-        }
-
-        let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
-
-        if( this.listArray[selected].nonce === searchedNonce )
-            return this.listArray[selected].txId;
-
-        let stop = false;
-
-        for( let i = selected ; !stop ; searchedNonceIsSmaller ? i-- : i++){
-            if(searchedNonceIsSmaller){
-                if(i<0) return false;
-            }
-            else if(!searchedNonceIsSmaller){
-                if(i<this.listArray) return false;
-            }
-
-            if( this.listArray[i].address === address ){
-                if( this.listArray[i].nonce === searchedNonce ){
+                if(compare === 0)
                     break;
-                }else{
-                    if( searchedNonceIsSmaller )
-                        if( this.listArray[i].nonce < searchedNonce ) break;
-                    else
-                        if( this.listArray[i].nonce > searchedNonce ) break;
+                if(compare > 0)
+                    Right = selected--;
+                if(compare < 0)
+                    Left = selected++;
+            }
+
+            let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
+
+            if( this.listArray[selected].nonce === searchedNonce )
+                return this.listArray[selected].txId;
+
+            let stop = false;
+
+            for( let i = selected ; !stop ; searchedNonceIsSmaller ? i-- : i++){
+                if(searchedNonceIsSmaller){
+                    if(i<0) return false;
+                }
+                else if(!searchedNonceIsSmaller){
+                    if(i<this.listArray) return false;
                 }
 
-            }else
-                break;
+                if( this.listArray[i].address === address ){
+                    if( this.listArray[i].nonce === searchedNonce ){
+                        break;
+                    }else{
+                        if( searchedNonceIsSmaller )
+                            if( this.listArray[i].nonce < searchedNonce ) break;
+                            else
+                            if( this.listArray[i].nonce > searchedNonce ) break;
+                    }
+
+                }else
+                    break;
+
+            }
 
         }
 
