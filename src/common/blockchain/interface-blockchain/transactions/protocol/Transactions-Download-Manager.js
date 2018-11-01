@@ -80,7 +80,7 @@ class TransactionsDownloadManager{
                 if( currentTime - this._transactionsQueue[txId].lastTrialTime > 1000*10 || this._transactionsQueue[txId].lastTrialTime === undefined ){
 
                     //Check the maximum fails allowed per transaction hash
-                    if( this._transactionsQueue[txId].fails <= 20 ){
+                    if( this._transactionsQueue[txId].fails <= 5 ){
 
                         //Check if tx has socket and is still valid
                         if ( this._transactionsQueue[txId].socket !== undefined )
@@ -236,7 +236,7 @@ class TransactionsDownloadManager{
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0
+                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
 
                             this.removeTransaction(txId);
 
