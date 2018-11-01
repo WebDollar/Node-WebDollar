@@ -272,6 +272,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
     propagateNewMissingNonce(addressBuffer,nonce){
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
+        console.warn("broadcasted missing nonce", nonce);
     }
 
 }
