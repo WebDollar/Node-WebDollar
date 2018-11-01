@@ -126,7 +126,7 @@ class TransactionsPendingQueue {
 
         if(searchedNonceIsSmaller){
 
-            for( let i = selected; i>0; i--)
+            for( let i = selected; i<0; i--)
                 if( this.listArray[i].address === address ){
                     if( this.listArray[i].nonce === searchedNonce ){
                         console.log("found",listArray[i].nonce);
