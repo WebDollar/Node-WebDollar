@@ -113,7 +113,7 @@ class TransactionsDownloadManager{
 
     }
 
-    addTransaction(socket, txId){
+    addTransaction(socket, txId, topPriority){
 
         if ( !Buffer.isBuffer(txId) )
             throw {message: "txId is not a buffer"};
@@ -132,6 +132,8 @@ class TransactionsDownloadManager{
             return true;
 
         }else{
+
+            if(topPriority) this._transactionsQueue.fails=0;
 
             let found = false;
 
