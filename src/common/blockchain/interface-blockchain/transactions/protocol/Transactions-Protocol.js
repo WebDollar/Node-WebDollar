@@ -76,6 +76,22 @@ class InterfaceBlockchainTransactionsProtocol {
 
         });
 
+        socket.node.on("transactions/missing-nonce/answer", async (response) =>{
+
+            try {
+
+                if (!response.response) throw {message:"Response is false"};
+
+                this.transactionsDownloadingManager.addTransaction(socket, response.transaction );
+
+            } catch (exception){
+
+                console.error("missing-nonce - Failed", exception);
+
+            }
+
+        });
+
         // in case the Blockchain was not loaded, I will not be interested in transactions
 
         socket.node.on("transactions/new-pending-transaction", async (response) =>{
@@ -271,7 +287,7 @@ class InterfaceBlockchainTransactionsProtocol {
     }
 
     propagateNewMissingNonce(addressBuffer,nonce){
-        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
+        NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
         console.warn("broadcasted missing nonce", nonce);
     }
 

@@ -212,7 +212,6 @@ class TransactionsPendingQueue {
 
     propagateMissingNonce(addressBuffer,nonce){
         this.transactionsProtocol.propagateNewMissingNonce(addressBuffer,nonce);
-        console.warn("missing nonce", nonce);
     }
 
 }
