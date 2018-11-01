@@ -231,13 +231,14 @@ class TransactionsDownloadManager{
                         if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
                             wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
-                            this.removeTransaction(txId);
                             found = true;
 
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0
+
+                            this.removeTransaction(txId);
 
                         }else{
                             this._transactionsQueue[txId].fails++;
