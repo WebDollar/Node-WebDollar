@@ -143,7 +143,7 @@ class TransactionsPendingQueue {
 
                 if( this.listArray[i].address === address ){
                     if( this.listArray[i].nonce === searchedNonce ){
-                        break;
+                        return this.listArray[selected].txId;
                     }else{
                         if( searchedNonceIsSmaller )
                             if( this.listArray[i].nonce < searchedNonce ) break;
