@@ -246,11 +246,12 @@ class TransactionsDownloadManager{
                             this._transactionsQueue[txId].fails++;
                             this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
 
-                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
+                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" ){
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid);
+                                if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                    this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid);
+                            }
                         }
 
                         // if(wasAdded !== null)
