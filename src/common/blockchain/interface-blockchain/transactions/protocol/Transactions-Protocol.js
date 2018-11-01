@@ -53,6 +53,29 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async initializeTransactionsPropagation(socket){
 
+        socket.node.on("transactions/missing-nonce", async (response) =>{
+
+            try {
+
+                console.warn("searching missing nonce");
+
+                if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid"};
+                if ( !isNaN(response.nonce) ) throw {message: "missing-nonce - nonce is not a number"};
+
+                let transaction = this.blockchain.transactions.pendingQueue.listArray.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
+
+                console.warn("Sending missing nonce", transaction);
+
+                socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
+
+            } catch (exception){
+
+                console.error("missing-nonce - Failed", exception);
+
+            }
+
+        });
+
         // in case the Blockchain was not loaded, I will not be interested in transactions
 
         socket.node.on("transactions/new-pending-transaction", async (response) =>{
