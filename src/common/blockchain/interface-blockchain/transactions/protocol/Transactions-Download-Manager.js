@@ -233,7 +233,7 @@ class TransactionsDownloadManager{
                             wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             found = true;
 
-                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed].node !== "undefined" )
+                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" )
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
@@ -256,7 +256,7 @@ class TransactionsDownloadManager{
 
                     } catch (exception) {
 
-                        console.error("No tx found");
+                        console.error("No tx found",exception);
 
                     }
 
