@@ -38,15 +38,13 @@ class TransactionsPendingQueue {
             if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
                 return false;
 
-        this._insertPendingTransaction(transaction);
-
-        this.propagateTransaction(transaction, exceptSockets);
+        this._insertPendingTransaction(transaction,exceptSockets);
 
         return true;
 
     }
 
-    _insertPendingTransaction(transaction){
+    _insertPendingTransaction(transaction,exceptSockets){
 
         let inserted = false;
 
@@ -64,20 +62,45 @@ class TransactionsPendingQueue {
                     break;
                 } else if (transaction.nonce < this.listArray[i].nonce){
 
-                    if(this.listArray[i].nonce - transaction.nonce > 1)
-                        for( let j=transaction.nonce+1; j<this.listArray[i].nonce; j++){
-                            this.propagateMissingNonce(this.listArray[j].from.addresses[0].unencodedAddress,this.listArray[j].nonce);
+                    let nonceGap = true;
+
+                    if(this.listArray[i].nonce - transaction.nonce > 1) {
+                        //Propagate missing nonce
+                        for (let j = transaction.nonce + 1; j < this.listArray[i].nonce; j++) {
+                            this.propagateMissingNonce(this.listArray[j].from.addresses[0].unencodedAddress, this.listArray[j].nonce);
                         }
+                    }
+                    else{
+                        this.propagateTransaction(transaction, exceptSockets);
+                        nonceGap = false;
+                    }
 
                     this.listArray.splice(i, 0, transaction);
                     this.list[transaction.txId.toString('hex')] = transaction;
                     inserted = true;
+
+                    //Propagate all tx after solving nonce gap
+                    if (!nonceGap){
+                        for( let j = i+1; j<this.listArray.length; j++){
+                            let secondCompare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress);
+                            if(secondCompare === 0){
+                                if(this.listArray[i].nonce - this.listArray[i-1].nonce === 1)
+                                    this.propagateTransaction(transaction, exceptSockets);
+                                else
+                                    break;
+                            }else{
+                                break;
+                            }
+                        }
+                    }
+
                     break;
                 }
 
             }
             else
             if (compare > 0) { // i will add it
+                this.propagateTransaction(transaction, exceptSockets);
                 this.listArray.splice(i, 0, transaction);
                 this.list[transaction.txId.toString('hex')] = transaction;
                 inserted = true;
@@ -87,6 +110,7 @@ class TransactionsPendingQueue {
         }
 
         if ( inserted === false){
+            this.propagateTransaction(transaction, exceptSockets);
             this.listArray.push(transaction);
             this.list[transaction.txId.toString('hex')] = transaction;
         }
@@ -109,21 +133,28 @@ class TransactionsPendingQueue {
     findPendingTransactionByAddressAndNonce(address,searchedNonce){
 
         let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
-
         if(this.listArray.length){
 
+            let selectedTwice = false;
             //Binary search for address
             while(Left <= Right)
             {
+
                 selected = Math.floor((Left+Right) / 2);
                 compare = this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
+
+                if(selectedTwice!==selected) selectedTwice = selected;
+                else {
+                    console.warn("infinite loop missing nonce");
+                    return false;
+                }
 
                 if(compare === 0)
                     break;
                 if(compare > 0)
-                    Right = selected--;
+                    Left = selected--;
                 if(compare < 0)
-                    Left = selected++;
+                    Right = selected++;
             }
 
             let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
@@ -134,29 +165,36 @@ class TransactionsPendingQueue {
             let stop = false;
 
             for( let i = selected ; !stop ; searchedNonceIsSmaller ? i-- : i++){
+
                 if(searchedNonceIsSmaller){
                     if(i<0) return false;
                 }
                 else if(!searchedNonceIsSmaller){
-                    if(i<this.listArray) return false;
+                    if(i>this.listArray.length) return false;
                 }
 
-                if( this.listArray[i].address === address ){
+                if( this.listArray[i].from.addresses[0].unencodedAddress.compare(address) === 0 ){
                     if( this.listArray[i].nonce === searchedNonce ){
-                        return this.listArray[selected].txId;
+                        return this.listArray[i].txId;
                     }else{
-                        if( searchedNonceIsSmaller )
-                            if( this.listArray[i].nonce < searchedNonce ) break;
-                            else
-                            if( this.listArray[i].nonce > searchedNonce ) break;
+                        if( this.listArray[i].nonce > searchedNonce ){
+                            if( searchedNonceIsSmaller ) continue;
+                            else break;
+                        }
+                        else if( this.listArray[i].nonce < searchedNonce ){
+                            if( searchedNonceIsSmaller ) continue;
+                        }
                     }
 
-                }else
-                    break;
+                }else{
+                    return false;
+                }
 
             }
 
         }
+
+        return false;
 
     }
 
