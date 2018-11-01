@@ -124,34 +124,28 @@ class TransactionsPendingQueue {
         if( this.listArray[selected].nonce === searchedNonce )
             return this.listArray[selected].nonce;
 
-        if(searchedNonceIsSmaller){
+        let stop = false;
 
-            for( let i = selected; i<0; i--)
-                if( this.listArray[i].address === address ){
-                    if( this.listArray[i].nonce === searchedNonce ){
-                        console.log("found",listArray[i].nonce);
-                        break;
-                    }else
-                        if( this.listArray[i].nonce > searchedNonce )
-                            return false;
-                }else
-                    return false;
-
-
-        }else{
-
-            for( let i = selected; i<this.listArray.length; i++){
-                if( this.listArray[i].address === address ){
-                    if( this.listArray[i].nonce === searchedNonce ){
-                        console.log("found",listArray[i].nonce);
-                        break;
-                    }else
-                        if( this.listArray[i].nonce < searchedNonce )
-                            return false;
-                }else
-                    return false;
-
+        for( let i = selected ; !stop ; searchedNonceIsSmaller ? i-- : i++){
+            if(searchedNonceIsSmaller){
+                if(i<0) return false;
             }
+            else if(!searchedNonceIsSmaller){
+                if(i<this.listArray) return false;
+            }
+
+            if( this.listArray[i].address === address ){
+                if( this.listArray[i].nonce === searchedNonce ){
+                    break;
+                }else{
+                    if( searchedNonceIsSmaller )
+                        if( this.listArray[i].nonce < searchedNonce ) break;
+                    else
+                        if( this.listArray[i].nonce > searchedNonce ) break;
+                }
+
+            }else
+                break;
 
         }
 
