@@ -100,6 +100,63 @@ class TransactionsPendingQueue {
 
     }
 
+    findPendingTransactionByAddressAndNonce(address,searchedNonce){
+
+        let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
+
+        //Binary search for address
+        while(Left <= Right)
+        {
+            selected = Math.floor((Left+Right) / 2);
+            compare = new Buffer.from(this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
+
+            if(compare === 0)
+                break;
+            if(compare > 0)
+                Right = selected--;
+            if(compare < 0)
+                Left = selected++;
+
+        }
+
+        let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
+
+        if( this.listArray[selected].nonce === searchedNonce )
+            return this.listArray[selected].nonce;
+
+        if(searchedNonceIsSmaller){
+
+            for( let i = selected; i>0; i--)
+                if( this.listArray[i].address === address ){
+                    if( this.listArray[i].nonce === searchedNonce ){
+                        console.log("found",listArray[i].nonce);
+                        break;
+                    }else
+                        if( this.listArray[i].nonce > searchedNonce )
+                            return false;
+                }else
+                    return false;
+
+
+        }else{
+
+            for( let i = selected; i<this.listArray.length; i++){
+                if( this.listArray[i].address === address ){
+                    if( this.listArray[i].nonce === searchedNonce ){
+                        console.log("found",listArray[i].nonce);
+                        break;
+                    }else
+                        if( this.listArray[i].nonce < searchedNonce )
+                            return false;
+                }else
+                    return false;
+
+            }
+
+        }
+
+    }
+
     _removePendingTransaction (transaction, index){
 
         if (index === null)
