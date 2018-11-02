@@ -14,7 +14,7 @@ class TransactionsPendingQueue {
         this.pendingQueueSavingManager = new TransactionsPendingQueueSavingManager(blockchain, this, db);
 
         this.blockchain = blockchain;
-        this.list = {};
+        this.listObject = {};
         this.listArray = [];
 
         this.db = db;
@@ -76,7 +76,7 @@ class TransactionsPendingQueue {
                     }
 
                     this.listArray.splice(i, 0, transaction);
-                    this.list[transaction.txId.toString('hex')] = transaction;
+                    this.listObject[transaction.txId.toString('hex')] = transaction;
                     inserted = true;
 
                     //Propagate all tx after solving nonce gap
@@ -85,7 +85,7 @@ class TransactionsPendingQueue {
                             let secondCompare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress);
                             if(secondCompare === 0){
                                 if(this.listArray[i].nonce - this.listArray[i-1].nonce === 1)
-                                    this.propagateTransaction(transaction, exceptSockets);
+                                    this.propagateTransaction(this.listArray[j], []);
                                 else
                                     break;
                             }else{
@@ -102,7 +102,7 @@ class TransactionsPendingQueue {
             if (compare > 0) { // i will add it
                 this.propagateTransaction(transaction, exceptSockets);
                 this.listArray.splice(i, 0, transaction);
-                this.list[transaction.txId.toString('hex')] = transaction;
+                this.listObject[transaction.txId.toString('hex')] = transaction;
                 inserted = true;
                 break;
             }
@@ -112,7 +112,7 @@ class TransactionsPendingQueue {
         if ( inserted === false){
             this.propagateTransaction(transaction, exceptSockets);
             this.listArray.push(transaction);
-            this.list[transaction.txId.toString('hex')] = transaction;
+            this.listObject[transaction.txId.toString('hex')] = transaction;
         }
 
         console.warn("Transactions stack -", this.listArray.length);
@@ -126,7 +126,11 @@ class TransactionsPendingQueue {
 
     findPendingTransaction(txId){
 
-        return this.list[txId.toString('hex')] ? this.list[txId.toString('hex')] : null;
+        let transaction = this.listObject[txId.toString('hex')];
+
+        delete transaction.propagated;
+
+        return transaction ? transaction : null;
 
     }
 
@@ -212,9 +216,9 @@ class TransactionsPendingQueue {
         if (index === null)
             return true;
 
-        this.list[transaction.txId.toString('hex')].destroyTransaction();
+        this.listObject[transaction.txId.toString('hex')].destroyTransaction();
 
-        delete this.list[transaction.txId.toString('hex')];
+        delete this.listObject[transaction.txId.toString('hex')];
 
         this.listArray.splice(index, 1);
 
