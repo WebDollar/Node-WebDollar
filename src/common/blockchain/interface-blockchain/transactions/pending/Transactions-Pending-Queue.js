@@ -157,6 +157,15 @@ class TransactionsPendingQueue {
                     Right = selected++;
             }
 
+            let closerSelected = undefined;
+            if( this.listArray[selected].nonce > searchedNonce )
+                closerSelected = this.listArray[selected].nonce + (this.listArray[selected].nonce-searchedNonce -1);
+            else
+                closerSelected = this.listArray[selected].nonce + (searchedNonce - this.listArray[selected].nonce -1);
+
+            if ( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
+                selected = closerSelected;
+
             let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
 
             if( this.listArray[selected].nonce === searchedNonce )
