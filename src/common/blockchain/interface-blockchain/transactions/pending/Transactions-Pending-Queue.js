@@ -23,6 +23,17 @@ class TransactionsPendingQueue {
 
     }
 
+    addNewTransaction(index,transaction){
+
+        if(index)
+            this.listArray.push(transaction);
+        else
+            this.listArray.splice(index, 0, transaction);
+
+        this.listObject[transaction.txId.toString('hex')] = transaction;
+        this.listObject[transaction.txId.toString('hex')].alreadyBroadcasted = false;
+    }
+
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
         if ( this.findPendingTransaction(transaction.txId) !== null )
@@ -71,21 +82,20 @@ class TransactionsPendingQueue {
                         }
                     }
                     else{
-                        this.propagateTransaction(transaction, exceptSockets);
+                        this.propagateTransaction(this.listArray[i], exceptSockets);
                         nonceGap = false;
                     }
 
-                    this.listArray.splice(i, 0, transaction);
-                    this.listObject[transaction.txId.toString('hex')] = transaction;
+                    this.addNewTransaction(i,transaction);
                     inserted = true;
 
-                    //Propagate all tx after solving nonce gap
+                    //Propagate all unsent tx after solving nonce gap
                     if (!nonceGap){
                         for( let j = i+1; j<this.listArray.length; j++){
                             let secondCompare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress);
                             if(secondCompare === 0){
                                 if(this.listArray[i].nonce - this.listArray[i-1].nonce === 1)
-                                    this.propagateTransaction(this.listArray[j], []);
+                                    this.propagateTransaction(this.listArray[j], exceptSockets);
                                 else
                                     break;
                             }else{
@@ -100,9 +110,8 @@ class TransactionsPendingQueue {
             }
             else
             if (compare > 0) { // i will add it
+                this.addNewTransaction(i,transaction);
                 this.propagateTransaction(transaction, exceptSockets);
-                this.listArray.splice(i, 0, transaction);
-                this.listObject[transaction.txId.toString('hex')] = transaction;
                 inserted = true;
                 break;
             }
@@ -110,9 +119,8 @@ class TransactionsPendingQueue {
         }
 
         if ( inserted === false){
+            this.addNewTransaction(undefined,transaction);
             this.propagateTransaction(transaction, exceptSockets);
-            this.listArray.push(transaction);
-            this.listObject[transaction.txId.toString('hex')] = transaction;
         }
 
         console.warn("Transactions stack -", this.listArray.length);
@@ -261,7 +269,14 @@ class TransactionsPendingQueue {
     }
 
     propagateTransaction(transaction, exceptSocket){
-        this.transactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket)
+
+        if ( transaction.alreadyBroadcasted )
+            return false;
+        else{
+            this.listObject[transaction.txId].alreadyBroadcasted = true;
+            this.transactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket);
+        }
+
     }
 
     propagateMissingNonce(addressBuffer,nonce){
