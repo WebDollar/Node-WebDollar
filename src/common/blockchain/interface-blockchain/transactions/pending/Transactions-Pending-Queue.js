@@ -133,13 +133,7 @@ class TransactionsPendingQueue {
     }
 
     findPendingTransaction(txId){
-
-        let transaction = this.listObject[txId.toString('hex')];
-
-        delete transaction.propagated;
-
-        return transaction ? transaction : null;
-
+        return this.listObject[txId.toString('hex')] ? this.listObject[txId.toString('hex')] : null;
     }
 
     findPendingTransactionByAddressAndNonce(address,searchedNonce){
