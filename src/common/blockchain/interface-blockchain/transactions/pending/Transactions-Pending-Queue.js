@@ -75,6 +75,9 @@ class TransactionsPendingQueue {
 
                     let nonceGap = true;
 
+                    this.addNewTransaction(i,transaction);
+                    inserted = true;
+
                     if(this.listArray[i].nonce - transaction.nonce > 1) {
                         //Propagate missing nonce
                         for (let j = transaction.nonce + 1; j < this.listArray[i].nonce; j++) {
@@ -82,12 +85,9 @@ class TransactionsPendingQueue {
                         }
                     }
                     else{
-                        this.propagateTransaction(this.listArray[i], exceptSockets);
+                        this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
                         nonceGap = false;
                     }
-
-                    this.addNewTransaction(i,transaction);
-                    inserted = true;
 
                     //Propagate all unsent tx after solving nonce gap
                     if (!nonceGap){
@@ -95,7 +95,7 @@ class TransactionsPendingQueue {
                             let secondCompare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress);
                             if(secondCompare === 0){
                                 if(this.listArray[i].nonce - this.listArray[i-1].nonce === 1)
-                                    this.propagateTransaction(this.listArray[j], exceptSockets);
+                                    this.propagateTransaction(this.listObject[this.listArray[j].txId], []);
                                 else
                                     break;
                             }else{
@@ -111,7 +111,7 @@ class TransactionsPendingQueue {
             else
             if (compare > 0) { // i will add it
                 this.addNewTransaction(i,transaction);
-                this.propagateTransaction(transaction, exceptSockets);
+                this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
                 inserted = true;
                 break;
             }
@@ -120,7 +120,7 @@ class TransactionsPendingQueue {
 
         if ( inserted === false){
             this.addNewTransaction(undefined,transaction);
-            this.propagateTransaction(transaction, exceptSockets);
+            this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
         }
 
         console.warn("Transactions stack -", this.listArray.length);
