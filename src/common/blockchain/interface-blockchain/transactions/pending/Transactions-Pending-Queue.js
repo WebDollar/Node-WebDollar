@@ -264,7 +264,7 @@ class TransactionsPendingQueue {
 
     propagateTransaction(transaction, exceptSocket){
 
-        if ( transaction.alreadyBroadcasted )
+        if ( this.listObject[transaction.txId].alreadyBroadcasted )
             return false;
         else{
             this.listObject[transaction.txId].alreadyBroadcasted = true;
