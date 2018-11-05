@@ -85,7 +85,7 @@ class TransactionsPendingQueue {
                         }
                     }
                     else{
-                        this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
+                        this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
                         nonceGap = false;
                     }
 
@@ -95,7 +95,7 @@ class TransactionsPendingQueue {
                             let secondCompare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress);
                             if(secondCompare === 0){
                                 if(this.listArray[i].nonce - this.listArray[i-1].nonce === 1)
-                                    this.propagateTransaction(this.listObject[this.listArray[j].txId], []);
+                                    this.propagateTransaction(this.listObject[this.listArray[j].txId.toString("hex")], []);
                                 else
                                     break;
                             }else{
@@ -111,7 +111,7 @@ class TransactionsPendingQueue {
             else
             if (compare > 0) { // i will add it
                 this.addNewTransaction(i,transaction);
-                this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
+                this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
                 inserted = true;
                 break;
             }
@@ -120,7 +120,7 @@ class TransactionsPendingQueue {
 
         if ( inserted === false){
             this.addNewTransaction(undefined,transaction);
-            this.propagateTransaction(this.listObject[transaction.txId], exceptSockets);
+            this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
         }
 
         console.warn("Transactions stack -", this.listArray.length);
