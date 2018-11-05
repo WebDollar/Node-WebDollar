@@ -25,7 +25,7 @@ class TransactionsPendingQueue {
 
     addNewTransaction(index,transaction){
 
-        if(index)
+        if(!index)
             this.listArray.push(transaction);
         else
             this.listArray.splice(index, 0, transaction);
