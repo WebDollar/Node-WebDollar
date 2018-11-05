@@ -264,10 +264,10 @@ class TransactionsPendingQueue {
 
     propagateTransaction(transaction, exceptSocket){
 
-        if ( this.listObject[transaction.txId].alreadyBroadcasted )
+        if ( this.listObject[transaction.txId.toString("hex")].alreadyBroadcasted )
             return false;
         else{
-            this.listObject[transaction.txId].alreadyBroadcasted = true;
+            this.listObject[transaction.txId.toString("hex")].alreadyBroadcasted = true;
             this.transactionsProtocol.propagateNewPendingTransaction(transaction, exceptSocket);
         }
 
