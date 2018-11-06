@@ -166,7 +166,7 @@ class TransactionsPendingQueue {
 
                 if(selectedTwice!==selected) selectedTwice = selected;
                 else {
-                    console.warn("infinite loop missing nonce");
+                    console.warn("missing nonce - not found in binary search for address");
                     return false;
                 }
 
@@ -180,9 +180,9 @@ class TransactionsPendingQueue {
 
             let closerSelected = undefined;
             if( this.listArray[selected].nonce > searchedNonce )
-                closerSelected = this.listArray[selected].nonce + (this.listArray[selected].nonce-searchedNonce -1);
+                closerSelected = this.listArray[selected].nonce - (this.listArray[selected].nonce-searchedNonce);
             else
-                closerSelected = this.listArray[selected].nonce + (searchedNonce - this.listArray[selected].nonce -1);
+                closerSelected = this.listArray[selected].nonce + (searchedNonce - this.listArray[selected].nonce);
 
             if ( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
                 selected = closerSelected;
