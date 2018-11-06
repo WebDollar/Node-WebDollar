@@ -20,7 +20,7 @@ class TransactionsDownloadManager{
         this.smallestTrial = 0;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribeSocket(result.socket)
+            this._unsubscribeSocket(result.socket.node.sckAddress.uuid)
         });
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
@@ -235,6 +235,9 @@ class TransactionsDownloadManager{
                             wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             found = true;
 
+                            if( typeof this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid] === "undefined")
+                                this._transactionsQueue[txId].totalSocketsProcessed = totalSocketsProcessed-1 > 0 ? totalSocketsProcessed : 0;
+
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" )
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
@@ -249,8 +252,8 @@ class TransactionsDownloadManager{
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                                if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                    this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid);
+                                if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 10 )
+                                    this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                             }
                         }
 
