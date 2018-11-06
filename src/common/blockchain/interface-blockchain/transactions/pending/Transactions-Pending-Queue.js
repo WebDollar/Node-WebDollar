@@ -183,9 +183,9 @@ class TransactionsPendingQueue {
 
                 if(compare === 0)
                     break;
-                if(compare > 0)
-                    Left = selected--;
                 if(compare < 0)
+                    Left = selected--;
+                if(compare > 0)
                     Right = selected++;
             }
 
