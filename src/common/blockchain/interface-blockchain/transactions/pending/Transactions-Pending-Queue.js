@@ -67,21 +67,14 @@ class TransactionsPendingQueue {
 
     analyseMissingNonce(i){
 
-        if( typeof this.listArray[i+1] !== "undefined")
+        if(this.listArray[i+1].nonce - this.listArray[i].nonce > 1)
             if( this.listArray[i+1].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0 )
-                if(this.listArray[i+1].nonce - this.listArray[i].nonce > 1) {
+                if( typeof this.listArray[i+1] !== "undefined") {
 
                     //Check all missing nonces for this address
-                    for (let j = i; j < this.listArray.length; j++) {
+                    for (let j = this.listArray[i].nonce+1; j < this.listArray[i+1].nonce; j++)
+                        this.propagateMissingNonce(this.listArray[j].from.addresses[0].unencodedAddress, j);
 
-                        if( this.listArray[j+1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) !== 0 )
-                            break;
-
-                        //Propagate missing nonce
-                        for( let k = this.listArray[j].nonce+1; k<this.listArray[j+1].nonce; k++)
-                            this.propagateMissingNonce(this.listArray[k].from.addresses[0].unencodedAddress, k);
-
-                    }
                 }
 
     }
@@ -91,6 +84,8 @@ class TransactionsPendingQueue {
         let inserted = false;
 
         for (let i=0; i<this.listArray.length ; i++ ) {
+
+            this.analyseMissingNonce(i);
 
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
@@ -104,33 +99,12 @@ class TransactionsPendingQueue {
                     break;
                 } else if (transaction.nonce < this.listArray[i].nonce){
 
-                    let nonceGap = true;
-
-                    if(this.listArray[i].nonce - transaction.nonce === 1) {
-                        this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
-                        nonceGap = false;
-                    }
-
                     this.addNewTransaction(i,transaction);
                     inserted = true;
 
-                    //Propagate all unsent tx after solving nonce gap
-                    if (!nonceGap){
-                        for( let j = i+1; j<this.listArray.length; j++){
-                            let secondCompare = this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[j+1].from.addresses[0].unencodedAddress);
-                            if(secondCompare === 0){
-                                if(this.listArray[j].nonce - this.listArray[j+1].nonce === 1)
-                                    this.propagateTransaction(this.listObject[this.listArray[j].txId.toString("hex")], []);
-                                else{
-                                    this.analyseMissingNonce(j);
-                                    break;
-                                }
-                            }else{
-                                break;
-                            }
-                        }
-                    }else
-
+                    if(this.listArray[i-1].nonce - this.listArray[i-2].nonce === 1) {
+                        this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+                    }
 
                     break;
                 }
