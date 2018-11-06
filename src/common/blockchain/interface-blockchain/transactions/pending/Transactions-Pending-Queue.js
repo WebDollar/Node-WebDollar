@@ -78,7 +78,8 @@ class TransactionsPendingQueue {
                             break;
 
                         //Propagate missing nonce
-                        this.propagateMissingNonce(this.listArray[j].from.addresses[0].unencodedAddress, this.listArray[j].nonce);
+                        for( let k = this.listArray[j].nonce+1; k<this.listArray[j+1].nonce; k++)
+                            this.propagateMissingNonce(this.listArray[k].from.addresses[0].unencodedAddress, k);
 
                     }
                 }
@@ -90,8 +91,6 @@ class TransactionsPendingQueue {
         let inserted = false;
 
         for (let i=0; i<this.listArray.length ; i++ ) {
-
-            this.analyseMissingNonce(i);
 
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
@@ -122,13 +121,16 @@ class TransactionsPendingQueue {
                             if(secondCompare === 0){
                                 if(this.listArray[j].nonce - this.listArray[j+1].nonce === 1)
                                     this.propagateTransaction(this.listObject[this.listArray[j].txId.toString("hex")], []);
-                                else
+                                else{
+                                    this.analyseMissingNonce(j);
                                     break;
+                                }
                             }else{
                                 break;
                             }
                         }
-                    }
+                    }else
+
 
                     break;
                 }
@@ -183,9 +185,9 @@ class TransactionsPendingQueue {
 
                 if(compare === 0)
                     break;
-                if(compare < 0)
-                    Left = selected--;
                 if(compare > 0)
+                    Left = selected--;
+                if(compare < 0)
                     Right = selected++;
             }
 
