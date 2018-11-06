@@ -257,7 +257,7 @@ class TransactionsDownloadManager{
                                     //If socket sent over 5 consecutive invalid tx
                                     if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
                                         let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                        BansList.addBan(suspiciousSocket, 30*60*1000, "Sent over 10 invalid transactions");
+                                        BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
                                         this._removeTransactionsFrom(suspiciousSocket);
                                         this._unsubscribeSocket(suspiciousSocket);
                                     }else{
@@ -271,7 +271,7 @@ class TransactionsDownloadManager{
                                     if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 10 )
+                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
                                             this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                     }
                                 }
