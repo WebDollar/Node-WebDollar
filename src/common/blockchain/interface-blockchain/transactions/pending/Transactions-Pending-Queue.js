@@ -49,10 +49,20 @@ class TransactionsPendingQueue {
             if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
                 return false;
 
+        if( !this.pendingQueueTxTimeLockValidation(transaction) )
+            return false;
+
         this._insertPendingTransaction(transaction,exceptSockets);
 
         return true;
 
+    }
+
+    pendingQueueTxTimeLockValidation(transaction){
+        if ( this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+            return false;
+        else
+            return true;
     }
 
     _insertPendingTransaction(transaction,exceptSockets){
@@ -60,6 +70,20 @@ class TransactionsPendingQueue {
         let inserted = false;
 
         for (let i=0; i<this.listArray.length ; i++ ) {
+
+            if( typeof this.listArray[i+1] !== "undefined")
+                if( this.listArray[i+1].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0 )
+                    if(this.listArray[i+1].nonce - this.listArray[i].nonce > 1) {
+                        //Propagate missing nonce
+                        for (let j = i; j < this.listArray.length; j++) {
+
+                            if( this.listArray[j+1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) !== 0 )
+                                break;
+
+                            this.propagateMissingNonce(this.listArray[j].from.addresses[0].unencodedAddress, this.listArray[j].nonce);
+
+                        }
+                    }
 
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
@@ -239,7 +263,7 @@ class TransactionsPendingQueue {
 
             if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
-            if ( this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.listArray[i].timeLock && this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
+            if( !this.pendingQueueTxTimeLockValidation(this.listArray[i]) ){
                 this._removePendingTransaction(this.listArray[i], i);
                 continue;
             }
