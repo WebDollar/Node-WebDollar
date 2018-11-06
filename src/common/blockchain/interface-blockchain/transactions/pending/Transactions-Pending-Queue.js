@@ -85,8 +85,6 @@ class TransactionsPendingQueue {
 
         for (let i=0; i<this.listArray.length ; i++ ) {
 
-            this.analyseMissingNonce(i);
-
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
@@ -104,6 +102,21 @@ class TransactionsPendingQueue {
 
                     if(this.listArray[i-1].nonce - this.listArray[i-2].nonce === 1) {
                         this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+
+                        //Propagate all tx after solving nonce gap
+                        for(let j=this.listArray[i-1].nonce; j<this.listArray.length; j++)
+                            if(this.listArray[j+1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0){
+                                if(this.listArray[j+1].nonce - this.listArray[j].nonce === 1)
+                                    this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+                                else
+                                    this.analyseMissingNonce(j);
+                            }else{
+                                break;
+                            }
+
+
+                    }else{
+                        this.analyseMissingNonce(i-2);
                     }
 
                     break;
