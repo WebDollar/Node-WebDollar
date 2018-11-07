@@ -153,6 +153,8 @@ class TransactionsPendingQueue {
 
     findPendingTransactionByAddressAndNonce(address,searchedNonce){
 
+        console.warn("Search Missing Nonce",searchedNonce,address);
+
         let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
         if(this.listArray.length){
 
@@ -166,7 +168,7 @@ class TransactionsPendingQueue {
 
                 if(selectedTwice!==selected) selectedTwice = selected;
                 else {
-                    console.warn("missing nonce - not found in binary search for address");
+                    console.warn("missing nonce - not found address in binary search");
                     return false;
                 }
 

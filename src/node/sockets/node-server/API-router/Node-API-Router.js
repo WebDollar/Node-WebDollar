@@ -80,7 +80,6 @@ class NodeAPIRouter{
 
         this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
 
-        
     }
 
     initializeRouterCallbacks(app, middleWare, prefix='', nodeApiType){
