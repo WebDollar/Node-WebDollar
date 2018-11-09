@@ -39,6 +39,8 @@ class TransactionsPendingQueue {
         if ( this.findPendingTransaction(transaction.txId) !== null )
             return false;
 
+        console.log("Found tx");
+
         let blockValidationType = {
             "take-transactions-list-in-consideration": {
                 validation: true
@@ -49,10 +51,16 @@ class TransactionsPendingQueue {
             if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
                 return false;
 
+        console.log("Tx validated Once");
+
         if( !this.pendingQueueTxTimeLockValidation(transaction) )
             return false;
 
+        console.log("Tx foundTime");
+
         this._insertPendingTransaction(transaction,exceptSockets);
+
+        console.log("Tx inserted");
 
         return true;
 
