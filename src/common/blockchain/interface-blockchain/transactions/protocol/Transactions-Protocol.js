@@ -115,7 +115,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                console.log("Received broadcast 2", data);
+                console.log("Received broadcast 2", data.txId);
 
                 if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
