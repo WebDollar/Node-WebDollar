@@ -15,6 +15,7 @@ argon2/
 dist_bundle/bundle_terminal\.js
 
 dist_bundle/terminal-menu-bundle\.js
+dist_bundle/terminal-menu-bundle.js.map
 
 dist_bundle/Node-WebDollar-bundle\.js
 
@@ -62,9 +63,15 @@ poolDB/
 
 blockchainDB2/
 
+defaultDB2/
+
 blockchainDB3/
 
 walletDB/
+
+minerPoolDB/
+
+serverPoolDB/
 
 transactionsDB/
 
