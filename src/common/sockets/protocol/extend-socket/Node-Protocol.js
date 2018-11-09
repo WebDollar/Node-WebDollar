@@ -174,6 +174,7 @@ class NodeProtocol {
 
             if (broadcast) {
                 nodes[i].socket.node.sendRequest(request, data);
+                console.log("Broadcast 2 ", data.toString('hex'))
             }
         }
 
