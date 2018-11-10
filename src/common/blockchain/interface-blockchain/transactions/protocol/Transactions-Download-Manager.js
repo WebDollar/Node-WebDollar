@@ -285,9 +285,9 @@ class TransactionsDownloadManager{
                                     //If socket sent over 5 consecutive invalid tx
                                     if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
                                         let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                        BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
                                         this._removeTransactionsFrom(suspiciousSocket);
                                         this._unsubscribeSocket(suspiciousSocket);
+                                        BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
                                     }else{
                                         this.removeTransaction(txId);
                                     }
@@ -379,9 +379,12 @@ class TransactionsDownloadManager{
     _removeTransactionsFrom(socket){
 
         for (let txId in this._transactionsQueue)
-            if(this._transactionsQueue[txId].socket.length === 1)
-                if(this._transactionsQueue[txId].socket[0].node.sckAddress.uuid = socket.node.sckAddress.uuid)
-                    delete this._transactionsQueue[txId];
+            if(this._transactionsQueue[txId].socket){
+                if(this._transactionsQueue[txId].socket.length === 1)
+                    if(this._transactionsQueue[txId].socket[0].node.sckAddress.uuid = socket.node.sckAddress.uuid)
+                        delete this._transactionsQueue[txId];
+            }else
+                delete this._transactionsQueue[txId];
 
     }
 
