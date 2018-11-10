@@ -375,7 +375,7 @@ class TransactionsDownloadManager{
         for (let txId in this._transactionsQueue)
             for( let i =0; i<this._transactionsQueue[txId].socket.length; i++){
 
-                if ( this._transactionsQueue[txId].socket[i] === socket )
+                if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid )
                     this._transactionsQueue[txId].socket.splice(i,1);
 
                 if( this._transactionsQueue[txId].socket.length === 0 )
@@ -405,7 +405,8 @@ class TransactionsDownloadManager{
         for ( let txId in this._transactionsQueue )
             for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
                 if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
-                    this._transactionsQueue[txId].socket[i] = socket;
+                    this._transactionsQueue[txId].socket[i].splice(i,1);
+                    this._transactionsQueue[txId].push(socket);
                     found = true;
                 }
 
