@@ -18,6 +18,9 @@ class TransactionsDownloadManager{
         this._transactionsQueue = {};
         this._transactionsQueueLength = 0;
 
+        this._missingNonceList = {};
+        this._missingNonceListLength = 0;
+
         this.smallestTrial = 0;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
@@ -30,6 +33,30 @@ class TransactionsDownloadManager{
 
         setTimeout( this._processSocket.bind(this), 10*1000 );
         setTimeout( this._processTransactions.bind(this), 2*1000 );
+
+    }
+
+    findMissingNonce(address,nonce){
+        return this._missingNonceList[address.toString('hex') + nonce] ? this._missingNonceList[address.toString('hex') + nonce] : false;
+    }
+
+    addMissingNonceList(address, nonce){
+
+        let missingNonceElement = {
+            address: address,
+            nonce: nonce
+        };
+
+        let key = address.toString('hex') + nonce;
+
+        this._missingNonceList[key] = missingNonceElement;
+
+    }
+
+    removeMissingNonceList(id){
+
+        delete this._missingNonceList[id];
+        this._missingNonceListLength--;
 
     }
 
@@ -242,9 +269,10 @@ class TransactionsDownloadManager{
                                     found = true;
 
                                     //If tx was not added into pending queue increase socket invalidTransactions
-                                    if(!wasAdded)
+                                    if(!wasAdded) {
+                                        console.info("Not Addred", this._transactionsQueue[txId].buffer);
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
-                                    else
+                                    }else
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
@@ -324,6 +352,8 @@ class TransactionsDownloadManager{
             return this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, true);
 
         } catch (exception) {
+
+            console.error("Create transaction Error", exception);
 
             if (transaction !== undefined && transaction !== null)
                 if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction.txId) === null)

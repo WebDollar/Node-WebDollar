@@ -80,7 +80,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                if (!response.response) throw {message:"missing-nonce - Response is false"};
+                if (!response.transaction) throw {message:"missing-nonce - Response is false"};
 
                 this.transactionsDownloadingManager.addTransaction(socket, response.transaction, true );
 
@@ -114,8 +114,6 @@ class InterfaceBlockchainTransactionsProtocol {
         socket.node.on("transactions/new-pending-transaction-id", (data)=>{
 
             try{
-
-                console.log("Received broadcast 2", data.txId);
 
                 if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
