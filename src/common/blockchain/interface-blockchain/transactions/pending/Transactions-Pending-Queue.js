@@ -73,15 +73,16 @@ class TransactionsPendingQueue {
 
     analyseMissingNonce(i){
 
-        if(this.listArray[i+1].nonce - this.listArray[i].nonce > 1)
-            if( this.listArray[i+1].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0 )
-                if( typeof this.listArray[i+1] !== "undefined") {
+        if(this.transactionsProtocol.transactionsDownloadingManager._transactionsQueueLength < 10)
+            if (this.listArray[i + 1].nonce - this.listArray[i].nonce > 1)
+                if (this.listArray[i + 1].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
+                    if (typeof this.listArray[i + 1] !== "undefined") {
 
-                    //Check all missing nonces for this address
-                    for (let j = this.listArray[i].nonce+1; j < this.listArray[i+1].nonce; j++)
-                        this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
+                        //Check all missing nonces for this address
+                        for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
+                            this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
 
-                }
+                    }
 
     }
 
