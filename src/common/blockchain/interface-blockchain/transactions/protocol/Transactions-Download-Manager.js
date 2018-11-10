@@ -255,9 +255,15 @@ class TransactionsDownloadManager{
 
                         try {
 
+                            //Check socket
+                            if( typeof this._transactionsQueue[txId].socket === "undefined" ){
+                                console.info("Remove wrong transactions from Download Manager");
+                                this.removeTransaction(txId);
+                                continue;
+                            }
+
                             let totalSocketsProcessed = this._transactionsQueue[txId].totalSocketsProcessed;
 
-                            //Check socket
                             if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" )
                                 if( typeof this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid] !== "undefined"){
 
