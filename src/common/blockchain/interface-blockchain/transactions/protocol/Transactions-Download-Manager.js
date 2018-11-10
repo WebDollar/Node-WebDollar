@@ -71,10 +71,15 @@ class TransactionsDownloadManager{
     }
 
     addSocket(socket){
+
         socket.downloadFails = 0;
         socket.invalidTransactions = 0;
-        this._socketsQueue[socket.node.sckAddress.uuid] = socket;
-        this._socketsQueueLength++;
+
+        if( !this.replaceOldSocket(socket) ){
+            this._socketsQueue[socket.node.sckAddress.uuid] = socket;
+            this._socketsQueueLength++;
+        }
+
         setTimeout( this._processSocket.bind(this,socket.node.sckAddress.uuid), 5000);
     }
 
@@ -285,7 +290,7 @@ class TransactionsDownloadManager{
                                     //If socket sent over 5 consecutive invalid tx
                                     if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
                                         let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                        this._removeTransactionsFrom(suspiciousSocket);
+                                        this._removeTransactionsOnlyFrom(suspiciousSocket);
                                         this._unsubscribeSocket(suspiciousSocket);
                                         BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
                                     }else{
@@ -367,16 +372,21 @@ class TransactionsDownloadManager{
 
     _unsubscribeSocket(socket){
 
-        this.removeSocket(socket);
-
         for (let txId in this._transactionsQueue)
-            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
+            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++){
+
                 if ( this._transactionsQueue[txId].socket[i] === socket )
                     this._transactionsQueue[txId].socket.splice(i,1);
 
+                if( this._transactionsQueue[txId].socket.length === 0 )
+                    this.removeTransaction(txId);
+            }
+
+        this.removeSocket(socket);
+
     }
 
-    _removeTransactionsFrom(socket){
+    _removeTransactionsOnlyFrom(socket){
 
         for (let txId in this._transactionsQueue)
             if(this._transactionsQueue[txId].socket){
@@ -387,6 +397,22 @@ class TransactionsDownloadManager{
                 delete this._transactionsQueue[txId];
 
     }
+
+    replaceOldSocket(socket){
+
+        let found = false;
+
+        for ( let txId in this._transactionsQueue )
+            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
+                if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
+                    this._transactionsQueue[txId].socket[i] = socket;
+                    found = true;
+                }
+
+        return found;
+
+    }
+
 
 }
 
