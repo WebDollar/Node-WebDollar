@@ -246,6 +246,7 @@ class TransactionsDownloadManager{
                     let firstUneleted = this.processTransactionsList();
                     let txId = undefined;
                     let found = false;
+                    let wasAdded = null;
 
                     if (typeof firstUneleted === 'object')
                         txId = firstUneleted.id;
@@ -266,23 +267,16 @@ class TransactionsDownloadManager{
                                     await this.blockchain.sleep(20);
                                     console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
 
-                                    let wasAdded = null;
-
                                     //If transaction was downloaded
                                     if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
+                                        found = true;
                                         wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
 
                                         //If tx was not added into pending queue increase socket invalidTransactions
                                         if(!wasAdded) {
-                                            console.info("Not Addred", this._transactionsQueue[txId].buffer);
+                                            console.info("Not Addred", this._transactionsQueue[txId].buffer.toString('hex'));
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
-                                            found = true;
-                                        }else{
-
-                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
-                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
-                                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
 
                                             //If socket sent over 5 consecutive invalid tx
                                             if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
@@ -295,12 +289,18 @@ class TransactionsDownloadManager{
                                                 this.removeTransaction(txId);
                                             }
 
-                                        }
+                                        }else{
 
-                                        //Decrease downloadFails for socket
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
-                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
-                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
+                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
+                                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
+
+                                            //Decrease downloadFails for socket
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
+                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
+                                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
+
+                                        }
 
                                     }else{
                                         this._transactionsQueue[txId].fails++;
@@ -328,6 +328,8 @@ class TransactionsDownloadManager{
                             //If already processed all tx sockets start again until will be removed
                             if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
                                 this._transactionsQueue[txId].totalSocketsProcessed=0;
+                        }else if(wasAdded){
+                            this.removeTransaction(txId);
                         }
 
                     }
