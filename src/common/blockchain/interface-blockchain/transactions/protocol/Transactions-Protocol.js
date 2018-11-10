@@ -224,8 +224,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
         try{
 
-            console.warn ("Will download tx from", start, "to", start+count);
-
             let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 12*1000);
 
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
@@ -258,7 +256,7 @@ class InterfaceBlockchainTransactionsProtocol {
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {
                 format: "buffer",
                 ids: [txId],
-            }, "answer", 6000);
+            }, "answer", 3000);
 
             if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) {
                 console.warn("Transaction", txId.toString('hex') ,"was not sent");
