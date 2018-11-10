@@ -265,8 +265,6 @@ class TransactionsPendingQueue {
 
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
-            if (this.listArray[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
-
             if( !this.pendingQueueTxTimeLockValidation(this.listArray[i]) ){
                 this._removePendingTransaction(this.listArray[i], i);
                 continue;
