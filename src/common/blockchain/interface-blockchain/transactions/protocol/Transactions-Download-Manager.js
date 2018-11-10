@@ -213,14 +213,14 @@ class TransactionsDownloadManager{
             if(socketID){
 
                 selectedSocket = socketID;
-                
+
             }else{
 
                 //Select random socket for being processed
                 let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
                 randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
                 selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
-                
+
             }
 
             if(this._socketsQueueLength > 0)
@@ -238,100 +238,102 @@ class TransactionsDownloadManager{
 
     async _processTransactions() {
 
-        for (let i = 0; i <= 20; i++){
+        if( Blockchain.synchronized )
+            for (let i = 0; i <= 20; i++){
 
-            try {
+                try {
 
-                let firstUneleted = this.processTransactionsList();
-                let txId = undefined;
-                let found = false;
+                    let firstUneleted = this.processTransactionsList();
+                    let txId = undefined;
+                    let found = false;
 
-                if (typeof firstUneleted === 'object')
-                    txId = firstUneleted.id;
+                    if (typeof firstUneleted === 'object')
+                        txId = firstUneleted.id;
 
-                if (txId !== undefined) {
+                    if (txId !== undefined) {
 
-                    try {
+                        try {
 
-                        let totalSocketsProcessed = this._transactionsQueue[txId].totalSocketsProcessed;
+                            let totalSocketsProcessed = this._transactionsQueue[txId].totalSocketsProcessed;
 
-                        //Check socket
-                        if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" )
-                            if( typeof this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid] !== "undefined"){
+                            //Check socket
+                            if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" )
+                                if( typeof this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid] !== "undefined"){
 
-                                //Try to download transaction by hash
-                                this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
+                                    //Try to download transaction by hash
+                                    this._transactionsQueue[txId].buffer = await this.transactionsProtocol.downloadTransaction(this._transactionsQueue[txId].socket[totalSocketsProcessed], Buffer.from(txId, 'hex'));
 
-                                await this.blockchain.sleep(20);
-                                console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
+                                    await this.blockchain.sleep(20);
+                                    console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
 
-                                let wasAdded = null;
+                                    let wasAdded = null;
 
-                                //If transaction was downloaded
-                                if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
+                                    //If transaction was downloaded
+                                    if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
-                                    wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
-                                    found = true;
+                                        wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                        found = true;
 
-                                    //If tx was not added into pending queue increase socket invalidTransactions
-                                    if(!wasAdded) {
-                                        console.info("Not Addred", this._transactionsQueue[txId].buffer);
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
-                                    }else
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
-                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
-                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
+                                        //If tx was not added into pending queue increase socket invalidTransactions
+                                        if(!wasAdded) {
+                                            console.info("Not Addred", this._transactionsQueue[txId].buffer);
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
+                                        }else
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
+                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
+                                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
 
-                                    //Decrease downloadFails for socket
-                                    this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
-                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
+                                        //Decrease downloadFails for socket
+                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
+                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
 
-                                    //If socket sent over 5 consecutive invalid tx
-                                    if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
-                                        let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                        this._removeTransactionsOnlyFrom(suspiciousSocket);
-                                        this._unsubscribeSocket(suspiciousSocket);
-                                        BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
+                                        //If socket sent over 5 consecutive invalid tx
+                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
+                                            let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
+                                            this._removeTransactionsOnlyFrom(suspiciousSocket);
+                                            this._unsubscribeSocket(suspiciousSocket);
+                                            BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
+                                        }else{
+                                            this.removeTransaction(txId);
+                                        }
+
                                     }else{
-                                        this.removeTransaction(txId);
+                                        this._transactionsQueue[txId].fails++;
+                                        this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
+
+                                        if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
+
+                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                                this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                        }
                                     }
 
-                                }else{
-                                    this._transactionsQueue[txId].fails++;
-                                    this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
-
-                                    if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
-
-                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                            this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
-                                    }
                                 }
 
-                            }
+                        } catch (exception) {
 
-                    } catch (exception) {
+                            console.error("No tx found",exception);
 
-                        console.error("No tx found",exception);
+                        }
+
+                        if(!found){
+                            this._transactionsQueue[txId].totalSocketsProcessed++;
+
+                            //If already processed all tx sockets start again until will be removed
+                            if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
+                                this._transactionsQueue[txId].totalSocketsProcessed=0;
+                        }
 
                     }
 
-                    if(!found){
-                        this._transactionsQueue[txId].totalSocketsProcessed++;
-
-                        //If already processed all tx sockets start again until will be removed
-                        if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
-                            this._transactionsQueue[txId].totalSocketsProcessed=0;
-                    }
-
+                } catch (exception) {
+                    console.error("_processTransactions raised an error", exception);
                 }
 
-            } catch (exception) {
-                console.error("_processTransactions raised an error", exception);
             }
-
-        }
 
         setTimeout( this._processTransactions.bind(this), 1000);
 
