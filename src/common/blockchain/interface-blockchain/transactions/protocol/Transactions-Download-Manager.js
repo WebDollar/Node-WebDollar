@@ -272,32 +272,35 @@ class TransactionsDownloadManager{
                                     if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
                                         wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, this._transactionsQueue[txId].socket[totalSocketsProcessed]);
-                                        found = true;
 
                                         //If tx was not added into pending queue increase socket invalidTransactions
                                         if(!wasAdded) {
                                             console.info("Not Addred", this._transactionsQueue[txId].buffer);
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
-                                        }else
+                                            found = true;
+                                        }else{
+
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
                                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
+
+                                            //If socket sent over 5 consecutive invalid tx
+                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
+                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
+                                                let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
+                                                this._removeTransactionsOnlyFrom(suspiciousSocket);
+                                                this._unsubscribeSocket(suspiciousSocket);
+                                                BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
+                                            }else{
+                                                this.removeTransaction(txId);
+                                            }
+
+                                        }
 
                                         //Decrease downloadFails for socket
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails =
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 > 0 ?
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails-1 : 0;
-
-                                        //If socket sent over 5 consecutive invalid tx
-                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
-                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
-                                            let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                            this._removeTransactionsOnlyFrom(suspiciousSocket);
-                                            this._unsubscribeSocket(suspiciousSocket);
-                                            BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
-                                        }else{
-                                            this.removeTransaction(txId);
-                                        }
 
                                     }else{
                                         this._transactionsQueue[txId].fails++;
@@ -407,8 +410,8 @@ class TransactionsDownloadManager{
         for ( let txId in this._transactionsQueue )
             for( let i =0; i<this._transactionsQueue[txId].socket.length; i++)
                 if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
-                    this._transactionsQueue[txId].socket[i].splice(i,1);
-                    this._transactionsQueue[txId].push(socket);
+                    this._transactionsQueue[txId].socket.splice(i,1);
+                    this._transactionsQueue[txId].socket.push(socket);
                     found = true;
                 }
 
