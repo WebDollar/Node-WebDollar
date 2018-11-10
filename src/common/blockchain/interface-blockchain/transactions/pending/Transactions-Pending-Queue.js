@@ -65,10 +65,10 @@ class TransactionsPendingQueue {
     }
 
     pendingQueueTxTimeLockValidation(transaction){
-        if ( this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-            return false;
-        else
+        if ( this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < transaction.timeLock && this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock )
             return true;
+        else
+            return false;
     }
 
     analyseMissingNonce(i){
