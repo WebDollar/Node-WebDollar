@@ -130,8 +130,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             let number = new BigInteger( hash.toString("hex"), 16);
 
             //let hex = number.divide( balance ).toString(16);
-            let diffTimestamp = Math.max(0, this.timeStamp - this.blockchain.blockValidation.getBlockCallBack(this.height-1).timeStamp);
-            let hex = number.divide( balance ).mult(diffTimestamp).toString(16);
+            let diffTimestamp = Math.max(0, this.timeStamp - this.blockValidation.getBlockCallBack(this.height-1).timeStamp);
+            let hex = number.divide( balance ).multiply(diffTimestamp).toString(16);
             if (hex.length % 2 === 1) hex = "0"+hex;
 
             return Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Buffer.from( hex , "hex")  );
