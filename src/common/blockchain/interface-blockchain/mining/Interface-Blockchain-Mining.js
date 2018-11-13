@@ -284,7 +284,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     this.block.timeStamp = medianTimestamp + i;
 
                     let answer = await this._mineNonces(0, 0);
-                    await this.blockchain.sleep(1000);
+                    // await this.blockchain.sleep(900);
 
                     if (consts.DEBUG && i % 300 === 0) {
                         console.log(i, answer.hash.toString("hex"));
