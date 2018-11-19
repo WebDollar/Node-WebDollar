@@ -281,22 +281,37 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i, this.block.height)) {
+                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
                     this.block.timeStamp = medianTimestamp + i;
 
-                    let answer = await this._mineNonces(0, 0);
-                    // await this.blockchain.sleep(900);
+                    let hash = await this.calculateHash(0);
+
+                    if (hash.compare(this.bestHash) < 0) {
+
+                        this.bestHash = hash;
+                        this.bestHashNonce = 0;
+
+                        if (this.bestHash.compare(this.difficulty) <= 0) {
+
+                            this.block.posSignature = await this.block._signPOSSignature();
+
+                            return {
+                                result: true,
+                                hash: hash,
+                                nonce: 0,
+                            };
+
+                        }
+
+                    }
 
                     if (consts.DEBUG && i % 300 === 0) {
-                        console.log(i, answer.hash.toString("hex"));
+                        console.log(i, hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
 
-                    if (answer.result) {
-                        this.block.posSignature = await this.block._signPOSSignature();
-                        return answer;
-                    }
+                    this._hashesPerSecond++;
 
                     i++;
 
@@ -312,7 +327,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     // console.error(exception);
                     //Todo remove comment on main net
 
-                await this.blockchain.sleep(100);
+                await this.blockchain.sleep(200);
                 
             }
 
