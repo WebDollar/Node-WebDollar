@@ -174,10 +174,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 answer = await this.mine(block, difficulty, start, end, height);
             } catch (exception){
                 console.error("Couldn't mine block " + block.height, exception);
-                answer.result = false;
+                answer = {
+                    result: false,
+                };
             }
 
-            if (answer.result && this.blockchain.blocks.length === block.height ){
+            if (answer && answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", "timestamp", block.timeStamp, answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
