@@ -140,7 +140,7 @@ class Blockchain{
 
             await this.Agent.initializeStartAgentOnce();
 
-            if (this.Agent.consensus && !consts.DEBUG)
+            if ( this.Agent.consensus )
                 await this.synchronizeBlockchain(true); //it tries synchronizing multiple times
             else {
                 this.synchronized = true; //consider it as synchronized

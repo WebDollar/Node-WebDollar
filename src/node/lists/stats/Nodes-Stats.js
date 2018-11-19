@@ -7,6 +7,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import NODE_TYPE from "../types/Node-Type";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BansList from "common/utils/bans/BansList";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class NodesStats {
 
@@ -36,6 +37,8 @@ class NodesStats {
     _printStats(){
 
         console.info(" blocks: ", Blockchain.blockchain.blocks.length, BlockchainGenesis.isPoSActivated(Blockchain.blockchain.blocks.length) ? "POS" : "POW" );
+        console.info(" amount mining wallet: ", Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD );
+
         console.info(" v: ", consts.SETTINGS.NODE.VERSION);
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
