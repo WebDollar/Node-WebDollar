@@ -275,6 +275,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         // try all timestamps
         let medianTimestamp = Math.ceil( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
+        let exceptionLogged = false;
 
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
@@ -306,7 +307,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     }
 
-                    if (consts.DEBUG && i % 300 === 0) {
+                    if (consts.DEBUG && i % 300 === 0 && !exceptionLogged ) {
                         console.log("medianTimestamp ", medianTimestamp," ", i, " timestamp ",medianTimestamp + i, hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
@@ -323,9 +324,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
                     done = true;
 
-                if ( consts.DEBUG )
-                    // console.error(exception);
+                if ( consts.DEBUG ){
+                    exceptionLogged = true;
+                    console.error(exception);
                     //Todo remove comment on main net
+                }
 
                 await this.blockchain.sleep(200);
                 
