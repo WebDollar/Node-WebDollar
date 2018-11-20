@@ -174,10 +174,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 answer = await this.mine(block, difficulty, start, end, height);
             } catch (exception){
                 console.error("Couldn't mine block " + block.height, exception);
-                answer.result = false;
+                answer = {
+                    result: false,
+                };
             }
 
-            if (answer.result && this.blockchain.blocks.length === block.height ){
+            if (answer && answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", "timestamp", block.timeStamp, answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
@@ -279,22 +281,37 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i, this.block.height)) {
+                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
                     this.block.timeStamp = medianTimestamp + i;
 
-                    let answer = await this._mineNonces(0, 0);
-                    // await this.blockchain.sleep(900);
+                    let hash = await this.calculateHash(0);
+
+                    if (hash.compare(this.bestHash) < 0) {
+
+                        this.bestHash = hash;
+                        this.bestHashNonce = 0;
+
+                        if (this.bestHash.compare(this.difficulty) <= 0) {
+
+                            this.block.posSignature = await this.block._signPOSSignature();
+
+                            return {
+                                result: true,
+                                hash: hash,
+                                nonce: 0,
+                            };
+
+                        }
+
+                    }
 
                     if (consts.DEBUG && i % 300 === 0) {
-                        console.log(i, answer.hash.toString("hex"));
+                        console.log(i, hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
 
-                    if (answer.result) {
-                        this.block.posSignature = await this.block._signPOSSignature();
-                        return answer;
-                    }
+                    this._hashesPerSecond++;
 
                     i++;
 
@@ -310,7 +327,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     // console.error(exception);
                     //Todo remove comment on main net
 
-                await this.blockchain.sleep(100);
+                await this.blockchain.sleep(200);
                 
             }
 
