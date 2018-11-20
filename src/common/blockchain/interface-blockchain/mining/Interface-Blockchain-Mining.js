@@ -307,7 +307,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     }
 
                     if (consts.DEBUG && i % 300 === 0) {
-                        console.log(i, hash.toString("hex"));
+                        console.log("medianTimestamp ", medianTimestamp," ", i, " timestamp ",medianTimestamp + i, hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
 
