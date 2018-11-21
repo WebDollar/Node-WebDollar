@@ -118,7 +118,7 @@ class InterfaceBlockchainBlocks{
         return this[ this.blocksStartingPoint ];
     }
 
-    recalculateNetworkHashRate(){
+    recalculateNetworkHashRate (){
 
         let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
         let SumDiff = new BigNumber( 0 );

@@ -141,9 +141,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
         }
     }
 
-    async _signPOSSignature(){
+    async _signPOSSignature () {
 
-        let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.posMinerAddress || this.data.minerAddress } );
+        console.info("this.data.minerAddress", this.data.minerAddress);
+        let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.data.minerAddress } );
 
         if (address === null)
             if( typeof this.data.minerAddress !== "undefined")
@@ -163,15 +164,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _verifyPOSSignature(){
 
-        if ( this.posMinerAddress !== undefined && ( !Buffer.isBuffer(this.posMinerAddress) || this.posMinerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH) ) throw {message: "posMinerAddress length is invalid"};
-
-        if ( this.posMinerAddress === undefined ) {
-
-            if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
-                throw { message: "posPublicKey doesn't match with the minerAddress" }
-        } else
-            if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.posMinerAddress))
-                throw { message: "posPublicKey doesn't match with the posMinerAddress" };
+        if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
+            throw { message: "posPublicKey doesn't match with the minerAddress" }
 
         let data = this._computeBlockHeaderPrefix( true );
 
