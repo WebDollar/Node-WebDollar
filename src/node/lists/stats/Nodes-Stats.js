@@ -39,8 +39,12 @@ class NodesStats {
         console.info(" blocks: ", Blockchain.blockchain.blocks.length, BlockchainGenesis.isPoSActivated(Blockchain.blockchain.blocks.length) ? "POS" : "POW" );
         console.info(" amount mining wallet: ", Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD, "  amount");
 
-        if (Blockchain.blockchain.mining.minerAddress && Buffer.isBuffer(Blockchain.blockchain.mining.unencodedMinerAddress) )
-            console.info("Exists: ", Blockchain.Wallet.getAddress( { unencodedAddress: Blockchain.blockchain.mining.unencodedMinerAddress } ) !== null ? "YES" : "NO" );
+        try {
+            if (Blockchain.blockchain.mining.minerAddress && Buffer.isBuffer(Blockchain.blockchain.mining.unencodedMinerAddress))
+                console.info("Exists: ", Blockchain.Wallet.getAddress({unencodedAddress: Blockchain.blockchain.mining.unencodedMinerAddress}) !== null ? "YES" : "NO");
+        } catch (err){
+            console.error(" Wallet was not found ", Blockchain.blockchain.mining.unencodedMinerAddress);
+        }
 
         console.info(" v: ", consts.SETTINGS.NODE.VERSION);
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
