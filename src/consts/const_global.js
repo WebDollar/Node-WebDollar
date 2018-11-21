@@ -474,13 +474,13 @@ if ( consts.DEBUG === true ){
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://testnet2.hoste.ro:8001"],
+        "addr": ["http://86.126.138.61:2224"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.203.7";
+    consts.SETTINGS.NODE.VERSION = "1.203.8";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.203.7";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.203.7";
 
