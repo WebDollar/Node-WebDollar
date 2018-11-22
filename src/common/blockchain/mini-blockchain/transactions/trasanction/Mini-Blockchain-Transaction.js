@@ -1,4 +1,5 @@
 import InterfaceBlockchainTransaction from 'common/blockchain/interface-blockchain/transactions/transaction/Interface-Blockchain-Transaction'
+import consts from 'consts/const_global'
 
 import MiniBlockchainTransactionFrom from './Mini-Blockchain-Transaction-From'
 import MiniBlockchainTransactionTo from './Mini-Blockchain-Transaction-To'
@@ -23,9 +24,9 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     }
 
-    _validateNonce(blockValidationType){
+    _validateNonce(blockValidationType, considerImutability=false){
 
-        //Validate nonce
+        //Nonce from the accountant Tree
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
         if (nonce < this.nonce)
@@ -39,7 +40,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
                 let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;
 
                 if (transactionsList === undefined)
-                    transactionsList = this.blockchain.transactions.pendingQueue.list;
+                    transactionsList = this.blockchain.transactions.pendingQueue.listArray;
 
                 transactionsList.forEach( (transaction)=>{
 
@@ -48,15 +49,25 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 });
 
-
-                for (let i=nonce; i<this.nonce; i++)
-                    if (!foundNonce[i])
-                        throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
+                if(!considerImutability)
+                    for (let i=nonce; i<this.nonce; i++)
+                        if (!foundNonce[i])
+                            throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
                 return true;
 
             }
 
+        if(considerImutability) {
+            let maximumDifference = consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH;
+            if (nonce > this.nonce + maximumDifference && nonce < this.nonce - maximumDifference)
+                throw {
+                    message: "Nonce is not right",
+                    myNonce: this.nonce,
+                    nonce: nonce,
+                    txId: this.txId.toString("hex")
+                };
+        }else
         if (nonce !== this.nonce)
             throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
@@ -71,7 +82,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         //calculate how many transactions we already have to increment the current nonce
         try {
 
-            this.blockchain.transactions.pendingQueue.list.forEach( (pendingTransaction) => {
+            this.blockchain.transactions.pendingQueue.listArray.forEach( (pendingTransaction) => {
 
                 if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
                     nonce++;

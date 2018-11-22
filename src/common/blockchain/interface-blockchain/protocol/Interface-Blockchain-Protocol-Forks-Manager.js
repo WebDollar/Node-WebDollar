@@ -44,6 +44,7 @@ class InterfaceBlockchainProtocolForksManager {
                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) )) {
 
                 socket.node.protocol.blocks = forkChainLength;
+                console.log("Error ForkTip 1");
                 return false;
             }
 
@@ -51,6 +52,7 @@ class InterfaceBlockchainProtocolForksManager {
                 && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
                 socket.node.protocol.blocks = forkChainLength;
                 socket.node.protocol.sendLastBlock();
+                console.log("Error ForkTip 2");
                 return false;
             }
 
@@ -59,6 +61,7 @@ class InterfaceBlockchainProtocolForksManager {
                   && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) ) {
                 socket.node.protocol.blocks = forkChainLength;
                 socket.node.protocol.sendLastBlock();
+                console.log("Error ForkTip 3");
                 return false;
             }
 
@@ -77,6 +80,7 @@ class InterfaceBlockchainProtocolForksManager {
             }
 
             return false;
+            console.log("Error ForkTip 4");
 
         } catch (exception){
 

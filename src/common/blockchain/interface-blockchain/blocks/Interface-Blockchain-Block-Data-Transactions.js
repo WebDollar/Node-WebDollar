@@ -53,7 +53,7 @@ class InterfaceBlockchainBlockDataTransactions {
             if (this.pendingTransactionsWereIncluded)
                 this.transactions[i].pendingTransactionsIncluded--;
 
-            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i]) === -1 )
+            if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i].txId) === null )
                 this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;

@@ -5,7 +5,6 @@ import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 
-import TransactionsListForPropagation from "./Transactions-List-For-Propagation";
 import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 
 import TransactionsDownloadManager from "./Transactions-Download-Manager";
@@ -23,11 +22,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
         NodesList.emitter.on("nodes-list/connected", (result) => { this._newSocketCreateProtocol(result) } );
 
-        this.transactionsForPropagation = new TransactionsListForPropagation(this.blockchain);
-
         StatusEvents.on('blockchain/status', async (data)=>{
 
-            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+            if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
                 return false;
 
             if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined)
@@ -44,17 +41,56 @@ class InterfaceBlockchainTransactionsProtocol {
 
         let socket = nodesListObject.socket;
 
-        if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+        if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
             return false;
 
         this.initializeTransactionsPropagation(socket);
 
-        if (Blockchain.loaded)
+        if (this.blockchain.loaded)
             this.transactionsDownloadingManager.addSocket(socket);
 
     }
 
     async initializeTransactionsPropagation(socket){
+
+        socket.node.on("transactions/missing-nonce", async (response) =>{
+
+            try {
+
+                console.warn("searching missing nonce");
+
+                if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
+                if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
+
+                let transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
+
+                console.warn("Sending missing nonce", transaction);
+
+                socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
+
+            } catch (exception){
+
+                console.error("missing-nonce - Failed", exception);
+
+            }
+
+        });
+
+        socket.node.on("transactions/missing-nonce/answer", async (response) =>{
+
+            try {
+
+                if (!response.transaction) throw {message:"missing-nonce - Response is false"};
+
+                this.transactionsDownloadingManager.addTransaction(socket, response.transaction, true );
+
+            } catch (exception){
+
+                console.error("missing-nonce - Failed", exception);
+
+            }
+
+        });
 
         // in case the Blockchain was not loaded, I will not be interested in transactions
 
@@ -62,20 +98,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                let txId, buffer;
+                if ( !Buffer.isBuffer(response.buffer)) throw {message: "Transaction Id is invalid"};
 
-                if (response.format === 'json' || response.format === undefined) {
-
-                    let json = response.json;
-                    txId = json.txId;
-
-                } else
-                if (response.format === 'buffer'){
-                    txId = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( response.buffer ));
-                    buffer = response.buffer;
-                }
-
-                this.transactionsDownloadingManager.addTransaction(socket, txId, buffer );
+                this.transactionsDownloadingManager._createTransaction(response.buffer,socket);
 
             } catch (exception){
 
@@ -90,9 +115,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction Id is invalid"};
+                if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
-                this.transactionsDownloadingManager.addTransaction(socket, data.txId, undefined );
+                this.transactionsDownloadingManager.addTransaction(socket, data.txId );
 
             } catch(exception){
                 if (consts.DEBUG)
@@ -116,30 +141,35 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 let list = [];
 
-                this.transactionsForPropagation.refreshTransactionsForPropagationList();
-
-                let length = Math.min( response.start + response.count, this.transactionsForPropagation.list.length );
+                let length = Math.min( response.start + response.count, this.blockchain.transactions.pendingQueue.listArray.length );
 
                 await this.blockchain.sleep(20);
 
                 for (let i=response.start; i < length; i++ ){
 
-                    if (response.format === "json") list.push( this.transactionsForPropagation.list[i].txId.toString("hex") ); else
-                    if (response.format === "buffer") list.push( this.transactionsForPropagation.list[i].txId );
+                    if (response.format === "json") list.push( this.blockchain.transactions.pendingQueue.listArray[i].txId.toString("hex") ); else
+                    if (response.format === "buffer") list.push( this.blockchain.transactions.pendingQueue.listArray[i].txId );
 
                     if (i % 20 === 0)
                         await this.blockchain.sleep( 20 );
 
                 }
 
-                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.transactionsForPropagation.list.length } );
+                console.warn("Sent hashes list with",list.length,"tx hashes, from", response.start, "to", length);
+
+                socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.blockchain.transactions.pendingQueue.listArray.length } );
 
             } catch (exception){
+
+                console.error("Failed to send tx list for download");
+
             }
 
         });
 
         socket.node.on("transactions/get-pending-transactions-by-ids", async (response) => {
+
+            let transaction = undefined;
 
             try{
 
@@ -155,23 +185,30 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 for (let i=0; i<response.ids.length; i++ ){
 
-                    let transaction = this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId(response.ids[i]);
+                    transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
 
-                    if (transaction === null || transaction === undefined) continue;
+                    if (transaction === null || transaction === undefined) {
+                        await this.blockchain.sleep(20);
+                        continue;
+                    }
+
+                    await this.blockchain.sleep(20);
 
                     if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
                     if (response.format === "buffer") list.push( transaction.serializeTransaction() );
 
-                    if (i % 20 === 0)
-                        await this.blockchain.sleep( 20 );
+                    transaction = undefined;
 
                 }
 
-                await this.blockchain.sleep(25);
+                await this.blockchain.sleep(200);
 
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
             } catch (exception){
+
+                console.error("error sending tx -",transaction, exception)
+
             }
 
         });
@@ -181,31 +218,30 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async downloadTransactions(socket, start, count, max){
 
-        if (start >= max) return;
+        if (start >= max) return false;
 
-        if (socket === undefined) return;
+        if (typeof socket === "undefined") return false;
 
         try{
 
-            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 5000);
+            let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 12*1000);
+
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
 
-            let ids = answer.transactions;
+            console.warn ("Will process tx from", start, "to", start+count);
 
-            for (let i=0; i<ids.length; i++) {
-
-                if (this.blockchain.transactions.pendingQueue.searchPendingTransactionByTxId( ids[i]) !== null ) continue;
-                this.transactionsDownloadingManager.addTransaction( socket, ids[ i ] );
-
-            }
+            for (let i=0; i<answer.transactions.length; i++)
+                this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
 
             if (start + count < answer.length)
-                await this.downloadTransactions(socket, start+count, count, max);
+                return await this.downloadTransactions(socket, start+count, count, max);
 
         } catch (exception){
 
             if (consts.DEBUG)
                 console.error("Error Getting All Pending Transactions", exception);
+
+            return false;
 
         }
 
@@ -213,19 +249,26 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async downloadTransaction(socket, txId){
 
+        if (typeof socket === "undefined") return false;
+
         try {
 
             let answerTransactions = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-by-ids", {
                 format: "buffer",
                 ids: [txId],
-            }, "answer", 8000);
+            }, "answer", 3000);
 
-            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) return false;
+            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) {
+                console.warn("Transaction", txId.toString('hex') ,"was not sent");
+                return false;
+            }
 
             return answerTransactions.transactions[0];
 
 
         } catch (exception){
+
+            console.error("Error sending tx", exception)
 
         }
 
@@ -233,12 +276,17 @@ class InterfaceBlockchainTransactionsProtocol {
 
     }
 
-
     propagateNewPendingTransaction(transaction, exceptSockets){
 
-        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
-        //NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
+        // NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
+        NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
+        console.warn("broadcasted tx", transaction.txId.toString('hex'));
 
+    }
+
+    propagateNewMissingNonce(addressBuffer,nonce){
+        NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
+        console.warn("broadcasted missing nonce", nonce);
     }
 
 }

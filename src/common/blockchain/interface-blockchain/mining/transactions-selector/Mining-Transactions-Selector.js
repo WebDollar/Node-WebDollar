@@ -49,16 +49,16 @@ class MiningTransactionsSelector{
 
     }
 
-    selectNextTransactions(miningFeePerByte){
+    selectNextTransactions(miningFeePerByte,showLogsOnlyOnce){
 
         this._transactions = [];
 
         let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
         let i = 0;
 
-        while (size > 0 && i < this.blockchain.transactions.pendingQueue.list.length ){
+        while (size > 0 && i < this.blockchain.transactions.pendingQueue.listArray.length ){
 
-            let transaction = this.blockchain.transactions.pendingQueue.list[i];
+            let transaction = this.blockchain.transactions.pendingQueue.listArray[i];
 
             try {
 
@@ -110,10 +110,12 @@ class MiningTransactionsSelector{
             i++;
         }
 
-        console.warn("--------------------------------");
-        console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.list.length);
-        console.warn("Transactions selected for mining: ", this._transactions.length);
-        console.warn("--------------------------------");
+        if(showLogsOnlyOnce){
+            console.warn("--------------------------------");
+            console.warn("pendingQueue", this.blockchain.transactions.pendingQueue.listArray.length);
+            console.warn("Transactions selected for mining: ", this._transactions.length);
+            console.warn("--------------------------------");
+        }
 
         return this._transactions;
     }

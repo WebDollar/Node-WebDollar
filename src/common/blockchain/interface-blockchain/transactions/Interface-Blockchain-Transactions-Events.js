@@ -71,7 +71,7 @@ class InterfaceBlockchainTransactionsEvents{
         };
 
         //adding the valid Pending Transactions
-        this.blockchain.transactions.pendingQueue.list.forEach((transaction)=>{
+        this.blockchain.transactions.pendingQueue.listArray.forEach((transaction)=>{
 
             try {
                 if (transaction.validateTransactionEveryTime(undefined, blockValidationType)) {

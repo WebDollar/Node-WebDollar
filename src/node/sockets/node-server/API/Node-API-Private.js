@@ -90,6 +90,25 @@ class NodeAPIPrivate{
 
     }
 
+    async walletCreate (){
+
+        console.info('Create new address via API');
+        try {
+            let address = await Blockchain.Wallet.createNewAddress();
+            console.info("Address was created: " + address.address);
+            return {result: true, wallet: {
+                address: address.address.toString('hex'),
+                publicKey: address.publicKey.toString('hex'),
+                privateKey: await address.exportAddressPrivateKeyToHex()
+            }};
+        } catch(err) {
+            console.err(err);
+            return false;
+        }
+
+
+    }
+
 }
 
 

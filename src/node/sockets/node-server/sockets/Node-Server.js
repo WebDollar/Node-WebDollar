@@ -290,7 +290,6 @@ class NodeServer {
 
         });
 
-
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.signaling.server.initializeSignalingServerService();
     }

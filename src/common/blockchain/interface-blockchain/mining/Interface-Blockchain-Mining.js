@@ -19,6 +19,7 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -40,13 +41,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
-    async getNextBlock(){
+    async getNextBlock(showLogsOnlyOnce){
 
         let nextBlock, nextTransactions;
 
         try {
 
-            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte);
+            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
@@ -97,6 +98,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      */
     async mineNextBlock(suspend){
 
+        let showLogsOnlyOnce = true;
+
         while (this.started && !global.TERMINATED){
 
             if (this.minerAddress === undefined){
@@ -112,7 +115,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             try {
 
-                let nextBlock = await this.getNextBlock();
+                let nextBlock = await this.getNextBlock(showLogsOnlyOnce);
 
                 let difficulty = this.blockchain.getDifficultyTarget();
 
@@ -134,7 +137,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let start = Math.floor( Math.random() * 3700000000 );
                 let end = 0xFFFFFFFF;
 
-                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height);
+                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height, showLogsOnlyOnce);
 
 
             } catch (exception){
@@ -142,6 +145,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this.stopMining();
             }
 
+            showLogsOnlyOnce = false;
 
         }
 
@@ -152,10 +156,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param block
      * @param difficulty
      */
-    async mineBlock( block,  difficulty, start, end, height){
+    async mineBlock( block,  difficulty, start, end, height, showLogsOnlyOnce){
 
-        console.log("");
-        console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
+        if(showLogsOnlyOnce) {
+            console.log("");
+            console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
+        }
 
         try{
 
@@ -168,10 +174,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 answer = await this.mine(block, difficulty, start, end, height);
             } catch (exception){
                 console.error("Couldn't mine block " + block.height, exception);
-                answer.result = false;
+                answer = {
+                    result: false,
+                };
             }
 
-            if (answer.result && this.blockchain.blocks.length === block.height ){
+            if (answer && answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
                 console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", "timestamp", block.timeStamp, answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
@@ -227,7 +235,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                console.error( "block ", block.height ," was not mined...");
+                if(showLogsOnlyOnce)
+                    console.error( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
@@ -251,41 +260,79 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         this.end = 0;
 
+
+        let balance = this.block.blockchain.accountantTree.getBalance( this.block.posMinerAddress || this.block.data.minerAddress );
+
+        if (balance === null){
+
+            await this.blockchain.sleep(1000);
+
+            return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                nonce: -1,
+            };
+
+        }
+
         // try all timestamps
         let medianTimestamp = Math.ceil( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
+        let exceptionLogged = false;
 
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
             try {
 
-                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(medianTimestamp + i, this.block.height)) {
+                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
                     this.block.timeStamp = medianTimestamp + i;
 
-                    let answer = await this._mineNonces(0, 0);
+                    let hash = await this.calculateHash(0);
 
-                    if (consts.DEBUG && i % 300 === 0) {
-                        console.log(i, answer.hash.toString("hex"));
+                    if (hash.compare(this.bestHash) < 0) {
+
+                        this.bestHash = hash;
+                        this.bestHashNonce = 0;
+
+                        if (this.bestHash.compare(this.difficulty) <= 0) {
+
+                            this.block.posSignature = await this.block._signPOSSignature();
+
+                            return {
+                                result: true,
+                                hash: hash,
+                                nonce: 0,
+                            };
+
+                        }
+
+                    }
+
+                    if (consts.DEBUG && i % 300 === 0 && !exceptionLogged ) {
+                        console.log("medianTimestamp ", medianTimestamp," ", i, " timestamp ",medianTimestamp + i, hash.toString("hex"));
                         await this.blockchain.sleep( 5 );
                     }
 
-                    if (answer.result) {
-                        this.block.posSignature = await this.block._signPOSSignature();
-                        return answer;
-                    }
+                    this._hashesPerSecond++;
 
                     i++;
 
                 } else
-                    await this.blockchain.sleep(50);
+                    await this.blockchain.sleep(100);
 
             } catch (exception){
 
-                if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time")
+                if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time"){
+
                     done = true;
 
-                await this.blockchain.sleep(50);
+                    exceptionLogged = true;
+                    console.error(exception);
+
+                }
+
+                await this.blockchain.sleep(200);
                 
             }
 
@@ -342,11 +389,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (exception){
             console.error("Error _mineNonces", "nonce", nonce, start, end );
-            this.resetForced = true;
+
+            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                this.resetForced = true;
         }
 
         if (consts.DEBUG && Math.random() < 0.05 ) {
-            console.log("bestHash", this.bestHash.toString("hex"), "   ", this.difficulty.toString("hex"));
+            console.log("current bestHash -", this.bestHash.toString("hex"), " target -", this.difficulty.toString("hex"));
             await this.blockchain.sleep( 5 );
         }
 

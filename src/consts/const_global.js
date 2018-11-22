@@ -54,7 +54,7 @@ consts.BLOCKCHAIN = {
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 200,
+        IMMUTABILITY_LENGTH: 30,
 
     },
 
@@ -135,6 +135,7 @@ consts.SPAM_GUARDIAN = {
     TRANSACTIONS:{
         MAXIMUM_IDENTICAL_INPUTS: 10,
         MAXIMUM_IDENTICAL_OUTPUTS: 255,
+        MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE: 500
     }
 
 };
@@ -265,10 +266,11 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.198.9",
 
-        VERSION_COMPATIBILITY: "1.198.9",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.198.9",
+        VERSION: "1.200.0",
+
+        VERSION_COMPATIBILITY: "1.200.0",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -276,7 +278,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 80, //port
+        PORT: 91, //port
         MINER_POOL_PORT: 8086, //port
 
     },
@@ -302,7 +304,7 @@ consts.SETTINGS = {
         },
 
         MAX_SIZE: {
-            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
+            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,      // in bytes
             SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
 
             SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 * 1024, //32 kb
@@ -399,7 +401,7 @@ consts.SETTINGS = {
             TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 10 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         },
 
-        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
+        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 1000,
 
         MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
 
@@ -467,20 +469,24 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8085;
+    consts.SETTINGS.NODE.PORT = 2224;
 
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://testnet2.hoste.ro:8001"],
+        "addr": ["http://86.126.138.61:2224"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
+    consts.SETTINGS.NODE.VERSION = "1.203.8";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.203.7";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.203.7";
+
 }
 
 if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
-    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet; 
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
 
 export default consts

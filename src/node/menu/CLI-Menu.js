@@ -310,6 +310,9 @@ class CLI {
                     if (answer.result === true) {
                         console.log("Address successfully imported", answer.address);
                         await Blockchain.Wallet.saveWallet();
+
+                        if(Blockchain.Wallet.addresses.length===1) Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[0].address;
+
                         resolve(true);
                     } else {
                         console.error(answer.message);
