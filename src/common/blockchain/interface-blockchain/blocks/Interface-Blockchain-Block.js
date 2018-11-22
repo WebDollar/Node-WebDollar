@@ -15,7 +15,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
 
@@ -24,6 +24,8 @@ class InterfaceBlockchainBlock {
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
+
+        this.hashChainPrev = hashChainPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
