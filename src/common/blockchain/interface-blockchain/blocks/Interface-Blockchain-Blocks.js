@@ -24,7 +24,6 @@ class InterfaceBlockchainBlocks{
         this._networkHashRate = 0 ;
 
         this._chainWork =  new BigInteger(0);
-        this._chainHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER );
 
 
         this.chainWorkSerialized = new Buffer(0);
@@ -65,10 +64,6 @@ class InterfaceBlockchainBlocks{
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
         this.chainWork = this.chainWork.plus( block.workDone );
-        this._chainHash = WebDollarCrypto.SHA256 ( WebDollarCrypto.SHA256( Buffer.concat( [this._chainHash, block.blockHash ]) );
-
-        //clone it
-        block._chainHash = Buffer.from( this._chainHash );
 
 
     }
@@ -97,14 +92,8 @@ class InterfaceBlockchainBlocks{
 
             }
 
-        if (this.length === 0){
+        if (this.length === 0)
             this._chainWork =  new BigInteger(0);
-            this._chainHash =  Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER );
-        } else {
-
-            this._chainHash = Buffer.from( this[this.length-1]._chainHash );
-
-        }
 
         this.length = after;
 
