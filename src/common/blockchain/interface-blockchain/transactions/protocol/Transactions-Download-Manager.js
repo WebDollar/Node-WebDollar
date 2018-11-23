@@ -24,7 +24,7 @@ class TransactionsDownloadManager{
         this.smallestTrial = 0;
 
         NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribeSocket(result.socket.node.sckAddress.uuid)
+            this._unsubscribeSocket(result.socket)
         });
 
         NodesList.emitter.on("nodes-list/connected", (result) => {
@@ -288,7 +288,6 @@ class TransactionsDownloadManager{
                                             if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
                                                 let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                                this._removeTransactionsOnlyFrom(suspiciousSocket);
                                                 this._unsubscribeSocket(suspiciousSocket);
                                                 BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
                                             }else{
@@ -396,18 +395,6 @@ class TransactionsDownloadManager{
             }
 
         this.removeSocket(socket);
-
-    }
-
-    _removeTransactionsOnlyFrom(socket){
-
-        for (let txId in this._transactionsQueue)
-            if(this._transactionsQueue[txId].socket){
-                if(this._transactionsQueue[txId].socket.length === 1)
-                    if(this._transactionsQueue[txId].socket[0].node.sckAddress.uuid = socket.node.sckAddress.uuid)
-                        delete this._transactionsQueue[txId];
-            }else
-                delete this._transactionsQueue[txId];
 
     }
 
