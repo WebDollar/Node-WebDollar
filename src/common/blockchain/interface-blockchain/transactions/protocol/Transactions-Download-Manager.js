@@ -388,14 +388,17 @@ class TransactionsDownloadManager{
     _unsubscribeSocket(socket){
 
         for (let txId in this._transactionsQueue)
-            for( let i =0; i<this._transactionsQueue[txId].socket.length; i++){
+            if(typeof this._transactionsQueue[txId].socket !== "undefined" )
+                for( let i =0; i<this._transactionsQueue[txId].socket.length; i++){
 
-                if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid )
-                    this._transactionsQueue[txId].socket.splice(i,1);
+                    if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid )
+                        this._transactionsQueue[txId].socket.splice(i,1);
 
-                if( this._transactionsQueue[txId].socket.length === 0 )
-                    this.removeTransaction(txId);
-            }
+                    if( this._transactionsQueue[txId].socket.length === 0 )
+                        this.removeTransaction(txId);
+                }
+            else
+                this.removeTransaction(txId);
 
         this.removeSocket(socket);
 
