@@ -57,8 +57,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                console.warn("searching missing nonce");
-
                 if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
                 if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
 

@@ -162,8 +162,6 @@ class TransactionsPendingQueue {
 
     findPendingTransactionByAddressAndNonce(address,searchedNonce){
 
-        console.warn("Search Missing Nonce",searchedNonce,address);
-
         let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
         if(this.listArray.length){
 
