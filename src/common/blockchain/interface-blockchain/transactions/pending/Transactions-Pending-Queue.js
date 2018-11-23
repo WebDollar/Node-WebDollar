@@ -135,7 +135,7 @@ class TransactionsPendingQueue {
                             break;
 
                 }else{
-                    this.analyseMissingNonce(i-1);
+                    this.analyseMissingNonce(i-1 >= 0 ? i-1 : i);
                 }
                 break;
             }
