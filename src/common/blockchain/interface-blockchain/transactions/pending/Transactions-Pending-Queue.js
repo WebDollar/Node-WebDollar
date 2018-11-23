@@ -125,7 +125,7 @@ class TransactionsPendingQueue {
                     this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
 
                     //Propagate all tx after solving nonce gap
-                    for(let j=this.listArray[i].nonce; j<this.listArray.length; j++)
+                    for(let j=this.listArray[i].nonce; j<this.listArray.length-1; j++)
                         if(this.listArray[j+1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0){
                             if(this.listArray[j+1].nonce - this.listArray[j].nonce === 1)
                                 this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);

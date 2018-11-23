@@ -289,13 +289,15 @@ class TransactionsDownloadManager{
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
                                                 let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
                                                 this._unsubscribeSocket(suspiciousSocket);
-                                                BansList.addBan(suspiciousSocket, 30*1000, "Sent over 10 invalid transactions");
+                                                BansList.addBan(suspiciousSocket, 20*1000, "Sent over 10 invalid transactions");
+                                                continue;
                                             }else{
                                                 this.removeTransaction(txId);
                                             }
 
                                         }else{
 
+                                            //Decrease invalid transactions
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions =
                                                 this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 > 0 ?
                                                     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions-1 : 0;
