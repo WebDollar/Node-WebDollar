@@ -314,8 +314,9 @@ class TransactionsDownloadManager{
                                         if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                                this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                            if( typeof this._transactionsQueue[txId] !== "undefined")
+                                                if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                                    this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                         }
                                     }
 
