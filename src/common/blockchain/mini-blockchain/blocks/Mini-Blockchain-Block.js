@@ -143,7 +143,6 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _signPOSSignature () {
 
-        console.info("this.data.minerAddress", this.data.minerAddress);
         let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.data.minerAddress } );
 
         if (address === null)
