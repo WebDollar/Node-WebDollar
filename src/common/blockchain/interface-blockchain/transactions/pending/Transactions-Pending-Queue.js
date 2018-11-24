@@ -65,8 +65,8 @@ class TransactionsPendingQueue {
     }
 
     pendingQueueTxTimeLockValidation(transaction){
-        // if ( this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && this.blockchain.blocks.length -  consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < transaction.timeLock )
-        if ( this.blockchain.blocks.length - 1 < transaction.timeLock )
+        if ( this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && this.blockchain.blocks.length -  consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < transaction.timeLock )
+        // if ( this.blockchain.blocks.length - 2 <= transaction.timeLock )
             return true;
         else
             return false;
