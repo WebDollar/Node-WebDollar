@@ -96,13 +96,14 @@ class TransactionsPendingQueue {
 
             if (compare < 0) // next
                 continue;
-            else
-            if (compare === 0){ //order by nonce
+            else if (compare === 0){ //order by nonce
 
                 if (transaction.nonce === this.listArray[i].nonce){
+
                     inserted = true;
                     break;
-                } else if (transaction.nonce < this.listArray[i].nonce){ // will add a smaller nonce
+
+                }else if (transaction.nonce < this.listArray[i].nonce){ // will add a smaller nonce
 
                     this.addNewTransaction(i,transaction);
                     inserted = true;
@@ -110,33 +111,32 @@ class TransactionsPendingQueue {
 
                 }
 
-            }
-            else
-            if (compare > 0) { // i will add a higher nonce
+            } else if (compare > 0) { // i will add a higher nonce
 
                 this.addNewTransaction(i,transaction);
                 inserted = true;
+                i++
 
             }
 
             if(inserted){
-                if( i>0 && this.listArray[i].nonce - this.listArray[i-1].nonce === 1){
+                if (this.listArray[i].nonce - this.listArray[i - 1].nonce === 1){
 
                     this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
 
                     //Propagate all tx after solving nonce gap
-                    for(let j=this.listArray[i].nonce; j<this.listArray.length-1; j++)
-                        if(this.listArray[j+1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0){
-                            if(this.listArray[j+1].nonce - this.listArray[j].nonce === 1)
+                    for (let j = this.listArray[i].nonce; j < this.listArray.length - 1; j++)
+                        if (this.listArray[j + 1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0) {
+                            if (this.listArray[j + 1].nonce - this.listArray[j].nonce === 1)
                                 this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
                             else
                                 this.analyseMissingNonce(j);
-                        }else
+                        } else
                             break;
 
-                }else{
-                    this.analyseMissingNonce(i-1 >= 0 ? i-1 : i);
-                }
+                }else
+                    this.analyseMissingNonce(i - 1 >= 0 ? i - 1 : i);
+
                 break;
             }
 
