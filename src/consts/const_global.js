@@ -181,7 +181,7 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://antelle.github.io/argon2-browser/dist'
+    distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
 };
 
 // change also to Browser-Mining-WebWorker.js

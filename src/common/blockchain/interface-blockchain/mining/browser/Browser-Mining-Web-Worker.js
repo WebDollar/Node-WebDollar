@@ -2,7 +2,7 @@
 
 let jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
 let block = undefined;
-let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://antelle.github.io/argon2-browser/dist'}
+let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://webdollar.io/public/WebDollar-dist/argon2/dist'}
 
 let algorithm = undefined;
 
@@ -17,7 +17,7 @@ var _librayLoaded = false;
 var _libraryLoadPromise = false;
 
 var global = typeof window === 'undefined' ? self : window;
-var root = "https://antelle.net/argon2-browser/";
+var root = "https://webdollar.io/public/WebDollar-dist/argon2/";
 
 var log;
 
@@ -26,6 +26,7 @@ function calcAsmJs() {
     let promise = new Promise( async (resolve) => {
 
         // log('Testing Argon2 using asm.js...');
+
 
         if (global.Module && !global.Module.wasmJSMethod) {
 
