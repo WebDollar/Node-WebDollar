@@ -409,7 +409,7 @@ class TransactionsDownloadManager{
         let found = false;
 
         for ( let txId in this._transactionsQueue )
-            if( typeof this._transactionsQueue[txId] !== "undefined" ){
+            if( typeof this._transactionsQueue[txId].socket !== "undefined" ){
                 for (let i = 0; i < this._transactionsQueue[txId].socket.length; i++)
                     if (this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid) {
                         this._transactionsQueue[txId].socket.splice(i, 1);
