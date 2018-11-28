@@ -91,7 +91,6 @@ class BansList{
 
         for (let i=0; i<this.bans.length; i++) {
 
-
             let timeLeft  = (this.bans[i].banTimestamp + this.bans[i].banTime) - new Date().getTime() ;
 
             if (timeLeft > 0)
