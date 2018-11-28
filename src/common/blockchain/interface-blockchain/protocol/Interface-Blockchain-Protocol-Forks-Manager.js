@@ -129,7 +129,7 @@ class InterfaceBlockchainProtocolForksManager {
 
                     if (this.blockchain.agent.light)
                         if (["fork is something new", "discoverAndProcessFork - fork already found by socket",
-                             "same proof, but your blockchain is smaller than mine", "Your proof is worst than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
+                             "same proof, but your blockchain is smaller than mine", "Your proof is worst than mine because you have the same block", "fork proof was already downloaded", "You gave me a block which I already have have the same block" ].indexOf( exception.message ) >= 0)
                             bIncludeBan = false;
 
                     if (bIncludeBan) {
