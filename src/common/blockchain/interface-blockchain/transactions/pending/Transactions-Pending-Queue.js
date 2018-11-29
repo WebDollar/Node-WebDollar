@@ -194,8 +194,9 @@ class TransactionsPendingQueue {
             else
                 closerSelected = selected + (searchedNonce - this.listArray[selected].nonce-1);
 
-            if ( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
-                selected = closerSelected;
+            if( typeof this.listArray[closerSelected] !== "undefined")
+                if( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
+                    selected = closerSelected;
 
             let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
 
