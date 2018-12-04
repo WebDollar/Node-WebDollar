@@ -167,7 +167,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 }
 
-                await this.blockchain.sleep(25);
+                await this.blockchain.sleep(30);
 
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
@@ -178,8 +178,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
 
     }
-
-
 
     async downloadTransactions(socket, start, count, max){
 

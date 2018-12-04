@@ -2,7 +2,6 @@ import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
 
 const io = require('socket.io');
-const publicIp = require('public-ip');
 
 import consts from 'consts/const_global'
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
@@ -15,6 +14,8 @@ import Blockchain from "main-blockchain/Blockchain"
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
+const publicIp = require('public-ip');
+
 const TIME_DISCONNECT_TERMINAL = 5*60*1000;
 const TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS = 5*60*1000;
 
@@ -22,12 +23,12 @@ const ROOMS = {
 
     TERMINALS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 30,
+        SERVER_FREE_ROOM : 20,
     },
 
     BROWSERS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 50,
+        SERVER_FREE_ROOM : 20,
     },
 
 };
@@ -60,27 +61,6 @@ class NodeServer {
             },
 
         };
-
-    }
-
-    getServerHTTPAddress(getIP) {
-
-        if ( !this.loaded || !NodeExpress.loaded ) return '';
-        if (NodeExpress.port === 0) return '';
-        if (NodeExpress.domain  === '') return '';
-
-        if ( getIP ){
-
-            return new Promise(async (resolve)=>{
-
-                resolve (  'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port );
-
-            })
-
-        }
-
-        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
-
 
     }
 
@@ -173,27 +153,29 @@ class NodeServer {
                     return;
                 }
 
+                let semiPublicKeyConsensus = socket.request._query["semiPublicKeyConsensus"];
 
-                if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
+                if (consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS === undefined || consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS.indexOf(semiPublicKeyConsensus) === -1 )
+                    if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
-                    //be sure it is not a fallback node
-                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
+                        //be sure it is not a fallback node
+                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
 
-                    if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+                        if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
 
-                        if (Math.random() < 0.05) console.warn("too many terminal connections");
+                            if (Math.random() < 0.05) console.warn("too many terminal connections");
+                            return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+
+                        }
+
+                    } else
+
+                    if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER)) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
+
+                        if (Math.random() < 0.05) console.warn("too many browser connections");
                         return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                     }
-
-                } else
-
-                if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER)) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
-
-                    if (Math.random() < 0.05) console.warn("too many browser connections");
-                    return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
-
-                }
 
 
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
@@ -298,10 +280,10 @@ class NodeServer {
             return false;
         }
 
-        socket.once("disconnect", () => {
+        socket.once("disconnect", async () => {
 
             try {
-                NodesList.disconnectSocket(socket);
+                await NodesList.disconnectSocket(socket);
             } catch (exception){
 
             }
@@ -311,6 +293,29 @@ class NodeServer {
 
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.signaling.server.initializeSignalingServerService();
+    }
+
+    async getServerHTTPAddress(getIP) {
+
+
+        if (NodeExpress === undefined) return '';
+
+        if ( !this.loaded )
+            await NodeExpress.startExpress();
+
+
+        if (NodeExpress.port === 0) return '';
+        if (NodeExpress.domain  === '') return '';
+
+        if ( getIP ){
+
+            return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port;
+
+        }
+
+        return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
+
+
     }
 
     _disconenctOldSockets() {

@@ -1,7 +1,6 @@
 import Argon2 from 'common/crypto/Argon2/Argon2'
 let crypto = (process.env.BROWSER) ? require('crypto-browserify') : require('crypto');
 
-
 class WebDollarCrypto {
 
     /**

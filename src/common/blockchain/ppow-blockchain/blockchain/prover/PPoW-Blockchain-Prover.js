@@ -52,9 +52,9 @@ class PPoWBlockchainProver{
                     // //  α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
-                    //
-                    // C[: −k]{B :}
-                    // for (let level = miu; level <=32; level++){
+
+                    // // C[: −k]{B :}
+                    // for (let level = miu; level < 256; level++){
                     //
                     //     //C[: −k] ↑µ
                     //     let chainBlocks = this.provesCalculated.levels[level];
@@ -75,15 +75,13 @@ class PPoWBlockchainProver{
                     //
                     // }
                     //
-                    // underlyingChain.blocks.sort(function(a, b) {
-                    //     return a.height - b.height;
-                    // });
+                    // //TODO keep the superChain.blocks already sorted and insert it using binary search
                     //
                     // superChain.blocks.sort(function(a,b){
                     //     return a.height - b.height;
                     // });
 
-                    //slow version
+                    // //slow version
                     for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                         if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
                             chain.blocks[i].getLevel() >= miu) {
@@ -95,6 +93,13 @@ class PPoWBlockchainProver{
                                 underlyingChain.push(chain.blocks[i]);
 
                         }
+
+
+
+
+
+
+
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
@@ -122,7 +127,13 @@ class PPoWBlockchainProver{
                 return a.height - b.height;
             });
 
-            underlyingChain.calculateProofHash();
+            await underlyingChain.calculateProofHash();
+            await underlyingChain.calculateProofSerialized();
+            await underlyingChain.calculateProofGzip();
+
+            //underlyingChain.proofGzip = undefined;
+            //underlyingChain.date = new Date().getTime();
+
         }
 
         // let s = "";

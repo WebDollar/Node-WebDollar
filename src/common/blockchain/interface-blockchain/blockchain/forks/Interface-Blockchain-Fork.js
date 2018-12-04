@@ -92,6 +92,9 @@ class InterfaceBlockchainFork {
         this._blocksCopy = [];
     }
 
+
+
+
     async _validateFork(validateHashesAgain, firstValidation){
 
         //forkStartingHeight is offseted by 1
@@ -109,6 +112,42 @@ class InterfaceBlockchainFork {
         this._validateChainWork();
 
         return true;
+    }
+
+    validateForkImmutability(){
+
+        //detecting there is a fork in my blockchain
+        if ( this.blockchain.blocks.blocksStartingPoint < this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH )
+            if (this.forkStartingHeight <= this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH){
+                //verify if there were only a few people mining in my last 30 blocks
+
+                let addresses = [];
+
+                for (let i=this.forkStartingHeight; i<this.blockchain.blocks.length; i++){
+
+                    if (this.blockchain.blocks[i].data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
+
+                    let found = false;
+                    for (let j=0; j<addresses.length; j++)
+                        if (addresses[j].equals(this.blockchain.blocks[i].data.minerAddress)){
+                            found = true;
+                            break;
+                        }
+
+                    if (!found)
+                        addresses.push(this.blockchain.blocks[i].data.minerAddress)
+
+                }
+
+                if (addresses.length >= 1)  //in my fork, there were also other miners, and not just me
+                    throw {message: "Validate for Immutability failed"};
+                else
+                    return true; //there were just 3 miners, probably it is my own fork...
+
+            }
+
+        return true;
+
     }
 
     _validateChainWork(){
@@ -248,6 +287,37 @@ class InterfaceBlockchainFork {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    deleteAlreadyIncludedBlocks(){
+
+        //verify if now, I have some blocks already in my the blockchain that are similar with the fork
+        let pos = -1;
+        for (let i=0; i<this.forkBlocks.length-1; i++)
+            if ( this.blockchain.blocks[ this.forkBlocks[i].height ] !== undefined && this.blockchain.blocks[ this.forkBlocks[i].height ].hash.equals(this.forkBlocks[i].hash)  ){
+
+                pos = i;
+
+            } else break;
+
+        if (pos >= 0){
+
+            this.forkStartingHeight = this.forkBlocks[pos].height;
+            this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
+
+            for (let j=0; j<=pos; j++)
+                if (this.blockchain.blocks[ this.forkBlocks[j].height ] !== this.forkBlocks[j])
+                    this.forkBlocks[j].destroyBlock();
+                else
+                    this.forkBlocks[j] = undefined;
+
+
+            this.forkBlocks.splice(0, pos);
+        }
+
+        if (this.forkBlocks.length !== 0) return true;
+        else return false;
+
+    }
+
     /**
      * Validate the Fork and Use the fork as main blockchain
      *
@@ -284,6 +354,11 @@ class InterfaceBlockchainFork {
                     return false
                 }
 
+                if (!this.deleteAlreadyIncludedBlocks()){
+                    Log.error("deleteAlreadyIncludedBlocks blocks no longer exist", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    return false;
+                }
+
                 if (this.downloadBlocksSleep) await this.sleep(30);
 
                 try {
@@ -293,7 +368,6 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
                     Log.error("preForkBefore raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
-                    this.forkIsSaving = false;
                     return false;
                 }
 
@@ -305,7 +379,7 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
 
-                    Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                    Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
                     revertActions.revertOperations('', "all");
                     this._blocksCopy = []; //We didn't use them so far
@@ -316,7 +390,6 @@ class InterfaceBlockchainFork {
                         Log.error("revertFork rasied an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
                     }
 
-                    this.forkIsSaving = false;
                     return false;
                 }
 
@@ -349,7 +422,7 @@ class InterfaceBlockchainFork {
                 let index;
                 try {
 
-                    for (index = 0; index < this.forkBlocks.length; index++) {
+                    for (index = 0; index < this.forkBlocks.length && (Blockchain.MinerPoolManagement === undefined || !Blockchain.MinerPoolManagement.minerPoolStarted); index++) {
 
                         StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 
@@ -363,9 +436,9 @@ class InterfaceBlockchainFork {
 
                         if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
                             this.forkBlocks[index].blockValidation.blockValidationType['skip-sleep'] = true;
-                        else {
+                        else
                             await this.blockchain.sleep(2);
-                        }
+
 
 
 
@@ -384,11 +457,15 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
 
-                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    Log.error("saveFork includeBlockchainBlock1 raised exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    this.printException( exception );
-                    Log.error("index: "+ index + "forkStartingHeight"+this.forkStartingHeight + "fork", Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
-                    Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
+                    try {
+                        Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        Log.error("saveFork includeBlockchainBlock1 raised exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        this.printException(exception);
+                        Log.error("index: " + index + "forkStartingHeight" + this.forkStartingHeight + "fork", Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                        Log.error('-----------------------------------------', Log.LOG_TYPE.BLOCKCHAIN_FORKS,);
+                    } catch (exception){
+
+                    }
 
                     forkedSuccessfully = false;
 
@@ -475,7 +552,6 @@ class InterfaceBlockchainFork {
         return success;
     }
 
-
     preForkClone(cloneBlocks=true){
 
         try {
@@ -535,29 +611,14 @@ class InterfaceBlockchainFork {
             this._blocksCopy.forEach((block) => {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
+                    block.data.transactions.unconfirmTransactions();
 
-                        transaction.confirmed = false;
-
-                        try {
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                        }
-                        catch (exception) {
-                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
-                        }
-
-                    });
             });
 
             this.forkBlocks.forEach((block)=> {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-
-                    });
+                    block.data.transactions.confirmTransactions();
 
             });
 
@@ -566,29 +627,15 @@ class InterfaceBlockchainFork {
             this.forkBlocks.forEach((block)=>{
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction)=>{
-                        transaction.confirmed = false;
+                    block.data.transactions.unconfirmTransactions();
 
-                        try {
-                            this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
-                        }
-                        catch (exception) {
-                            Log.warn("Transaction Was Rejected to be Added to the Pending Queue ", Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON() );
-                        }
-
-                    });
             });
 
 
             this._blocksCopy.forEach( (block) => {
 
                 if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.transactions.forEach((transaction) => {
-                        transaction.confirmed = true;
-
-                        this.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
-
-                    });
+                    block.data.transactions.confirmTransactions();
 
             });
 
@@ -672,15 +719,35 @@ class InterfaceBlockchainFork {
         return -1;
     }
 
+    getForkSocket(index){
+
+        if (this.sockets.length === 0) return undefined;
+
+        if (! this.sockets[index % this.sockets.length].connected) {
+            this.sockets.splice(index % this.sockets.length);
+            return undefined;
+        }
+        return this.sockets[index % this.sockets.length];
+    }
+
     pushSocket(socket, priority){
 
         if (this._findSocket(socket) === -1) {
 
             if (priority)
                 this.sockets.splice(0,0, socket);
-            else
+            else {
+
+                if (socket.latency !== 0)
+                    for (let i=0; i<this.sockets.length; i++)
+                        if (this.sockets[i].latency > socket.latency)
+                            return this.sockets.splice(i, 0, socket);
+
                 this.sockets.push(socket)
+            }
+
         }
+
     }
 
     pushHeaders(hashes){

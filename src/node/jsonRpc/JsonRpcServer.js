@@ -14,14 +14,23 @@ class JsonRpcServer
         this._config      = config || {};
         this._methods     = new Map();
 
-
-        //@TODO SUpport for multiple users with different permissions
         if (process.env.JSON_RPC_USERNAME !== '' && process.env.JSON_RPC_PASSWORD !== '')
         {
             this._config.auth = {username: process.env.JSON_RPC_USERNAME, password: process.env.JSON_RPC_PASSWORD}
         }
 
         this.initMethods();
+
+        if (typeof this._config['customRoutes'] !== 'undefined')
+        {
+            const customRoutes = this._config['customRoutes'];
+
+            for (let i in customRoutes)
+            {
+                this._addMethod(customRoutes[i]['name'], customRoutes[i]['requiresAuthentication'], customRoutes[i]['callback']);
+            }
+        }
+
         this._expressApp.post('/json-rpc', this._processRequest.bind(this))
     }
 
@@ -36,11 +45,12 @@ class JsonRpcServer
         // this._addMethod('createAccount', true);
     }
 
-    _addMethod(method, requiresAuthentication = false) {
+    _addMethod(method, requiresAuthentication = false, callback = null) {
         // maybe add a check to see if the server is started on localhost and enable some methods (security)
         this._methods.set(method, {
             name                  : '_' + method,
-            requiresAuthentication: requiresAuthentication
+            requiresAuthentication: requiresAuthentication,
+            callback              : callback === null ? this['_' + method] : callback
         })
     }
 

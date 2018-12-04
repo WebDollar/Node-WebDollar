@@ -12,6 +12,8 @@ class SocketExtend{
 
     extendSocket(socket, address, port, uuid, level){
 
+        socket.latency = 0;
+
         socket.level = level;
 
         socket.node = {
@@ -64,6 +66,11 @@ class SocketExtend{
 
         socket.node.protocol.sendLastBlock = NodeProtocol.prototype.sendLastBlock.bind(socket);
 
+        socket.node.protocol.calculateLatency = NodeProtocol.prototype.calculateLatency.bind(socket) ;
+        socket.node.on("ping", ()=>{
+            socket.node.sendRequest("ping/pong", 'r' )
+        });
+
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket) };
 
@@ -77,12 +84,9 @@ class SocketExtend{
         socket.node.protocol.agent = {};
         socket.node.protocol.agent.startedAgentDone = false;
 
-
-
         NodePropagationProtocol.initializeNodesPropagation(socket);
+
     }
-
-
 
 }
 

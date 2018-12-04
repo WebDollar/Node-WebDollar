@@ -10,6 +10,10 @@ import StatusEvents from "common/events/Status-Events";
 import Blockchain from "main-blockchain/Blockchain";
 import NodesList from 'node/lists/Nodes-List'
 import Log from 'common/utils/logging/Log';
+import NodeDiscoveryService from 'node/sockets/node-clients/service/discovery/Node-Clients-Discovery-Service'
+import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
+
+import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
 class MinerProtocol {
 
@@ -42,7 +46,7 @@ class MinerProtocol {
         return answer;
     }
 
-    async startMinerPool(poolURL, forceStartMinerPool = false ){
+    async startMinerPool(poolURL, forceStartMinerPool = false, skipSaving = false ){
 
         try {
 
@@ -52,11 +56,11 @@ class MinerProtocol {
             }
 
             if (poolURL !== undefined)
-                await this.minerPoolSettings.setPoolURL(poolURL);
+                await this.minerPoolSettings.setPoolURL(poolURL, skipSaving);
 
             if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '') {
                 this._minerPoolStarted = false;
-                return await this.setMinerPoolStarted(true, forceStartMinerPool);
+                return await this.setMinerPoolStarted(true, forceStartMinerPool, skipSaving);
             }
             else {
                 console.error("Couldn't start MinerPool");
@@ -92,9 +96,10 @@ class MinerProtocol {
         StatusEvents.emit("miner-pool/status", {result: value, message: "Miner Pool Opened changed" });
     }
 
-    async setMinerPoolStarted(value, forceStartMinerPool = false){
+    async setMinerPoolStarted(value, forceStartMinerPool = false, skipSaving = false){
 
         try {
+
             if (this._minerPoolStarted !== value) {
 
                 if (value && forceStartMinerPool) {
@@ -106,13 +111,11 @@ class MinerProtocol {
 
                 this._minerPoolStarted = value;
 
-                await this.minerPoolSettings.setMinerPoolActivated(value);
+                await this.minerPoolSettings.setMinerPoolActivated(value, skipSaving);
 
                 NodesList.disconnectAllNodes("all");
 
                 if (value) {
-
-                    Blockchain.blockchain.miningSolo.stopMining();
 
                     this.blockchain.mining = this.minerPoolMining;
                     Blockchain.Mining = this.minerPoolMining;
@@ -124,7 +127,16 @@ class MinerProtocol {
 
                     await this.minerPoolProtocol.insertServersListWaitlist(this.minerPoolSettings.poolServers);
                     await this.minerPoolMining._startMinerPoolMining();
-                    await this.minerPoolProtocol._startMinerProtocol();
+
+                    if (!this.minerPoolMining.started) {
+                        let workers;
+                        if (Blockchain.blockchain.miningSolo.workers !== undefined) workers = Blockchain.blockchain.miningSolo.workers.workers;
+
+                        Blockchain.blockchain.miningSolo.stopMining();
+                        await this.minerPoolProtocol._startMinerProtocol();
+
+                        if (workers !== undefined) this.minerPoolMining.setWorkers(workers);
+                    }
 
                     await this.minerPoolReferrals.startLoadMinerPoolReferrals();
 
@@ -132,19 +144,31 @@ class MinerProtocol {
                 }
                 else {
 
-                    Blockchain.blockchain.miningSolo.stopMining();
-
                     this.blockchain.mining = Blockchain.blockchain.miningSolo;
                     Blockchain.Mining = Blockchain.blockchain.miningSolo;
 
-                    await this.minerPoolProtocol._stopMinerProtocol();
-                    await this.minerPoolMining._stopMinerPoolMining();
+                    if (this.minerPoolMining.started) {
+                        await this.minerPoolProtocol._stopMinerProtocol();
+
+                        let workers;
+                        if (this.minerPoolMining.workers !== undefined) workers = this.minerPoolMining.workers.workers;
+
+                        await this.minerPoolMining._stopMinerPoolMining();
+                        Blockchain.blockchain.miningSolo.startMining();
+
+                        if (workers !== undefined) Blockchain.blockchain.miningSolo.setWorkers(workers);
+                    }
 
                     await this.minerPoolReferrals.stopLoadMinerPoolReferrals();
 
                     this.blockchain.blocks.length = 0;
                     this.blockchain.agent.consensus = true;
+                    this.minerPoolReward.totalReward = 0;
+                    this.minerPoolReward.confirmedReward = 0;
+                    this.minerPoolReward.totalReferralReward = 0;
+                    this.minerPoolReward.confirmedReferralReward = 0;
 
+                    NodeDiscoveryService.startDiscovery();
 
                     if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
                         this.blockchain.prover.proofActivated = true;
@@ -163,6 +187,54 @@ class MinerProtocol {
         }
     }
 
+    //be sure the URL of the webpage was read
+    async setMinerInitialPoolURL(newURL){
+
+        if (newURL !== '' && newURL !== undefined) {
+            await this.minerPoolSettings.setPoolURL(newURL);
+            await this.setMinerPoolStarted(true, true);
+        }
+
+        if (this._setRandomPoolTimeout === undefined)
+            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 10);
+
+        return true;
+    }
+
+    async _setRandomPool(){
+
+        try {
+
+            // if (!VersionCheckerHelper.detectMobile())
+            //     throw "no mobile";
+
+            if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+                throw "it is sync";
+
+            let pools = 0;
+            for (let key in this.minerPoolSettings.poolsList)
+                pools++;
+
+            let random = Math.floor(Math.random() * pools);
+
+            let c = 0;
+            for (let key in this.minerPoolSettings.poolsList) {
+
+                if (c === random) {
+                    await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL, true, true);
+                    break;
+                }
+
+                c++;
+            }
+
+        } catch (exception){
+
+        }
+
+        setTimeout( this._setRandomPool.bind(this), 5000);
+
+    }
 
 }
 

@@ -88,11 +88,13 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade -y; elif ca
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y linuxbrew-wrapper; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y linuxbrew-wrapper; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y clang; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y clang; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi \
-elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi \
-elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(command -v nvm) ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && source ~/.bash_profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; elif [[ ! $(command -v nvm) ]]; then echo "$showok NVM is already installed!"; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
+elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
+elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.bash_profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo npm install pm2 -g --unsafe-perm ; fi
+
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand"; fi fi
 
 function ftconfig()
 {
@@ -157,10 +159,10 @@ elif [[ "$readft" == 2 ]]; then
 			echo "$showinfo Current directory is $(pwd)"
 
 			crnt_dir=$(pwd)
-			countcurrentnodes=$(find / -name "Node-WebDollar[0-9]" | wc -l)
+			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -171,8 +173,7 @@ elif [[ "$readft" == 2 ]]; then
 					echo "$showok Node-WebDollar$i Deployed successfully!"
 				done
 			else
-				if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
-
+				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 					echo "$showok We are outside of a Node-WebDollar Folder"
 
 					for ((i=countcurrentnodes+1; i<=countcurrentnodes+readnrofnodesdeploy; i++));
@@ -238,10 +239,10 @@ elif [[ "$readft" == 3 ]]; then
 			echo "$showinfo Current directory is $(pwd)"
 
 			crnt_dir=$(pwd)
-			countcurrentnodes=$(find / -name "Node-WebDollar[0-9]" | wc -l)
+			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(pwd | cut -d '/' -f4) =~ Node-WebDollar[0-9] ]]; then
+			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -266,7 +267,7 @@ elif [[ "$readft" == 3 ]]; then
 					fi
 				fi
 			else
-				if [[ ! -n $(pwd | cut -d '/' -f4) ]]; then
+				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 					echo "$showok We are outside of a Node-WebDollar Folder"
 					echo -e "---\\n${cyan}$(ls)$stand\\n---"

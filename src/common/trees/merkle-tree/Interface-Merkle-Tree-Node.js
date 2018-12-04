@@ -96,6 +96,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         if (initialHash === null && this.hash !== null)
             return false; // different hash
+
         if (initialHash.sha256 === null && this.hash.sha256 !== null) // different hash
             return false;
 

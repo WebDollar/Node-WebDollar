@@ -23,9 +23,15 @@ class InterfaceBlockchainBlock {
 
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
-
+        //this._hashPrev;
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
+
+        this.height = (typeof height === "number" ? height : null); // index set by me
+
+        if (blockValidation === undefined || blockValidation === null)
+            blockValidation = this.blockchain.createBlockValidation();
+
+        this.blockValidation = blockValidation;
         
         if ( timeStamp === undefined  || timeStamp === null) {
 
@@ -36,6 +42,20 @@ class InterfaceBlockchainBlock {
 
             timeStamp += Math.floor( Math.random()*5  * (Math.random() < 0.5 ?  -1 : 1  ));
 
+            try {
+
+                if ( this.height === this.blockchain.blocks.length )  //last block
+                    this._validateMedianTimestamp( timeStamp );
+
+            } catch (exception){
+                timeStamp = exception.medianTimestamp + 1;
+
+                this._validateMedianTimestamp( timeStamp );
+
+                //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
+            }
+
+            timeStamp = Math.floor( timeStamp );
         }
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
@@ -48,25 +68,36 @@ class InterfaceBlockchainBlock {
 
         
         //computed data
-        this.computedBlockPrefix = null;
-        this.computedSerialization = null;
+        this.computedBlockPrefix = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
-        this.difficultyTargetPrev = null; // difficulty set by Blockchain
-        this.height = (typeof height === "number" ? height : null); // index set by me
+        //this._difficultyTargetPrev;
 
         this.reward = undefined;
-
-        if (blockValidation === undefined)
-            blockValidation = this.blockchain.createBlockValidation();
-
-        this.blockValidation = blockValidation;
 
         this.db = db;
 
         this._socketPropagatedBy = undefined;
 
         this._workDone = undefined;
+
+    }
+
+    get difficultyTargetPrev(){
+
+        if (this._difficultyTargetPrev  !== undefined) return this._difficultyTargetPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getDifficultyTarget(this.height);
+
+        return this.blockValidation.getDifficultyCallback(this.height);
+
+    }
+
+    get hashPrev(){
+
+        if (this._hashPrev !== undefined) return this._hashPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getHashPrev(this.height);
+
+        return this.blockValidation.getHashPrevCallback(this.height);
 
     }
 
@@ -151,7 +182,7 @@ class InterfaceBlockchainBlock {
         //skip the validation, if the blockValidationType is provided
         if (!this.blockValidation.blockValidationType['skip-validation-PoW-hash']) {
 
-            if (this.computedBlockPrefix === null)
+            if (this.computedBlockPrefix === undefined)
                 this._computeBlockHeaderPrefix(); //making sure that the prefix was calculated for calculating the block
 
             let hash = await this.computeHash();
@@ -190,23 +221,27 @@ class InterfaceBlockchainBlock {
         return true;
     }
 
+    _validateMedianTimestamp(timestamp){
+
+        let medianTimestamp = 0;
+
+        for (let i = this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
+            medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
+
+        medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
+
+        if ( timestamp < medianTimestamp )
+            throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: medianTimestamp };
+            //throw {message: "Block Timestamp is not bigger than the previous 10 blocks", medianTimestamp: this.blockValidation.getTimeStampCallback(this.height) };
+
+    }
+
     _validateBlockTimeStamp(){
 
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
-
-        if (!this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1) {
-
-            let medianTimestamp = 0;
-            for (let i=this.height-1; i >= this.height - consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS; i--)
-                medianTimestamp += this.blockValidation.getTimeStampCallback(i+1);
-
-            medianTimestamp = medianTimestamp / consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
-
-            if (this.timeStamp < medianTimestamp)
-                throw {message: "Block Timestamp is not bigger than the previous 10 blocks"};
-
-        }
+        if ( !this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS+1 )
+            this._validateMedianTimestamp(this.timeStamp);
 
 
         if ( this.blockValidation.blockValidationType['validation-timestamp-adjusted-time'] === true ) {
@@ -268,8 +303,8 @@ class InterfaceBlockchainBlock {
         try {
 
             // hash is hashPow ( block header + nonce )
-            if (this.computedBlockPrefix === null)
-                return this._computeBlockHeaderPrefix();
+            if (this.computedBlockPrefix === undefined)
+                this._computeBlockHeaderPrefix();
 
             let buffer = Buffer.concat([
                 Serialization.serializeBufferRemovingLeadingZeros(Serialization.serializeNumber4Bytes(this.height)),
@@ -282,7 +317,8 @@ class InterfaceBlockchainBlock {
 
         } catch (exception){
             console.error("Error computeHash", exception);
-            return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+            //return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
+            throw exception;
         }
     }
 
@@ -309,8 +345,6 @@ class InterfaceBlockchainBlock {
 
         // serialize block is ( hash + nonce + header )
 
-        if (this.computedSerialization !== null && requestHeader === true) return this.computedSerialization;
-
         this._computeBlockHeaderPrefix(true, requestHeader);
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
@@ -322,13 +356,11 @@ class InterfaceBlockchainBlock {
                                      this.computedBlockPrefix,
                                   ]);
 
-        if (this.computedSerialization === null && requestHeader === true) this.computedSerialization = data;
-
         return data;
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget, offset = 0){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, usePrevHash = false){
 
         if (!Buffer.isBuffer(buffer))
             if (typeof buffer === "string")
@@ -338,9 +370,7 @@ class InterfaceBlockchainBlock {
         if (reward !== undefined) this.reward = reward;
         else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
 
-        if (difficultyTarget !== undefined) this.difficultyTarget = difficultyTarget;
-
-        if ( (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
+        if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
 
         try {
@@ -357,7 +387,8 @@ class InterfaceBlockchainBlock {
             offset += 2;
 
             //TODO  put hashPrev into block.data
-            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            if (usePrevHash)
+                this._hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
 
@@ -475,13 +506,15 @@ class InterfaceBlockchainBlock {
 
         this.height = json.height;
         this.hash = json.hash;
-        this.hashPrev = json.hashPrev;
         this.data.hashData = json.data.hashData;
+
+        this._hashPrev = json.hashPrev;
+        this._difficultyTargetPrev = json.difficultyTargetPrev;
+
         this.nonce = json.nonce;
 
         this.version = json.version;
         this.timeStamp = json.timeStamp;
-        this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         //calculate Hash
         this._computeBlockHeaderPrefix(true, true);
@@ -506,6 +539,8 @@ class InterfaceBlockchainBlock {
      *
      */
     get workDone(){
+
+        return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
 
         if (this._workDone !== undefined) return this._workDone;
 

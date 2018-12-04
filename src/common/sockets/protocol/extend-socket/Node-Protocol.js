@@ -19,15 +19,16 @@ class NodeProtocol {
         HELLO PROTOCOL
      */
 
-    justSendHello(){
 
-        return this.node.sendRequestWaitOnce("HelloNode", {
-            version: consts.SETTINGS.NODE.VERSION,
-            uuid: consts.SETTINGS.UUID,
-            nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
-            domain: process.env.BROWSER ? "browser" : NodeServer.getServerHTTPAddress(),
-            UTC: Blockchain.blockchain.timestamp.timeUTC,
-        }, undefined, 5000);
+    async justSendHello(){
+
+        this.node.sendRequest("HelloNode", {
+                version: consts.SETTINGS.NODE.VERSION,
+                uuid: consts.SETTINGS.UUID,
+                nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
+                domain: process.env.BROWSER ? "browser" : await NodeServer.getServerHTTPAddress(),
+                UTC: Blockchain.blockchain.timestamp.timeUTC,
+        });
 
     }
 
@@ -91,20 +92,37 @@ class NodeProtocol {
 
     async sendHello ( validationDoubleConnectionsTypes, process = true ) {
 
-
         // Waiting for Protocol Confirmation
 
-        let response;
-        for (let i=0; i < 3; i++) {
+        if (this.connected === false) return false;
 
-            if (this.connected === false) return false;
+        let response = await new Promise( (resolve)=> {
 
-            response = await this.node.protocol.justSendHello();
+            let interval, timeout;
 
-            if ( typeof response === "object" && response !== null && response.hasOwnProperty("uuid") )
-                break;
+            this.node.once("HelloNode", (data) => {
 
-        }
+                resolve(data);
+                clearInterval(interval);
+                clearTimeout(timeout)
+
+            });
+
+            interval = setInterval(async () => {
+
+                this.node.protocol.justSendHello();
+
+            }, 3000);
+
+            this.node.protocol.justSendHello();
+
+            timeout = setTimeout(() => {
+                resolve(false);
+                clearInterval(interval);
+                clearTimeout(timeout)
+            }, 10000);
+
+        });
 
         if (!process)
             return true;
@@ -175,6 +193,18 @@ class NodeProtocol {
         }, callback);
     }
 
+    async calculateLatency(){
+
+        let maxLatency = consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY;
+        let startTime = Date.now();
+        let answer = await this.node.sendRequestWaitOnce("ping", undefined, "pong", maxLatency);
+
+        if (answer === 'r')
+            this.latency = Date.now() - startTime;
+        else
+            this.latency = maxLatency;
+
+    }
 
 }
 

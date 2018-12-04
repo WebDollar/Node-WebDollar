@@ -291,6 +291,11 @@ class PoolData {
                     console.log('Unable to load miners from DB');
                     return false;
                 }
+
+                console.warn("==========================================================");
+                console.warn("POOLS BLOCK INFORMATION LOADED: " + this.blocksInfo.length);
+                console.warn("==========================================================");
+
             }
 
             return true;

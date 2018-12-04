@@ -31,9 +31,12 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
                 let gzipped = data.gzipped || false;
 
-                let serialization = this.blockchain.getSerializedAccountantTree(data.height);
+                let serialization = this.blockchain.getSerializedAccountantTree( data.height , gzipped );
 
-                if (gzipped===true) serialization = await GZip.zip(serialization);
+                if (serialization === undefined && gzipped) { //just send the initial tree
+                    serialization = this.blockchain.getSerializedAccountantTree(data.height);
+                    gzipped = false;
+                }
 
                 let moreChunks = false;
 
@@ -187,12 +190,16 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
         //console.log("Before ungziped");
         //console.log(buffer.toString('hex'));
 
-        if (gzippedCommunication) buffer = await GZip.unzip(buffer);
+        try {
+            buffer = gzippedCommunication ? await GZip.unzip(buffer) : buffer;
+        } catch (exception){
+            gzippedCommunication = false;
+        }
 
-        //console.log("After ungziped");
-        //console.log(buffer.toString('hex'));
-
-        return buffer;
+        return {
+            buffer: buffer,
+            gzipped: gzippedCommunication ? buffer : undefined
+        };
 
     }
 

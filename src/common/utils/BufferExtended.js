@@ -47,7 +47,10 @@ class BufferExtended {
 
     }
     
-    safeCompare(buffer1, buffer2){
+    safeCompare(buffer1, buffer2, fastValidation){
+
+        if (fastValidation)
+            return buffer1.equals(buffer2);
 
         if (!buffer1.equals(buffer2)) return false; //optimization
 

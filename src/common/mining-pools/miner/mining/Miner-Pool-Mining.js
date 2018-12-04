@@ -27,6 +27,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._miningWork = {
             block: undefined, //entire serialization
+            blockId: undefined,
+
             start: undefined,
             end: undefined,
             height: undefined, //number
@@ -95,10 +97,13 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.block = work.block;
 
         this._miningWork.height = work.h;
+        this._miningWork.blockId = work.I||work.h;
+
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;
 
         Blockchain.blockchain.blocks.length = work.h;
+        Blockchain.blockchain.blocks.emitBlockCountChanged();
 
         this._miningWork.start = work.start;
         this._miningWork.end = work.end;
@@ -135,6 +140,10 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     this._isBeingMining = true;
                     let workHeight = this._miningWork.height;
+                    let workId = this._miningWork.blockId;
+                    let workEnd = this._miningWork.end;
+                    let workStart = this._miningWork.start;
+
                     let answer = await this._run();
                     this._isBeingMining = false;
 
@@ -145,8 +154,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     if (!this.resetForced ) {
                         this._miningWork.resolved = true;
-                        answer.height = workHeight;
-                        answer.hashes = this._miningWork.end - this._miningWork.start;
+                        answer.id = workId;
+                        answer.hashes = workEnd - workStart;
                         await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
                     } else {
                         this.resetForced = false;
@@ -192,7 +201,7 @@ class MinerPoolMining extends InheritedPoolMining {
             if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
-            if (this.started && (new Date().getTime() - this._miningWork.date ) > 120000 ){
+            if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 180000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
 
                 //in case I can not mine from this pool, show an error and disconnect
                 Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);

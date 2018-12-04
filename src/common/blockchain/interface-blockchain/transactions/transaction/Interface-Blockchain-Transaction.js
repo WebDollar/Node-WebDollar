@@ -22,7 +22,7 @@ class InterfaceBlockchainTransaction{
      * @param txId - usually null
      */
 
-    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true){
+    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, validateTxId = true ){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -30,19 +30,21 @@ class InterfaceBlockchainTransaction{
 
         this._confirmed = false;
 
-        if (timeLock === undefined)
-            this.timeLock = blockchain.blocks.length-1;
-        else
-            this.timeLock = timeLock;
-
-        if (version === undefined){
-
-            if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+        if(validateTimeLock)
+            if (timeLock === undefined)
+                this.timeLock = blockchain.blocks.length-1;
             else
-            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
-            else version = 0x02;
+                this.timeLock = timeLock;
 
-        }
+        if(validateVersion)
+            if (version === undefined){
+
+                if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
+                else
+                if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
+                else version = 0x02;
+
+            }
 
         this.version = version; //version
 
@@ -74,6 +76,16 @@ class InterfaceBlockchainTransaction{
         }
 
 
+        if(validateNonce)
+            if (nonce === undefined || nonce === null)
+                nonce = this._computeNonce();
+
+        if(validateVersion)
+            if (version === 0x00) nonce = nonce % 0x100;
+            else if (version >= 0x01) nonce = nonce % 0X10000;
+
+        this.nonce = nonce; //1 bytes
+
 
         try {
 
@@ -97,25 +109,32 @@ class InterfaceBlockchainTransaction{
 
         }
 
-
-        if (nonce === undefined || nonce === null)
-            nonce = this._computeNonce();
-
-        if (version === 0x00) nonce = nonce % 0x100;
-        else if (version >= 0x01) nonce = nonce % 0X10000;
-
-        this.nonce = nonce; //1 bytes
-
-        if (txId === undefined || txId === null)
-            txId = this._computeTxId();
+        if (validateTxId)
+            if (txId === undefined || txId === null)
+                txId = this._computeTxId();
 
         this.txId = txId;
 
         this._serializated = undefined;
     }
 
-    destroyTransaction(){
+    destroyTransaction(pendingTransactionsWereIncluded){
+
+        //avoid to delete
+        if (pendingTransactionsWereIncluded)
+            this.pendingTransactionsIncluded--;
+
+        if (this.pendingTransactionsIncluded !== undefined && this.pendingTransactionsIncluded > 0)
+            return;
+
         this.blockchain = undefined;
+
+        delete this._serializated;
+        delete this.from.addresses;
+        delete this.from.currencyTokenId;
+        delete this.to.addresses;
+        delete this.txId;
+
     }
 
     _createTransactionFrom(from){
@@ -171,6 +190,10 @@ class InterfaceBlockchainTransaction{
         if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
         if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
         if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+
+        if (blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
+        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
 
         if (this.nonce > 0xFFFF) throw {message: "nonce is invalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
@@ -263,6 +286,8 @@ class InterfaceBlockchainTransaction{
 
     serializeTransaction(rewrite = false){
 
+        // return this._serializeTransaction();
+
         if ( !this._serializated || rewrite )
             this._serializated = this._serializeTransaction();
 
@@ -292,7 +317,7 @@ class InterfaceBlockchainTransaction{
         return this.txId;
     }
 
-    deserializeTransaction(buffer, offset){
+    deserializeTransaction(buffer, offset, returnTransaction=false){
 
         offset = offset || 0;
 
@@ -357,7 +382,7 @@ class InterfaceBlockchainTransaction{
      * It will update the Accountant Tree
      */
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions){
+    _preProcessTransaction(multiplicationFactor = 1 , revertActions, showUpdate){
         return true;
     }
 
@@ -366,7 +391,7 @@ class InterfaceBlockchainTransaction{
         if ( multiplicationFactor === 1 ) { // adding transaction
 
             //nonce
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
@@ -381,7 +406,7 @@ class InterfaceBlockchainTransaction{
             if (!this.to.processTransactionTo(multiplicationFactor, revertActions, showUpdate)) return false;
             if (!this.from.processTransactionFrom(multiplicationFactor, revertActions, showUpdate)) return false;
 
-            if (!this._preProcessTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate)) return false;
+            if (!this._preProcessTransaction(multiplicationFactor, revertActions, showUpdate)) return false;
 
 
         }else

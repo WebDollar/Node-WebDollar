@@ -1,4 +1,4 @@
-
+import global from 'consts/global';
 
 class SemaphoreProcessing{
 
@@ -33,6 +33,7 @@ class SemaphoreProcessing{
         if (this._list.length > 0){
 
             this.processing = true;
+            global.SEMAPHORE_PROCESS_DONE = false;
 
             let answer = false;
             try {
@@ -52,7 +53,7 @@ class SemaphoreProcessing{
             }
 
             this.processing = false;
-
+            global.SEMAPHORE_PROCESS_DONE = true;
         }
 
         setTimeout( this._processingSemaphoreList.bind(this), this.processingSemaphoreInterval);

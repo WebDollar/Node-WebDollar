@@ -1,6 +1,6 @@
-import BufferExtended from "common/utils/BufferExtended"
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import consts from 'consts/const_global'
+import GZip from "common/utils/GZip";
 
 class PPoWBlockchainProofBasic{
 
@@ -15,13 +15,15 @@ class PPoWBlockchainProofBasic{
 
         this.hash = undefined;
 
+        this.proofSerialized = undefined;
+
     }
 
     destroyProof(){
 
-        if (!this.blockchain.agent.light) {
+        if (!this.blockchain.agent.light)
             this.blocks = [];
-        } else
+        else
         for (let i=0; i<this.blocks.length; i++) {
 
             if (this.blocks[i] === undefined || this.blocks[i] === null) continue;
@@ -53,17 +55,14 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    getProofHeaders(starting, length, gzipped){
+    getProofHeaders(starting, length){
 
         let list = [];
         for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++) {
 
             try {
 
-                if (gzipped)
-                    list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
-                else
-                    list.push(this.blocks[i].getBlockHeader());
+                list.push(this.blocks[i].getBlockHeader());
 
             } catch (exception){
 
@@ -77,10 +76,27 @@ class PPoWBlockchainProofBasic{
             }
         }
 
-        if (gzipped)
-            return Buffer.concat(list);
-        else
-            return list;
+        return list;
+
+    }
+
+    async calculateProofSerialized(){
+
+        let list = [];
+
+        for (let i=0; i<this.blocks.length; i++)
+            list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
+
+        this.proofSerialized  = Buffer.concat(list);
+        return this.proofSerialized;
+
+    }
+
+    async calculateProofGzip(){
+
+        this.proofGzip = await GZip.zip(this.proofSerialized);
+
+        return this.proofGzip;
 
     }
 

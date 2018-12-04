@@ -10,6 +10,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 const PAYOUT_INTERVAL = consts.DEBUG ? 5 : 40 + Math.floor( Math.random()*10 ); //in blocks;
+const PAYOUT_FEE = WebDollarCoins.WEBD * 0;
 
 
 class PoolPayouts{
@@ -48,7 +49,13 @@ class PoolPayouts{
         if (this._payoutInProgress) return;
 
         this._payoutInProgress = true;
-        await this._doPayout();
+
+        try {
+            await this._doPayout();
+        } catch (exception){
+            console.error("doPayout raised an error", exception)
+        }
+
         this._payoutInProgress = false;
 
     }
@@ -92,6 +99,18 @@ class PoolPayouts{
 
             Log.info("Payout: Initialized ", Log.LOG_TYPE.POOLS);
 
+            let totalSumReward = 0;
+            for (let i=0; i<blocksConfirmed.length; i++)
+                totalSumReward += BlockchainMiningReward.getReward ( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
+
+            let poolFork = totalSumReward - Blockchain.blockchain.accountantTree.getBalance( this.blockchain.mining.minerAddress );
+
+            let poolForkDifferencePerBlock = 0;
+
+            if (poolFork > 0)
+                poolForkDifferencePerBlock = Math.ceil( poolFork / blocksConfirmed );
+
+
             for (let i=0; i<blocksConfirmed.length; i++) {
 
                 let totalDifficulty = new BigNumber(0);
@@ -112,12 +131,12 @@ class PoolPayouts{
                     sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].rewardForReferral;
                 }
 
-                let difference = sumReward - maxSumReward ;
+                let difference = (sumReward - maxSumReward) + poolForkDifferencePerBlock;
 
                 //reducing the price
                 if ( Math.abs( difference ) > 1 ) {
 
-                    difference = Math.floor( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
+                    difference = Math.ceil( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
 
                     blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance)=>{
 
@@ -187,7 +206,7 @@ class PoolPayouts{
                 let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
                 try {
-                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, toAddresses, undefined, 0, );
+                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
                     if (!transaction.result) throw {message: "Transaction was not made"};
                 } catch (exception){
                     Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

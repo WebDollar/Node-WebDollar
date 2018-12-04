@@ -10,6 +10,8 @@ import StatusEvents from "common/events/Status-Events";
 import PoolNewWorkManagement from "./Pool-New-Work-Management"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
+import PoolWorkValidation from "./Pool-Work-Validation";
+
 class PoolWorkManagement{
 
     constructor(poolManagement, blockchain){
@@ -18,8 +20,19 @@ class PoolWorkManagement{
         this.blockchain = blockchain;
 
         this.poolNewWorkManagement = new PoolNewWorkManagement(poolManagement, this, blockchain);
+        this.poolWorkValidation = new PoolWorkValidation(poolManagement, this);
 
         this.poolWork = new PoolWork(poolManagement, blockchain);
+    }
+
+    startPoolWorkManagement(){
+        this.poolWork.startGarbageCollector();
+        this.poolWorkValidation.startPoolWorkValidation();
+    }
+
+    stopPoolWorkManagement(){
+        this.poolWorkValidation.stopPoolWorkValidation();
+        this.poolWork.stopGarbageCollector();
     }
 
 
@@ -47,23 +60,24 @@ class PoolWorkManagement{
             h: this.poolWork.lastBlock.height,
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlock.computedBlockPrefix,
+            I: this.poolWork.lastBlockId,
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
 
         };
 
+        this.poolWork.lastBlockNonce += hashes;
+
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
         minerInstance.dateActivity = new Date().getTime()/1000;
-
-        this.poolWork.lastBlockNonce += hashes;
 
         blockInformationMinerInstance.workBlock = this.poolWork.lastBlock;
 
         if (this.poolManagement.poolSettings.poolUseSignatures) {
 
-            let message = Buffer.concat([this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end)]);
+            let message = Buffer.concat( [ this.poolWork.lastBlockSerialization, Serialization.serializeNumber4Bytes(answer.start), Serialization.serializeNumber4Bytes(answer.end) ]);
             answer.sig = this.poolManagement.poolSettings.poolDigitalSign(message);
 
         }
@@ -90,17 +104,6 @@ class PoolWorkManagement{
             if ( (prevBlock  || blockInformationMinerInstance.workBlock) === undefined)
                 throw {message: "miner instance - no block"};
 
-            if (work.timeDiff !== undefined) {
-                if (typeof work.timeDiff !== "number") throw {message: "timeDiff is invalid"};
-
-                let hashesFactor = Math.min(10, ( 80000 / work.timeDiff )); //80 sec
-                hashesFactor = Math.max(0.2, hashesFactor);
-
-                let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
-
-            }
-
 
             if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce, prevBlock )  )
                 throw {message: "block was incorrectly mined", work: work };
@@ -111,7 +114,7 @@ class PoolWorkManagement{
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
-            if ( work.result && prevBlock === undefined ) { //it is a solution and prevBlock is undefined
+            if ( work.result  ) { //it is a solution and prevBlock is undefined
 
                 if ( await blockInformationMinerInstance.wasBlockMined() ){
 
@@ -161,7 +164,7 @@ class PoolWorkManagement{
                         try {
                             blockInformation.block = workBlock;
                         } catch (exception){
-
+                            console.error("blockInformation block", exception);
                         }
 
                         this.poolManagement.poolData.addBlockInformation();
@@ -182,8 +185,6 @@ class PoolWorkManagement{
 
                     }
 
-                    this.poolWork.getNextBlockForWork();
-
                     revertActions.destroyRevertActions();
 
                 }
@@ -201,7 +202,7 @@ class PoolWorkManagement{
 
         } catch (exception){
 
-            if (exception.message === "block was incorrectly mined" && Math.random() < 0.01 )
+            if (exception.message === "block was incorrectly mined" && Math.random() < 0.3 )
                 console.error("Pool Work Management raised an error", exception);
 
         }

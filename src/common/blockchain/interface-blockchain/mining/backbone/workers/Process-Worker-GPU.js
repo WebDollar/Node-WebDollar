@@ -17,8 +17,6 @@ class ProcessWorkerGPU extends ProcessWorker {
 
         super(gpuID, noncesWorkBatch);
 
-        this._filename = './dist_bundle/GPU/input.txt';
-
         let gpuInstance;
 
         gpuInstance = gpuID % consts.TERMINAL_WORKERS.GPU_INSTANCES;

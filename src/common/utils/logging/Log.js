@@ -37,12 +37,14 @@ class Log{
         this.poolsLogger = new Logger("pools", LOG_TYPE.POOLS);
         this.blockchainLogger = new Logger("blockchain", LOG_TYPE.BLOCKCHAIN);
         this.blockchainForksLogger = new Logger("blockchainForks", LOG_TYPE.BLOCKCHAIN_FORKS);
+        this.savingManagerLogger = new Logger("savingManager", LOG_TYPE.SAVING_MANAGER);
         this.menuLogger = new Logger("cli_menu", LOG_TYPE.CLI_MENU);
 
         this.loggers = {};
         this.loggers[LOG_TYPE.DEFAULT] = this.defaultLogger;
         this.loggers[LOG_TYPE.POOLS] = this.poolsLogger;
         this.loggers[LOG_TYPE.BLOCKCHAIN] = this.blockchainLogger;
+        this.loggers[LOG_TYPE.SAVING_MANAGER] = this.savingManagerLogger;
         this.loggers[LOG_TYPE.BLOCKCHAIN_FORKS] = this.blockchainForksLogger;
         this.loggers[LOG_TYPE.CLI_MENU] = this.menuLogger;
 
@@ -52,9 +54,6 @@ class Log{
      * Logs an info message
      */
     info(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
-
-        if (process.env.BROWSER)
-            return;
 
         if (this.loggers[ config ] !== undefined)
             this.loggers[ config ].info.apply(this.loggers[ config ], arguments);
@@ -66,8 +65,6 @@ class Log{
     */
     log(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
-        if (process.env.BROWSER)
-            return;
 
         if (this.loggers[ config ] !== undefined)
             this.loggers[ config ].log.apply(this.loggers[ config ], arguments);
@@ -80,9 +77,6 @@ class Log{
      */
     debug(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
 
-        if(process.env.BROWSER)
-            return;
-
         if (this.loggers[ config ] !== undefined)
             this.loggers[ config ].debug.apply(this.loggers[ config ], arguments);
 
@@ -92,9 +86,6 @@ class Log{
      * Logs an error message
      */
     error(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
-
-        if(process.env.BROWSER)
-            return;
 
         if (this.loggers[ arguments[1] ] !== undefined)
             this.loggers[ arguments[1] ].error.apply(this.loggers[ arguments[1] ], arguments);
@@ -106,9 +97,6 @@ class Log{
         * Logs an error message
     */
     warn(msg, config = LOG_TYPE.DEFAULT, msg2, msg3){
-
-        if(process.env.BROWSER)
-            return;
 
         if (this.loggers[ arguments[1] ] !== undefined)
             this.loggers[ arguments[1] ].warn.apply(this.loggers[ arguments[1] ], arguments);

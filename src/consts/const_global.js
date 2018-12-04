@@ -1,5 +1,7 @@
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
+import  Utils from "common/utils/helpers/Utils"
+
 const BigNumber = require('bignumber.js');
 const BigInteger = require('big-integer');
 
@@ -38,7 +40,7 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
-        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 60, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
@@ -46,11 +48,16 @@ consts.BLOCKCHAIN = {
 
     },
 
+    FORKS:{
+
+        //forks larger than this will not be accepted
+        IMMUTABILITY_LENGTH: 20,
+
+    },
 
     HARD_FORKS : {
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
-
 
         TRANSACTIONS_OPTIMIZATION: 153060,
         DIFFICULTY_TIME_BIGGER: 153060,
@@ -174,7 +181,7 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://antelle.github.io/argon2-browser/dist'
+    distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
 };
 
 // change also to Browser-Mining-WebWorker.js
@@ -219,15 +226,20 @@ consts.MINING_POOL = {
 
     MINING:{
         MINING_POOL_MINIMUM_PAYOUT: 200000,
-        FEE_PER_BYTE: 600, // in WEBD
+        FEE_PER_BYTE: 580, // in WEBD
+
         MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR: 13
     },
 
     CONNECTIONS:{
 
-        NO_OF_IDENTICAL_IPS: 80,
+        NO_OF_IDENTICAL_IPS: 101,
+        PUSH_WORK_MAX_CONNECTIONS_CONSECUTIVE: 0,       //0  - means unlimited, it requires a lot of bandwidth
+                                                        //30 - means after sending to 30 pool miners, it will do a sleep of 10 ms
 
     },
+
+    SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
 
 
 
@@ -239,8 +251,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.175",
-        VERSION_COMPATIBILITY: "1.162.0",
+        VERSION: "1.198.3",
+
+        VERSION_COMPATIBILITY: "1.174",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -255,7 +269,11 @@ consts.SETTINGS = {
 
     PARAMS: {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
-        STATUS_INTERVAL: 40 * 1000,                      //miliseconds
+        STATUS_INTERVAL: 40 * 1000,
+        LATENCY_CHECK: 5*1000,
+        MAX_ALLOWED_LATENCY: 6*1000,  //miliseconds
+        CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
+
 
         WAITLIST: {
             TRY_RECONNECT_AGAIN: 30 * 1000,             //miliseconds
@@ -292,10 +310,10 @@ consts.SETTINGS = {
                 CLIENT: {
 
                     MAX_SOCKET_CLIENTS_WAITLIST: 3,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
-                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 1,
+                    MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
 
                     SERVER_OPEN:{
                         MAX_SOCKET_CLIENTS_WAITLIST: 5,
@@ -349,7 +367,7 @@ consts.SETTINGS = {
             },
 
             FORKS:{
-                MAXIMUM_BLOCKS_TO_DOWNLOAD: 100,
+                MAXIMUM_BLOCKS_TO_DOWNLOAD: 300,
                 MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP: 30,
             },
 
@@ -369,7 +387,11 @@ consts.SETTINGS = {
 
         MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
 
-    }
+        MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
+
+    },
+    GEO_IP_ENABLED: true,
+    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -377,7 +399,7 @@ consts.TERMINAL_WORKERS = {
     // file gets created on build
     CPU_WORKER_NONCES_WORK: 700,  //per seconds
 
-    CPU_CPP_WORKER_NONCES_WORK: 40000,  //per second
+    CPU_CPP_WORKER_NONCES_WORK: 0,  //per second   0 is undefined
     CPU_CPP_WORKER_NONCES_WORK_BATCH: 500,  //per second
 
     //NONCES_WORK should be way bigger than WORK_BATCHES
@@ -392,12 +414,16 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: "cpu", //cpu-cpp
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp", //cpu-cpp, or gpu
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
-    PATH_CPP: './dist_bundle/CPU/argon2-bench2',
-    PATH_GPU: './dist_bundle/GPU/argon2-gpu-test',
+
+    PATH_CPP: Utils.isWin ? '' : './dist_bundle/CPU/', //Unix are in folders, Win32 is in root
+    PATH_CPP_FILENAME: 'argon2-bench2' + (Utils.isWin ? '.exe' : ''),
+
+    PATH_GPU: Utils.isWin ? '' : './dist_bundle/GPU/', //Unix are in folders, Win32 is in root
+    PATH_GPU_FILENAME: 'argon2-gpu-test' + (Utils.isWin ? '.exe' : ''),
 
     GPU_MODE: "opencl", //opencl
     GPU_MAX: 1,
@@ -412,7 +438,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
-    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
 };
 
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
@@ -429,16 +455,18 @@ if ( consts.DEBUG === true ){
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8082;
+    consts.SETTINGS.NODE.PORT = 8085;
 
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
         "addr": ["http://127.0.0.1:8085"],
     }];
-
-
+    
 }
+
+if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet; 
 
 
 export default consts

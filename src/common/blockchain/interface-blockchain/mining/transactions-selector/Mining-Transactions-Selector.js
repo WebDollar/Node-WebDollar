@@ -6,30 +6,42 @@ import InterfaceBlockchainAddressHelper from "../../addresses/Interface-Blockcha
 class MiningTransactionsSelector{
 
     constructor(blockchain){
+
         this.blockchain = blockchain;
         this._transactions = [];
+
     }
 
     validateTransaction(transaction, miningFeePerByte){
 
         //don't upset the SPAM_GUARDIAN
         for (let j = 0; j < transaction.from.addresses.length; j++) {
+
             if (this._countAddresses(transaction.from.addresses[j].unencodedAddress, true, false) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS)
                 throw {message: "too many inputs", from: transaction.from.addresses[j]};
+
+            if ( transaction.from.addresses[j].amount < consts.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
+                throw {message: "amount too small"};
+
         }
 
         for (let j = 0; j < transaction.to.addresses.length; j++) {
+
             if (this._countAddresses(transaction.to.addresses[j].unencodedAddress, false, true) + 1 > consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS)
-                throw {message: "too many outputs", from: transaction.to.addresses[j]};
+                throw { message: "too many outputs", from: transaction.to.addresses[j] };
+
+            if ( transaction.to.addresses[j].amount < consts.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT )
+                throw { message: "amount too small" };
 
         }
+
 
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
             return true;
 
         //verify fee
-        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
+        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard( transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};
 
         return true;
@@ -41,7 +53,8 @@ class MiningTransactionsSelector{
 
         this._transactions = [];
 
-        let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
+        //let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
+        let size = 200 * 1024 - 800;
         let i = 0;
 
         while (size > 0 && i < this.blockchain.transactions.pendingQueue.list.length ){
@@ -49,10 +62,15 @@ class MiningTransactionsSelector{
             let transaction = this.blockchain.transactions.pendingQueue.list[i];
 
             try {
-                
-                console.log(transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
 
-                this.validateTransaction(transaction, miningFeePerByte);
+                if (transaction.blockchain === undefined) {
+                    i++;
+                    continue;
+                }
+
+                console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
+
+                this.validateTransaction( transaction, miningFeePerByte );
 
                 let bRemoveTransaction = false;
 
@@ -60,17 +78,24 @@ class MiningTransactionsSelector{
 
                     let blockValidationType = {
                         "take-transactions-list-in-consideration": {
+                            //validation: true => allows to complex transactions flow
+                            //                    like the following: tx1: A=>B,  tx2: B=>C; tx3 C=>D
                             validation: true,
                             transactions: this._transactions,
-                        }
+
+                            // validation: false,
+                            //transactions: [],
+                        },
+                        "validate-fast-transactions": true,
                     };
 
-                    if ( transaction.validateTransactionEveryTime(this.blockchain.blocks.length,  blockValidationType )) {
+                    if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
 
                         size -= transaction.serializeTransaction().length;
 
-                        if (size >= 0)
+                        if (size >= 0) {
                             this._transactions.push(transaction);
+                        }
 
                     } else
                         bRemoveTransaction = true;
@@ -110,17 +135,19 @@ class MiningTransactionsSelector{
 
         let count = 0;
 
+        //safe compare is not necessary
+
         this._transactions.forEach((transaction)=>{
 
             if (from)
                 transaction.from.addresses.forEach((address)=>{
-                    if (BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if (address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 });
 
             if (to)
                 transaction.to.addresses.forEach((address)=>{
-                    if ( BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if ( address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 })
 

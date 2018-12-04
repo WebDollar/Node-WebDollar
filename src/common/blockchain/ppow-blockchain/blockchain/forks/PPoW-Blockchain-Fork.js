@@ -5,7 +5,7 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events";
 import PPoWHelper from '../helpers/PPoW-Helper'
 import BansList from "common/utils/bans/BansList";
-import GZip from "../../../../utils/GZip";
+import GZip from "common/utils/GZip";
 
 class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
@@ -84,7 +84,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
-                if (this.forkChainLength > this.blockchain.blocks.length ){
+                if (this.forkChainWork.greater(this.blockchain.blocks.chainWork)){
                     this.forkProofPi = this.blockchain.proofPi;
                     return true;
                 } //you have actually more forks but with the same proof
@@ -100,50 +100,58 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             this.forkProofPi = new PPoWBlockchainProofPi(this.blockchain, []);
             this.forkProofPi.hash = proofPiData.hash;
 
-            let i = 0, length = 100;
             let proofsList = [];
 
-            let knowGzip = consts.BLOCKCHAIN.LIGHT.GZIPPED ? true : undefined;
+            let downloading = true;
+            let pos = 0;
+            let buffers = [];
+            let timeoutCount = 100;
 
-            while ( i*length < proofPiData.length && i < 100 ) {
+            while (downloading && pos < timeoutCount) {
 
-                StatusEvents.emit( "agent/status", {message: "Proofs - Downloading", blockHeight: Math.min( (i+1) *length, proofPiData.length )  } );
+                let answer = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi-gzip", {
+                        starting: pos * consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES,
+                        length: consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES
+                    }, "answer" , 10000);
 
-                let answer = await socket.node.sendRequestWaitOnce( "get/nipopow-blockchain/headers/get-proofs/pi", { starting: i * length, length: length, gzipped:knowGzip }, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                if (answer === null) throw {message: "get-proofGziped never received ", answer: answer };
+                if (!answer.result) throw {message: "get-proofGziped return false ", answer: answer.message };
 
-                if (answer === null || answer === undefined) throw { message: "Proof is empty" };
+                if ( !Buffer.isBuffer(answer.data) )
+                    throw {message: "accountantTree data is not a buffer"};
 
-                if (answer.gzipped){
+                if (answer.data.length === consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES ||
+                    (answer.data.length <= consts.SETTINGS.PARAMS.MAX_SIZE.SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES && !answer.moreChunks))
+                {
 
-                    knowGzip=true;
-                    proofsList.push(await GZip.unzip(answer.data));
+                    buffers.push(answer.data);
 
-                } else{
-
-                    knowGzip=false;
-
-                    for (let i=0; i<answer.length; i++)
-                        proofsList.push(answer[i]);
+                    if (!answer.moreChunks)
+                        downloading = false;
 
                 }
 
-                i++;
+                pos++;
+
             }
 
-            if(knowGzip){
+            let buffer = Buffer.concat(buffers);
 
-                let buffer = Buffer.concat(proofsList);
-                proofsList = [];
+            try {
 
-                let offset = 0;
-                while(offset!=buffer.length){
+                buffer = await GZip.unzip(buffer);
 
-                    let result = this.forkProofPi.deserializeProof(buffer, offset);
+            } catch (exception){
 
-                    proofsList.push(result.data);
-                    offset = result.offset;
+            }
 
-                }
+            let offset = 0;
+            while(offset!=buffer.length){
+
+                let result = this.forkProofPi.deserializeProof(buffer, offset);
+
+                proofsList.push(result.data);
+                offset = result.offset;
 
             }
 

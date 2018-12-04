@@ -22,8 +22,7 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
         if (includeHashes)
             return this.hash.sha256;
-        else
-            return null;
+        else return null;
     }
 
     serializeNodeData(includeEdges, includeHashes){
@@ -101,6 +100,15 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
     _refreshHash(forced){
         return InterfaceMerkleTreeNode.prototype._refreshHash.call(this, forced);
+    }
+
+    _calculateHashTree(){
+
+        for (let i=0; i<this.edges.length; i++)
+            this.edges[i].targetNode._calculateHashTree();
+
+        this._computeHash(true);
+
     }
 
 

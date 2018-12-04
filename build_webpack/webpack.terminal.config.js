@@ -35,8 +35,15 @@ const config = merge(base, {
                 FORCE_LOAD: process.env.FORCE_LOAD,
                 DOMAIN: "'" + process.env.DOMAIN + "'",
                 WALLET_SECRET_URL: "'" + process.env.WALLET_SECRET_URL + "'",
+                DOMAIN: "'" + (process.env.DOMAIN||'') + "'",
+                WALLET_SECRET_URL: "'" + (process.env.WALLET_SECRET_URL||'') + "'",
                 JSON_RPC_USERNAME: "'" + process.env.JSON_RPC_USERNAME + "'",
                 JSON_RPC_PASSWORD: "'" + process.env.JSON_RPC_PASSWORD + "'",
+                NETWORK: "'" + (process.env.NETWORK||'') + "'",
+                TERMINAL_WORKERS_TYPE: "'" + (process.env.TERMINAL_WORKERS_TYPE || '') + "'",
+                TERMINAL_WORKERS_CPU_MAX: "'" + (process.env.TERMINAL_WORKERS_CPU_MAX || '') + "'",
+                COLLECT_STATS: process.env.COLLECT_STATS,
+                GH_COMMIT: "'" + (process.env.GH_COMMIT || '') + "'",
             }
         })
     ]

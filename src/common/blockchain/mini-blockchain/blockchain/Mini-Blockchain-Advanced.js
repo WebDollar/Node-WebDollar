@@ -3,6 +3,9 @@ import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
 import Log from 'common/utils/logging/Log';
+import GZip from "common/utils/GZip";
+import MiniBlockchainAdvancedGZipManager from "./Mini-Blockchain-Advanced-GZip-Manager"
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -11,6 +14,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         super(agent);
 
         this.lightAccountantTreeSerializations = {};
+        this.lightAccountantTreeSerializationsGzipped = {};
+
+        this.lightGZipManager = new MiniBlockchainAdvancedGZipManager(this);
+
     }
 
 
@@ -20,24 +27,28 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         if ( ! block.blockValidation.blockValidationType["skip-saving-light-accountant-tree-serializations"] ){
 
-            let serialization = this.accountantTree.serializeMiniAccountant();
-            this.lightAccountantTreeSerializations[block.height+1] = serialization;
+            // let serialization = this.accountantTree.serializeMiniAccountant();
+            //
+            // this.lightAccountantTreeSerializations[block.height+1] = serialization;
+            // this.lightAccountantTreeSerializationsGzipped[block.height+1] = undefined;
+
+            //gzip is being calculated later on
 
             //delete old lightAccountantTreeSerializations
 
-            let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
-
-            while (this.lightAccountantTreeSerializations[index] !== undefined){
-                delete this.lightAccountantTreeSerializations[index];
-                index--;
-            }
+            // let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
+            //
+            // while (this.lightAccountantTreeSerializations[index] !== undefined){
+            //     delete this.lightAccountantTreeSerializations[index];
+            //     delete this.lightAccountantTreeSerializationsGzipped[index];
+            //     index--;
+            // }
 
         }
 
     }
 
-
-    getSerializedAccountantTree(height){
+    getSerializedAccountantTree(height, gzipped = false){
 
         if (height < 0)
             height = -1;
@@ -49,45 +60,81 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             return data;
         }
 
-        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) )
-            return this.lightAccountantTreeSerializations[height];
+        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) ){
+
+            if (gzipped)
+                return this.lightAccountantTreeSerializationsGzipped[height];
+            else
+                return this.lightAccountantTreeSerializations[height];
+
+        }
 
         // else I need to compute it, by removing n-1..n
         throw {message: "not computed ", height:height};
 
     }
 
+    async _loadBlockchainPrevious(){
 
+        let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
+
+        if (offset === null || offset < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
+            throw "load blockchain simple";
+
+        if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
+            throw "load blockchain simple";
+
+        let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, offset);
+
+        if (!answer) {
+            //couldn't load the last K blocks
+
+            Log.error("Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER);
+
+            await this.accountantTree.loadMiniAccountant(new Buffer(0));
+
+            throw "load blockchain simple"; //let's force to load a simple blockchain
+        }
+
+    }
 
     async _loadBlockchain(){
 
         if (process.env.BROWSER)
             return true;
 
-        //AccountantTree[:-BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS]
-
         try {
 
             if (process.env.FORCE_LOAD !== undefined) throw "load blockchain simple" ;
 
-            let offset = await this.db.get("lightAccountantTreeAdvanced_offset");
+            let length = await this.db.get("lightAccountantTreeFinalAdvanced_blockLength");
 
-            if (offset === null || offset < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)
-                throw "load blockchain simple";
+            if (length === null)
+                await this._loadBlockchainPrevious();
+            else {
 
-            if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, true,  "lightAccountantTreeAdvanced")))
-                throw "load blockchain simple";
+                if (!(await this.accountantTree.loadMiniAccountant(undefined, undefined, false,  "lightAccountantTreeFinalAdvanced")))
+                    throw "load blockchain simple";
 
-            let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, offset);
+                this.accountantTree.root._calculateHashTree();
 
-            if (!answer) {
-                //couldn't load the last K blocks
+                console.info("accountant tree loaded 1", this.accountantTree.root.hash.sha256.toString("hex"));
 
-                Log.error("Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER);
+                let answer = await this.inheritBlockchain.prototype._loadBlockchain.call(this, undefined, 0, length);
 
-                await this.accountantTree.loadMiniAccountant(new Buffer(0));
+                console.info("accountant tree loaded 2", this.accountantTree.root.hash.sha256.toString("hex"));
+                console.info("accountant tree", this.accountantTree.root.edges.length);
 
-                throw "load blockchain simple"; //let's force to load a simple blockchain
+                if (!answer) {
+                    //couldn't load the last K blocks
+
+                    Log.error("Couldn't load accountan tree", Log.LOG_TYPE.SAVING_MANAGER);
+
+                    await this.accountantTree.loadMiniAccountant(new Buffer(0));
+
+                    throw "load blockchain simple"; //let's force to load a simple blockchain
+                }
+
             }
 
         } catch (exception){
@@ -102,6 +149,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         }
 
         this._miniBlockchainSaveBlocks = this.blocks.length;
+
+        if (consts.BLOCKCHAIN.LIGHT.GZIPPED)
+            await this.lightGZipManager.processAllAccountantTrees();
 
         return false;
 
@@ -118,7 +168,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if (length === 0) throw {message: "length is 0"};
 
             //avoid resaving the same blockchain
-            if (this._miniBlockchainSaveBlocks === length) throw {message: "already saved"};
+            if (this._miniBlockchainSaveBlocks >= length) throw {message: "already saved"};
 
             Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
 
@@ -127,15 +177,15 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             if (length < consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES) throw {message: "Couldn't save blockchain"};
 
-            if (!(await this.db.save("lightAccountantTreeAdvanced_offset", consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES)))
-                throw { message: "Couldn't be saved _lightAccountantTreeAdvanced_offset",  index: this._blockchainFileName + consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES };
+            if (!(await this.db.save("lightAccountantTreeFinalAdvanced_blockLength", length )))
+                throw { message: "Couldn't be saved _lightAccountantTreeAdvanced_offset",  index: this._blockchainFileName  };
 
             await this.sleep(70);
 
-            if (serialization === undefined)
-                serialization = this.lightAccountantTreeSerializations[length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
+            console.info("accountant tree", this.accountantTree.root.hash.sha256.toString("hex"));
+            console.info("accountant tree", this.accountantTree.root.edges.length);
 
-            if (!(await this.accountantTree.saveMiniAccountant(true, "lightAccountantTreeAdvanced", serialization)))
+            if (!(await this.accountantTree.saveMiniAccountant(true, "lightAccountantTreeFinalAdvanced", serialization)))
                 throw {message: "saveMiniAccountant couldn't be saved"};
 
             await this.sleep(70);
@@ -154,7 +204,13 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
+
     async saveBlockchainTerminated(){
+
+        Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
+
+        if (this.agent === undefined || !this.agent.consensus)
+            return false;
 
         await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);
 
@@ -168,7 +224,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            await this.saveAccountantTree();
+            Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
+
+            await this.saveAccountantTree(this.accountantTree.serializeMiniAccountant(false), this.blocks.length );
 
             Log.info('Saving Ended', Log.LOG_TYPE.SAVING_MANAGER);
 

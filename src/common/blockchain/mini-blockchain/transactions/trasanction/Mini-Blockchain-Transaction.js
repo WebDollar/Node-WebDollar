@@ -15,7 +15,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
         return new MiniBlockchainTransactionTo(this, to);
     }
 
-    _preProcessTransaction(multiplicationFactor = 1 , minerAddress, revertActions, showUpdate){
+    _preProcessTransaction(multiplicationFactor = 1 ,  revertActions, showUpdate){
 
         this.blockchain.accountantTree.updateAccountNonce(this.from.addresses[0].unencodedAddress, multiplicationFactor, revertActions, showUpdate);
 
@@ -32,8 +32,6 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
             if (blockValidationType !== undefined && blockValidationType['take-transactions-list-in-consideration'] !== undefined && blockValidationType['take-transactions-list-in-consideration'].validation ){
 
                 let foundNonce = {};
-                for (let i=nonce; i<this.nonce; i++)
-                    foundNonce[i] = false;
 
                 //fetching the transactions list
                 let transactionsList = blockValidationType['take-transactions-list-in-consideration'].transactions;

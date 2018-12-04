@@ -17,14 +17,16 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         //first pointer is to Genesis
         this._level = undefined;
         this.interlink = undefined;
+        this._provesClculatedInserted = undefined;
     }
 
     destroyBlock(){
 
         //in case it was already included
         if (this.blockchain === undefined) return;
-        
-        this.blockchain.prover.provesCalculated.deleteBlock(this);
+
+        if (this._provesClculatedInserted)
+            this.blockchain.prover.provesCalculated.deleteBlock(this);
 
         InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
     }
@@ -212,10 +214,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTarget,  offset){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation, usePrevHash){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTarget,  offset);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation, usePrevHash);
 
         try {
 

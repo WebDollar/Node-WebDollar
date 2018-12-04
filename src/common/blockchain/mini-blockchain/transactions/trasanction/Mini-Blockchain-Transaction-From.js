@@ -16,10 +16,15 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
             if (transactionsList === undefined)
                 transactionsList = this.transaction.blockchain.transactions.pendingQueue.list;
 
-            transactionsList.forEach((transaction)=>{
+            for (let i=0; i < transactionsList.length; i++){
 
-                if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId))
+                let transaction = transactionsList[i];
+
+                if (transaction.blockchain === undefined) continue; //maybe the tx was deleted
+
+                if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId, blockValidationType["validate-fast-transactions"]))
                     return false; // transaction is not taken in consideration
+
 
                 transaction.from.addresses.forEach((address)=>{
 
@@ -41,11 +46,10 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                 });
 
-            });
+
+            }
 
         }
-
-
 
         this.addresses.forEach ( (fromObject, index) =>{
 
@@ -63,7 +67,7 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
             }
 
-            if (value < 0) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress}
+            if (value < 0) throw {message: "Accountant Tree Input doesn't exist", unencodedAddress: fromObject.unencodedAddress};
 
             if (value < fromObject.amount)
                 throw { message: "Value is Less than From.address.amount", address: fromObject, index: index };

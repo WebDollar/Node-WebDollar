@@ -16,6 +16,7 @@ class PoolWork {
         this.lastBlockPromise = undefined;
         this.lastBlock = undefined;
         this.lastBlockNonce = 0;
+        this.lastBlockId = 0;
 
         this._blocksList = []; //for garbage collector
 
@@ -32,6 +33,16 @@ class PoolWork {
 
     }
 
+    findBlockById(blockId, blockHeight){
+
+        for (let i=0; i<this._blocksList.length; i++)
+            if ( (blockId !== undefined && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
+                return this._blocksList[i].block;
+            }
+
+        return undefined;
+    }
+
     getNextBlockForWork(){
 
         if (!Blockchain.synchronized)
@@ -46,26 +57,50 @@ class PoolWork {
         this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
+            this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
+            this.lastBlock._hashPrev = this.lastBlock.hashPrev;
+
             this.lastBlockNonce = 0;
 
 
-            if (this.lastBlock.computedBlockPrefix === null )
-                this.lastBlock._computeBlockHeaderPrefix();
+            let error = false;
+            try{
 
-            this.lastBlockSerialization = Buffer.concat( [
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock.computedBlockPrefix
-            ]);
+                if (this.lastBlock.computedBlockPrefix === undefined )
+                    this.lastBlock._computeBlockHeaderPrefix();
+
+                this.lastBlockSerialization = Buffer.concat( [
+                    Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
+                    Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
+                    this.lastBlock.computedBlockPrefix
+                ]);
+
+            } catch (exception){
+
+                error = true;
+
+            }
+
+
+            this.lastBlockId ++ ;
 
             this.lastBlockElement = {
+
                 block: this.lastBlock,
+                blockId: this.lastBlockId,
+
                 instances: {
 
                 },
             };
 
-            this._blocksList.push(this.lastBlockElement);
+            this._blocksList.push( this.lastBlockElement );
+
+            if (error) {
+                resolve(false);
+                console.error("Error creating Pool block");
+                return;
+            }
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
@@ -99,10 +134,10 @@ class PoolWork {
 
             if (!found)
                 //delete block
-                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 5*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK)) {
+                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 20*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) && this._blocksList[i].block.height < this.blockchain.blocks.length - 20 ) {
 
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
-                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+i, Log.LOG_TYPE.POOLS);
+                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+ this._blocksList[i].blockId +" height "+this._blocksList[i].block.height, Log.LOG_TYPE.POOLS);
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
                     for (let key in this._blocksList[i].instances)

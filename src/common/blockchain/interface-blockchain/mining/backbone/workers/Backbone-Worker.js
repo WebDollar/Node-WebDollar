@@ -1,3 +1,7 @@
+/**
+ * Backbone Worker based on node-gyp and multi-threading in node.js
+ */
+
 const argon2 = require('argon2');
 
 const opt = {
@@ -44,98 +48,133 @@ var sendMessage = (msg) => {
  *
  * @return {Boolean}
  */
-var mineNoncesBatch = async (block, difficulty, start, batch) => {
 
-    block = new Buffer(block);
-    difficulty = new Buffer(difficulty);
+var difficulty = new Buffer(32);
+var start = 0;
+var end = 0;
+var blockId = 0;
+var length = 0;
+var buffer = 0;
+var bestHash = new Buffer(32);
+var bestNonce = 0;
+
+var mineNoncesBatch = (myBlock, myDifficulty, myStart, myBatch, myBlockId) => {
+
+    myBlock = new Buffer(myBlock);
+    difficulty = new Buffer(myDifficulty);
 
     // pool mining
-    let length = block.length;
-    let buffer = Buffer.concat([block, new Buffer(4) ]);
+    length = myBlock.length;
+    buffer = Buffer.concat([myBlock, new Buffer(4) ]);
 
+    start = parseInt(myStart);
+    end = parseInt(myStart) + parseInt(myBatch);
 
+    blockId = myBlockId;
 
     // difficulty
-    let bestHash = MAX_TARGET;
-    let bestNonce = 0;
-    let change, found;
-
-    for (let nonce = parseInt(start), n=(parseInt(start) + parseInt(batch)); nonce < n; nonce++) {
-
-        if (nonce > 0xFFFFFFFF) {
-            // batched: signal main process that it finished this batch
-            sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce  });
-
-
-            return false;
-        }
-
-        try {
-            buffer[length + 3] = nonce & 0xff;
-            buffer[length + 2] = nonce >> 8 & 0xff;
-            buffer[length + 1] = nonce >> 16 & 0xff;
-            buffer[length    ] = nonce >> 24 & 0xff;
-
-            let hash = await argon2.hash(buffer, opt );
-
-            // console.log(nonce, hash);
-
-            change = false;
-
-            for (let i = 0, l = bestHash.length; i < l; i++)
-                if (hash[i] < bestHash[i]) {
-                    change = true;
-                    break;
-                }
-                else if (hash[i] > bestHash[i])
-                    break;
-
-            if ( change ) {
-
-                bestHash = hash;
-                bestNonce = nonce;
-
-                found = false;
-                for (let i = 0, l = difficulty.length; i < l; i++)
-                    if (hash[i] < difficulty[i]) {
-                        found = true;
-                        break;
-                    }
-                    else if (hash[i] > difficulty[i])
-                        break;
-
-                if (found) {
-
-                    // solved: signal main process that we got a solution
-                    sendMessage({
-                        type: 's',
-                        nonce:nonce,
-                        hash: hash,
-                    });
-
-
-                    return false;
-                }
-
-            }
-
-
-            // hashing: signal main process that we hashed one time
-
-            if (nonce % 3 === 0)
-                sendMessage({ type: 'h' });
-
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
-    // batched: signal main process that it finished this batch
-    sendMessage({ type: 'b', bestHash:bestHash, bestNonce: bestNonce });
-
+    bestHash = MAX_TARGET;
+    bestNonce = -1;
 
     return false;
 };
+
+
+var executionLoop = async ()=>{
+
+    var nonce = 0;
+    var change, found;
+
+    while (1===1){
+
+        if (start < end){
+
+            nonce = start;
+            start++;
+
+            if (nonce > 0xFFFFFFFF) {
+                // batched: signal main process that it finished this batch
+                sendMessage({ type: 'b', bestHash:bestHash, bestNone: bestNonce, blockId: blockId  });
+                bestNonce = -1;
+                continue;
+            }
+
+            try {
+
+                buffer[length + 3] = nonce & 0xff;
+                buffer[length + 2] = nonce >> 8 & 0xff;
+                buffer[length + 1] = nonce >> 16 & 0xff;
+                buffer[length    ] = nonce >> 24 & 0xff;
+
+                let hash = await argon2.hash(buffer, opt );
+
+                // console.log(nonce, hash);
+
+                change = false;
+
+                for (let i = 0, l = bestHash.length; i < l; i++)
+                    if (hash[i] < bestHash[i]) {
+                        change = true;
+                        break;
+                    }
+                    else if (hash[i] > bestHash[i])
+                        break;
+
+                if ( change ) {
+
+                    bestHash = hash;
+                    bestNonce = nonce;
+
+                    found = false;
+                    for (let i = 0, l = difficulty.length; i < l; i++)
+                        if (hash[i] < difficulty[i]) {
+                            found = true;
+                            break;
+                        }
+                        else if (hash[i] > difficulty[i])
+                            break;
+
+                    if (found) {
+
+                        // solved: signal main process that we got a solution
+                        sendMessage({ type: 's',  nonce:nonce,  hash: hash, blockId: blockId });
+
+                        start = end+1;
+                        bestNonce = -1;
+
+                        continue;
+
+                    }
+
+                }
+
+
+                // hashing: signal main process that we hashed one time
+
+                if (nonce % 3 === 0)
+                    sendMessage({ type: 'h' });
+
+            } catch (error) {
+                console.log(error);
+            }
+
+        } else
+            if (bestNonce !== -1) {
+                // batched: signal main process that it finished this batch
+                sendMessage( { type: 'b', bestHash: bestHash, bestNonce: bestNonce, blockId: blockId } );
+                bestNonce = -1;
+            } else
+                await sleep(3);
+
+    }
+
+};
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+executionLoop();
 
 /**
  * Gets called by main process

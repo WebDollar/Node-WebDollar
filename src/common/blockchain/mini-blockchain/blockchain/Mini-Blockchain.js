@@ -41,6 +41,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         try{
 
+            let date = new Date().getTime();
             if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
 
                 //updating reward

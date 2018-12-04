@@ -149,7 +149,7 @@ class PoolDataMiner{
     }
 
     set rewardTotal(newValue){
-        this._rewardTotal = newValue;
+        this._rewardTotal = Math.max(0, newValue);
     }
     set rewardConfirmed(newValue){
         this._rewardConfirmed = newValue;

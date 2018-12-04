@@ -2,6 +2,7 @@ import consts from 'consts/const_global'
 import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
 import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
+import Blockchain from "../../../../../main-blockchain/Blockchain";
 
 class TransactionsPendingQueue {
 
@@ -24,7 +25,7 @@ class TransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
-        if (this.findPendingTransaction(transaction) !== -1)
+        if ( this.findPendingTransaction(transaction) !== -1 )
             return false;
 
         let blockValidationType = {
@@ -51,6 +52,7 @@ class TransactionsPendingQueue {
         let inserted = false;
 
         for (let i=0; i<this.list.length && inserted === false; i++ ) {
+
             let compare = transaction.from.addresses[0].unencodedAddress.compare(this.list[i].from.addresses[0].unencodedAddress);
 
             if (compare < 0) // next
@@ -87,10 +89,24 @@ class TransactionsPendingQueue {
         this.transactions.emitTransactionChangeEvent( transaction );
     }
 
-    findPendingTransaction(transaction){
+    findPendingIdenticalTransaction(transaction){
+
+        if ( transaction === undefined) return -1;
 
         for (let i = 0; i < this.list.length; i++)
-            if (  this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
+            if ( this.list[i] === transaction ) //it is not required to use BufferExtended.safeCompare
+                return i;
+
+        return -1;
+
+    }
+
+    findPendingTransaction(transaction){
+
+        if ( transaction === undefined || !Buffer.isBuffer(transaction.txId)) return -1;
+
+        for (let i = 0; i < this.list.length; i++)
+            if ( this.list[i].txId !== undefined && this.list[i].txId.equals( transaction.txId )) //it is not required to use BufferExtended.safeCompare
                 return i;
 
         return -1;
@@ -109,6 +125,8 @@ class TransactionsPendingQueue {
 
     _removePendingTransaction (transaction){
 
+        if (transaction.pendingTransactionsIncluded !== undefined && transaction.pendingTransactionsIncluded !== 0) return; //try next time
+
         let index;
 
         if (typeof transaction === "object") index = this.findPendingTransaction(transaction);
@@ -120,10 +138,13 @@ class TransactionsPendingQueue {
         if (index === -1)
             return true;
 
-        this.list[index].destroyTransaction();
+        if (transaction.blockchain !== undefined){
+            this.transactions.emitTransactionChangeEvent(transaction, true);
+            this.list[index].destroyTransaction();
+        }
+
         this.list.splice(index, 1);
 
-        this.transactions.emitTransactionChangeEvent(transaction, true);
     }
 
     _removeOldTransactions (){
@@ -136,17 +157,25 @@ class TransactionsPendingQueue {
 
         for (let i=this.list.length-1; i >= 0; i--) {
 
+            if (this.list[i].blockchain === undefined) {
+                this._removePendingTransaction(i, true);
+                continue;
+            }
+
             if (this.list[i].from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress )) continue;
 
             try{
 
-                if ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION ||  !this.list[i].validateTransactionEveryTime(undefined, blockValidationType )) &&
-                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length )) {
+                if ( ( (this.blockchain.blocks.length > this.list[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||  ( Blockchain.blockchain.agent.consensus && !this.list[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
+                     (this.list[i].timeLock === 0 || this.list[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
                     this._removePendingTransaction(i);
                 }
 
             } catch (exception){
-                console.warn("Old Transaction removed because of exception ", exception);
+
+                if ( Math.random() < 0.1)
+                    console.warn("Old Transaction removed because of exception ", exception);
+
                 this._removePendingTransaction(i)
             }
 

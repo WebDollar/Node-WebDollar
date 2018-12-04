@@ -48,10 +48,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
-            nextBlock.difficultyTargetPrev = Buffer.from( this.blockchain.getDifficultyTarget() );
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             nextBlock.updateInterlink();
 
+            nextBlock.data.transactions.markBlockDataTransactionsToBeInPending();
 
         } catch (Exception){
             console.error("Error creating next block ", Exception, nextBlock);
@@ -76,7 +76,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 }) === false) throw {message: "Mining1 returned False"};
 
         } catch (Exception){
-            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : undefined );
             revertActions.revertOperations();
         }
 
@@ -104,9 +104,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             //mining next blocks
 
-            let nextBlock = await this.getNextBlock();
-
             try {
+
+                let nextBlock = await this.getNextBlock();
 
                 let difficulty = this.blockchain.getDifficultyTarget();
 
@@ -220,7 +220,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                console.error( "block ", block.height ," was not mined...");
+                console.warn( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
@@ -229,7 +229,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
 
-            console.error( "Error mining block ", Exception, block.toJSON() );
+            console.error( "Error mining block ", Exception, (block !== null ? block.toJSON() : '') );
 
             throw Exception;
         }

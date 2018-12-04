@@ -4,6 +4,7 @@ import BufferExtended from "common/utils/BufferExtended"
 import consts from 'consts/const_global';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import Blockchain from "main-blockchain/Blockchain"
+import Utils from "common/utils/helpers/Utils";
 
 class PoolDataBlockInformationMinerInstance {
 
@@ -79,11 +80,13 @@ class PoolDataBlockInformationMinerInstance {
 
         if (difficulty === undefined) difficulty = this._workDifficulty;
 
-        this.minerInstanceTotalDifficulty  = this.minerInstanceTotalDifficulty.plus(difficulty);
+        if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
 
-        this.blockInformation.adjustBlockInformationDifficulty(difficulty);
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
+            this.minerInstanceTotalDifficulty = difficulty;
 
-        this.calculateReward(useDeltaTime );
+            this.calculateReward(useDeltaTime );
+        }
 
     }
 
@@ -168,6 +171,7 @@ class PoolDataBlockInformationMinerInstance {
 
                             address = this.poolManagement.poolData.miners[i].address;
                             break;
+
                         }
 
         } else {

@@ -21,15 +21,15 @@ class NodeAPIPrivate{
 
     async walletImport(req, res){
 
+        let address = req.address;
+        let publicKey = req.publicKey;
         let privateKey = req.privateKey;
-
-        let address = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
         let content = {
             version: '0.1',
-            address: address.address,
-            publicKey: address.publicKey,
-            privateKey: address.privateKey,
+            address: address,
+            publicKey: publicKey,
+            privateKey: privateKey,
         };
 
         try {
@@ -38,7 +38,7 @@ class NodeAPIPrivate{
 
             if (answer.result === true) {
                 await Blockchain.Wallet.saveWallet();
-                return {result: true, address: address.address};
+                return {result: true, address: address};
             } else
                 return {result: false, message: answer.message};
 
@@ -49,14 +49,27 @@ class NodeAPIPrivate{
     }
 
     async walletCreateTransaction(req, res){
+        
+        var from;
+        var to;
 
-        let from = req.from;
-        let to = req.to;
-        let amount = req.amount;
-        let fee = req.fee;
+        if (req.from && req.from != 'null' &&
+          req.to && req.to != 'null' &&
+          req.amount && req.amount != 'null') {
+          from = req.from;
+          to = req.to;
+        } else if(req.from && req.from != 'null') {
+          // fan out
+          from = req.from;
+          to = req.multiple_to;
+        } else if(req.to && req.to != 'null') {
+          // fan in
+          from = req.multiple_from;
+          to = req.to;
+        }
 
-        amount = parseInt(amount) * WebDollarCoins.WEBD;
-        fee = parseInt(fee) * WebDollarCoins.WEBD;
+        let amount = parseInt(req.amount) ? parseInt(req.amount) * WebDollarCoins.WEBD : undefined;
+        let fee = parseInt(req.fee) * WebDollarCoins.WEBD;
 
         let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 

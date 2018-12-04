@@ -7,6 +7,7 @@ import StatusEvents from "common/events/Status-Events"
 import Utils from "common/utils/helpers/Utils";
 import PoolsUtils from "common/mining-pools/common/Pools-Utils"
 import Blockchain from "main-blockchain/Blockchain";
+import AGENT_STATUS from "../../blockchain/interface-blockchain/agents/Agent-Status";
 
 
 const sanitizer = require('sanitizer');
@@ -20,6 +21,8 @@ class MinerPoolSettings {
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.MINER_POOL_DATABASE );
 
         this._poolURL = '';
+        this.poolDedicated = false;
+
         this.poolsList = {};
 
         this.poolName = "";
@@ -48,14 +51,16 @@ class MinerPoolSettings {
 
     }
 
-    async initializeMinerPoolSettings(poolURL){
 
-        await this._getMinerPoolList();
+
+    async initializeMinerPoolSettings(poolURL){
 
         if (poolURL !== undefined)
             await this.setPoolURL(poolURL);
 
         await this._getMinerPoolDetails();
+
+        await this._getMinerPoolList();
 
     }
 
@@ -76,6 +81,8 @@ class MinerPoolSettings {
 
 
     async setPoolURL(newValue, skipSaving = false){
+
+        newValue = await this._replacePoolURL(newValue);
 
         newValue = sanitizer.sanitize(newValue);
 
@@ -103,6 +110,7 @@ class MinerPoolSettings {
         this.generatePoolURLReferral();
 
         StatusEvents.emit("miner-pool/newPoolURL", { poolURL: this._poolURL });
+
         this.notifyNewChanges();
 
         return true;
@@ -137,8 +145,6 @@ class MinerPoolSettings {
         else if (poolMinerActivated === "false") poolMinerActivated = false;
         else if (poolMinerActivated === null) poolMinerActivated = false;
 
-        poolMinerActivated = false;
-
         PoolsUtils.validatePoolActivated(poolMinerActivated);
 
 
@@ -148,20 +154,22 @@ class MinerPoolSettings {
     }
 
 
-    async addPoolList(url, data){
+    async addPoolList(url, data, save = true){
 
         if (data === undefined)
             data = PoolsUtils.extractPoolURL(url);
 
         if (data === null) return;
 
-        let foundPool = this.poolsList[data.poolPublicKey.toString("hex")];
+        let foundPool = this.poolsList[ data.poolPublicKey.toString("hex") ];
         if (foundPool === undefined)
             foundPool = {};
 
         if (JSON.stringify(this.poolsList[data.poolPublicKey.toString("hex")]) !== JSON.stringify(data)){
             this.poolsList[data.poolPublicKey.toString("hex")] = data;
-            await this._saveMinerPoolList();
+
+            if ( save )
+                await this._saveMinerPoolList();
         }
 
 
@@ -169,7 +177,11 @@ class MinerPoolSettings {
 
     async _saveMinerPoolList(){
 
-        let result = await this._db.save("minerPool_poolsList", new Buffer( JSON.stringify( this.poolsList), "ascii") );
+        let list = {};
+        for (let key in this.poolsList)
+            list[key] = this.poolsList[key];
+
+        let result = await this._db.save("minerPool_poolsList", new Buffer( JSON.stringify( list ), "ascii") );
         return result;
 
     }
@@ -187,6 +199,8 @@ class MinerPoolSettings {
             this.poolsList = result;
         } else
             this.poolsList = {};
+
+        await this._addPoolsList();
 
         return result;
     }
@@ -213,7 +227,27 @@ class MinerPoolSettings {
         return this._minerPoolActivated;
     }
 
+    async _addPoolsList(){
 
+        await this.addPoolList("/pool/1/BACMpool/0.01/21dc1f57cb7338963ea159877b4ade97b71dd11ac17292e3852bdc33a26a17e4/https:$$pool.bacm.ro:443", undefined, true);
+        await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
+        await this.addPoolList("/pool/0/WebDollarExperimentalPool/0.02/WEBD$gDU+tP3@42@L9$Is463vDJi4IKrabPNNn$$/93ba881950314cca579d4f8699a6bc67695ec7292bceadb6f6709b70beba774a/https:$$webdollar.ddns.net/https:$$webdollar.ddns.net:80", undefined, true);
+        await this.addPoolList("/pool/1/WEBDminers/0.01/9d1e36899b3a1164e1fc790cc38c73f81d6b48522cef0abbb559c823662f0c57/https:$$webdminers.ddns.net:80", undefined, true);
+        await this.addPoolList("/pool/1/WMP/0.02/c01f57930c27e78e434de1243ae02b98e56d6cd3df42d136be1a1c0a0a9a8624/https:$$server.webdollarminingpool.com:443", undefined, true);
+        await this.addPoolList("/pool/1/WebDollarPoolWin/0.01/60ba45707efcf2292e1c8d4c6a16b602a58aa8bee04d7d3645198afa4f8435e0/https:$$webdollarpool.win:80", undefined, true);
+        await this.addPoolList("/pool/1/USWebDollarPoolWin/0.01/8cf424002c86e737f7b2e68ea8861938685e4753e2465d9b4973927c6f95af39/https:$$us.webdollarpool.win:80", undefined, true);
+        
+    }
+
+    async _replacePoolURL(url = ''){
+
+        if (typeof url !== "string") return url;
+
+        if (url.indexOf("WMP/0.02/bdda9527a040d9063e22e1dccc4d860b84227ff73232f5c418054112114a6ea4/https:$$pool.webdollarminingpool.com:443") >= 0)
+            url = url.replace( "WMP/0.02/bdda9527a040d9063e22e1dccc4d860b84227ff73232f5c418054112114a6ea4/https:$$pool.webdollarminingpool.com:443", "WMP/0.02/c01f57930c27e78e434de1243ae02b98e56d6cd3df42d136be1a1c0a0a9a8624/https:$$server.webdollarminingpool.com:443", );
+
+        return url;
+    }
 
 }
 

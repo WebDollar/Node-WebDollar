@@ -1,6 +1,7 @@
 import InterfaceBlockchainProtocol from "common/blockchain/interface-blockchain/protocol/Interface-Blockchain-Protocol"
 import PPoWBlockchainProtocolForksManager from "./PPoW-Blockchain-Protocol-Forks-Manager"
-import GZip from "common/utils/GZip"
+import consts from "consts/const_global";
+import BufferExtended from "../../../utils/BufferExtended";
 
 class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
@@ -18,9 +19,9 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
     }
 
-    _initializeNodeNiPoPoW(socket){
+    _initializeNodeNiPoPoW(socket) {
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash",  ()=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi/hash", () => {
 
             try {
 
@@ -39,37 +40,62 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
 
                 socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi/hash" + "/answer", answer);
 
-            } catch (exception){
+            } catch (exception) {
 
             }
 
         });
 
-        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi", async (data)=>{
+        socket.node.on("get/nipopow-blockchain/headers/get-proofs/pi-gzip", async (data)=>{
 
             try {
 
-                if (data.starting === undefined) data.starting = 0;
-                if (data.length === undefined) data.length = 1000;
-                if (data.gzipped === undefined) data.gzipped = false;
+                let serialization;
+                let proofPi;
 
-                if (typeof data.starting !== "number") throw "starting is not a number";
-                if (typeof data.length !== "number") throw "length is not a number";
+                if (this.blockchain.agent.light) proofPi = this.blockchain.proofPi;
+                else proofPi = this.blockchain.prover.proofPi; // full node
 
-                let proof;
 
-                if (this.blockchain.agent.light)
-                    proof = this.blockchain.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
-                else  // full node
-                    proof = this.blockchain.prover.proofPi.getProofHeaders(data.starting, data.length, data.gzipped);
+                if (proofPi.proofGzip !== undefined) serialization = proofPi.proofGzip;
+                else serialization = proofPi.proofSerialized;
 
-                if (data.gzipped === true) proof = await GZip.zip(proof);
+                let moreChunks = false;
 
-                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi" + "/answer", {result:true, data: proof, gzipped: data.gzipped});
+                if (typeof data === "object" && data !== null) {
 
-            } catch (exception){
+                    if (typeof data.starting === "number" && typeof data.length === "number") {
 
-                console.error("Error getting proofs headers", exception);
+                        if (data.length < consts.SETTINGS.PARAMS.MAX_SIZE.MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES) throw {message: "way to few messages"};
+
+                        if ((serialization.length - data.starting) > data.length)
+                            moreChunks = true;
+                        else
+                            moreChunks = false;
+
+                        if (serialization.length - 1 - data.starting > 0)
+                            serialization = BufferExtended.substr(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
+                        else
+                            serialization = new Buffer(0);
+
+                        return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer", {
+                            result: true,
+                            data: serialization,
+                            moreChunks: moreChunks,
+                        });
+
+                    }
+
+                }
+
+            } catch (exception) {
+
+                console.error("Socket Error - get/nipopow-blockchain/headers/get-proofs/pi-gzip", exception, data);
+
+                socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer",{
+                    result: false,
+                    message: exception
+                });
 
             }
 
