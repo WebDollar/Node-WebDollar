@@ -33,8 +33,6 @@ const config = merge(base, {
                 MAXIMUM_CONNECTIONS_FROM_BROWSER: process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER,
                 MAXIMUM_CONNECTIONS_FROM_TERMINAL: process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL,
                 FORCE_LOAD: process.env.FORCE_LOAD,
-                DOMAIN: "'" + process.env.DOMAIN + "'",
-                WALLET_SECRET_URL: "'" + process.env.WALLET_SECRET_URL + "'",
                 DOMAIN: "'" + (process.env.DOMAIN||'') + "'",
                 WALLET_SECRET_URL: "'" + (process.env.WALLET_SECRET_URL||'') + "'",
                 JSON_RPC_USERNAME: "'" + process.env.JSON_RPC_USERNAME + "'",
