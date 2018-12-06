@@ -1,12 +1,12 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc';
 
 /**
  * The information about a transaction by block hash and transaction index position.
  */
-class GetTransactionByBlockHashAndIndex extends Method
+class GetTransactionByBlockHashAndIndex extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options)
+    constructor(name) {
+        super(name);
     }
 
     getHandler(args) {

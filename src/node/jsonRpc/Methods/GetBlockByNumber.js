@@ -1,10 +1,13 @@
-import {Method} from './../../../jsonRpc'
-import {defaults} from 'lodash'
+import {RpcMethod} from './../../../jsonRpc';
+import {defaults} from 'lodash';
 
-class GetBlockByNumber extends Method
+/**
+ * Th information about a block by block number.
+ */
+class GetBlockByNumber extends RpcMethod
 {
-    constructor(name, options = {}, oBlockFinder, oBlockTransformer) {
-        super(name, options);
+    constructor(name, oBlockFinder, oBlockTransformer) {
+        super(name);
         this._oBlockFinder      = oBlockFinder;
         this._oBlockTransformer = oBlockTransformer;
     }

@@ -1,23 +1,29 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc';
+import InterfaceBlockchainAddressHelper from '../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
 
-class GetBalance extends Method
+/**
+ * The balance of the account of given address.
+ */
+class GetBalance extends RpcMethod
 {
-    constructor(name, options = {}, oWallet, oAddressBalanceProvider) {
-        super(name, options)
-        this._oWallet                 = oWallet;
+    constructor(name, oAddressBalanceProvider) {
+        super(name);
         this._oAddressBalanceProvider = oAddressBalanceProvider;
     }
 
     getHandler(args) {
-        const sAddress = args[0] || undefined;
-        const oAddress = this._oWallet.getAddress(sAddress, false);
+        let sAddress = args[0] || undefined;
 
-        if (oAddress === null)
+        try
         {
-            throw new Error('Address not found');
+            sAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(sAddress);
+        }
+        catch (exception)
+        {
+            throw new Error('Address is invalid');
         }
 
-        return this._oAddressBalanceProvider.getBalance(oAddress);
+        return this._oAddressBalanceProvider.getBalance({address: sAddress});
     }
 }
 

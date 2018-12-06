@@ -1,16 +1,27 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc';
 
 /**
  * The number of transactions in a block matching the given block number.
  */
-class GetBlockTransactionCountByNumber extends Method
+class GetBlockTransactionCountByNumber extends RpcMethod
 {
-    constructor(name, options = {}, oBlockFinder) {
-        super(name, options);
-        this._oBlockFinder      = oBlockFinder;
+    constructor(name, oBlockFinder, oTransactionsPendingQueue) {
+        super(name);
+        this._oBlockFinder              = oBlockFinder;
+        this._oTransactionsPendingQueue = oTransactionsPendingQueue;
     }
 
     getHandler(args) {
+        if (args.length !== 1)
+        {
+            throw new Error('Params must contain exactly one entry, the block number/TAG');
+        }
+
+        if (args[0] === 'pending')
+        {
+            return this._oTransactionsPendingQueue.list.length;
+        }
+
         const oBlock = this._oBlockFinder.findByNumberOrTag(args[0]);
 
         if (oBlock === null)

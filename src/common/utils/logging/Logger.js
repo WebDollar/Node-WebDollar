@@ -1,4 +1,4 @@
-class Logger{
+class Logger {
 
     constructor(name){
         this.name = name;

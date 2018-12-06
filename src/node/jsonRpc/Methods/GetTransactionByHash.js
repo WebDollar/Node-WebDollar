@@ -1,12 +1,12 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc'
 
 /**
  * The information about a transaction requested by transaction hash.
  */
-class GetTransactionByHash extends Method
+class GetTransactionByHash extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options)
+    constructor(name) {
+        super(name);
     }
 
     getHandler(args) {

@@ -1,13 +1,17 @@
-import {Method} from './../../../jsonRpc'
+import {authenticatedMethod, RpcMethod} from './../../../jsonRpc';
 
-class SendRawTransaction extends Method
+/**
+ * Creates a new transaction for pre-signed transactions.
+ */
+class SendRawTransaction extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options);
+    constructor(name) {
+        super(name);
     }
 
     getHandler(args) {
+        throw new Error('SendRawTransaction method is not supported');
     }
 }
 
-export default SendRawTransaction;
+export default authenticatedMethod(SendRawTransaction);

@@ -1,10 +1,15 @@
-import {Method} from './../../../jsonRpc'
-import {isObject, isString, isNumber} from 'lodash'
+import {authenticatedMethod, RpcMethod} from './../../../jsonRpc';
+import {isObject, isString, isNumber} from 'lodash';
 
-class SendTransaction extends Method
+/**
+ * Creates and sign a transaction based on the provided parameters
+ */
+class SendTransaction extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options);
+    constructor(name, oTransactionsManager) {
+        super(name);
+
+        this._oTransactionsManager = oTransactionsManager;
     }
 
     async getHandler(args) {
@@ -13,7 +18,7 @@ class SendTransaction extends Method
             throw new Error('Params must contain exactly one entry and that entry must be an object');
         }
 
-        const fromAddress = args[0].from;
+        const fromAddress = args[0]['from'];
         const toAddress   = args[0].to;
         const value       = args[0].value;
         const fee         = args[0].fee;
@@ -21,31 +26,33 @@ class SendTransaction extends Method
 
         if (isString(fromAddress) === false)
         {
-            throw new Error('From address is invalid. Only string values are supported.')
+            throw new Error('From address is invalid. Only string values are supported.');
         }
 
         if (isString(toAddress) === false)
         {
-            throw new Error('To address is invalid. Only string value is supported.')
+            throw new Error('To address is invalid. Only string value is supported.');
         }
 
         if (isNumber(value) === false || value <= 0)
         {
-            throw new Error('Value is invalid. Only numerical values greater than 0 are supported.')
+            throw new Error('Value is invalid. Only numerical values greater than 0 are supported.');
         }
 
         if (typeof fee !== 'undefined' && (isNumber(fee) === false || fee <= 0))
         {
-            throw new Error('Fee is invalid. Only numerical values greater than 0 are supported.')
+            throw new Error('Fee is invalid. Only numerical values greater than 0 are supported.');
         }
 
-        let oTransaction = await this._oTransactionsManager.wizard.createTransactionSimple( fromAddress, toAddress, value, fee, undefined, password)
+        let oTransaction = await this._oTransactionsManager.wizard.createTransactionSimple( fromAddress, toAddress, value, fee, undefined, password);
 
         if (!oTransaction.result)
         {
             throw new Error('Transaction not accepted. ' + oTransaction.message);
         }
+
+        return oTransaction._computeTxId();
     }
 }
 
-export default SendTransaction;
+export default authenticatedMethod(SendTransaction);

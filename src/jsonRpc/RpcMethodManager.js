@@ -1,13 +1,20 @@
-import Method from "./Method";
+import Method from "./RpcMethod";
 
+/**
+ * Ensure that the specified object is an instance of {@see JsonRpc\RpcMethod}
+ *
+ * @private
+ * @param oMethod
+ * @private
+ */
 const _ensureMethod = (oMethod) => {
     if ((oMethod instanceof Method) === false)
     {
-        throw new Error('Method must be an instance of "JsonRpc\\Method"');
+        throw new Error('Method must be an instance of "JsonRpc\\RpcMethod"');
     }
 };
 
-class MethodManager
+class RpcMethodManager
 {
     constructor() {
         this._methods = new Map();
@@ -23,7 +30,7 @@ class MethodManager
     addMethod(oMethod) {
         _ensureMethod(oMethod);
 
-        this._methods.set(oMethod.getName(), oMethod)
+        this._methods.set(oMethod.getName(), oMethod);
     }
 
     removeMethod(oMethod) {
@@ -49,4 +56,4 @@ class MethodManager
     }
 }
 
-export default MethodManager;
+export default RpcMethodManager;

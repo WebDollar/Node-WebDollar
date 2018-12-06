@@ -1,10 +1,18 @@
-import {Method} from './../../../jsonRpc'
-import Blockchain from '../../../main-blockchain/Blockchain';
+import {RpcMethod} from './../../../jsonRpc';
 
-class BlockNumber extends Method
+/**
+ * The number of the most recent block.
+ */
+class BlockNumber extends RpcMethod
 {
+    constructor(name, oBlockchain) {
+        super(name);
+        this._oBlockchain = oBlockchain;
+    }
+
+
     getHandler() {
-        return Blockchain.blockchain.blocks.last.height;
+        return this._oBlockchain.blocks.last.height;
     }
 }
 

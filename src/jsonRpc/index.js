@@ -1,9 +1,15 @@
-import RpcServerMiddleware from './RpcServerMiddleware'
-import Method   from './Method'
-import MethodManager from './MethodManager'
+import RpcServerMiddleware from './RpcServerMiddleware';
+import RpcMethod   from './RpcMethod';
+import RpcMethodManager from './RpcMethodManager';
+import authenticatedMethod from './authenticatedMethod';
 
-const fRpcServerMiddleware = (oMethodManager) => {
-    return (new RpcServerMiddleware(oMethodManager)).getMiddleware();
+const fRpcServerMiddleware = (oRpcMethodManager, bServerIsSecured) => {
+    return (new RpcServerMiddleware(oRpcMethodManager)).getMiddleware(bServerIsSecured);
 };
 
-export {fRpcServerMiddleware, Method, MethodManager};
+export {
+    fRpcServerMiddleware,
+    authenticatedMethod,
+    RpcMethod,
+    RpcMethodManager
+};

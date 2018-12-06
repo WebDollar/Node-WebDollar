@@ -5,11 +5,7 @@ import InterfaceBlockchainAddressHelper from "../../../common/blockchain/interfa
 
 class TransactionTransformer
 {
-    transform(oTransaction, oBlock, i) {
-        const nBlockTimestampRaw = oBlock.timeStamp;
-        const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
-        const oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
-
+    transform(oTransaction, oBlock = null, i) {
         const nInputSum  = oTransaction.from.calculateInputSum();
         const nOutputSum = oTransaction.to.calculateOutputSum();
 
@@ -23,15 +19,28 @@ class TransactionTransformer
             to_length      : oTransaction.to.addresses.length,
             fee            : oTransaction.fee / WebDollarCoins.WEBD,
             fee_raw        : oTransaction.fee,
-            timestamp      : oBlockTimestampUTC.toUTCString(),
-            timestamp_UTC  : nBlockTimestamp,
-            timestamp_block: nBlockTimestampRaw,
-            timestamp_raw  : nBlockTimestampRaw,
-            createdAtUTC   : oBlockTimestampUTC,
-            block_id       : oBlock.height,
+            timestamp      : null,
+            timestamp_UTC  : null,
+            timestamp_block: null,
+            timestamp_raw  : null,
+            createdAtUTC   : null,
+            block_id       : null,
             from           : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
             to             : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
         };
+
+        if (oBlock !== null)
+        {
+            const nBlockTimestampRaw = oBlock.timeStamp;
+            const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
+            const oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
+
+            aTransaction.timestamp       = oBlockTimestampUTC.toUTCString();
+            aTransaction.timestamp_UTC   = nBlockTimestamp;
+            aTransaction.timestamp_block = nBlockTimestampRaw;
+            aTransaction.timestamp_raw   = nBlockTimestampRaw;
+            aTransaction.createdAtUTC    = oBlockTimestampUTC;
+        }
 
         oTransaction.from.addresses.forEach((oAddress) => {
             aTransaction.from.trxs.push({

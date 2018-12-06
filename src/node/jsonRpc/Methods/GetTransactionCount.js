@@ -1,12 +1,12 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc'
 
 /**
  * The number of transactions sent from an address.
  */
-class GetTransactionCount extends Method
+class GetTransactionCount extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options)
+    constructor(name) {
+        super(name)
     }
 
     getHandler(args) {

@@ -1,12 +1,12 @@
-import {Method} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc';
 
 /**
  * The number of transactions in a block from a block matching the given block hash.
  */
-class GetBlockTransactionCountByHash extends Method
+class GetBlockTransactionCountByHash extends RpcMethod
 {
-    constructor(name, options = {}) {
-        super(name, options)
+    constructor(name) {
+        super(name)
     }
 
     getHandler(args) {
