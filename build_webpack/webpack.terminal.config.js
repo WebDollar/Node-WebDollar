@@ -39,6 +39,7 @@ const config = merge(base, {
                 WALLET_SECRET_URL: "'" + (process.env.WALLET_SECRET_URL||'') + "'",
                 JSON_RPC_USERNAME: "'" + process.env.JSON_RPC_USERNAME + "'",
                 JSON_RPC_PASSWORD: "'" + process.env.JSON_RPC_PASSWORD + "'",
+                JSON_RPC_PORT    : process.env.JSON_RPC_PORT,
                 NETWORK: "'" + (process.env.NETWORK||'') + "'",
                 TERMINAL_WORKERS_TYPE: "'" + (process.env.TERMINAL_WORKERS_TYPE || '') + "'",
                 TERMINAL_WORKERS_CPU_MAX: "'" + (process.env.TERMINAL_WORKERS_CPU_MAX || '') + "'",

@@ -14,8 +14,6 @@ import NodeAPIRouter from "../API-router/Node-API-Router"
 import NODE_API_TYPE from "../API-router/NODE_API_TYPE";
 
 import NodeServerSocketAPI from "../sockets/Node-Server-Socket-API"; //required because it will process the SocketAPI
-import JsonRpcServer from '../../../jsonRpc/JsonRpcServer'
-import Blockchain from "main-blockchain/Blockchain"
 
 class NodeExpress{
 
@@ -96,7 +94,7 @@ class NodeExpress{
                         break;
                     }
 
-                if (privateKey === '' && cert === '' && caBundle === '') throw {message: "HTTPS server couldn't be started. Starting HTTP"};            
+                if (privateKey === '' && cert === '' && caBundle === '') throw {message: "HTTPS server couldn't be started. Starting HTTP"};
                 if (privateKey === '') throw {message: "HTTPS server couldn't be started because certificate private.key was not found"};
                 if (cert === '') throw {message: "HTTPS server couldn't be started because certificate certificate.crt was not found"};
                 if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};
@@ -182,8 +180,6 @@ class NodeExpress{
         NodeAPIRouter.initializeRouter( this.app.all.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter._routesEnabled = false;
-
-        let oJsonRpcServer = new JsonRpcServer(app, Blockchain)
     }
 
 
@@ -205,7 +201,7 @@ class NodeExpress{
                 req.params[k] = decodeURIComponent(req.params[k]);
 
             let merged = req.body ? Object.assign(req.params, req.body) : req.params;
-            
+
             let answer = await callback(merged, res);
             res.json(answer);
 
