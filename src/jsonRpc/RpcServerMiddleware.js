@@ -1,17 +1,27 @@
-import * as jayson from 'jayson/promise';
-import RpcMethodManager from "./RpcMethodManager";
+import RpcMethodManager from './RpcMethodManager';
+const jayson = require('jayson/promise');
 
 class RpcServerMiddleware
 {
+    /**
+     * @param {RpcMethodManager} oMethodManager
+     */
     constructor(oMethodManager) {
-        this._isInitialized = false;
+        this._oMiddleware = null;
         this.setMethodManager(oMethodManager);
     }
 
+    /**
+     * @return {RpcMethodManager}
+     */
     getMethodManager() {
         return this._oMethodManager;
     }
 
+    /**
+     * @param {RpcMethodManager} oMethodManager
+     * @throws Error
+     */
     setMethodManager(oMethodManager) {
         if (!(oMethodManager instanceof RpcMethodManager))
         {
@@ -21,10 +31,14 @@ class RpcServerMiddleware
         this._oMethodManager = oMethodManager;
     }
 
+    /**
+     * @param {boolean} bServerIsSecured
+     * @return {Middleware}
+     */
     getMiddleware(bServerIsSecured) {
-        if (this._isInitialized)
+        if (this._oMiddleware !== null)
         {
-            return;
+            return this._oMiddleware;
         }
 
         const oServer = jayson.server();
@@ -54,9 +68,7 @@ class RpcServerMiddleware
             }));
         }
 
-        this._isInitialized = true;
-
-        return oServer.middleware();
+        return this._oMiddleware = oServer.middleware();
     }
 }
 

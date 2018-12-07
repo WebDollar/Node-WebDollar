@@ -1,7 +1,7 @@
 import BlockFinder from './BlockFinder';
 import BlockTransformer from './BlockTransformer'
 import TransactionTransformer from './TransactionTransformer';
-import Blockchain from '../../../main-blockchain/Blockchain';
+import Blockchain from './../../../main-blockchain/Blockchain';
 import BlockDataHardForksProcessor from './BlockDataHardForksProcessor'
 import AddressBalanceProvider from './AddressBalanceProvider';
 

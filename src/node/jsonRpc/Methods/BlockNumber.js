@@ -10,8 +10,7 @@ class BlockNumber extends RpcMethod
         this._oBlockchain = oBlockchain;
     }
 
-
-    getHandler() {
+    getHandler(args) {
         return this._oBlockchain.blocks.last.height;
     }
 }

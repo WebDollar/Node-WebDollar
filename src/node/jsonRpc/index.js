@@ -4,9 +4,9 @@ import * as basicAuth       from 'express-basic-auth';
 import * as rateLimit       from 'express-rate-limit';
 import {json as jsonParser} from 'body-parser';
 import {defaults, omit, omitBy, isUndefined}   from 'lodash';
-import Logger               from '../../common/utils/logging/Logger';
+import Logger               from './../../common/utils/logging/Logger';
 
-import {RpcMethodManager, fRpcServerMiddleware} from '../../jsonRpc';
+import {RpcMethodManager, fRpcServerMiddleware} from './../../jsonRpc';
 import * as oMethods from './Methods';
 
 const oLogger           = new Logger('JSON RPC Server');

@@ -10,6 +10,7 @@ const fRpcServerMiddleware = (oRpcMethodManager, bServerIsSecured) => {
 export {
     fRpcServerMiddleware,
     authenticatedMethod,
+    RpcServerMiddleware,
     RpcMethod,
     RpcMethodManager
 };

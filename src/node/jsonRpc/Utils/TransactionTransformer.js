@@ -1,7 +1,7 @@
-import BlockchainGenesis from "../../../common/blockchain/global/Blockchain-Genesis";
-import WebDollarCoins from "../../../common/utils/coins/WebDollar-Coins";
-import BufferExtended from "../../../common/utils/BufferExtended";
-import InterfaceBlockchainAddressHelper from "../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import BlockchainGenesis from './../../../common/blockchain/global/Blockchain-Genesis';
+import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
+import BufferExtended from './../../../common/utils/BufferExtended';
+import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 class TransactionTransformer
 {
