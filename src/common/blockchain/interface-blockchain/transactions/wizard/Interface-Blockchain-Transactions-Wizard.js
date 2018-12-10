@@ -191,7 +191,10 @@ class InterfaceBlockchainTransactionsWizard{
 
         try{
 
-            this.transactions.pendingQueue.includePendingTransaction(transaction);
+            if (this.transactions.pendingQueue.includePendingTransaction(transaction) === false)
+            {
+                throw new Error('Error including transaction in PendingQueue');
+            }
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception);

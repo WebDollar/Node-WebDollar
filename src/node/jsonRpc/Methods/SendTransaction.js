@@ -44,14 +44,21 @@ class SendTransaction extends RpcMethod
             throw new Error('Fee is invalid. Only numerical values greater than 0 are supported.');
         }
 
-        let oTransaction = await this._oTransactionsManager.wizard.createTransactionSimple( fromAddress, toAddress, value, fee, undefined, password);
-
-        if (!oTransaction.result)
+        try
         {
-            throw new Error('Transaction not accepted. ' + oTransaction.message);
-        }
+            const aResponse = await this._oTransactionsManager.wizard.createTransactionSimple( fromAddress, toAddress, value, fee, undefined, password);
 
-        return oTransaction._computeTxId();
+            if (!aResponse.result)
+            {
+                throw new Error(aResponse.message);
+            }
+
+            return aResponse.transaction._computeTxId().toString('hex');
+        }
+        catch (e)
+        {
+            throw new Error('Transaction not accepted. ' + e.message);
+        }
     }
 }
 

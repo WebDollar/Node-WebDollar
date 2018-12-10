@@ -10,6 +10,8 @@ import BlockNumber                         from './BlockNumber';
 import GetBalance                          from './GetBalance';
 import GetBlockByHash                      from './GetBlockByHash';
 import GetBlockByNumber                    from './GetBlockByNumber';
+import GetBlocksByNumbers                  from './GetBlocksByNumbers';
+import GetBlocksByRange                    from './GetBlocksByRange';
 import GetBlockTransactionCountByHash      from './GetBlockTransactionCountByHash';
 import GetBlockTransactionCountByNumber    from './GetBlockTransactionCountByNumber';
 import GetTransactionByBlockHashAndIndex   from './GetTransactionByBlockHashAndIndex';
@@ -28,6 +30,8 @@ const oBlockNumber                         = new BlockNumber('blockNumber', Bloc
 const oGetBalance                          = new GetBalance('getBalance', oAddressBalanceProvider);
 const oGetBlockByHash                      = new GetBlockByHash('getBlockByHash', oBlockFinder, oBlockTransformer);
 const oGetBlockByNumber                    = new GetBlockByNumber('getBlockByNumber', oBlockFinder, oBlockTransformer);
+const oGetBlocksByNumbers                  = new GetBlocksByNumbers('getBlocksByNumbers', oBlockFinder, oBlockTransformer);
+const oGetBlocksByRange                    = new GetBlocksByRange('getBlocksByRange', oBlockFinder, oBlockTransformer);
 const oGetBlockTransactionCountByHash      = new GetBlockTransactionCountByHash('getBlockTransactionCountByHash');
 const oGetBlockTransactionCountByNumber    = new GetBlockTransactionCountByNumber('getBlockTransactionCountByNumber', oBlockFinder, Blockchain.Transactions.pendingQueue);
 const oGetTransactionByBlockHashAndIndex   = new GetTransactionByBlockHashAndIndex('getTransactionByBlockHashAndIndex');
@@ -47,6 +51,8 @@ export {
     oBlockNumber,
     oGetBlockByHash,
     oGetBlockByNumber,
+    oGetBlocksByNumbers,
+    oGetBlocksByRange,
     oGetBlockTransactionCountByHash,
     oGetBlockTransactionCountByNumber,
     oGetTransactionByBlockHashAndIndex,
