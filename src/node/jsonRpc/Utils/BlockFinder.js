@@ -104,7 +104,7 @@ class BlockFinder
 
         for (let i in aNumbers)
         {
-            aBlocks.push(this.findByNumberOrTag(aNumbers[i]);
+            aBlocks.push(this.findByNumberOrTag(aNumbers[i]));
         }
 
         return aBlocks;
