@@ -227,6 +227,7 @@ class BlockDataHardForksProcessor
         };
 
         let i = 0;
+
         for (let sAddress in HARD_FORK_INFO.ADDRESS_BALANCE_REDUCTION)
         {
             aTransaction.from.trxs.push({

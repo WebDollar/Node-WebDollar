@@ -41,7 +41,7 @@ const oGetTransactionCount                 = new GetTransactionCount('getTransac
 const oNetworkHashRate                     = new NetworkHashRate('networkHashRate', Blockchain.blockchain);
 const oPeerCount                           = new PeerCount('peerCount', NodesList);
 const oProtocolVersion                     = new ProtocolVersion('protocolVersion');
-const oSendRawTransaction                  = new SendRawTransaction('sendRawTransaction');
+const oSendRawTransaction                  = new SendRawTransaction('sendRawTransaction', Blockchain.Transactions);
 const oSendTransaction                     = new SendTransaction('sendTransaction', Blockchain.Transactions);
 const oSyncing                             = new Syncing('syncing', Blockchain.blockchain);
 

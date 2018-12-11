@@ -21,7 +21,7 @@
     "show_coverage": "node src/tests/browser/show-coverage.test.js",
     "build_terminal_worker": "webpack --config build_webpack/webpack.terminal-worker.config.js",
     "commands": "npm run build_terminal_menu && npm run build_terminal_worker && node --max_old_space_size=6144 dist_bundle/terminal-menu-bundle.js",
-    "json_rpc_test": "mocha-webpack --webpack-config=tests/webpack.config.js src/node/jsonRpc/tests/ src/jsonRpc/tests/"
+    "json_rpc_test": "mocha-webpack --webpack-config=tests/webpack.config.js src/node/jsonRpc/tests/** src/jsonRpc/tests/**"
   },
   "repository": {
     "type": "git",

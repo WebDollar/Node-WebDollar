@@ -21,27 +21,27 @@ class BlockFinder
 
         if (isInteger(mBlockNumber) === false)
         {
-            throw new Error('Invalid block number');
+            throw new Error('Invalid Block');
         }
 
         if (mBlockNumber < this._oBlockchain.blocksStartingPoint)
         {
-            throw new Error('Invalid block number');
+            throw new Error('Invalid Block');
         }
 
-        if (mBlockNumber > this._oBlockchain.blocks.length)
-        {
-            throw new Error('Block not found.');
-        }
-
-        try
-        {
-            return this._oBlockchain.blocks[mBlockNumber];
-        }
-        catch (exception)
+        if (mBlockNumber > this._oBlockchain.blocks.last.height)
         {
             throw new Error('Invalid Block');
         }
+
+        const oBlock = this._oBlockchain.blocks[mBlockNumber];
+
+        if (typeof oBlock === 'undefined')
+        {
+            throw new Error('Invalid Block');
+        }
+
+        return oBlock;
     }
 
     findByRange(mStartingNumber, mEndingNumber) {
