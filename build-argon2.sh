@@ -186,6 +186,10 @@ fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib64/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi fi
 
 ### CUDA_INSTALLER_START
+read -r -e -p "$showinput Do you want to install CUDA drivers? y or n: " install_cuda_yn
+
+if [[ $install_cuda_yn == y ]]; then
+
 if [[ -a "/usr/local/build-argon2-cuda-install" ]]; then
 	echo "$showinfo CUDA was already installed..."
 else
@@ -303,6 +307,20 @@ fi
 ### CUDA_CHECK_FILE
 fi
 ### CUDA_INSTALLER_END
+elif [[ $install_cuda_yn == n ]]; then
+
+	echo "$showok Skipping CUDA install..."
+
+elif [[ $install_cuda_yn == "" ]]; then
+
+	echo "$showerror Empty space is not an option..." && deps
+
+elif [[ $install_cuda_yn == * ]]; then
+
+	echo "$showerror Possible options are: y or n." && deps
+fi # skip CUDA install function END
+
+
 elif [[ $is_Linux == MINGW ]]; then
 	echo "$showwarning Windows Detected..."
 
