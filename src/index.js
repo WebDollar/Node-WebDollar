@@ -26,6 +26,8 @@ module.exports =  exportObject;
     Export the WebDollar to Browser
  */
 
+let isBrowser = typeof global.window !== "undefined";
+
 //browser minimized script
 if ( typeof global.window !== 'undefined')
     global.window.WebDollar = exportObject;
@@ -33,7 +35,8 @@ if ( typeof global.window !== 'undefined')
 if ( typeof window !== 'undefined')
     window.WebDollar = exportObject;
 
-if ( process && !process.env.BROWSER && process.env.COLLECT_STATS === true ){
+if ( !isBrowser && process && !process.env.BROWSER && process.env.COLLECT_STATS === true ){
+
     var Raven = require('raven');
 
     Raven.config('https://8297738fd29f41af94f624cbc4d353bc@sentry.io/1283203', {
