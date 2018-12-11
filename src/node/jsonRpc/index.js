@@ -1,4 +1,4 @@
-import * as express         from 'express'
+import * as express         from 'express';
 import * as cors            from 'cors';
 import * as basicAuth       from 'express-basic-auth';
 import * as rateLimit       from 'express-rate-limit';
@@ -24,12 +24,12 @@ const JsonRpcServer = (oConfig) => {
     const app = express();
     app.use(cors({methods: ['POST']}));
 
-    if (typeof oConfig['basicAuth'] !== "undefined" && oConfig.basicAuth.isEnabled)
+    if (typeof oConfig['basicAuth'] !== 'undefined' && oConfig.basicAuth.isEnabled)
     {
-        app.use(basicAuth(omit(oConfig.basicAuth, ['isEnabled'])))
+        app.use(basicAuth(omit(oConfig.basicAuth, ['isEnabled'])));
     }
 
-    if (typeof oConfig['rateLimit'] !== "undefined" && oConfig.rateLimit.isEnabled)
+    if (typeof oConfig['rateLimit'] !== 'undefined' && oConfig.rateLimit.isEnabled)
     {
         app.use(rateLimit(omit(oConfig.rateLimit, ['isEnabled'])));
     }
@@ -53,4 +53,4 @@ const JsonRpcServer = (oConfig) => {
 export {
     JsonRpcServer,
     oRpcMethodManager
-}
+};

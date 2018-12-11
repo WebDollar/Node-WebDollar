@@ -55,7 +55,7 @@ class RpcServerMiddleware
 
                         try
                         {
-                            resolve(oMethod.getHandler(args))
+                            resolve(oMethod.getHandler(args));
                         }
                         catch (e)
                         {

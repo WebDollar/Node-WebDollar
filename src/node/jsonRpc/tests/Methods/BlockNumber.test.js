@@ -1,9 +1,9 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
 import BlockNumber from './../../Methods/BlockNumber';
 import Blockchain from './../../../../main-blockchain/Blockchain';
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
 
 describe('BlockNumberTest', () => {
     const oBlockchain = Blockchain.blockchain;

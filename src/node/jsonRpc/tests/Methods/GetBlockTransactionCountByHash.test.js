@@ -1,8 +1,8 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
-import GetBlockTransactionCountByHash from "../../Methods/GetBlockTransactionCountByHash";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
+import GetBlockTransactionCountByHash from '../../Methods/GetBlockTransactionCountByHash';
 
 describe('GetBlockTransactionCountByHashTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

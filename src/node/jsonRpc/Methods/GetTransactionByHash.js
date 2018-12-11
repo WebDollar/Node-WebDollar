@@ -1,4 +1,4 @@
-import {RpcMethod} from './../../../jsonRpc'
+import {RpcMethod} from './../../../jsonRpc';
 
 /**
  * The information about a transaction requested by transaction hash.

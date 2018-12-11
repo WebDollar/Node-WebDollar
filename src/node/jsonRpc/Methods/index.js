@@ -65,4 +65,4 @@ export {
     oSendRawTransaction,
     oSendTransaction,
     oSyncing,
-}
+};

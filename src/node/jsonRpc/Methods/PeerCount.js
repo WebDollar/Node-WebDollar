@@ -1,5 +1,5 @@
 import {RpcMethod} from './../../../jsonRpc';
-import CONNECTIONS_TYPE from './../../../node/lists/types/Connection-Type'
+import CONNECTIONS_TYPE from './../../../node/lists/types/Connection-Type';
 
 /**
  * The current number of peers connected to the client.

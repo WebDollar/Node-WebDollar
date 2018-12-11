@@ -1,5 +1,5 @@
 import {RpcMethod} from './../../../jsonRpc';
-import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
+import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 /**
  * The balance of the account of given address.

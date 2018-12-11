@@ -8,4 +8,4 @@ describe('authenticatedMethodTest', () => {
         assert.instanceOf(oRpcMethod, RpcMethod);
         assert.isOk(oRpcMethod.isPrivate());
     });
-})
+});

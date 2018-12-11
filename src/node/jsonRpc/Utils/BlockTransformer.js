@@ -1,8 +1,8 @@
 import BlockchainGenesis from './../../../common/blockchain/global/Blockchain-Genesis';
 import Serialization from './../../../common/utils/Serialization';
-import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper'
-import BufferExtended from './../../../common/utils/BufferExtended'
-import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins'
+import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
+import BufferExtended from './../../../common/utils/BufferExtended';
+import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
 
 class BlockTransformer
 {

@@ -46,7 +46,7 @@ describe('RpcMethodManagerTest', () => {
     it('RpcMethodManager::removeMethod should throw exception if argument is not an instance of RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();
         expect(() => {return oRpcMethodManager.removeMethod('invalid');}).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
-    })
+    });
 
     it('RpcMethodManager::removeMethod should remove exactly one RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();

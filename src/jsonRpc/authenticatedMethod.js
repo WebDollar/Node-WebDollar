@@ -4,7 +4,7 @@ const authenticatedMethod = function (Method) {
         oMethod.setOption('isPrivate', true);
 
         return oMethod;
-    }
+    };
 };
 
 export default authenticatedMethod;

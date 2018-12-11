@@ -7,7 +7,7 @@ import consts from './../../../consts/const_global';
 class ProtocolVersion extends RpcMethod
 {
     constructor(name) {
-        super(name)
+        super(name);
     }
 
     getHandler(args) {

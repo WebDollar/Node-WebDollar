@@ -70,7 +70,7 @@ class RpcMethod
     /**
      * @return {boolean}
      */
-    isPrivate() {
+    isPrivate() {x
         const bIsPrivate = this.getOption('isPrivate');
 
         if (bIsPrivate !== null && isBoolean(bIsPrivate))

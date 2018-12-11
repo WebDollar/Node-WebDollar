@@ -1,8 +1,8 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
-import GetTransactionByBlockNumberAndIndex from "../../Methods/GetTransactionByBlockNumberAndIndex";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
+import GetTransactionByBlockNumberAndIndex from '../../Methods/GetTransactionByBlockNumberAndIndex';
 
 describe('GetTransactionByBlockNumberAndIndexTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

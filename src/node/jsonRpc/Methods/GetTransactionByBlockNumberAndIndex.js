@@ -29,7 +29,7 @@ class GetTransactionByBlockNumberAndIndex extends RpcMethod
 
         if (args[0] === 'pending')
         {
-            if (typeof this._oTransactionsPendingQueue.list[nTransactionIndex] === "undefined")
+            if (typeof this._oTransactionsPendingQueue.list[nTransactionIndex] === 'undefined')
             {
                 return null;
             }

@@ -10,7 +10,7 @@ class TransactionTransformer
         const nOutputSum = oTransaction.to.calculateOutputSum();
 
         let aTransaction = {
-            trx_id         : oTransaction.txId.toString("hex"),
+            trx_id         : oTransaction.txId.toString('hex'),
             version        : oTransaction.version,
             nonce          : oTransaction.nonce,
             index          : i,
@@ -45,8 +45,8 @@ class TransactionTransformer
         oTransaction.from.addresses.forEach((oAddress) => {
             aTransaction.from.trxs.push({
                 trx_from_address   : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oAddress.unencodedAddress)),
-                trx_from_pub_key   : oAddress.publicKey.toString("hex"),
-                trx_from_signature : oAddress.signature.toString("hex"),
+                trx_from_pub_key   : oAddress.publicKey.toString('hex'),
+                trx_from_signature : oAddress.signature.toString('hex'),
                 trx_from_amount    : oAddress.amount / WebDollarCoins.WEBD,
                 trx_from_amount_raw: oAddress.amount
             });

@@ -1,8 +1,8 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
-import NetworkHashRate from "../../Methods/NetworkHashRate";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
+import NetworkHashRate from '../../Methods/NetworkHashRate';
 
 describe('NetworkHashRateTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

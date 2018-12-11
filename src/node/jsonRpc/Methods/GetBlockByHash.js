@@ -1,5 +1,5 @@
 import {RpcMethod} from './../../../jsonRpc';
-import {defaults} from "lodash";
+import {defaults} from 'lodash';
 
 /**
  * The information about a block by hash.

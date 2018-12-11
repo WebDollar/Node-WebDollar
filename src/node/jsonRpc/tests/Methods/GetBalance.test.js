@@ -1,8 +1,8 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
-import GetBalance from "../../Methods/GetBalance";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
+import GetBalance from '../../Methods/GetBalance';
 
 describe('GetBalanceTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

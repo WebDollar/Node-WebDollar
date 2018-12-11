@@ -17,13 +17,13 @@ class Syncing extends RpcMethod
         let nSecondsBehind = 0;
         let lastBlock      = this._oBlockchain.blocks.last;
 
-        if (!(typeof lastBlock === "undefined" || lastBlock === null))
+        if (!(typeof lastBlock === 'undefined' || lastBlock === null))
         {
             const currentTimestamp = new Date().getTime();
             const oDate            = new Date((lastBlock.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
             const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
 
-            nSecondsBehind   = currentTimestamp - oDate.getTime();
+            nSecondsBehind = currentTimestamp - oDate.getTime();
 
             if (nSecondsBehind < UNSYNC_THRESHOLD)
             {
@@ -34,7 +34,7 @@ class Syncing extends RpcMethod
         return {
             currentBlock  : this._oBlockchain.blocks.length,
             isSynchronized: isSynchronized,
-            secondsBehind : nSecondsBehind,
+            secondsBehind : nSecondsBehind / 1000,
         };
     }
 }

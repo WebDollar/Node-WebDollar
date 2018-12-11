@@ -1,8 +1,8 @@
 import sinon from 'sinon';
-import { expect, assert } from 'chai';
+import { assert } from 'chai';
 
-import RpcMethod from "../../../../jsonRpc/RpcMethod";
-import ProtocolVersion from "../../Methods/ProtocolVersion";
+import RpcMethod from '../../../../jsonRpc/RpcMethod';
+import ProtocolVersion from '../../Methods/ProtocolVersion';
 
 describe('ProtocolVersionTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

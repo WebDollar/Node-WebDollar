@@ -6,7 +6,7 @@ import {RpcMethod} from './../../../jsonRpc';
 class GetBlockTransactionCountByHash extends RpcMethod
 {
     constructor(name) {
-        super(name)
+        super(name);
     }
 
     getHandler(args) {
