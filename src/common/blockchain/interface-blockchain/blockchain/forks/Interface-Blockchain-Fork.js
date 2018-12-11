@@ -276,11 +276,24 @@ class InterfaceBlockchainFork {
         return this.blockchain.getHashPrev(height) // the blockchain
     }
 
+    getForkChainPrevHash(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (height === 0) return BlockchainGenesis.hashPrev;
+
+        if ( forkHeight === 0) return this.blockchain.getChainPrevHash(height);
+        if (forkHeight > 0) return this.forkBlocks[forkHeight - 1].blockChainPrevHash;
+
+        return this.blockchain.getChainPrevHash(height);
+
+    }
+
     _createBlockValidation_ForkValidation(height, forkHeight){
 
         let validationType = {};
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -290,7 +303,7 @@ class InterfaceBlockchainFork {
         if (height !== this.forkChainLength-1)
             validationType["skip-calculating-proofs"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
     }
 
     sleep(ms) {

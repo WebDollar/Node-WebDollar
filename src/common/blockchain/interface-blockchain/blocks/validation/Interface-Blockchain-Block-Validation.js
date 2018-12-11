@@ -2,7 +2,7 @@ import BlockchainDifficulty from "common/blockchain/global/difficulty/Blockchain
 
 class InterfaceBlockchainBlockValidation {
 
-    constructor(getBlockCallBack, getDifficultyCallback, getTimeStampCallback, getHashPrevCallback, blockValidationType){
+    constructor(getBlockCallBack, getDifficultyCallback, getTimeStampCallback, getHashPrevCallback, getChainPrevHashCallback, blockValidationType){
 
         if (blockValidationType === undefined || blockValidationType === null)
             blockValidationType = {};
@@ -11,6 +11,7 @@ class InterfaceBlockchainBlockValidation {
         this.getDifficultyCallback = getDifficultyCallback;
         this.getTimeStampCallback = getTimeStampCallback;
         this.getHashPrevCallback = getHashPrevCallback;
+        this.getChainPrevHash = getChainPrevHashCallback;
 
         this.blockValidationType = blockValidationType;
     }
@@ -21,6 +22,7 @@ class InterfaceBlockchainBlockValidation {
         this.getDifficultyCallback = undefined;
         this.getTimeStampCallback = undefined;
         this.getHashPrevCallback = undefined;
+        this.getChainPrevHash = undefined;
 
         this.blockValidationType = undefined;
 

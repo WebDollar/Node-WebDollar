@@ -28,7 +28,7 @@ class MiniBlockchainFork extends inheritFork{
             "skip-validation-transactions-from-values": true //can not validate the transactions
         };
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
     }
 
     preForkClone(cloneBlocks=true, cloneAccountantTree=true){

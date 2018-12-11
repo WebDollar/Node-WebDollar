@@ -260,7 +260,8 @@ class InterfaceBlockchainBlock {
             requestHeader = false;
 
         return Buffer.concat ( [
-                                  Serialization.serializeNumber2Bytes( this.version),
+
+                                  Serialization.serializeNumber2Bytes( this.version ),
                                   Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
                                   Serialization.serializeNumber4Bytes( this.timeStamp ),
                                   (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChainPrev ) : new Buffer(0),
@@ -557,6 +558,17 @@ class InterfaceBlockchainBlock {
 
     get blockHash(){
         return this.hash;
+    }
+
+    get blockChainPrevHash(){
+
+        if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+            return this.hashPrev;
+        }
+        else {
+            return this.hashChainPrev;
+        }
+
     }
 
 }

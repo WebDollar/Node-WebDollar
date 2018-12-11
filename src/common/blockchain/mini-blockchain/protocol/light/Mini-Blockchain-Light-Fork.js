@@ -18,6 +18,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
         this.forkPrevChainWork = null;
+        this.forkPrevChainWorkPrevHash = null;
 
         this.forkDifficultyCalculation = {
             difficultyAdditionalBlocks: [],
@@ -74,6 +75,19 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         }
 
         return MiniBlockchainFork.prototype.getForkPrevHash.call(this, height);
+    }
+
+    getForkChainPrevHash(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
+            if (this.forkPrevChainWorkPrevHash === null || this.forkPrevChainWorkPrevHash === undefined)
+                throw {message: "forkChainHashPrev was not specified"};
+            return this.forkPrevChainWorkPrevHash;
+        }
+
+        return MiniBlockchainFork.prototype.getForkChainPrevHash.call(this, height);
     }
 
     _createBlockValidation_ForkValidation(height, forkHeight){
