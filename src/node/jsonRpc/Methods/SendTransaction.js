@@ -6,16 +6,24 @@ import {isObject, isString, isNumber} from 'lodash';
  */
 class SendTransaction extends RpcMethod
 {
-    constructor(name, oTransactionsManager) {
+    constructor(name, oTransactionsManager, oSyncing) {
         super(name);
 
         this._oTransactionsManager = oTransactionsManager;
+        this._oSyncing             = oSyncing;
     }
 
     async getHandler(args) {
         if (args.length !== 1 || isObject(args[0]) === false)
         {
             throw new Error('Params must contain exactly one entry and that entry must be an object');
+        }
+
+        const oSyncingStatus = this._oSyncing.getHandler();
+
+        if (oSyncingStatus.isSynchronized === false)
+        {
+            throw new Error('Cannot send transaction while node is not in sync');
         }
 
         const fromAddress = args[0]['from'];

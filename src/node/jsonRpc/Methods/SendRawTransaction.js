@@ -6,16 +6,24 @@ import atob from 'atob';
  */
 class SendRawTransaction extends RpcMethod
 {
-    constructor(name, oTransactionsManager) {
+    constructor(name, oTransactionsManager, oSyncing) {
         super(name);
 
         this._oTransactionsManager = oTransactionsManager;
+        this._oSyncing             = oSyncing;
     }
 
     async getHandler(args) {
         if (args.length !== 1)
         {
             throw new Error('Params must contain exactly one entry');
+        }
+
+        const oSyncingStatus = this._oSyncing.getHandler();
+
+        if (oSyncingStatus.isSynchronized === false)
+        {
+            throw new Error('Cannot send transaction while node is not in sync');
         }
 
         //@TODO Check if this is the correct way of propagating a raw transaction

@@ -55,11 +55,11 @@ class RpcServerMiddleware
 
                         try
                         {
-                            resolve(oMethod.getHandler(args));
+                            return resolve(oMethod.getHandler(args));
                         }
                         catch (e)
                         {
-                            reject(oServer.error(null, null, {details: e.message || null}));
+                            return reject(oServer.error(null, null, {details: e.message || null}));
                         }
                     });
                 },
