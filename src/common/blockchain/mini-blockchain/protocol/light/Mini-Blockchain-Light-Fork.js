@@ -108,7 +108,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             validationType["skip-validation-interlinks"] = true;
 
 
-        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -127,7 +127,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if ( forkHeight === 0)
             validationType["skip-interlinks-update"] = true;
 
-        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
     }
 
     preForkClone(){
