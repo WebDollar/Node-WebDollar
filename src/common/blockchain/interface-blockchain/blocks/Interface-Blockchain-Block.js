@@ -165,7 +165,15 @@ class InterfaceBlockchainBlock {
             //validate hashChainPrev
             if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
-                let previousChainPrev = this.blockValidation.getHashBlockPrev(this.height);
+                let previousBlockHash = this.blockValidation.getChainHashPrev(this.height);
+                if ( previousBlockHash === null || !Buffer.isBuffer(previousBlockHash))
+                    throw {message: 'previous chain hash is not given'};
+
+                if (! BufferExtended.safeCompare(previousBlockHash, this.blockHash))
+                    throw {message: "block previousBlockHash doesn't match ", prevBlockHash: previousBlockHash.toString("hex"), hashChainPrev: this.hashChainPrev.toString("hex")};
+
+
+                let previousChainPrev = this.blockValidation.getChainHashPrev(this.height);
                 if ( previousChainPrev === null || !Buffer.isBuffer(previousChainPrev))
                     throw {message: 'previous chain hash is not given'};
 

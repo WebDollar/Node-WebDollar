@@ -282,10 +282,10 @@ class InterfaceBlockchainFork {
 
         if (height === 0) return BlockchainGenesis.hashPrev;
 
-        if ( forkHeight === 0) return this.blockchain.getChainPrevHash(height);
+        if ( forkHeight === 0) return this.blockchain.getChainHashPrevCallback(height);
         if (forkHeight > 0) return this.forkBlocks[forkHeight - 1].blockChainPrevHash;
 
-        return this.blockchain.getChainPrevHash(height);
+        return this.blockchain.getChainHashPrev(height);
 
     }
 
