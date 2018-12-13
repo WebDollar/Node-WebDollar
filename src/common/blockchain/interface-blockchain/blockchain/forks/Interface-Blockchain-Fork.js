@@ -276,16 +276,16 @@ class InterfaceBlockchainFork {
         return this.blockchain.getHashPrev(height) // the blockchain
     }
 
-    getForkChainPrevHash(height){
+    getForkChainHash(height){
 
         let forkHeight = height - this.forkStartingHeight;
 
         if (height === 0) return BlockchainGenesis.hashPrev;
 
-        if ( forkHeight === 0) return this.blockchain.getChainHashPrevCallback(height);
-        if (forkHeight > 0) return this.forkBlocks[forkHeight - 1].blockChainPrevHash;
+        if ( forkHeight === 0) return this.blockchain.getChainHashCallback(height);
+        if (forkHeight > 0) return this.forkBlocks[forkHeight - 1].blockChainHash;
 
-        return this.blockchain.getChainHashPrev(height);
+        return this.blockchain.getChainHash(height);
 
     }
 
@@ -293,7 +293,7 @@ class InterfaceBlockchainFork {
 
         let validationType = {};
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -303,7 +303,7 @@ class InterfaceBlockchainFork {
         if (height !== this.forkChainLength-1)
             validationType["skip-calculating-proofs"] = true;
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     sleep(ms) {

@@ -178,9 +178,9 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    async _validateBlockHash() {
+    async _validateHash() {
 
-        await inheritBlockchainBlock.prototype._validateBlockHash.call(this);
+        await inheritBlockchainBlock.prototype._validateHash.call(this);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 

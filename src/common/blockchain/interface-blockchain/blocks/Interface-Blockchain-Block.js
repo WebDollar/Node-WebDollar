@@ -131,7 +131,7 @@ class InterfaceBlockchainBlock {
         if (height !== this.height)
             throw {message: 'height is different', height: height, myHeight: this.height};
 
-        if ( ! (await this._validateBlockHash()) )
+        if ( ! (await this._validateHash()) )
             throw {message: "validateBlockchain returned false"};
 
         this._validateTargetDifficulty();
@@ -150,7 +150,7 @@ class InterfaceBlockchainBlock {
     /**
      * it will recheck the validity of the block
      */
-    async _validateBlockHash() {
+    async _validateHash() {
 
         if ( ! this.blockValidation.blockValidationType["skip-prev-hash-validation"] ){
 
@@ -165,15 +165,7 @@ class InterfaceBlockchainBlock {
             //validate hashChainPrev
             if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
-                let previousBlockHash = this.blockValidation.getChainHashPrev(this.height);
-                if ( previousBlockHash === null || !Buffer.isBuffer(previousBlockHash))
-                    throw {message: 'previous chain hash is not given'};
-
-                if (! BufferExtended.safeCompare(previousBlockHash, this.blockHash))
-                    throw {message: "block previousBlockHash doesn't match ", prevBlockHash: previousBlockHash.toString("hex"), hashChainPrev: this.hashChainPrev.toString("hex")};
-
-
-                let previousChainPrev = this.blockValidation.getChainHashPrev(this.height);
+                let previousChainPrev = this.blockValidation.getChainHashCallback(this.height);
                 if ( previousChainPrev === null || !Buffer.isBuffer(previousChainPrev))
                     throw {message: 'previous chain hash is not given'};
 
@@ -568,7 +560,7 @@ class InterfaceBlockchainBlock {
         return this.hash;
     }
 
-    get blockChainPrevHash(){
+    get blockChainHash(){
 
         if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
             return this.hashPrev;

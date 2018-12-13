@@ -320,7 +320,7 @@ class PoolRewardsManagement{
 
         validationType["skip-validation-interlinks"] = true;
 
-        return new InterfaceBlockchainBlockValidation(  this._getServerBlock.bind(this), this._getServerDifficultyTarget.bind(this), this._getServerTimeStamp.bind(this), this._getServerPrevHash.bind(this), this._getServerChainPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(  this._getServerBlock.bind(this), this._getServerDifficultyTarget.bind(this), this._getServerTimeStamp.bind(this), this._getServerPrevHash.bind(this), this._getServerChainHash.bind(this), validationType );
 
     }
 
@@ -360,12 +360,12 @@ class PoolRewardsManagement{
 
     }
 
-    __getServerChainPrevHash(height){
+    __getServerChainHash(height){
 
         let forkHeight = height - this._serverBlockInfo.height;
 
-        if ( forkHeight === 0) return this._serverBlockInfo.chainHashPrev;
-        else return this._serverBlocks[forkHeight-1].chainHashPrev; // the fork
+        if ( forkHeight === 0) return this._serverBlockInfo.chainHash;
+        else return this._serverBlocks[forkHeight-1].chainHash; // the fork
 
     }
 
