@@ -256,6 +256,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             return this.blocks[height-1].hashChain;
         }
+
     }
 
 

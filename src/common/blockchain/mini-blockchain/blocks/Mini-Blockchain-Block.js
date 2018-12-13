@@ -253,7 +253,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
 
-    get calculateNewChainHash(){
+    calculateNewChainHash(){
 
         if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return WebDollarCrypto.SHA256( this._computeBlockHeaderPrefix( true ) );

@@ -165,12 +165,12 @@ class InterfaceBlockchainBlock {
             //validate hashChain
             if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
-                let previousChainPrev = this.blockValidation.getChainHashCallback(this.height);
-                if ( previousChainPrev === null || !Buffer.isBuffer(previousChainPrev))
+                let prevBlockChainNew = this.blockValidation.getBlockCallBack(this.height).calculateNewChainHash();
+                if ( prevBlockChainNew === null || !Buffer.isBuffer(prevBlockChainNew))
                     throw {message: 'previous chain hash is not given'};
 
-                if (! BufferExtended.safeCompare(previousChainPrev, this.hashChain))
-                    throw {message: "block prevChainHash doesn't match ", prevChainHash: previousChainPrev.toString("hex"), hashChain: this.hashChain.toString("hex")};
+                if (! BufferExtended.safeCompare(prevBlockChainNew, this.hashChain))
+                    throw {message: "block prevChainHash doesn't match ", prevChainHash: prevBlockChainNew.toString("hex"), hashChain: this.hashChain.toString("hex")};
 
             }
 
@@ -556,7 +556,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    get calculateNewChainHash(){
+    calculateNewChainHash(){
 
         if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
             return this.hash;
