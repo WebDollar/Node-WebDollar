@@ -142,7 +142,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     fork.pushHeader(answer.hash);
 
-                    if (this.blockchain.blocks[i].blockChainHash.equals(answer.hash)){
+                    if (this.blockchain.blocks[i].hashChain.equals(answer.hash)){
 
                         binarySearchResult = {
                             position: (i === currentBlockchainLength-1)  ? currentBlockchainLength :  i+1,
@@ -393,7 +393,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
                     await this.blockchain.sleep(15);
 
-                if (this.blockchain.blocks[block.height] !== undefined && block.blockChainHash.equals(this.blockchain.blocks[block.height].blockChainHash) )
+                if (this.blockchain.blocks[block.height] !== undefined && block.hashChain.equals(this.blockchain.blocks[block.height].hashChain ) )
                     throw {message: "You gave me a block which I already have have the same block"};
 
                 let result;

@@ -100,7 +100,7 @@ class InterfaceBlockchainBlockData {
      **/
     serializeData(onlyHeader = false){
 
-        if (!Buffer.isBuffer(this.hashData) || this.hashData.length !== 32)
+        if ( !Buffer.isBuffer(this.hashData) || this.hashData.length !== 32 )
             this.computeHashBlockData();
 
         return Buffer.concat( [

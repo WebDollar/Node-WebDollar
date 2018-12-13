@@ -14,7 +14,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
     let interlinkHash1 = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d70b5462806b92be0cbccd30cb", "hex");
     let interlinkHash2 = new Buffer("7bb3e84e1234c7e76be2beedb94a5678b7f095d50b5462806b92be0cbccd30cc", "hex");
     let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let hashChainPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
+    let hashChain = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
     let timeStamp = Math.trunc(Math.random() * 100000);
     let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;
@@ -29,7 +29,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
         
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), version, hash, hashPrev, hashChainPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.saveBlock();
@@ -67,7 +67,7 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 
         let interlink = [{height: h1, blockId: interlinkHash1}, {height: h2, blockId: interlinkHash2}];
         
-        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), version, hash, hashPrev, hashChainPrev, timeStamp, nonce, data, height, db );
+        block = new PPoWBlockchainBlock( Blockchain.blockchain, Blockchain.blockchain.createBlockValidation(), version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db );
         block.interlink = interlink;
         
         response = await block.saveBlock();

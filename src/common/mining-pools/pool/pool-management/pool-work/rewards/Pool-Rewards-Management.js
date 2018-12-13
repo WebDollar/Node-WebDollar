@@ -364,8 +364,8 @@ class PoolRewardsManagement{
 
         let forkHeight = height - this._serverBlockInfo.height;
 
-        if ( forkHeight === 0) return this._serverBlockInfo.chainHash;
-        else return this._serverBlocks[forkHeight-1].chainHash; // the fork
+        if ( forkHeight === 0) return this._serverBlockInfo.hashChain;
+        else return this._serverBlocks[forkHeight-1].hashChain; // the fork
 
     }
 

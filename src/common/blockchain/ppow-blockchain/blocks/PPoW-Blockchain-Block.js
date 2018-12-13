@@ -10,9 +10,9 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, timeStamp, nonce, data, height, db) {
+    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db) {
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
         this._level = undefined;
