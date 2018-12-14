@@ -18,6 +18,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         this.forkPrevTimeStamp = null;
         this.forkPrevHashPrev = null;
         this.forkPrevChainWork = null;
+        this.forkPrevChainWorkPrevHash = null;
 
         this.forkDifficultyCalculation = {
             difficultyAdditionalBlocks: [],
@@ -76,6 +77,19 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         return MiniBlockchainFork.prototype.getForkPrevHash.call(this, height);
     }
 
+    getForkChainHash(height){
+
+        let forkHeight = height - this.forkStartingHeight;
+
+        if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
+            if (this.forkPrevChainWorkPrevHash === null || this.forkPrevChainWorkPrevHash === undefined)
+                throw {message: "forkChainHash was not specified"};
+            return this.forkPrevChainWorkPrevHash;
+        }
+
+        return MiniBlockchainFork.prototype.getForkChainHash.call(this, height);
+    }
+
     _createBlockValidation_ForkValidation(height, forkHeight){
 
         let validationType = {
@@ -94,7 +108,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             validationType["skip-validation-interlinks"] = true;
 
 
-        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -113,7 +127,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if ( forkHeight === 0)
             validationType["skip-interlinks-update"] = true;
 
-        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     preForkClone(){

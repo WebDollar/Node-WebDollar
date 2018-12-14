@@ -147,14 +147,38 @@ class InterfaceBlockchainProtocol {
 
             });
 
-        if (this.acceptBlockHeaders)
+        if (this.acceptBlockHeaders) {
+
+            socket.node.on("head/chainHash", async (h) => {
+
+                try {
+
+                    // height
+                    await this.blockchain.sleep(15 + Math.random() * 20);
+
+                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
+                        socket.node.sendRequest("head/chainHash", null);
+                        return;
+                    }
+
+                    let block = this.blockchain.blocks[h];
+                    if (block === undefined) socket.node.sendRequest("head/chainHash", null);
+
+                    socket.node.sendRequest("head/chainHash/" + h, { hash: block.hashChain });
+
+                } catch (exception) {
+
+                }
+
+            });
+
             socket.node.on("head/hash", async (h) => {
 
                 try {
 
                     // height
 
-                    await this.blockchain.sleep(15+Math.random()*20);
+                    await this.blockchain.sleep(15 + Math.random() * 20);
 
                     if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
                         socket.node.sendRequest("head/hash", null);
@@ -164,13 +188,14 @@ class InterfaceBlockchainProtocol {
                     let block = this.blockchain.blocks[h];
                     if (block === undefined) socket.node.sendRequest("head/hash", null);
 
-                    socket.node.sendRequest("head/hash/" + h, {hash: block.blockHash});
+                    socket.node.sendRequest("head/hash/" + h, { hash: block.hash });
 
-                } catch (exception){
+                } catch (exception) {
 
                 }
 
             });
+        }
 
 
         if (this.acceptBlocks)

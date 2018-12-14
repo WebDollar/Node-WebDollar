@@ -15,7 +15,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
 
@@ -24,6 +24,8 @@ class InterfaceBlockchainBlock {
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
         this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
+
+        this.hashChain = hashChain||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
 
@@ -117,6 +119,7 @@ class InterfaceBlockchainBlock {
 
         if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw {message: 'hash is empty'};
         if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw {message: 'hashPrev is empty'};
+        if (this.hashChain === undefined || this.hashChain === null || !Buffer.isBuffer(this.hashChain) ) throw {message: 'hashChain is empty'};
 
         //timestamp must be on 4 bytes
         if (this.timeStamp < 0 || this.timeStamp >= 0xFFFFFFFF) throw {message: 'timeStamp is invalid'};
@@ -128,7 +131,7 @@ class InterfaceBlockchainBlock {
         if (height !== this.height)
             throw {message: 'height is different', height: height, myHeight: this.height};
 
-        if ( ! (await this._validateBlockHash()) )
+        if ( ! (await this._validateHash()) )
             throw {message: "validateBlockchain returned false"};
 
         this._validateTargetDifficulty();
@@ -147,7 +150,7 @@ class InterfaceBlockchainBlock {
     /**
      * it will recheck the validity of the block
      */
-    async _validateBlockHash() {
+    async _validateHash() {
 
         if ( ! this.blockValidation.blockValidationType["skip-prev-hash-validation"] ){
 
@@ -158,6 +161,20 @@ class InterfaceBlockchainBlock {
 
             if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
                 throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
+
+            //validate hashChain
+            if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+
+                let prevBlockChainNew = this.blockValidation.getBlockCallBack(this.height).calculateNewChainHash();
+                if ( prevBlockChainNew === null || !Buffer.isBuffer(prevBlockChainNew))
+                    throw {message: 'previous chain hash is not given'};
+
+                if (! BufferExtended.safeCompare(prevBlockChainNew, this.hashChain))
+                    throw {message: "block prevChainHash doesn't match ", prevChainHash: prevBlockChainNew.toString("hex"), hashChain: this.hashChain.toString("hex")};
+
+            }
+
+
         }
 
         //validate hash
@@ -224,6 +241,7 @@ class InterfaceBlockchainBlock {
             height: this.height,
             version: this.version,
             hashPrev: (this.hashPrev !== null ? this.hashPrev.toString("hex") : ''),
+            hashChain: (this.hashChain !== null ? this.hashChain.toString("hex") : ''),
             data: (this.data !== null ? this.data.toJSON() : ''),
             nonce: this.nonce,
             timeStamp: this.timeStamp,
@@ -242,9 +260,11 @@ class InterfaceBlockchainBlock {
             requestHeader = false;
 
         return Buffer.concat ( [
-                                  Serialization.serializeNumber2Bytes( this.version),
+
+                                  Serialization.serializeNumber2Bytes( this.version ),
                                   Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
                                   Serialization.serializeNumber4Bytes( this.timeStamp ),
+                                  (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChain ) : new Buffer(0),
                                   //data contains addressMiner, transactions history, contracts, etc
                                   this.data.serializeData(requestHeader),
 
@@ -285,6 +305,7 @@ class InterfaceBlockchainBlock {
             //return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
             throw exception;
         }
+
     }
 
 
@@ -373,9 +394,14 @@ class InterfaceBlockchainBlock {
             this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
-
             this.timeStamp = Serialization.deserializeNumber4Bytes( buffer, offset);
             offset += 4;
+
+            if (height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+                this.hashChain = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+                offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
+            } else
+                this.hashChain = this.hashPrev;
 
             offset = this.data.deserializeData(buffer, offset);
 
@@ -474,6 +500,7 @@ class InterfaceBlockchainBlock {
             height: this.height,
             hash: this.hash,
             hashPrev: this.hashPrev,
+            hashChain: this.hashChain,
             data: {
                 hashData: this.data.hashData,
             },
@@ -489,6 +516,7 @@ class InterfaceBlockchainBlock {
         this.height = json.height;
         this.hash = json.hash;
         this.hashPrev = json.hashPrev;
+        this.hashChain = json.hashChain;
         this.data.hashData = json.data.hashData;
         this.nonce = json.nonce;
 
@@ -528,8 +556,15 @@ class InterfaceBlockchainBlock {
 
     }
 
-    get blockHash(){
-        return this.hash;
+    calculateNewChainHash(){
+
+        if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+            return this.hash;
+        }
+        else {
+            return this.hash;
+        }
+
     }
 
 }

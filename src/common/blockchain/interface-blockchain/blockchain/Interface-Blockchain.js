@@ -206,14 +206,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             else if (height % 30 === 0 ) height = height - 10;  //first POS, get the last proof of Stake
             else if (height % 30 === 20 ) height = height - 20; //first POW, get the last proof of Work
 
-            /*
-
-            if (height % 30 === 29 && height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
-            else if (height % 30 === 29 ) height = height - 10;  //first POS, get the last proof of Stake
-            else if (height % 30 === 19 ) height = height - 20; //first POW, get the last proof of Work
-
-             */
-
         }
 
         if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
@@ -251,7 +243,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    getHashBlockPrev(height){
+    getChainHash(height){
 
         if (height === undefined) height = this.blocks.length;
 
@@ -259,11 +251,12 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             return BlockchainGenesis.hash;
         else {
 
-            if (height > this.blocks.length ) throw {message: "getHashBlockPrev invalid height", height: height}; else
-            if (this.blocks[height-1] === undefined) throw {message: "getHashBlockPrev invalid height", height: height};
+            if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height}; else
+            if (this.blocks[height-1] === undefined) throw {message: "getChainHash invalid height", height: height};
 
-            return this.blocks[height-1].blockHash;
+            return this.blocks[height-1].hashChain;
         }
+
     }
 
 
@@ -418,7 +411,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
-                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
+                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), validationType );
 
                     let block = await this._loadBlock(indexStart, index, blockValidation);
 
@@ -512,7 +505,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     createBlockValidation(){
 
-        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), {} );
 
     }
 

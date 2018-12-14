@@ -10,6 +10,7 @@ import Blockchain from "main-blockchain/Blockchain"
 
 import ed25519 from "common/crypto/ed25519";
 import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainBlock from "../../interface-blockchain/blocks/Interface-Blockchain-Block";
 const BigInteger = require('big-integer');
 
 let inheritBlockchainBlock;
@@ -20,9 +21,9 @@ else  inheritBlockchainBlock = InterfaceBlock;
 
 class MiniBlockchainBlock extends inheritBlockchainBlock {
 
-    constructor(blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
+    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
 
-        super(blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
@@ -177,9 +178,9 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    async _validateBlockHash() {
+    async _validateHash() {
 
-        await inheritBlockchainBlock.prototype._validateBlockHash.call(this);
+        await inheritBlockchainBlock.prototype._validateHash.call(this);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
@@ -250,11 +251,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             return inheritBlockchainBlock.prototype._deserializeBlock.call(this, buffer, offset);
     }
 
-    get blockHash(){
-        if (BlockchainGenesis.isPoSActivated(this.height))
-            return WebDollarCrypto.SHA256(this._computeBlockHeaderPrefix( true ));
+
+    calculateNewChainHash(){
+
+        if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
+            return WebDollarCrypto.SHA256( this._computeBlockHeaderPrefix( true ) );
         else
-            return this.hash;
+            return InterfaceBlockchainBlock.prototype.calculateNewChainHash.call(this);
+
     }
 
 }

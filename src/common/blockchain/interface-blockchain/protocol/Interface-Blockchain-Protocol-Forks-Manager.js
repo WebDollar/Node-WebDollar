@@ -80,7 +80,6 @@ class InterfaceBlockchainProtocolForksManager {
             }
 
             return false;
-            console.log("Error ForkTip 4");
 
         } catch (exception){
 
