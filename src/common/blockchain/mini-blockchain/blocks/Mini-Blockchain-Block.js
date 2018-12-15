@@ -254,8 +254,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     calculateNewChainHash(){
 
-        if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
-            return WebDollarCrypto.SHA256( this._computeBlockHeaderPrefix( true ) );
+        if ( BlockchainGenesis.isPoSActivated(this.height) )
+            return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this._calculateSerializedBlock( true ) ));
         else
             return InterfaceBlockchainBlock.prototype.calculateNewChainHash.call(this);
 

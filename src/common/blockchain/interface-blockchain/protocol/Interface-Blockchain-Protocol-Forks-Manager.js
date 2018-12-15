@@ -16,7 +16,7 @@ class InterfaceBlockchainProtocolForksManager {
     /*
         may the fork2 be with you Otto
     */
-    async newForkTip(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork){
+    async newForkTip(socket, forkChainLength, forkChainStartingPoint, forkLastBlockChainHash, forkProof, forkChainWork){
 
         try {
 
@@ -69,7 +69,7 @@ class InterfaceBlockchainProtocolForksManager {
                 throw {message: "forkChainWork is zero"};
 
 
-            let answer = await this.protocol.forkSolver.discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockHash, forkProof, forkChainWork );
+            let answer = await this.protocol.forkSolver.discoverFork(socket, forkChainLength, forkChainStartingPoint, forkLastBlockChainHash, forkProof, forkChainWork );
 
             if (answer.result){
 
