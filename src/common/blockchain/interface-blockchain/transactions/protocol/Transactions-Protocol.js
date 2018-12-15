@@ -1,3 +1,4 @@
+/* eslint-disable */
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import NodesList from 'node/lists/Nodes-List'
 import consts from 'consts/const_global'
@@ -109,7 +110,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         });
 
-        socket.node.on("transactions/new-pending-transaction-id", (data)=>{
+        socket.node.on("transactions/new-pending-transaction-id", async (data)=>{
 
             try{
 

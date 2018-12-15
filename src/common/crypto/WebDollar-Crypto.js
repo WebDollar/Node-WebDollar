@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Argon2 from 'common/crypto/Argon2/Argon2'
 let crypto = (process.env.BROWSER) ? require('crypto-browserify') : require('crypto');
 
@@ -72,7 +73,7 @@ class WebDollarCrypto {
     static bytesToHex(bytes){
 
         let result = '';
-        
+
         for (let i = 0; i < bytes.length; i++) {
             let hex = bytes[i].toString(16);
             result += (hex.length === 1 ? '0' : '') + hex ;
@@ -83,7 +84,7 @@ class WebDollarCrypto {
 
     static isHex(h) {
         let a = parseInt(h, 16);
-        
+
         return (a.toString(16) === h.toLowerCase());
     }
 
@@ -94,7 +95,7 @@ class WebDollarCrypto {
 
         return sha256.digest();
     }
-    
+
     static encryptAES(buffer, password){
 
         if (!Buffer.isBuffer(buffer))
@@ -110,7 +111,7 @@ class WebDollarCrypto {
             return null;
         }
     }
-    
+
     static decryptAES(buffer, password) {
 
         if (!Buffer.isBuffer(buffer))
@@ -123,6 +124,7 @@ class WebDollarCrypto {
             return Buffer.from(decrypt);
         }
         catch(exception){
+            console.log(exception);
             return null;
         }
     }

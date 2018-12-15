@@ -1,3 +1,4 @@
+/* eslint-disable */
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 import  Utils from "common/utils/helpers/Utils"
@@ -455,6 +456,36 @@ consts.TERMINAL_WORKERS = {
     CPU_MAX: -1, //for CPU-CPP use, 2x or even 3x threads
 };
 
+consts.JSON_RPC = {
+    serverConfig: {
+        host: process.env.JSON_RPC_SERVER_HOST || '127.0.0.1',
+        port: process.env.JSON_RPC_SERVER_PORT,
+    },
+
+    // @see express-basic-auth package for configuration (except isEnabled)
+    basicAuth: {
+        users    : {},
+        isEnabled: process.env.JSON_RPC_BASIC_AUTH_ENABLE
+    },
+
+    // @see express-rate-limit package for configuration (except isEnabled)
+    rateLimit: {
+        windowMs : process.env.JSON_RPC_RATE_LIMIT_WINDOW       || 60 * 1000, // 1 minute
+        max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
+        isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
+    }
+};
+
+if (typeof process.env.JSON_RPC_BASIC_AUTH_USER !== 'undefined' && typeof process.env.JSON_RPC_BASIC_AUTH_PASS !== 'undefined')
+{
+    consts.JSON_RPC.basicAuth.users[process.env.JSON_RPC_BASIC_AUTH_USER] = process.env.JSON_RPC_BASIC_AUTH_PASS;
+
+    if (typeof consts.JSON_RPC.basicAuth.isEnabled === 'undefined')
+    {
+        consts.JSON_RPC.basicAuth.isEnabled = true;
+    }
+}
+
 if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
@@ -489,4 +520,4 @@ if ( consts.DEBUG === true ){
 if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
     FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
 
-export default consts
+export default consts;

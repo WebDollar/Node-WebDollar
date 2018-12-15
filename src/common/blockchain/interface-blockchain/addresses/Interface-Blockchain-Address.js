@@ -1,3 +1,4 @@
+/* eslint-disable */
 import ed25519 from "common/crypto/ed25519";
 
 import AdvancedMessages from "node/menu/Advanced-Messages";
@@ -161,7 +162,7 @@ class InterfaceBlockchainAddress{
             if (password === null)
                 return null;
 
-        } else password = undefined;
+        }
 
         let privateKey = await this._getPrivateKey(password);
 

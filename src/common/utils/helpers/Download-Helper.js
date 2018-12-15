@@ -1,5 +1,6 @@
+/* eslint-disable */
 const axios = require('axios');
-import consts from 'consts/const_global'
+import consts from 'consts/const_global';
 
 class DownloadHelper{
 
@@ -28,6 +29,9 @@ class DownloadHelper{
                 responseType: 'json',
             });
 
+            // Socket IO reports local Ip`s prefixed with ::ffff:
+            address = address.replace('::ffff:', '');
+
             let response = await axiosInstance.get(address);
             if (response === null) return null;
 
@@ -52,7 +56,7 @@ class DownloadHelper{
         catch(exception){
 
             if (consts.DEBUG)
-                console.error("ERROR downloading list: ", address );
+                console.error("DownloadHelper::downloadFile ERROR downloading list: ", address );
 
             return null;
         }
