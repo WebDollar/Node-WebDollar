@@ -122,7 +122,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     if (i === forkChainLength-1 && forkLastChainHash !== undefined && forkLastChainHash !== undefined) {
                         answer = { hash: forkLastChainHash };
                     } else {
-                        answer = await socket.node.sendRequestWaitOnce( "head/hash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
+                        answer = await socket.node.sendRequestWaitOnce( "head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
                         if (answer === null || answer === undefined || answer.hash === undefined)
                             continue;
                     }
