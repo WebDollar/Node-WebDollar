@@ -1,10 +1,11 @@
+/* eslint-disable */
 const FileSystem = require('fs');
-
-let NodeExpress, NodeServer;
+import {JsonRpcServer} from './../jsonRpc';
+let NodeExpress;
 
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
-    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+    // NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 
@@ -176,6 +177,8 @@ class CLI {
 
         this._showCommands();
         AdvancedMessages.WEBD_CLI.prompt();
+
+        JsonRpcServer(consts.JSON_RPC);
 
         this._exitMenu = false;
         await this._runMenu();
@@ -441,7 +444,7 @@ class CLI {
     }
 
     async startMiningInsidePool(){
-        
+
         Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
 
         consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
