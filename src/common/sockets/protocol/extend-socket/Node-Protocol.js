@@ -186,7 +186,7 @@ class NodeProtocol {
 
         this.node.sendRequest("head/new-block", {
             l: Blockchain.blockchain.blocks.length,
-            h: Blockchain.blockchain.blocks.last.hash,
+            h: Blockchain.blockchain.blocks.last.chainHash,
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
             p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== undefined && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true, // i also have the proof
             W: Blockchain.blockchain.blocks.chainWorkSerialized, // chain work
