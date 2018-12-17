@@ -1,3 +1,4 @@
+/* eslint-disable */
 var assert = require('assert')
 
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'

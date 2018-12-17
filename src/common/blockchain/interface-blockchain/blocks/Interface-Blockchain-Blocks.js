@@ -1,34 +1,26 @@
-import consts from 'consts/const_global'
-import StatusEvents from "common/events/Status-Events"
+import const_global  from './../../../../consts/const_global';
+import StatusEvents  from './../../../events/Status-Events';
+import Serialization from './../../../utils/Serialization';
+import InterfaceBlockchainBlockTimestamp from './../blocks/Interface-Blockchain-Block-Timestamp';
+import NetworkHashRateCalculator         from '../../../../components/NetworkHashRateCalculator';
 
 const BigInteger = require('big-integer');
-const BigNumber = require('bignumber.js');
-
-import Serialization from "common/utils/Serialization";
-import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
-import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
  **/
+class InterfaceBlockchainBlocks {
 
-class InterfaceBlockchainBlocks{
+    constructor(blockchain) {
 
-    constructor(blockchain){
-
-        this.blockchain = blockchain;
-
-        this.blocksStartingPoint = 0;
-        this._length = 0;
-
-        this._networkHashRate = 0 ;
-
-        this._chainWork =  new BigInteger(0);
-
-
-        this.chainWorkSerialized = new Buffer(0);
-
-        this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
+        this.blockchain                  = blockchain;
+        this.blocksStartingPoint         = 0;
+        this._length                     = 0;
+        this._networkHashRate            = 0 ;
+        this._chainWork                  = new BigInteger(0);
+        this.chainWorkSerialized         = new Buffer(0);
+        this.timestampBlocks             = new InterfaceBlockchainBlockTimestamp(blockchain);
+        this._oNetworkHashRateCalculator = new NetworkHashRateCalculator(blockchain, const_global.BLOCKCHAIN.BLOCKS_MAX_TARGET, const_global.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS);
     }
 
     addBlock(block, revertActions, saveBlock, showUpdate = true){
@@ -36,83 +28,100 @@ class InterfaceBlockchainBlocks{
         this[this.length] =  block;
 
         this.length += 1;
+
         if (showUpdate)
+        {
             this.emitBlockCountChanged();
+        }
 
         if (saveBlock)
+        {
             this.emitBlockInserted(block);
+        }
 
         //delete old blocks when I am in light node
-        if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
+        if (typeof this.blockchain.agent !== 'undefined' && this.blockchain.agent.light)
+        {
+            let index = this.length - const_global.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
 
-            let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
-
-            while (this[index] !== undefined){
+            while (typeof this[index] !== 'undefined')
+            {
                 this[index].destroyBlock();
                 delete this[index];
-
                 index--;
             }
 
-            while (this.length > 0 && this[this.blocksStartingPoint] === undefined && this.blocksStartingPoint < this.length){
+            while (this.length > 0 && typeof this[this.blocksStartingPoint] === 'undefined' && this.blocksStartingPoint < this.length)
+            {
                 this.blocksStartingPoint++;
             }
-
         }
 
-        if ( revertActions !== undefined )
-            revertActions.push( {name: "block-added", height: this.length-1 } );
+        if (typeof revertActions !== 'undefined')
+        {
+            revertActions.push({
+                name: 'block-added',
+                height: this.length - 1
+            });
+        }
 
-        this.chainWork = this.chainWork.plus( block.workDone );
-
-
+        this.chainWork = this.chainWork.plus(block.workDone);
     }
 
-    emitBlockInserted(block){
-        StatusEvents.emit("blockchain/block-inserted", block !== undefined ? block : this[this._length-1]);
+    emitBlockInserted(block) {
+        StatusEvents.emit('blockchain/block-inserted', typeof block !== 'undefined' ? block : this[this._length-1]);
     }
 
-    emitBlockCountChanged(){
-        StatusEvents.emit("blockchain/blocks-count-changed", this._length);
+    emitBlockCountChanged() {
+        StatusEvents.emit('blockchain/blocks-count-changed', this._length);
     }
 
-    spliceBlocks(after, freeMemory = false, showUpdate = true){
+    spliceBlocks(after, freeMemory = false, showUpdate = true) {
 
         for (let i = this.length - 1; i >= after; i--)
-            if (this[i] !== undefined){
+        {
+            if (typeof this[i] !== 'undefined')
+            {
+                this.chainWork = this.chainWork.minus(this[i].workDone);
 
-                this.chainWork = this.chainWork.minus( this[i].workDone );
-
-                if (freeMemory) {
+                if (freeMemory)
+                {
                     this[i].destroyBlock();
                     delete this[i];
                 }
                 else
+                {
                     this[i] = undefined;
-
+                }
             }
+        }
 
         if (this.length === 0)
+        {
             this._chainWork =  new BigInteger(0);
+        }
 
         this.length = after;
 
         if (showUpdate)
+        {
             this.emitBlockCountChanged();
+        }
     }
 
-    clear(){
-
+    clear() {
         this.spliceBlocks(0, true);
-
     }
 
-    get endingPosition(){
-
+    get endingPosition() {
         if (this.blockchain.agent.light)
+        {
             return this.blockchain.blocks.length;
+        }
         else //full node
+        {
             return this.blockchain.blocks.length;
+        }
     }
 
     // aka head
@@ -122,69 +131,42 @@ class InterfaceBlockchainBlocks{
 
     // aka tail
     get first() {
-        return this[ this.blocksStartingPoint ];
+        return this[this.blocksStartingPoint];
     }
 
-    recalculateNetworkHashRate (){
+    recalculateNetworkHashRate() {
 
-        let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
-        let SumDiff = new BigNumber( 0 );
-
-        let last, first;
-        for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS); i<this.blockchain.blocks.endingPosition; i++) {
-
-            if (this.blockchain.blocks[i] === undefined) continue;
-
-            let diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
-            SumDiff = SumDiff.plus( diff );
-
-
-            if (!first) first = i;
-            last = i;
-
-        }
-
-        let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
-
-        let answer = SumDiff.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
-        answer = parseFloat(answer);
-
-        this.networkHashRate = answer;
-
-        return answer;
-
+        const fNetworkHashRate = this._oNetworkHashRateCalculator.calculate();
+        this.networkHashRate   = fNetworkHashRate;
+        return fNetworkHashRate;
     }
 
-    set networkHashRate(newValue){
-
+    set networkHashRate(newValue) {
         this._networkHashRate = newValue;
-        StatusEvents.emit("blockchain/new-network-hash-rate", this._networkHashRate );
+        StatusEvents.emit('blockchain/new-network-hash-rate', this._networkHashRate);
 
     }
 
-    get networkHashRate(){
+    get networkHashRate() {
         return this._networkHashRate;
     }
 
-    set length(newValue){
+    set length(newValue) {
         this._length = newValue;
     }
 
-    get length(){
+    get length() {
         return this._length;
     }
 
-    set chainWork(newValue){
-        this._chainWork = newValue;
+    set chainWork(newValue) {
+        this._chainWork          = newValue;
         this.chainWorkSerialized = Serialization.serializeBigInteger( newValue );
     }
 
-    get chainWork(){
+    get chainWork() {
         return this._chainWork;
     }
-
-
-
 }
 
 export default InterfaceBlockchainBlocks;

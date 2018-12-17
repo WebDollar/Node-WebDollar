@@ -1,3 +1,4 @@
+/* eslint-disable */
 var assert = require('assert')
 import Argon2 from 'common/crypto/Argon2/Argon2'
 import TestsHelper from 'tests/Tests.helper'

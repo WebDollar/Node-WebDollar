@@ -1,3 +1,4 @@
+/* eslint-disable */
 import Serialization from 'common/utils/Serialization';
 import TestsHelper from 'tests/Tests.helper'
 
