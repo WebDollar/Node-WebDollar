@@ -1,17 +1,18 @@
 import {RpcMethod} from './../../../jsonRpc';
-import consts from './../../../consts/const_global';
 
 /**
  * The current webdollar protocol version.
  */
 class ProtocolVersion extends RpcMethod
 {
-    constructor(name) {
+    constructor(name, version) {
         super(name);
+
+        this._sVersion = version;
     }
 
     getHandler(args) {
-        return consts.SETTINGS.NODE.VERSION;
+        return this._sVersion;
     }
 }
 
