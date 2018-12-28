@@ -48,7 +48,8 @@ export default {
         {"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd
         
-        {"addr": ["https://cryptocoingb.ddns.net:443"]}, // Thanks to CryptoCoinGB
+        {"addr": ["https://cryptocoingb.ddns.net:80"]}, // Thanks to CryptoCoinGB
+        {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
         
         // ----------------------------------------- inactive nodes        
         // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
