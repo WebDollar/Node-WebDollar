@@ -14,6 +14,8 @@ export default {
         {"addr": ["https://ez.cnbacolt.com:443"]},
         {"addr": ["https://server.cnbacolt.com:443"]},
 
+        {"addr": ["https://webdollar-vps1.ddns.net:80"]}, 
+
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
