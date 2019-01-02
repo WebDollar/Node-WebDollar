@@ -64,11 +64,17 @@ class TransactionsPendingQueue {
 
     }
 
-    pendingQueueTxTimeLockValidation(transaction){
-        if ( this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && this.blockchain.blocks.length -  consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < transaction.timeLock )
-        // if ( this.blockchain.blocks.length - 2 <= transaction.timeLock )
+    pendingQueueTxTimeLockValidation(transaction,blockValidationType){
+
+        if ( ( (this.blockchain.blocks.length > transaction.pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||  ( Blockchain.blockchain.agent.consensus && !transaction.validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
+            (transaction.timeLock === 0 || transaction.timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
             return true;
-        else
+        }
+
+        // if ( this.blockchain.blocks.length + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > transaction.timeLock && this.blockchain.blocks.length -  consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < transaction.timeLock )
+        // // if ( this.blockchain.blocks.length - 2 <= transaction.timeLock )
+        //     return true;
+        // else
             return false;
     }
 
@@ -263,7 +269,7 @@ class TransactionsPendingQueue {
 
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
-            if( !this.pendingQueueTxTimeLockValidation(this.listArray[i]) ){
+            if( !this.pendingQueueTxTimeLockValidation(this.listArray[i],blockValidationType) ){
                 this._removePendingTransaction(this.listArray[i], i);
                 continue;
             }
