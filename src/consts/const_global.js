@@ -457,6 +457,7 @@ consts.TERMINAL_WORKERS = {
 };
 
 consts.JSON_RPC = {
+    version: '1.0.0',
     serverConfig: {
         host: process.env.JSON_RPC_SERVER_HOST || '127.0.0.1',
         port: process.env.JSON_RPC_SERVER_PORT,
@@ -492,8 +493,12 @@ if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
 if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL;
 
+consts.NETWORK_TYPE = {
+    id: 1,
+    name: "Webdollar MainNet"
+};
 
-if ( consts.DEBUG === true ){
+if ( consts.DEBUG === true ) {
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
@@ -518,6 +523,17 @@ if ( consts.DEBUG === true ){
 }
 
 if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+{
     FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
+
+    consts.NETWORK_TYPE = {
+        id: 2,
+        name: "Webdollar TestNet"
+    };
+}
+
+
+
+
 
 export default consts;
