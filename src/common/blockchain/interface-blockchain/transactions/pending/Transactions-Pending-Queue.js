@@ -55,9 +55,6 @@ class TransactionsPendingQueue {
             if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
                 return false;
 
-        if( !this.pendingQueueTxTimeLockValidation(transaction) )
-            return false;
-
         this._insertPendingTransaction(transaction,exceptSockets);
 
         return true;
