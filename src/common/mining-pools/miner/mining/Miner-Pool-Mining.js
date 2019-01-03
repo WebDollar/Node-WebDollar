@@ -6,6 +6,8 @@ import AdvancedMessages from "node/menu/Advanced-Messages"
 import Log from 'common/utils/logging/Log';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
+import InterfaceBlockchainBlockCreator from "../../../blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 let InheritedPoolMining;
 
@@ -21,7 +23,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
     constructor(minerPoolManagement) {
 
-        super();
+        super(minerPoolManagement.blockchain);
 
         this.minerPoolManagement = minerPoolManagement;
 
@@ -94,7 +96,16 @@ class MinerPoolMining extends InheritedPoolMining {
 
     updatePoolMiningWork(work, poolSocket){
 
-        this._miningWork.block = work.block;
+
+
+        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
+        block.deserializeBlock( work.block, undefined, undefined, undefined, undefined, undefined, true );
+
+        if (BlockchainGenesis.isPoSActivated(work.h))
+            block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
+
+        let prevBlock = this._miningWork.block;
+        this._miningWork.block = block;
 
         this._miningWork.height = work.h;
         this._miningWork.blockId = work.I||work.h;
@@ -116,6 +127,9 @@ class MinerPoolMining extends InheritedPoolMining {
         if (this._isBeingMining){
             this.resetForced = true;
         }
+
+        if (prevBlock !== undefined)
+            prevBlock.destroyBlock();
 
         Log.info("New Work: "+ (work.end - work.start) + "   starting at: "+work.start + " block: "+this._getBlockSuffix(), Log.LOG_TYPE.POOLS );
 

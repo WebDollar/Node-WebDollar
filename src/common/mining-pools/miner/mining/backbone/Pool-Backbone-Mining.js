@@ -5,9 +5,9 @@ import consts from "consts/const_global";
 class PoolBackboneMining extends BlockchainBackboneMining {
 
 
-    constructor(){
+    constructor( blockchain, minerAddress, miningFeePerByte ){
 
-        super(undefined, undefined, 0);
+        super(blockchain, minerAddress, miningFeePerByte);
 
         this.WORKER_NONCES_WORK = 0xFFFFFFFF;
 

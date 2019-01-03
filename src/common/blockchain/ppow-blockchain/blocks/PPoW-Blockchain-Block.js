@@ -211,10 +211,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation = true){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation = true, skipDeserializeBlock = false){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation, skipDeserializeBlock);
 
         try {
 

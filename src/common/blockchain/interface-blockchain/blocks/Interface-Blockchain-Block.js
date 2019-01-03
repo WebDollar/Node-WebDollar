@@ -368,7 +368,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, skipDeserializeBlock = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
@@ -384,7 +384,8 @@ class InterfaceBlockchainBlock {
 
         try {
 
-            offset = this._deserializeBlock(buffer, offset);
+            if (!skipDeserializeBlock)
+                offset = this._deserializeBlock(buffer, offset);
 
             //TODO 1 byte version
             this.version = Serialization.deserializeNumber2Bytes( buffer, offset );
