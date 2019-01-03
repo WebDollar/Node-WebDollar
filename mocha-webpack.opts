@@ -1,0 +1,8 @@
+--recursive
+--webpack-config=tests/webpack.config.js
+src/node/jsonRpc/tests
+src/jsonRpc/tests
+src/tests/benchmarks
+src/tests/crypto
+src/tests/satoshimindb
+src/tests/utils
