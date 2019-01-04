@@ -15,10 +15,6 @@ class PoolBackboneMining extends BlockchainBackboneMining {
 
     }
 
-    calculateHash(nonce){
-        return InterfaceBlockchainBlock.computeHashStatic(this.block, nonce);
-    }
-
 
 }
 

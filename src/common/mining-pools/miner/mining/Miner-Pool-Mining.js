@@ -72,6 +72,10 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
+    getMedianTimestamp(){
+        return this._miningWork.medianTimestamp;
+    }
+
     async _setAddress(newAddress, save, skipChangingAddress=false ){
 
         if (this._minerAddress === newAddress)
@@ -96,21 +100,16 @@ class MinerPoolMining extends InheritedPoolMining {
 
     updatePoolMiningWork(work, poolSocket){
 
-
-
         let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
-        block.deserializeBlock( work.block, undefined, undefined, undefined, undefined, undefined, true );
+        block.deserializeBlock( work.block, undefined, undefined, work.t, undefined, undefined, true );
 
         //required data
-        if (BlockchainGenesis.isPoSActivated(work.h)) {
-
+        if (BlockchainGenesis.isPoSActivated(work.h))
             block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
-            block.getMedianTimestamp = ()=> { return work.m  };
-
-        }
 
         let prevBlock = this._miningWork.block;
         this._miningWork.block = block;
+        this._miningWork.medianTimestamp = work.m;
 
         this._miningWork.height = work.h;
         this._miningWork.blockId = work.I||work.h;

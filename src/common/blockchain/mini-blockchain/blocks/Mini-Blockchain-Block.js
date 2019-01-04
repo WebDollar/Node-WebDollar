@@ -78,6 +78,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
+    /**
+     *
+     * SHA256(prevhash + address + timestamp) <= 2^256 * balance / diff
+     *
+     * hashPrev not chainHash to avoid attacks with multiple changes in the block
+     * signature is not included to avoid attacks changing signatures or timestamp
+     *
+     */
     async computeHashPOS(){
 
         try {
@@ -93,9 +101,6 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.timeStamp) ),
 
             ]);
-
-            if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
-                buffer = Buffer.concat([ buffer, this.blockValidation.getBlockCallBack(this.height).posSignature ]);
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
@@ -144,11 +149,11 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _signPOSSignature () {
 
-        let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.data.minerAddress } );
+        let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.posMinerAddress || this.data.minerAddress } );
 
         if (address === null)
             if( typeof this.data.minerAddress !== "undefined")
-                throw {message: "Can not sign POS because the address doesn't exist in your wallet " + this.data.minerAddress.toString('hex') };
+                throw {message: "Can not sign POS because the address doesn't exist in your wallet " + (this.posMinerAddress||this.data.minerAddress).toString('hex') };
             else
                 throw {message: "Can not sign POS because the address doesn't exist in your wallet"};
 

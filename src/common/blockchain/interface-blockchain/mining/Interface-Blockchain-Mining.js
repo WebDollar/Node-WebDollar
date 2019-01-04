@@ -283,6 +283,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
 
+        this.block.posSignature = await this.block._signPOSSignature();
+
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
@@ -300,8 +302,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                         this.bestHashNonce = 0;
 
                         if (this.bestHash.compare(this.difficulty) <= 0) {
-
-                            this.block.posSignature = await this.block._signPOSSignature();
 
                             return {
                                 result: true,
