@@ -61,6 +61,8 @@ class PoolWorkManagement{
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlock._computeBlockHeaderPrefix( true ),
             I: this.poolWork.lastBlockId,
+            m: this.blockchain.blocks.timestampBlocks.getMedianTimestamp( this.poolWork.lastBlock.height, this.poolWork.lastBlock.blockValidation) ,
+
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
