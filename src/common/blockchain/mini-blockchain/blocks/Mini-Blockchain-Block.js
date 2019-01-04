@@ -99,10 +99,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
-            let balance = this.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
+            let balance = Blockchain.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
 
             //reward already included in the new balance
-            if (this.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
+            if (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
 
                 if (this.posMinerAddress === undefined) { //in case it was sent to the minerAddress
                     balance -= this.reward;

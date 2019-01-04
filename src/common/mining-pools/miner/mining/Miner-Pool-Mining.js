@@ -101,8 +101,13 @@ class MinerPoolMining extends InheritedPoolMining {
         let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
         block.deserializeBlock( work.block, undefined, undefined, undefined, undefined, undefined, true );
 
-        if (BlockchainGenesis.isPoSActivated(work.h))
+        //required data
+        if (BlockchainGenesis.isPoSActivated(work.h)) {
+
             block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
+            block.getMedianTimestamp = ()=> { return work.m  };
+
+        }
 
         let prevBlock = this._miningWork.block;
         this._miningWork.block = block;

@@ -256,6 +256,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         return this.block.computeHash(nonce);
     }
 
+    getMedianTimestamp(){
+        this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation);
+    }
+
     async _minePOS(){
 
         this.end = 0;
@@ -276,7 +280,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         }
 
         // try all timestamps
-        let medianTimestamp = Math.ceil( this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation));
+        let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
 
         let i = 0, done = false;
