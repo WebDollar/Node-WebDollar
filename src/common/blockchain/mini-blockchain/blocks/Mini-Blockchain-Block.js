@@ -169,7 +169,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     async _verifyPOSSignature(){
 
-        if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals(this.data.minerAddress) )
+        if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals( this.posMinerAddress || this.data.minerAddress  ) )
             throw { message: "posPublicKey doesn't match with the minerAddress" }
 
         let data = this._computeBlockHeaderPrefix( true );

@@ -257,7 +257,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     }
 
     getMedianTimestamp(){
-        this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation);
+        return this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation);
     }
 
     async _minePOS(){
@@ -283,8 +283,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
 
-        this.block.posSignature = await this.block._signPOSSignature();
-
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
@@ -299,14 +297,16 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     if (hash.compare(this.bestHash) < 0) {
 
                         this.bestHash = hash;
-                        this.bestHashNonce = 0;
+                        this.bestHashNonce = this.block.timeStamp;
 
                         if (this.bestHash.compare(this.difficulty) <= 0) {
+
+                            this.block.posSignature = await this.block._signPOSSignature();
 
                             return {
                                 result: true,
                                 hash: hash,
-                                nonce: 0,
+                                nonce: this.block.timeStamp,
                             };
 
                         }
