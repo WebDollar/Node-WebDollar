@@ -57,7 +57,7 @@ class InterfaceBlockchainBlock {
                 //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
             }
 
-            
+
             timeStamp = Math.ceil( timeStamp );
         }
 
@@ -68,7 +68,7 @@ class InterfaceBlockchainBlock {
 
         this.data = data;
 
-        
+
         //computed data
         this.computedSerialization = undefined;
 
@@ -185,7 +185,7 @@ class InterfaceBlockchainBlock {
 
             if (! BufferExtended.safeCompare(hash, this.hash))
                 throw {message: "block hash is not right", nonce: this.nonce, height: this.height, myHash:this.hash.toString("hex"), hash:hash.toString("hex"),
-                       difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this._computeBlockHeaderPrefix(), Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
+                    difficultyTargetPrev: this.difficultyTargetPrev.toString("hex"), serialization: Buffer.concat( [this._computeBlockHeaderPrefix(), Serialization.serializeNumber4Bytes(this.nonce)] ).toString("hex")};
 
         }
 
@@ -261,14 +261,14 @@ class InterfaceBlockchainBlock {
 
         return Buffer.concat ( [
 
-                                  Serialization.serializeNumber2Bytes( this.version ),
-                                  Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
-                                  Serialization.serializeNumber4Bytes( this.timeStamp ),
-                                  (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChain ) : new Buffer(0),
-                                  //data contains addressMiner, transactions history, contracts, etc
-                                  this.data.serializeData(requestHeader),
+            Serialization.serializeNumber2Bytes( this.version ),
+            Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
+            Serialization.serializeNumber4Bytes( this.timeStamp ),
+            (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChain ) : new Buffer(0),
+            //data contains addressMiner, transactions history, contracts, etc
+            this.data.serializeData(requestHeader),
 
-                               ]);
+        ]);
     }
 
 
@@ -368,7 +368,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, skipDeserializeBlock = false){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
@@ -384,7 +384,7 @@ class InterfaceBlockchainBlock {
 
         try {
 
-            if (!skipDeserializeBlock)
+            if (!onlyHeader)
                 offset = this._deserializeBlock(buffer, offset);
 
             //TODO 1 byte version
@@ -404,7 +404,7 @@ class InterfaceBlockchainBlock {
             } else
                 this.hashChain = this.hashPrev;
 
-            offset = this.data.deserializeData(buffer, offset);
+            offset = this.data.deserializeData(buffer, offset, onlyHeader);
 
         } catch (exception){
             console.error("error deserializing a block  ", exception, buffer);
@@ -427,7 +427,7 @@ class InterfaceBlockchainBlock {
             console.error('ERROR serializing block: ',  exception);
             throw exception;
         }
-    
+
         try{
             return (await this.db.save(key, bufferValue));
         }
@@ -459,11 +459,11 @@ class InterfaceBlockchainBlock {
             return false;
         }
     }
-    
+
     async removeBlock() {
-        
+
         let key = "block" + this.height;
-        
+
         try{
             return (await this.db.remove(key));
         }
@@ -471,7 +471,7 @@ class InterfaceBlockchainBlock {
             return 'ERROR on REMOVE block: ' + exception;
         }
     }
-    
+
     equals(targetBlock){
 
         return BufferExtended.safeCompare(this.hash, targetBlock.hash) &&
@@ -539,7 +539,7 @@ class InterfaceBlockchainBlock {
         this._socketPropagatedBy = socket;
 
         socket.on("disconnect",()=>{
-           this._socketPropagatedBy = undefined;
+            this._socketPropagatedBy = undefined;
         });
 
     }
