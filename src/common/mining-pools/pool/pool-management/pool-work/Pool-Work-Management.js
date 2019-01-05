@@ -104,8 +104,17 @@ class PoolWorkManagement{
             if ( (prevBlock  || blockInformationMinerInstance.workBlock) === undefined)
                 throw {message: "miner instance - no block"};
 
+            let args = [];
+            if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
-            if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash,  work.nonce, prevBlock )  )
+                work.nonce = 0;
+                args = [work.pos.timestamp, work.pos.posMinerAddress, work.pos.posSignature];
+
+            } else {
+                args = [work.nonce];
+            }
+
+            if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
@@ -116,14 +125,13 @@ class PoolWorkManagement{
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
-                if ( await blockInformationMinerInstance.wasBlockMined() ){
+                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, arguments ) ){
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("WebDollar Block was mined in Pool 2 ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
-
 
                     //returning false, because a new fork was changed in the mean while
                     if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
@@ -136,8 +144,12 @@ class PoolWorkManagement{
 
                         blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
 
-                        if (BlockchainGenesis.isPoSActivated(blockInformationMinerInstance.workBlock.height))
+                        if (BlockchainGenesis.isPoSActivated(blockInformationMinerInstance.workBlock.height)) {
                             blockInformationMinerInstance.workBlock.nonce = 0;
+                            blockInformationMinerInstance.workBlock.posSignature = work.pos.posSignature;
+                            blockInformationMinerInstance.workBlock.posMinerAddress = work.pos.posMinerAddress;
+                            blockInformationMinerInstance.workBlock.timestamp = work.pos.timestamp;
+                        }
                         else
                             blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 

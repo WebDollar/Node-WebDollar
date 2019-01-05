@@ -47,13 +47,10 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    async validateWorkHash(workHash, workNonce, prevBlock){
-
-        if ( BlockchainGenesis.isPoSActivated( (prevBlock || this.workBlock).height) )
-            workNonce = 0;
+    async validateWorkHash(prevBlock, workHash){
 
         //validate hash
-        let hash = await  (prevBlock || this.workBlock).computeHash( workNonce );
+        let hash = await  (prevBlock || this.workBlock).computeHash.apply( this, arguments.slice(2) );
 
         if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
@@ -63,7 +60,7 @@ class PoolDataBlockInformationMinerInstance {
 
     async wasBlockMined(){
 
-        if ( (await this.workBlock.computeHash(this.workHashNonce)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+        if ( (await this.workBlock.computeHash.call(this, arguments)).compare(this.workBlock.difficultyTargetPrev) <= 0)
             return true;
 
         return false;

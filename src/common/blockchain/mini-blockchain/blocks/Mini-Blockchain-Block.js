@@ -52,12 +52,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
 
-    computeHash(newNonce){
+    computeHash(){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) )
-            return this.computeHashPOS();
+            return this.computeHashPOS.apply(this, arguments);
         else
-            return this.computeHashPOW(newNonce);
+            return this.computeHashPOW.apply(this, arguments);
 
     }
 
@@ -86,7 +86,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      * signature is not included to avoid attacks changing signatures or timestamp
      *
      */
-    async computeHashPOS(){
+    async computeHashPOS( newTimestamp, posNewMinerAddress ){
 
         try {
 
@@ -97,14 +97,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.posMinerAddress || this.data.minerAddress ),
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.timeStamp) ),
+                Serialization.serializeBufferRemovingLeadingZeros( posNewMinerAddress || (this.posMinerAddress || this.data.minerAddress) ),
+                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes( newTimestamp || this.timeStamp) ),
 
             ]);
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
-            let balance = Blockchain.blockchain.accountantTree.getBalance(this.posMinerAddress || this.data.minerAddress);
+            let balance = Blockchain.blockchain.accountantTree.getBalance(posNewMinerAddress || (this.posMinerAddress || this.data.minerAddress));
 
             //reward already included in the new balance
             if (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {

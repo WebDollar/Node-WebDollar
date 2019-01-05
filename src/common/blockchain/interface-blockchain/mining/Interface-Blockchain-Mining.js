@@ -252,8 +252,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
-    calculateHash(nonce){
-        return this.block.computeHash(nonce);
+    calculateHash(){
+        return this.block.computeHash.apply(this, arguments);
     }
 
     getMedianTimestamp(){
@@ -294,7 +294,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     this.block.timeStamp = medianTimestamp + i;
 
-                    let hash = await this.calculateHash(0);
+                    let hash = await this.calculateHash( this.block.timeStamp, this.block.posSignature, this.block.posMinerAddress);
 
                     if (hash.compare(this.bestHash) < 0) {
 
