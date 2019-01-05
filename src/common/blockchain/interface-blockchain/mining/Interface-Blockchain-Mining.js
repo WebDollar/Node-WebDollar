@@ -279,6 +279,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     timestamp: this.block.timeStamp,
                     posSignature: new Buffer(64) ,
                     posMinerAddress: this.block.posMinerAddress || this.block.data.minerAddress,
+                    posMinerPublicKey: this.block.posMinerPublicKey,
                 }
             };
 
@@ -317,6 +318,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                                     timestamp: this.block.timeStamp,
                                     posSignature: this.block.posSignature,
                                     posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                                    posMinerPublicKey: this.block.posMinerPublicKey,
                                 }
 
                             };
@@ -367,6 +369,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 timestamp: this.bestHashNonce,
                 posSignature: this.block.posSignature,
                 posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                posMinerPublicKey: this.block.posMinerPublicKey,
             }
         };
 

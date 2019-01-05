@@ -49,9 +49,11 @@ class PoolDataBlockInformationMinerInstance {
 
     async validateWorkHash(prevBlock, workHash){
 
-        //validate hash
-        let hash = await  (prevBlock || this.workBlock).computeHash.apply( this, arguments.slice(2) );
+        prevBlock = (prevBlock || this.workBlock);
 
+        //validate hash
+        let hash = await  prevBlock.computeHash.apply(  prevBlock, Array.prototype.slice.call( arguments, 2 ) );
+11
         if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
         return true;
@@ -60,7 +62,7 @@ class PoolDataBlockInformationMinerInstance {
 
     async wasBlockMined(){
 
-        if ( (await this.workBlock.computeHash.call(this, arguments)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+        if ( (await this.workBlock.computeHash.apply(this.workBlock, arguments)).compare(this.workBlock.difficultyTargetPrev) <= 0)
             return true;
 
         return false;

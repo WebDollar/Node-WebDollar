@@ -110,7 +110,7 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
                  work.nonce = 0;
-                args = [work.pos.timestamp, Buffer.from( work.pos.posMinerAddress, "hex"), Buffer.from( work.pos.posSignature, "hex" )];
+                args = [work.pos.timestamp, work.pos.posMinerAddress,work.pos.posSignature];
 
             } else {
                 args = [work.nonce];
@@ -122,12 +122,19 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
+            if (BlockchainGenesis.isPoSActivated( (prevBlock||blockInformationMinerInstance.workBlock).height) ) {
+                blockInformationMinerInstance.workPosSignature = work.posSignature;
+                blockInformationMinerInstance.workPosMinerAddress = work.posMinerAddress;
+                blockInformationMinerInstance.workPosMinerPublicKey = work.posMinerPublicKey;
+                blockInformationMinerInstance.workTimestamp = work.timestamp;
+            }
+
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
-                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, arguments ) ){
+                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, args ) ){
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
@@ -144,18 +151,19 @@ class PoolWorkManagement{
                     let block;
                     try {
 
-                        blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
+                        let workBlock = blockInformationMinerInstance.workBlock;
 
-                        if (BlockchainGenesis.isPoSActivated(blockInformationMinerInstance.workBlock.height)) {
-                            blockInformationMinerInstance.workBlock.nonce = 0;
-                            blockInformationMinerInstance.workBlock.posSignature = work.pos.posSignature;
-                            blockInformationMinerInstance.workBlock.posMinerAddress = work.pos.posMinerAddress;
-                            blockInformationMinerInstance.workBlock.timestamp = work.pos.timestamp;
+                        workBlock.hash = blockInformationMinerInstance.workHash;
+
+                        if (BlockchainGenesis.isPoSActivated(workBlock.height)) {
+                            workBlock.nonce = 0;
+                            workBlock.posSignature = blockInformationMinerInstance.workPosSignature;
+                            workBlock.posMinerAddress = blockInformationMinerInstance.workPosMinerAddress;
+                            workBlock.posMinerPublicKey = blockInformationMinerInstance.workPosMinerPublicKey;
+                            workBlock.timestamp = blockInformationMinerInstance.workTimestamp;
                         }
                         else
-                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
-
-                        let workBlock = blockInformationMinerInstance.workBlock;
+                            workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
                         let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
                         block = this.blockchain.blockCreator.createEmptyBlock(workBlock.height, undefined );
