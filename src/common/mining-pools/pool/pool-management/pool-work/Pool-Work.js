@@ -59,11 +59,14 @@ class PoolWork {
             this.lastBlock = await this.blockchain.mining.getNextBlock();
             this.lastBlockNonce = 0;
 
-            this.lastBlockSerialization = Buffer.concat( [
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock._computeBlockHeaderPrefix( false )
-            ]);
+            //fill with blank info
+            this.lastBlock.hash = new Buffer(32);
+            if (BlockchainGenesis.isPoSActivated(this.lastBlock.height)) {
+                this.lastBlock.posMinerPublicKey = new Buffer(32 );
+                this.lastBlock.posSignature = new Buffer(64 );
+            }
+
+            this.lastBlockSerialization = this.lastBlock.serializeBlock(false);
 
             this.lastBlockId ++ ;
 
