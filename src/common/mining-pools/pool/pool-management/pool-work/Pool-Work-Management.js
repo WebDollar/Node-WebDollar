@@ -105,7 +105,7 @@ class PoolWorkManagement{
                 throw {message: "miner instance - no block"};
 
 
-            if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash, work.nonce, prevBlock )  )
+            if ( false === await blockInformationMinerInstance.validateWorkHash( work.hash,  work.nonce, prevBlock )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
@@ -135,7 +135,11 @@ class PoolWorkManagement{
                     try {
 
                         blockInformationMinerInstance.workBlock.hash = blockInformationMinerInstance.workHash;
-                        blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+
+                        if (BlockchainGenesis.isPoSActivated(blockInformationMinerInstance.workBlock.height))
+                            blockInformationMinerInstance.workBlock.nonce = 0;
+                        else
+                            blockInformationMinerInstance.workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
                         let workBlock = blockInformationMinerInstance.workBlock;
 

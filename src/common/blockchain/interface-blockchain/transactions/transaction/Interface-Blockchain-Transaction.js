@@ -421,7 +421,7 @@ class InterfaceBlockchainTransaction{
     }
 
     get confirmed(){
-        return this._confirmed;
+        return this._confirmed;11
     }
 
     set confirmed(newValue){

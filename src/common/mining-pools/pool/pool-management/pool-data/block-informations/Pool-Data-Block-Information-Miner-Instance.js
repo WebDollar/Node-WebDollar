@@ -5,6 +5,7 @@ import consts from 'consts/const_global';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import Blockchain from "main-blockchain/Blockchain"
 import Utils from "common/utils/helpers/Utils";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class PoolDataBlockInformationMinerInstance {
 
@@ -47,6 +48,9 @@ class PoolDataBlockInformationMinerInstance {
     }
 
     async validateWorkHash(workHash, workNonce, prevBlock){
+
+        if ( BlockchainGenesis.isPoSActivated( (prevBlock || this.workBlock).height) )
+            workNonce = 0;
 
         //validate hash
         let hash = await  (prevBlock || this.workBlock).computeHash( workNonce );
