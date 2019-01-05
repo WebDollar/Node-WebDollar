@@ -62,6 +62,7 @@ class PoolWorkManagement{
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
             m: this.poolWork.lastBlock.timeStamp,
+            lsig: ( BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ) ? this.blockchain.blocks[this.poolWork.lastBlock.height].posSignature : undefined,
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
@@ -108,7 +109,7 @@ class PoolWorkManagement{
             let args = [];
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
-                work.nonce = 0;
+                 work.nonce = 0;
                 args = [work.pos.timestamp, Buffer.from( work.pos.posMinerAddress, "hex"), Buffer.from( work.pos.posSignature, "hex" )];
 
             } else {

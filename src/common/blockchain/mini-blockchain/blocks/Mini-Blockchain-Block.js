@@ -66,13 +66,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
         if (!BlockchainGenesis.isPoSActivated(this.height - 1))
             return inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
 
-        let data = inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
-
-        if ( BlockchainGenesis.isPoSActivated(this.height - 1) )
-            data = Buffer.concat([
-                    data,
-                    this.blockValidation.getBlockCallBack(this.height).posSignature,
-                ]);
+        return Buffer.concat([
+            inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce),
+            this.blockValidation.getBlockCallBack(this.height).posSignature,
+        ]);
 
         return data;
 
