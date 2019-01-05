@@ -275,6 +275,11 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 result: false,
                 hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: -1,
+                pos: {
+                    timestamp: this.block.timeStamp,
+                    posSignature: new Buffer(64) ,
+                    posMinerAddress: this.block.posMinerAddress || this.block.data.minerAddress,
+                }
             };
 
         }
@@ -282,8 +287,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         // try all timestamps
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
-
-        this.block.posSignature = await this.block._signPOSSignature();
 
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
@@ -303,6 +306,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                         if (this.bestHash.compare(this.difficulty) <= 0) {
 
+                            this.block.posSignature = await this.block._signPOSSignature();
+
                             return {
 
                                 result: true,
@@ -310,8 +315,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                                 nonce: 0,
                                 pos: {
                                     timestamp: this.block.timeStamp,
-                                    posSignature: this.block.posSignature.toString("hex"),
-                                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress.toString("hex") : undefined,
+                                    posSignature: this.block.posSignature,
+                                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
                                 }
 
                             };
@@ -351,14 +356,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         }
 
+        this.block.timeStamp = this.bestHashNonce;
+        this.block.posSignature = await this.block._signPOSSignature();
+
         return {
             result: false,
             hash: this.bestHash,
             nonce: 0,
             pos: {
                 timestamp: this.bestHashNonce,
-                posSignature: this.block.posSignature.toString("hex"),
-                posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress.toString("hex") : undefined,
+                posSignature: this.block.posSignature,
+                posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
             }
         };
 
