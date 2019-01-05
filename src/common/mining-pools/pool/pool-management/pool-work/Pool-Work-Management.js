@@ -62,7 +62,7 @@ class PoolWorkManagement{
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
             m: this.poolWork.lastBlock.timeStamp,
-            lsig: ( BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ) ? this.blockchain.blocks[this.poolWork.lastBlock.height].posSignature : undefined,
+            lsig: ( BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ) ? this.blockchain.blocks[this.poolWork.lastBlock.height-1].posSignature : undefined,
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
