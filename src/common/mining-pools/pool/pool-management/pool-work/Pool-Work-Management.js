@@ -61,6 +61,7 @@ class PoolWorkManagement{
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
+            m: this.poolWork.lastBlock.timeStamp,
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,

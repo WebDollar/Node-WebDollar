@@ -294,7 +294,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     this.block.timeStamp = medianTimestamp + i;
 
-                    let hash = await this.calculateHash( this.block.timeStamp, this.block.posSignature, this.block.posMinerAddress);
+                    let hash = await this.calculateHash( this.block.timeStamp, this.block.posMinerAddress);
 
                     if (hash.compare(this.bestHash) < 0) {
 
