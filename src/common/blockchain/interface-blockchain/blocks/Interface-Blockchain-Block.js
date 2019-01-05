@@ -384,8 +384,7 @@ class InterfaceBlockchainBlock {
 
         try {
 
-            if (!onlyHeader)
-                offset = this._deserializeBlock(buffer, offset);
+            offset = this._deserializeBlock(buffer, offset);
 
             //TODO 1 byte version
             this.version = Serialization.deserializeNumber2Bytes( buffer, offset );

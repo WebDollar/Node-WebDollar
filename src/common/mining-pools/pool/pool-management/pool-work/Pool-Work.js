@@ -60,13 +60,13 @@ class PoolWork {
             this.lastBlockNonce = 0;
 
             //fill with blank info
-            this.lastBlock.hash = new Buffer(32);
+            this.lastBlock.hash = new Buffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH );
             if (BlockchainGenesis.isPoSActivated(this.lastBlock.height)) {
-                this.lastBlock.posMinerPublicKey = new Buffer(32 );
-                this.lastBlock.posSignature = new Buffer(64 );
+                this.lastBlock.posMinerPublicKey = new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH );
+                this.lastBlock.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH );
             }
 
-            this.lastBlockSerialization = this.lastBlock.serializeBlock(false);
+            this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
 
             this.lastBlockId ++ ;
 

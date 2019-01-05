@@ -38,7 +38,7 @@ class MinerPoolMining extends InheritedPoolMining {
             serializedHeader: undefined, //Buffer not used because the block is the entire serialization
 
             resolved: true,
-            poolSocket: undefined,
+            poolSock1et: undefined,
         };
 
         NodesList.emitter.on("nodes-list/disconnected", ( nodesListObject ) => {
@@ -101,7 +101,7 @@ class MinerPoolMining extends InheritedPoolMining {
     updatePoolMiningWork(work, poolSocket){
 
         let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
-        block.deserializeBlock( work.block, undefined, undefined, work.t, undefined, undefined, true );
+        block.deserializeBlock( work.block, work.h, undefined, work.t, undefined, undefined, true );
 
         //required data
         if (BlockchainGenesis.isPoSActivated(work.h))
