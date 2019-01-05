@@ -108,7 +108,7 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
                 work.nonce = 0;
-                args = [work.pos.timestamp, work.pos.posMinerAddress, work.pos.posSignature];
+                args = [work.pos.timestamp, Buffer.from( work.pos.posMinerAddress, "hex"), Buffer.from( work.pos.posSignature, "hex" )];
 
             } else {
                 args = [work.nonce];

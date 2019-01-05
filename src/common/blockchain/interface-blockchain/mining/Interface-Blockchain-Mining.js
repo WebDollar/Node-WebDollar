@@ -253,7 +253,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     }
 
     calculateHash(){
-        return this.block.computeHash.apply(this, arguments);
+        return this.block.computeHash.apply(this.block, arguments);
     }
 
     getMedianTimestamp(){
