@@ -209,16 +209,16 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-                            block.hash = answer.hash;
-                            block.nonce = answer.nonce;
+                        block.hash = answer.hash;
+                        block.nonce = answer.nonce;
 
-                            //returning false, because a new fork was changed in the mean while
-                            if (this.blockchain.blocks.length !== block.height)
-                                return false;
+                        //returning false, because a new fork was changed in the mean while
+                        if (this.blockchain.blocks.length !== block.height)
+                            return false;
 
-                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
+                        return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
 
-                        }) === false) throw {message: "Mining2 returned false"};
+                    }) === false) throw {message: "Mining2 returned false"};
 
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 
@@ -283,6 +283,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
 
+        this.block.posSignature = await this.block._signPOSSignature();
+
         let i = 0, done = false;
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
@@ -301,12 +303,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                         if (this.bestHash.compare(this.difficulty) <= 0) {
 
-                            this.block.posSignature = await this.block._signPOSSignature();
-
                             return {
+
                                 result: true,
                                 hash: hash,
-                                nonce: this.block.timeStamp,
+                                nonce: 0,
+                                pos: {
+                                    timestamp: this.block.timeStamp,
+                                    posSignature: this.block.posSignature.toString("hex"),
+                                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress.toString("hex") : undefined,
+                                }
+
                             };
 
                         }
@@ -337,7 +344,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 }
 
                 await this.blockchain.sleep(200);
-                
+
             }
 
             //this._hashesPerSecond = 1;
@@ -346,8 +353,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         return {
             result: false,
-            hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
-            nonce: -1,
+            hash: this.bestHash,
+            nonce: 0,
+            pos: {
+                timestamp: this.bestHashNonce,
+                posSignature: this.block.posSignature.toString("hex"),
+                posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress.toString("hex") : undefined,
+            }
         };
 
     }
