@@ -76,8 +76,12 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.listArray.forEach( (pendingTransaction) => {
 
-                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
-                    nonce++;
+                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce > nonce ) {
+
+                    //Compute only consecutive nonces
+                    if( pendingTransaction.nonce - nonce === 1 )
+                        nonce++;
+
                 }
 
             });
