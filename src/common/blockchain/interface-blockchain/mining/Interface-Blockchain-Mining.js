@@ -296,7 +296,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
-                    let hash = await this.calculateHash(  this.block, medianTimestamp + i, this.block.posMinerAddress);
+                    let hash = await this.calculateHash(   medianTimestamp + i, this.block.posMinerAddress);
                     this.block.timeStamp = medianTimestamp + i;
 
                     if (hash.compare(this.bestHash) < 0) {

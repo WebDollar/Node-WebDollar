@@ -179,6 +179,7 @@ class InterfaceBlockchainBlock {
 
         //validate hash
         //skip the validation, if the blockValidationType is provided
+
         if (!this.blockValidation.blockValidationType['skip-validation-PoW-hash']) {
 
             let hash = await this.computeHash();

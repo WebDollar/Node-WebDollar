@@ -53,7 +53,7 @@ class PoolDataBlockInformationMinerInstance {
 
         //validate hash
         let hash = await  prevBlock.computeHash.apply(  prevBlock, Array.prototype.slice.call( arguments, 2 ) );
-11
+
         if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
         return true;

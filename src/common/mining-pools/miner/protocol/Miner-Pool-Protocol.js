@@ -13,6 +13,7 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from "consts/const_global"
 import Log from 'common/utils/logging/Log';
 import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-Status";
+import WebDollarCoins from "../../../utils/coins/WebDollar-Coins";
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -326,6 +327,9 @@ class MinerProtocol extends PoolProtocolList{
             }, "answer", 6000);
 
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
+            if (miningAnswer.pos){
+                Log.info( "timestamp " + miningAnswer.pos.timestamp + "   " + "balance " + (Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
+            }
 
             if (!miningAnswer.result){
 

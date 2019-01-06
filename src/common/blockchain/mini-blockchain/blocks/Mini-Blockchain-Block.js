@@ -85,6 +85,9 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      */
     async computeHashPOS( newTimestamp, posNewMinerAddress ){
 
+        let posMinerAddress = posNewMinerAddress || this.posMinerAddress ;
+        let minerAddress = posMinerAddress ||  this.data.minerAddress;
+
         try {
 
             //  SHA256(prevhash + address + timestamp) <= 2^256 * balance / diff
@@ -98,32 +101,34 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes( newTimestamp || this.timeStamp) ),
 
             ]);
-
+11
             let hash = await WebDollarCrypto.SHA256(buffer);
 
-            let balance = Blockchain.blockchain.accountantTree.getBalance(posNewMinerAddress || (this.posMinerAddress || this.data.minerAddress));
+            let balance = Blockchain.blockchain.accountantTree.getBalance( minerAddress );
 
             //reward already included in the new balance
             if (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
 
-                if (this.posMinerAddress === undefined) { //in case it was sent to the minerAddress
+                if ( posMinerAddress === undefined) { //in case it was sent to the minerAddress
                     balance -= this.reward;
                     balance -= this.data.transactions.calculateFees();
+
                 }
 
                 this.data.transactions.transactions.forEach((tx)=>{
 
                     tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( this.data.minerAddress ))
+                        if ( from.unencodedAddress.equals( posMinerAddress ))
                             balance += from.amount;
                     });
 
                     tx.to.addresses.forEach((to)=>{
-                        if ( to.unencodedAddress.equals( this.data.minerAddress ))
+                        if ( to.unencodedAddress.equals( posMinerAddress ))
                             balance -= to.amount;
                     });
 
                 });
+
 
             }
 
