@@ -81,7 +81,7 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         this.bestHashNonce = -1;
 
         if ( BlockchainGenesis.isPoSActivated( height ) )
-            return this._minePOS()  ;
+            return this._minePOS(block, difficulty)  ;
 
         // multi threading
         if (this._workers.haveSupport())

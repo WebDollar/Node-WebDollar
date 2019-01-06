@@ -123,10 +123,10 @@ class PoolWorkManagement{
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
             if (BlockchainGenesis.isPoSActivated( (prevBlock||blockInformationMinerInstance.workBlock).height) ) {
-                blockInformationMinerInstance.workPosSignature = work.posSignature;
-                blockInformationMinerInstance.workPosMinerAddress = work.posMinerAddress;
-                blockInformationMinerInstance.workPosMinerPublicKey = work.posMinerPublicKey;
-                blockInformationMinerInstance.workTimestamp = work.timestamp;
+                blockInformationMinerInstance.workPosSignature = work.pos.posSignature;
+                blockInformationMinerInstance.workPosMinerAddress = work.pos.posMinerAddress;
+                blockInformationMinerInstance.workPosMinerPublicKey = work.pos.posMinerPublicKey;
+                blockInformationMinerInstance.workPosTimestamp = work.pos.timestamp;
             }
 
             if (Math.random() < 0.001)
@@ -160,7 +160,7 @@ class PoolWorkManagement{
                             workBlock.posSignature = blockInformationMinerInstance.workPosSignature;
                             workBlock.posMinerAddress = blockInformationMinerInstance.workPosMinerAddress;
                             workBlock.posMinerPublicKey = blockInformationMinerInstance.workPosMinerPublicKey;
-                            workBlock.timestamp = blockInformationMinerInstance.workTimestamp;
+                            workBlock.timeStamp = blockInformationMinerInstance.workPosTimestamp;
                         }
                         else
                             workBlock.nonce = blockInformationMinerInstance.workHashNonce;
