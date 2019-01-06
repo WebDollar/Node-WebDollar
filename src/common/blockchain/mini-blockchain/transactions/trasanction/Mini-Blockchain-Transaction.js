@@ -68,9 +68,6 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
 
-        //Select next nonce
-        nonce++;
-
         //calculate how many transactions we already have to increment the current nonce
         try {
 
