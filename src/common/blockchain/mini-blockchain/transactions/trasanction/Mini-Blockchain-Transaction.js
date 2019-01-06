@@ -57,11 +57,8 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             }
 
-        if (nonce !== this.nonce) {
-            console.error ( {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") } );
-            //throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex")};
-            throw "Nonce is not right";
-        }
+        if (nonce !== this.nonce)
+            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex")};
 
         return true;
 
@@ -76,8 +73,12 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.listArray.forEach( (pendingTransaction) => {
 
-                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
-                    nonce++;
+                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce > nonce ) {
+
+                    //Compute only consecutive nonces
+                    if( pendingTransaction.nonce - nonce === 1 )
+                        nonce++;
+
                 }
 
             });
