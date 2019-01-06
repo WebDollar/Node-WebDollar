@@ -23,7 +23,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         //in case it was already included
         if (this.blockchain === undefined) return;
-        
+
         this.blockchain.prover.provesCalculated.deleteBlock(this);
 
         InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
@@ -36,7 +36,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     getLevel(){
 
         if (this._level !== undefined) return this._level;
-        
+
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
 
@@ -46,9 +46,9 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if ( this.height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
             T = BlockchainGenesis.difficultyTargetPOS;
 
-        
+
         if (T === undefined || T === null) throw {message: "Target is not defined"};
-        
+
         if (Buffer.isBuffer(T))
             T = Convert.bufferToBigIntegerHex(T);
 
@@ -211,10 +211,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation = true){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation = true, onlyHeader = false){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation, onlyHeader);
 
         try {
 

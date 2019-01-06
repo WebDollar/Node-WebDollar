@@ -5,7 +5,7 @@ import BufferExtended from "common/utils/BufferExtended";
 class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
 
-    validateFromEnoughMoney(blockValidationType, skip = false){
+    validateFromEnoughMoney(blockValidationType){
 
         let amounts = {};
         if (blockValidationType !== undefined && blockValidationType['take-transactions-list-in-consideration'] !== undefined &&  blockValidationType['take-transactions-list-in-consideration'].validation ){
@@ -20,9 +20,8 @@ class MiniBlockchainTransactionFrom extends InterfaceBlockchainTransactionFrom{
 
                 let transaction = transactionsList[i];
 
-                if(!skip)
-                    if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId))
-                        return false; // transaction is not taken in consideration
+                if (BufferExtended.safeCompare(this.transaction.txId, transaction.txId))
+                    return false; // transaction is not taken in consideration
 
                 transaction.from.addresses.forEach((address)=>{
 

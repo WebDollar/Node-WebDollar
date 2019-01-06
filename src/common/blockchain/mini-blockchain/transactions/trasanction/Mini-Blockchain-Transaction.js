@@ -24,7 +24,7 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
     }
 
-    _validateNonce(blockValidationType, considerImutability=false){
+    _validateNonce( blockValidationType ){
 
         //Nonce from the accountant Tree
         let nonce = this.blockchain.accountantTree.getAccountNonce( this.from.addresses[0].unencodedAddress );
@@ -49,27 +49,16 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
                 });
 
-                if(!considerImutability)
-                    for (let i=nonce; i<this.nonce; i++)
-                        if (!foundNonce[i])
-                            throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
+                for (let i=nonce; i<this.nonce; i++)
+                    if (!foundNonce[i])
+                        throw {message: "Nonce is not right 2", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
 
                 return true;
 
             }
 
-        if(considerImutability) {
-            let maximumDifference = consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH;
-            if (nonce > this.nonce + maximumDifference && nonce < this.nonce - maximumDifference)
-                throw {
-                    message: "Nonce is not right",
-                    myNonce: this.nonce,
-                    nonce: nonce,
-                    txId: this.txId.toString("hex")
-                };
-        }else
         if (nonce !== this.nonce)
-            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex") };
+            throw {message: "Nonce is not right", myNonce: this.nonce, nonce: nonce, txId: this.txId.toString("hex")};
 
         return true;
 
@@ -84,8 +73,12 @@ class MiniBlockchainTransaction extends  InterfaceBlockchainTransaction {
 
             this.blockchain.transactions.pendingQueue.listArray.forEach( (pendingTransaction) => {
 
-                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce >= nonce ) {
-                    nonce++;
+                if ( BufferExtended.safeCompare(pendingTransaction.from.addresses[0].unencodedAddress, this.from.addresses[0].unencodedAddress) && pendingTransaction.nonce > nonce ) {
+
+                    //Compute only consecutive nonces
+                    if( pendingTransaction.nonce - nonce === 1 )
+                        nonce++;
+
                 }
 
             });

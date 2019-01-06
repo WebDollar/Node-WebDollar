@@ -42,7 +42,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         this.bestHashNonce = -1;
 
         if ( BlockchainGenesis.isPoSActivated( height ) )
-            return this._minePOS();
+            return this._minePOS(block, difficultyTarget);
 
         this.block = block;
         this.difficulty = difficultyTarget;

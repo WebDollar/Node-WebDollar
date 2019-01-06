@@ -5,6 +5,7 @@ import consts from 'consts/const_global';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 import Blockchain from "main-blockchain/Blockchain"
 import Utils from "common/utils/helpers/Utils";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class PoolDataBlockInformationMinerInstance {
 
@@ -46,11 +47,13 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    async validateWorkHash(workHash, workNonce, prevBlock){
+    async validateWorkHash(prevBlock, workHash){
+
+        prevBlock = (prevBlock || this.workBlock);
 
         //validate hash
-        let hash = await  (prevBlock || this.workBlock).computeHash( workNonce );
-
+        let hash = await  prevBlock.computeHash.apply(  prevBlock, Array.prototype.slice.call( arguments, 2 ) );
+11
         if ( ! BufferExtended.safeCompare(hash, workHash ) ) return false;
 
         return true;
@@ -59,7 +62,7 @@ class PoolDataBlockInformationMinerInstance {
 
     async wasBlockMined(){
 
-        if ( (await this.workBlock.computeHash(this.workHashNonce)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+        if ( (await this.workBlock.computeHash.apply(this.workBlock, arguments)).compare(this.workBlock.difficultyTargetPrev) <= 0)
             return true;
 
         return false;

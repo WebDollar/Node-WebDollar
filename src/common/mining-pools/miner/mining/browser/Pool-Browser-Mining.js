@@ -4,9 +4,9 @@ import consts from "consts/const_global";
 
 class PoolBrowserMining extends InterfaceBlockchainBrowserMining{
 
-    constructor(){
+    constructor(blockchain, minerAddress, miningFeePerByte){
 
-        super ( 0 );
+        super ( blockchain, minerAddress, miningFeePerByte );
 
         this.useResetConsensus = false;
 

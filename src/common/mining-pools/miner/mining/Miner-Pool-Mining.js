@@ -6,6 +6,8 @@ import AdvancedMessages from "node/menu/Advanced-Messages"
 import Log from 'common/utils/logging/Log';
 import Serialization from "common/utils/Serialization";
 import BufferExtended from "common/utils/BufferExtended";
+import InterfaceBlockchainBlockCreator from "../../../blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 let InheritedPoolMining;
 
@@ -21,7 +23,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
     constructor(minerPoolManagement) {
 
-        super();
+        super(minerPoolManagement.blockchain);
 
         this.minerPoolManagement = minerPoolManagement;
 
@@ -36,7 +38,9 @@ class MinerPoolMining extends InheritedPoolMining {
             serializedHeader: undefined, //Buffer not used because the block is the entire serialization
 
             resolved: true,
-            poolSocket: undefined,
+            poolSock1et: undefined,
+
+            blocks: [],
         };
 
         NodesList.emitter.on("nodes-list/disconnected", ( nodesListObject ) => {
@@ -70,6 +74,10 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
+    getMedianTimestamp(){
+        return this._miningWork.medianTimestamp;
+    }
+
     async _setAddress(newAddress, save, skipChangingAddress=false ){
 
         if (this._minerAddress === newAddress)
@@ -94,7 +102,28 @@ class MinerPoolMining extends InheritedPoolMining {
 
     updatePoolMiningWork(work, poolSocket){
 
-        this._miningWork.block = work.block;
+        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
+        block.deserializeBlock( work.block, work.h, undefined, work.t, undefined, undefined, true );
+
+        //required data
+        if (BlockchainGenesis.isPoSActivated(work.h))
+            block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
+
+        if (BlockchainGenesis.isPoSActivated(work.h-1))
+            block.blockValidation.getBlockCallBack = ( height ) =>{
+
+                if (height !== work.h) throw "invalid height for pool miner";
+
+                return {
+                    posSignature: work.lsig,
+                }
+
+            };
+
+        this._miningWork.blocks.push(block);
+
+        this._miningWork.block = block;
+        this._miningWork.medianTimestamp = work.m;
 
         this._miningWork.height = work.h;
         this._miningWork.blockId = work.I||work.h;
@@ -136,6 +165,18 @@ class MinerPoolMining extends InheritedPoolMining {
 
                 try {
 
+                    //except the last block
+                    if (this.block)
+                        for ( let i=this._miningWork.blocks.length-2; i >= 0; i-- )
+                            if ( this._miningWork.blocks[i].height  < this.block.height  ){
+                                this._miningWork.blocks[i].destroyBlock();
+                                this._miningWork.blocks.splice(i, 1);
+                            }
+
+                    let prevBlock = this.block;
+                    if (prevBlock !== undefined && prevBlock !== this._miningWork.block )
+                        prevBlock.destroyBlock();
+
                     let timeInitial = new Date().getTime();
 
                     this._isBeingMining = true;
@@ -167,7 +208,6 @@ class MinerPoolMining extends InheritedPoolMining {
                 }
 
             }
-
 
         }
 

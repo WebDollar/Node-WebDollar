@@ -266,11 +266,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof work.start !== "number") throw {message: "get-work invalid noncesStart"};
         if (typeof work.end !== "number") throw {message: "get-work invalid noncesEnd"};
 
-        let serialization = Buffer.concat([
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(work.h) ),
-            Serialization.serializeBufferRemovingLeadingZeros( work.t ),
-            work.s,
-        ]);
+        let serialization = work.s;
 
         work.block = serialization;
 

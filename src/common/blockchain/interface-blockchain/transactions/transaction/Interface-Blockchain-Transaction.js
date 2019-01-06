@@ -224,7 +224,7 @@ class InterfaceBlockchainTransaction{
         return true;
     }
 
-    validateTransactionEveryTime( blockHeight , blockValidationType = {}, considerImutability=false){
+    validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
         if (this.blockchain === undefined) throw {message: "blockchain is empty"};
 
@@ -232,24 +232,18 @@ class InterfaceBlockchainTransaction{
 
             if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
 
-            if(considerImutability){
-                if (this.timeLock !== 0 )
-                    if( blockHeight > this.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH && blockHeight < this.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH)
-                        throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
-            }
-            else
-                if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+            if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
-            if (! this._validateNonce(blockValidationType,considerImutability) ) throw {message: "Nonce is invalid" };
+            if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
 
-            return this.from.validateFromEnoughMoney(blockValidationType,considerImutability);
+            return this.from.validateFromEnoughMoney(blockValidationType);
         }
 
         return true;
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}, considerImutability = false){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
@@ -260,7 +254,7 @@ class InterfaceBlockchainTransaction{
                 validation: true
             };
 
-            this.validateTransactionEveryTime(undefined, blockValidationType, considerImutability );
+            this.validateTransactionEveryTime(undefined, blockValidationType );
 
         } catch (exception){
 
@@ -427,7 +421,7 @@ class InterfaceBlockchainTransaction{
     }
 
     get confirmed(){
-        return this._confirmed;
+        return this._confirmed;11
     }
 
     set confirmed(newValue){
