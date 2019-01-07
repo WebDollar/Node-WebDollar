@@ -118,12 +118,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 this.data.transactions.transactions.forEach((tx)=>{
 
                     tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( posMinerAddress ))
+                        if ( from.unencodedAddress.equals( this.data.minerAddress ))
                             balance += from.amount;
                     });
 
                     tx.to.addresses.forEach((to)=>{
-                        if ( to.unencodedAddress.equals( posMinerAddress ))
+                        if ( to.unencodedAddress.equals( this.data.minerAddress ))
                             balance -= to.amount;
                     });
 
