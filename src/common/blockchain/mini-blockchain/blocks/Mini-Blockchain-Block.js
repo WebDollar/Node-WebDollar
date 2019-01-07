@@ -101,7 +101,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes( newTimestamp || this.timeStamp) ),
 
             ]);
-11
+
             let hash = await WebDollarCrypto.SHA256(buffer);
 
             let balance = Blockchain.blockchain.accountantTree.getBalance( minerAddress );
