@@ -60,10 +60,26 @@ class PoolWorkManagement{
 
         if (BlockchainGenesis.isPoSActivated( this.poolWork.lastBlock.height )){
 
+            balances = [];
             for (let i=0; i < minerInstance.addresses.length; i++) {
                 let balance = this.blockchain.accountantTree.getBalance(minerInstance.addresses[i]);
                 if (balance === null) balance = 0;
-                balances.push(i);
+
+                this.poolWork.lastBlock.data.transactions.transactions.forEach((tx)=>{
+
+                    tx.from.addresses.forEach((from)=>{
+                        if ( from.unencodedAddress.equals( minerInstance.addresses[i] ))
+                            balance += from.amount;
+                    });
+
+                    tx.to.addresses.forEach((to)=>{
+                        if ( to.unencodedAddress.equals( minerInstance.addresses[i] ))
+                            balance -= to.amount;
+                    });
+
+                });
+
+                balances.push(balance);
             }
 
         }
@@ -131,7 +147,7 @@ class PoolWorkManagement{
                 args = [work.nonce];
             }
 
-            if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
+             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;

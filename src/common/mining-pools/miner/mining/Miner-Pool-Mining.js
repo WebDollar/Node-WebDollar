@@ -103,15 +103,15 @@ class MinerPoolMining extends InheritedPoolMining {
     updatePoolMiningWork(work, poolSocket){
 
         //update manually the balances
-        if (work.balances && work.balances.length === Blockchain.Wallet.addresses.length){
+        if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
 
-            for (let i=0 ; i< work.balances.length; i++){
+            for (let i=0 ; i< work.b.length; i++){
 
                 let prevVal = Blockchain.AccountantTree.getBalance( Blockchain.Wallet.addresses[i].unencodedAddress );
                 if (prevVal=== null ) prevVal = 0;
 
-                if (work.balances[i] - prevVal !== 0)
-                    Blockchain.AccountantTree.updateAccount( Blockchain.Wallet.addresses[i].unencodedAddress, work.balances[i] - prevVal, undefined, undefined, true );
+                if (work.b[i] - prevVal !== 0)
+                    Blockchain.AccountantTree.updateAccount( Blockchain.Wallet.addresses[i].unencodedAddress, work.b[i] - prevVal, undefined, undefined, true );
             }
         }
 

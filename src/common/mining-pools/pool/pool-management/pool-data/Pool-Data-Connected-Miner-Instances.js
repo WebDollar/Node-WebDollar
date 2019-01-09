@@ -26,33 +26,39 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
     _deleteUnresponsiveMiners(){
 
-        let time = new Date().getTime()/1000;
+        try{
 
-        for (let i = this.connectedMinerInstances.length - 1; i >= 0; i--) {
+            let time = new Date().getTime()/1000;
 
-            if ( !this.connectedMinerInstances[i] || !this.connectedMinerInstances[i].socket )
-                this.connectedMinerInstances.splice(i, 1);
-            else
-            if ((time - this.connectedMinerInstances[i].dateActivity > 480) || this.connectedMinerInstances[i].socket.disconnected) { //8 minutes
+            for (let i = this.connectedMinerInstances.length - 1; i >= 0; i--) {
 
-                try {
+                if ( !this.connectedMinerInstances[i] || !this.connectedMinerInstances[i].socket )
+                    this.connectedMinerInstances.splice(i, 1);
+                else
+                if ((time - this.connectedMinerInstances[i].dateActivity > 480) || this.connectedMinerInstances[i].socket.disconnected) { //8 minutes
 
-                    let socket = this.connectedMinerInstances[i].socket;
-                    if (!this.poolManagement.poolSettings.poolUsePoolServers) {
-                        Log.info("Socket was disconnected for not having activity: " + time - this.connectedMinerInstances[i].dateActivity, Log.LOG_TYPE.POOLS);
-                        this.connectedMinerInstances[i].socket.disconnect();
+                    try {
+
+                        let socket = this.connectedMinerInstances[i].socket;
+
+                        if ( !this.poolManagement.poolSettings.poolUsePoolServers ) {
+                            Log.info("Socket was disconnected for not having activity: " + time - this.connectedMinerInstances[i].dateActivity, Log.LOG_TYPE.POOLS);
+                            this.connectedMinerInstances[i].socket.disconnect();
+                        }
+
+                        if (this.connectedMinerInstance[i] && socket === this.connectedMinerInstances[i].socket)
+                            this.connectedMinerInstances.splice(i, 1);
+
+                    } catch (exception) {
+                        Log.error("_deleteUnresponsiveMiners raised an error", Log.LOG_TYPE.POOLS, exception);
                     }
 
-                    if (socket === this.connectedMinerInstances[i].socket)
-                        this.connectedMinerInstances.splice(i, 1);
-
-                } catch (exception) {
-                    Log.error("_deleteUnresponsiveMiners raised an error", Log.LOG_TYPE.POOLS, exception);
                 }
-
             }
-        }
 
+        }catch(err){
+
+        }
 
         setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
     }
