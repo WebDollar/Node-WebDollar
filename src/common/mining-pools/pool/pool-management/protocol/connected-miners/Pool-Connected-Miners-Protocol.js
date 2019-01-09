@@ -78,7 +78,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let addresses = [];
                 if (data.addresses)
-                    for (let i=0; i < data.addresses.length; i++)
+                    for (let i=0; i < Math.min( 20, data.addresses.length); i++)
                         addresses.push( Buffer.from( data.addresses[i], "hex") );
 
 

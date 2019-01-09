@@ -61,7 +61,9 @@ class PoolWorkManagement{
         if (BlockchainGenesis.isPoSActivated( this.poolWork.lastBlock.height )){
 
             for (let i=0; i < minerInstance.addresses.length; i++) {
-                let balance = this.blockchain.accountantTree.getBalance(minerInstance.miner.addresses[i]);
+                let balance = this.blockchain.accountantTree.getBalance(minerInstance.addresses[i]);
+                if (balance === null) balance = 0;
+                balances.push(i);
             }
 
         }
