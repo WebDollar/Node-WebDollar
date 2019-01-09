@@ -55,6 +55,17 @@ class PoolWorkManagement{
 
         this.poolWork.lastBlockElement.instances[minerInstance.socket.node.sckAddress.uuid] = this.poolWork.lastBlock;
 
+        //for proof of stake it is necessary to know exactly the balance
+        let balances = undefined;
+
+        if (BlockchainGenesis.isPoSActivated( this.poolWork.lastBlock.height )){
+
+            for (let i=0; i < minerInstance.addresses.length; i++) {
+                let balance = this.blockchain.accountantTree.getBalance(minerInstance.miner.addresses[i]);
+            }
+
+        }
+
         let answer = {
 
             h: this.poolWork.lastBlock.height,
@@ -66,6 +77,8 @@ class PoolWorkManagement{
 
             start: this.poolWork.lastBlockNonce,
             end: this.poolWork.lastBlockNonce + hashes,
+
+            b: balances,
 
         };
 

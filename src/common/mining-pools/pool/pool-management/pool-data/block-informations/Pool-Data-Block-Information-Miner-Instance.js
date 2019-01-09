@@ -26,6 +26,8 @@ class PoolDataBlockInformationMinerInstance {
 
         this._workDifficulty = undefined;
 
+        this.addresses = []; //received by pool for POS balances to be sent
+
         if ( minerInstanceTotalDifficulty === undefined )
             minerInstanceTotalDifficulty = BigNumber(0);
 

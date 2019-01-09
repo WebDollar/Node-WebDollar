@@ -9,6 +9,7 @@ import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockc
 import ed25519 from "common/crypto/ed25519";
 import Serialization from 'common/utils/Serialization';
 import Blockchain from "main-blockchain/Blockchain";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class PoolConnectedMinersProtocol extends PoolProtocolList{
 
@@ -75,6 +76,12 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
                 if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
 
+                let addresses = [];
+                if (data.addresses)
+                    for (let i=0; i < data.addresses.length; i++)
+                        addresses.push( Buffer.from( data.addresses[i], "hex") );
+
+
                 // save minerPublicKey
                 let miner = this.poolManagement.poolData.findMiner(unencodedAddress);
 
@@ -82,6 +89,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     miner = await this.poolManagement.poolData.addMiner(unencodedAddress );
 
                 let minerInstance = miner.addInstance(socket);
+
+                minerInstance.addresses = data.addresses;
 
                 if (data.ref !== undefined && (typeof data.ref === "string" || (Buffer.isBuffer(data.ref) && data.ref.length === consts.ADDRESSES.ADDRESS.LENGTH) )){
                     miner.referrals.setReferralLink(data.ref);
@@ -212,7 +221,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/get-work/answer"+suffix, { result: true, work: work, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
                     h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
-                    b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, } )
+                    b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,
+                } )
 
             } catch (exception){
 

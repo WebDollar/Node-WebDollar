@@ -113,7 +113,10 @@ class MinerProtocol extends PoolProtocolList{
         try{
 
             let message = WebDollarCrypto.getBufferRandomValues(32);
-            //let message = new Buffer(32);
+
+            let addresses = [];
+            for (let i=0; i < Blockchain.Wallet.addresses.length; i++)
+                addresses.push( Blockchain.Wallet.addresses[i].unencodedAddress.toString("hex") )
 
             let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
 
@@ -123,6 +126,8 @@ class MinerProtocol extends PoolProtocolList{
                 minerAddress: Blockchain.blockchain.mining.minerAddress,
 
                 ref: this.minerPoolManagement.minerPoolSettings.poolReferral !== '' ? this.minerPoolManagement.minerPoolSettings.poolReferral : undefined,
+
+                addresses: addresses,
 
             }, "answer", 30000  );
 
