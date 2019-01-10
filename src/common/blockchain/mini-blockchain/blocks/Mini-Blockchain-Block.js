@@ -83,7 +83,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      * signature is not included to avoid attacks changing signatures or timestamp
      *
      */
-    async computeHashPOS( newTimestamp, posNewMinerAddress ){
+    async computeHashPOS( newTimestamp, posNewMinerAddress, simulate = false ){
 
         let posMinerAddress = posNewMinerAddress || this.posMinerAddress ;
         let minerAddress = posMinerAddress ||  this.data.minerAddress;
@@ -107,7 +107,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             let balance = Blockchain.blockchain.accountantTree.getBalance( minerAddress );
 
             //reward already included in the new balance
-            if (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) && balance !== null) {
+            if ( (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) || simulate ) && balance !== null) {
 
                 if ( posMinerAddress === undefined) { //in case it was sent to the minerAddress
                     balance -= this.reward;
@@ -118,12 +118,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 this.data.transactions.transactions.forEach((tx)=>{
 
                     tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( this.data.minerAddress ))
+                        if ( from.unencodedAddress.equals( minerAddress ))
                             balance += from.amount;
                     });
 
                     tx.to.addresses.forEach((to)=>{
-                        if ( to.unencodedAddress.equals( this.data.minerAddress ))
+                        if ( to.unencodedAddress.equals( minerAddress ))
                             balance -= to.amount;
                     });
 

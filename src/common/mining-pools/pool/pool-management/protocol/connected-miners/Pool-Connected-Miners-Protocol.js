@@ -90,7 +90,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 let minerInstance = miner.addInstance(socket);
 
-                minerInstance.addresses = addresses;
+                if (addresses.length > 0)
+                    minerInstance.addresses = addresses;
 
                 if (data.ref !== undefined && (typeof data.ref === "string" || (Buffer.isBuffer(data.ref) && data.ref.length === consts.ADDRESSES.ADDRESS.LENGTH) )){
                     miner.referrals.setReferralLink(data.ref);
