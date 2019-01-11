@@ -61,25 +61,12 @@ class PoolWorkManagement{
         if (BlockchainGenesis.isPoSActivated( this.poolWork.lastBlock.height )){
 
             balances = [];
-            for (let i=0; i < minerInstance.addresses.length; i++) {
-                let balance = this.blockchain.accountantTree.getBalance(minerInstance.addresses[i]);
-                if (balance === null) balance = 0;
 
-                this.poolWork.lastBlock.data.transactions.transactions.forEach((tx)=>{
 
-                    tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( minerInstance.addresses[i] ))
-                            balance -= from.amount;
-                    });
+            for (let i=0; i < minerInstance.addresses.length; i++){
 
-                    tx.to.addresses.forEach((to)=>{
-                        if ( to.unencodedAddress.equals( minerInstance.addresses[i] ))
-                            balance += to.amount;
-                    });
+                balances.push(this._getMinerBalance( minerInstance.addresses[i] ));
 
-                });
-
-                balances.push(balance);
             }
 
         }
@@ -140,8 +127,8 @@ class PoolWorkManagement{
             let args = [];
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
-                 work.nonce = 0;
-                args = [ work.pos.timestamp, work.pos.posMinerAddress ];
+                work.nonce = 0;
+                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress) ];
 
             } else {
                 args = [work.nonce];
@@ -265,6 +252,34 @@ class PoolWorkManagement{
         }
 
         return {result: result, reward: minerInstance.miner.rewardTotal, confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed  }
+
+    }
+
+
+    _getMinerBalance(address){
+
+        let balance = this.blockchain.accountantTree.getBalance( address );
+        if (balance === null) balance = 0;
+
+        //must be reverted
+        console.log("2 Before Balance ", balance); let s = "";
+        for (let i = this.poolWork.lastBlock.height-1; i >= 0 && i >= this.poolWork.lastBlock.height -1 - 30; i--  ) {
+
+            let block = this.blockchain.blocks[ i ];
+
+            s += block.height + " ";
+
+            block.data.transactions.transactions.forEach( (tx) => {
+                tx.to.addresses.forEach((to)=>{
+                    if ( to.unencodedAddress.equals( address))
+                        balance -= to.amount;
+                });
+            });
+        }
+
+        console.log("2 After Balance ", balance, s);
+
+        return balance;
 
     }
 

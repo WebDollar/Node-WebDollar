@@ -85,10 +85,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      * signature is not included to avoid attacks changing signatures or timestamp
      *
      */
-    async computeHashPOS( newTimestamp, posNewMinerAddress, simulate = false ){
+    async computeHashPOS( newTimestamp, posNewMinerAddress, balance){
 
         let whoIsMining = posNewMinerAddress || this.posMinerAddress ||  this.data.minerAddress;
-        let whoIsRecevingMoney = this.data.minerAddress;
+        let whoIsReceivingMoney = this.data.minerAddress;
 
         try {
 
@@ -106,12 +106,13 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
-            let balance = Blockchain.blockchain.accountantTree.getBalance( whoIsMining );
+            if (balance === undefined)
+                balance = Blockchain.blockchain.accountantTree.getBalance( whoIsMining );
 
             //reward already included in the new balance
-            if ( (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) || simulate ) && balance !== null) {
+            if ( Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree )  && balance !== null) {
 
-                if ( whoIsMining !== undefined) { //in case it was sent to the minerAddress
+                if ( whoIsReceivingMoney .equals( whoIsMining )) { //in case it was sent to the minerAddress
 
                     balance -= this.reward;
                     balance -= this.data.transactions.calculateFees();
@@ -132,9 +133,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 });
 
+                console.log("Initial Balance ", balance); let s = "";
                 for (let i = this.height-1; i >= 0 && i >= this.height -1 - 30; i--  ) {
 
-                    let block = this.blockValidation.getBlockCallBack(i);
+                    let block = this.blockValidation.getBlockCallBack(i+1);
+
+                    s += block.height + " ";
 
                     block.data.transactions.transactions.forEach( (tx) => {
                         tx.to.addresses.forEach((to)=>{
@@ -143,6 +147,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                         });
                     });
                 }
+                console.log("After Balance ", balance, s);
 
 
             }
