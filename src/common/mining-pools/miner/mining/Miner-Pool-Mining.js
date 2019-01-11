@@ -240,7 +240,7 @@ class MinerPoolMining extends InheritedPoolMining {
             return answer;
 
         } catch (exception){
-            console.error("Couldn't mine block ", this._miningWork, exception);
+            console.error("Couldn't mine block ", this._miningWork.block.toJSON(), exception);
             return null;
         }
 
