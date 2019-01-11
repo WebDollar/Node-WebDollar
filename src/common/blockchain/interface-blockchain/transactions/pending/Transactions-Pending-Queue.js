@@ -233,13 +233,15 @@ class TransactionsPendingQueue {
         if (index === null)
             return true;
 
-        this.listObject[transaction.txId.toString('hex')].destroyTransaction();
+        if(this.listObject[transaction.txId.toString('hex')]){
+            this.listObject[transaction.txId.toString('hex')].destroyTransaction();
 
-        delete this.listObject[transaction.txId.toString('hex')];
+            delete this.listObject[transaction.txId.toString('hex')];
 
-        this.listArray.splice(index, 1);
+            this.listArray.splice(index, 1);
 
-        this.transactions.emitTransactionChangeEvent(transaction, true);
+            this.transactions.emitTransactionChangeEvent(transaction, true);
+        }
     }
 
     _removeOldTransactions (){
