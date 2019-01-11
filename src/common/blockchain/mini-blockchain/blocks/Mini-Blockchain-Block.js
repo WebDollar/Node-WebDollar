@@ -11,6 +11,8 @@ import Blockchain from "main-blockchain/Blockchain"
 import ed25519 from "common/crypto/ed25519";
 import InterfaceBlockchainAddressHelper from "../../interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import InterfaceBlockchainBlock from "../../interface-blockchain/blocks/Interface-Blockchain-Block";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+
 const BigInteger = require('big-integer');
 
 let inheritBlockchainBlock;
@@ -85,8 +87,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      */
     async computeHashPOS( newTimestamp, posNewMinerAddress, simulate = false ){
 
-        let posMinerAddress = posNewMinerAddress || this.posMinerAddress ;
-        let minerAddress = posMinerAddress ||  this.data.minerAddress;
+        let whoIsMining = posNewMinerAddress || this.posMinerAddress ||  this.data.minerAddress;
+        let whoIsRecevingMoney = this.data.minerAddress;
 
         try {
 
@@ -97,19 +99,20 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.difficultyTargetPrev ),
                 Serialization.serializeBufferRemovingLeadingZeros( this.hashPrev ),
-                Serialization.serializeBufferRemovingLeadingZeros( posNewMinerAddress || (this.posMinerAddress || this.data.minerAddress) ),
+                Serialization.serializeBufferRemovingLeadingZeros( whoIsMining ),
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes( newTimestamp || this.timeStamp) ),
 
             ]);
 
             let hash = await WebDollarCrypto.SHA256(buffer);
 
-            let balance = Blockchain.blockchain.accountantTree.getBalance( minerAddress );
+            let balance = Blockchain.blockchain.accountantTree.getBalance( whoIsMining );
 
             //reward already included in the new balance
             if ( (Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree ) || simulate ) && balance !== null) {
 
-                if ( posMinerAddress === undefined) { //in case it was sent to the minerAddress
+                if ( whoIsMining !== undefined) { //in case it was sent to the minerAddress
+
                     balance -= this.reward;
                     balance -= this.data.transactions.calculateFees();
 
@@ -118,21 +121,33 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 this.data.transactions.transactions.forEach((tx)=>{
 
                     tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( minerAddress ))
+                        if ( from.unencodedAddress.equals( whoIsMining ))
                             balance += from.amount;
                     });
 
                     tx.to.addresses.forEach((to)=>{
-                        if ( to.unencodedAddress.equals( minerAddress ))
+                        if ( to.unencodedAddress.equals( whoIsMining ))
                             balance -= to.amount;
                     });
 
                 });
 
+                for (let i = this.height-1; i >= 0 && i >= this.height -1 - 30; i--  ) {
+
+                    let block = this.blockValidation.getBlockCallBack(i);
+
+                    block.data.transactions.transactions.forEach( (tx) => {
+                        tx.to.addresses.forEach((to)=>{
+                            if ( to.unencodedAddress.equals( whoIsMining ))
+                                balance -= to.amount;
+                        });
+                    });
+                }
+
 
             }
 
-            if (balance === null || balance === 0)
+            if (balance === null || balance < 100 * WebDollarCoins.WEBD)
                 return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
 
             let number = new BigInteger( hash.toString("hex"), 16);

@@ -69,12 +69,12 @@ class PoolWorkManagement{
 
                     tx.from.addresses.forEach((from)=>{
                         if ( from.unencodedAddress.equals( minerInstance.addresses[i] ))
-                            balance += from.amount;
+                            balance -= from.amount;
                     });
 
                     tx.to.addresses.forEach((to)=>{
                         if ( to.unencodedAddress.equals( minerInstance.addresses[i] ))
-                            balance -= to.amount;
+                            balance += to.amount;
                     });
 
                 });
@@ -141,7 +141,7 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
                  work.nonce = 0;
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, true ];
+                args = [ work.pos.timestamp, work.pos.posMinerAddress ];
 
             } else {
                 args = [work.nonce];
