@@ -14,10 +14,6 @@ class MiningTransactionsSelector{
 
     validateTransaction(transaction, miningFeePerByte){
 
-        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
-            throw {message: "transaction is too old"};
-        }
-
         //don't upset the SPAM_GUARDIAN
         for (let j = 0; j < transaction.from.addresses.length; j++) {
 

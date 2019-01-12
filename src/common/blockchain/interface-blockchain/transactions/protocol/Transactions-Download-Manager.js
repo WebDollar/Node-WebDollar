@@ -360,6 +360,14 @@ class TransactionsDownloadManager{
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
+            if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
+                throw {message: "transaction is too old"};
+            }
+
+            if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length ){
+                throw {message: "transaction is in future"};
+            }
+
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "Transsaction validation failed"};
 
@@ -377,7 +385,7 @@ class TransactionsDownloadManager{
 
             if (transaction !== undefined && transaction !== null)
                 if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction.txId) === null)
-                    transaction.destroyTransaction();
+                    this.removeTransaction(transaction.txId);
 
         }
 
