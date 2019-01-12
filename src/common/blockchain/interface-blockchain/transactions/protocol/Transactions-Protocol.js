@@ -58,14 +58,17 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
+                let transaction;
+
                 if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
                 if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
 
-                let transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
+                if( typeof response === "object"){
+                    transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
 
-                console.warn("Sending missing nonce", transaction);
-
-                socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
+                    console.warn("Sending missing nonce", transaction);
+                    socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
+                }
 
             } catch (exception){
 
