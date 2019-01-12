@@ -100,7 +100,15 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    updatePoolMiningWork(work, poolSocket){
+    async updatePoolMiningWork(work, poolSocket){
+
+        if (this._isBeingMining){
+
+            this.resetForced = true;
+            if (this._runningPromise)
+                await this._runningPromise;
+
+        }
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
@@ -115,7 +123,7 @@ class MinerPoolMining extends InheritedPoolMining {
             }
         }
 
-        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   )
+        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );
         block.deserializeBlock( work.block, work.h, undefined, work.t, undefined, undefined, true );
 
         //required data
@@ -154,10 +162,6 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.date = new Date().getTime();
 
         this._miningWork.poolSocket = poolSocket;
-
-        if (this._isBeingMining){
-            this.resetForced = true;
-        }
 
         Log.info("New Work: "+ (work.end - work.start) + "   starting at: "+work.start + " block: "+this._getBlockSuffix(), Log.LOG_TYPE.POOLS );
 
@@ -228,21 +232,32 @@ class MinerPoolMining extends InheritedPoolMining {
 
     async _run() {
 
-        try {
+        this._runningPromise = new Promise( async (resolve)=>{
 
-            if (this._miningWork.block === undefined) throw {message: "block is undefined"};
-            if (this._miningWork.start === undefined) throw {message: "start is undefined"};
-            if (this._miningWork.end === undefined) throw {message: "end is undefined"};
-            if (this._miningWork.difficultyTarget === undefined) throw {message: "difficultyTarget is undefined"};
+            try {
 
-            let answer = await this.mine (this._miningWork.block, this._miningWork.difficultyTarget, this._miningWork.start, this._miningWork.end, this._miningWork.height,  );
+                if (this._miningWork.block === undefined) throw {message: "block is undefined"};
+                if (this._miningWork.start === undefined) throw {message: "start is undefined"};
+                if (this._miningWork.end === undefined) throw {message: "end is undefined"};
+                if (this._miningWork.difficultyTarget === undefined) throw {message: "difficultyTarget is undefined"};
 
-            return answer;
+                let answer = await this.mine (this._miningWork.block, this._miningWork.difficultyTarget, this._miningWork.start, this._miningWork.end, this._miningWork.height,  );
 
-        } catch (exception){
-            console.error("Couldn't mine block ", this._miningWork.block.toJSON(), exception);
-            return null;
-        }
+                resolve(answer);
+
+
+            } catch (exception){
+
+                console.error("Couldn't mine block ", this._miningWork.block.toJSON(), exception);
+                resolve(null);
+
+            }
+
+
+        });
+
+        return this._runningPromise;
+
 
     }
 

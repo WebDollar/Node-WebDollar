@@ -171,7 +171,7 @@ class MinerProtocol extends PoolProtocolList{
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
                 if (answer.work !== undefined)
-                    this._validateRequestWork(answer.work, socket);
+                    await this._validateRequestWork(answer.work, socket);
 
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolAddress = poolAddress;
@@ -246,7 +246,7 @@ class MinerProtocol extends PoolProtocolList{
                 else
                     Log.warn("Sending Partial Work was skipped" , Log.LOG_TYPE.POOLS);
 
-                this._validateRequestWork(data.work, socket);
+                await this._validateRequestWork(data.work, socket);
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
@@ -261,7 +261,7 @@ class MinerProtocol extends PoolProtocolList{
 
     }
 
-    _validateRequestWork(work, socket){
+    async _validateRequestWork(work, socket){
 
         if (typeof work !== "object") throw {message: "get-work invalid work"};
 
@@ -284,7 +284,7 @@ class MinerProtocol extends PoolProtocolList{
             if (!ed25519.verify(work.sig, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
         }
 
-        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
+        await this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
 
     }
 
@@ -310,7 +310,7 @@ class MinerProtocol extends PoolProtocolList{
 
         if (answer.result !== true) throw {message: "get-work answered false"};
 
-        this._validateRequestWork( answer.work, poolSocket);
+        await this._validateRequestWork( answer.work, poolSocket);
 
         this._updateStatistics(answer);
         this.minerPoolManagement.minerPoolReward.setReward(answer);
@@ -355,7 +355,7 @@ class MinerProtocol extends PoolProtocolList{
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 
-            this._validateRequestWork( answer.newWork||answer.work, poolSocket);
+            await this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
             this.minerPoolManagement.minerPoolReward.setReward(answer);
