@@ -87,6 +87,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      */
     async computeHashPOS( newTimestamp, posNewMinerAddress, balance){
 
+        let virtualizedBalance = balance;
+
         let whoIsMining = posNewMinerAddress || this.posMinerAddress ||  this.data.minerAddress;
         let whoIsReceivingMoney = this.data.minerAddress;
 
@@ -133,23 +135,26 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 });
 
-                console.log("Initial Balance ", balance); let s = "";
-                for (let i = this.height-1; i >= 0 && i >= this.height -1 - 30; i--  ) {
+            }
 
-                    let block = this.blockValidation.getBlockCallBack(i+1);
+            //also solo miners need to subtract the transactions as well
+            if ( !virtualizedBalance ) {
+                let s = "";
+                for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - 30; i--) {
 
-                    s += block.height + " ";
+                    let block = this.blockValidation.getBlockCallBack(i + 1);
 
-                    block.data.transactions.transactions.forEach( (tx) => {
-                        tx.to.addresses.forEach((to)=>{
-                            if ( to.unencodedAddress.equals( whoIsMining ))
+                    if (block === undefined) continue;
+
+                    //s += block.height + " ";
+
+                    block.data.transactions.transactions.forEach((tx) => {
+                        tx.to.addresses.forEach((to) => {
+                            if (to.unencodedAddress.equals(whoIsMining))
                                 balance -= to.amount;
                         });
                     });
                 }
-                console.log("After Balance ", balance, s);
-
-
             }
 
             if (balance === null || balance < 100 * WebDollarCoins.WEBD)
