@@ -285,15 +285,15 @@ class TransactionsDownloadManager{
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
 
                                             //If socket sent over 5 consecutive invalid tx
-                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
-                                                this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
-                                                let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                                this._unsubscribeSocket(suspiciousSocket);
-                                                // BansList.addBan(suspiciousSocket, 20*1000, "Sent over 10 invalid transactions");
-                                                continue;
-                                            }else{
-                                                this.removeTransaction(txId);
-                                            }
+                                            // if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 5 ){
+                                            //     this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
+                                            //     let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
+                                            //     this._unsubscribeSocket(suspiciousSocket);
+                                            //     // BansList.addBan(suspiciousSocket, 20*1000, "Sent over 10 invalid transactions");
+                                            //     continue;
+                                            // }else{
+                                            //     this.removeTransaction(txId);
+                                            // }
 
                                         }else{
 
@@ -316,9 +316,9 @@ class TransactionsDownloadManager{
                                         if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                                            if( typeof this._transactionsQueue[txId] !== "undefined")
-                                                if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                                    this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                            // if( typeof this._transactionsQueue[txId] !== "undefined")
+                                            //     if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                            //         this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                         }
                                     }
 
