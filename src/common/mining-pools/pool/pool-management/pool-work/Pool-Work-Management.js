@@ -77,7 +77,7 @@ class PoolWorkManagement{
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
-            m: this.poolWork.lastBlock.timeStamp,
+            m: this.poolWork.lastBlock.getMedianTimestamp(),
             lsig: ( BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ) ? this.blockchain.blocks[this.poolWork.lastBlock.height-1].posSignature : undefined,
 
             start: this.poolWork.lastBlockNonce,
