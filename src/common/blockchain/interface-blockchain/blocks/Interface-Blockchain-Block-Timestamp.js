@@ -22,7 +22,7 @@ class InterfaceBlockchainBlockTimestamp {
 
         let no_blocks = consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS;
 
-        if (height >= consts.POS_ACTIVATION)
+        if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             no_blocks = 2;
 
         for (let i = height-1; i >= height - no_blocks; i--)
