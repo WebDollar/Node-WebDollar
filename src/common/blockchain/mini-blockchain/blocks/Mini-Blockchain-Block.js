@@ -87,6 +87,8 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      */
     async computeHashPOS( newTimestamp, posNewMinerAddress, balance){
 
+        let virtualBalance = balance;
+
         let whoIsMining = posNewMinerAddress || this.posMinerAddress ||  this.data.minerAddress;
         let whoIsReceivingMoney = this.data.minerAddress;
 
@@ -136,7 +138,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             }
 
             //also solo miners need to subtract the transactions as well
-            if ( !Blockchain.MinerPoolManagement.minerPoolSettings.minerPoolActivated ) {
+            if ( virtualBalance && !Blockchain.MinerPoolManagement.minerPoolSettings.minerPoolActivated ) {
 
                 console.log("Before Balance ", balance); let s = "";
                 for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - 30; i--) {

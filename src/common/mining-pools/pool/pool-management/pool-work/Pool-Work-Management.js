@@ -127,7 +127,7 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
 
                 work.nonce = 0;
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress) ];
+                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress, prevBlock) ];
 
             } else {
                 args = [work.nonce];
@@ -255,14 +255,16 @@ class PoolWorkManagement{
     }
 
 
-    _getMinerBalance(address){
+    _getMinerBalance(address, prevBlock){
+
+        prevBlock = prevBlock || this.poolWork.lastBlock;
 
         let balance = this.blockchain.accountantTree.getBalance( address );
         if (balance === null) balance = 0;
 
         //must be reverted
         console.log("2 Before Balance ", balance); let s = "";
-        for (let i = this.poolWork.lastBlock.height-1; i >= 0 && i >= this.poolWork.lastBlock.height -1 - 30; i--  ) {
+        for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - 30; i--  ) {
 
             let block = this.blockchain.blocks[ i ];
 
