@@ -51,7 +51,7 @@ class MinerPoolMining extends InheritedPoolMining {
         this._minerAddress = Blockchain.blockchain.mining.minerAddress;
         this._unencodedMinerAddress = Blockchain.blockchain.mining.unencodedMinerAddress;
 
-        this._isBeingMining = false;
+        this._isBeingMining = undefined;
 
         if (this._workers !== undefined)
             this._workers._in_pool = true;
@@ -109,14 +109,19 @@ class MinerPoolMining extends InheritedPoolMining {
         if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start)
             return;
 
-        this._miningWork.blockId = Math.max( this._miningWork.blockId || 0, work.I  );
-        this._miningWork.start = work.start;
+        if ( (this._miningWork.blockId||0) < work.I){
+            this._miningWork.blockId = work.I ;
+            this._miningWork.start = work.start;
+        }
 
-        this.resetForced = true;
-        await this._runningPromise;
+        if (this._isBeingMining) {
+            this.resetForced = true;
+            await this._isBeingMining;
+        }
 
         if (this._miningWork.blockId > work.I)
             return;
+
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
@@ -166,10 +171,11 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.start = work.start;
         this._miningWork.end = work.end;
 
-        this._miningWork.resolved = false;
         this._miningWork.date = new Date().getTime();
 
         this._miningWork.poolSocket = poolSocket;
+        this._miningWork.resolved = false;
+
 
         Log.info("New Work: "+ (work.end - work.start) + "   starting at: "+work.start + " block: "+this._getBlockSuffix(), Log.LOG_TYPE.POOLS );
 
@@ -204,28 +210,46 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     let timeInitial = new Date().getTime();
 
-                    this._isBeingMining = true;
-                    let workHeight = this._miningWork.height;
-                    let workId = this._miningWork.blockId;
-                    let workEnd = this._miningWork.end;
-                    let workStart = this._miningWork.start;
+                    this._isBeingMining = new Promise( async (resolve)=>{
 
-                    let answer = await this._run();
-                    this._isBeingMining = false;
+                        try {
 
-                    if (answer === null)
-                        continue;
+                            let workHeight = this._miningWork.height;
+                            let workId = this._miningWork.blockId;
+                            let workEnd = this._miningWork.end;
+                            let workStart = this._miningWork.start;
 
-                    answer.timeDiff = new Date().getTime() - timeInitial;
+                            let answer = await this._run();
 
-                    if (!this.resetForced ) {
-                        this._miningWork.resolved = true;
-                        answer.id = workId;
-                        answer.hashes = workEnd - workStart;
-                        await this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
-                    } else {
-                        this.resetForced = false;
-                    }
+                            if (answer === null) {
+                                resolve(false)
+                            }
+
+                            answer.timeDiff = new Date().getTime() - timeInitial;
+
+                            if (!this.resetForced) {
+                                answer.id = workId;
+                                answer.hashes = workEnd - workStart;
+                                this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
+                            } else {
+                                this.resetForced = false;
+                            }
+
+                            this._miningWork.resolved = true;
+
+                            resolve(true);
+
+                        } catch (exception){
+                            console.log("Pool Mining Exception", exception);
+                            this.stopMining();
+
+                            resolve(false);
+                        }
+
+                    })
+
+
+                    await this._isBeingMining;
 
                 } catch (exception) {
                     console.log("Pool Mining Exception", exception);
