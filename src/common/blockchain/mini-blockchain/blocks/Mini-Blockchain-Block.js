@@ -138,7 +138,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             }
 
             //also solo miners need to subtract the transactions as well
-            if ( virtualBalance && !Blockchain.MinerPoolManagement.minerPoolSettings.minerPoolActivated ) {
+            if ( !virtualBalance && !Blockchain.MinerPoolManagement.minerPoolSettings.minerPoolActivated ) {
 
                 console.log("Before Balance ", balance); let s = "";
                 for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - 30; i--) {
