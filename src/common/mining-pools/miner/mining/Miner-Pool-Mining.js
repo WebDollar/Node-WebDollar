@@ -29,7 +29,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._miningWork = {
             block: undefined, //entire serialization
-            blockId: undefined,
+            blockId: -1,
 
             start: undefined,
             end: undefined,
@@ -55,8 +55,6 @@ class MinerPoolMining extends InheritedPoolMining {
 
         if (this._workers !== undefined)
             this._workers._in_pool = true;
-
-        this._lastWorkdId = -1;
 
     }
 
@@ -109,7 +107,7 @@ class MinerPoolMining extends InheritedPoolMining {
         if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start)
             return;
 
-        if ( (this._miningWork.blockId||0) < work.I){
+        if ( this._miningWork.blockId < work.I){
             this._miningWork.blockId = work.I ;
             this._miningWork.start = work.start;
         }
@@ -122,6 +120,7 @@ class MinerPoolMining extends InheritedPoolMining {
         if (this._miningWork.blockId > work.I)
             return;
 
+        this.resetForced = false;
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){

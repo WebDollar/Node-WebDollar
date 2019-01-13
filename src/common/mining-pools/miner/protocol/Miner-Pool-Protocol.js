@@ -224,6 +224,8 @@ class MinerProtocol extends PoolProtocolList{
         if (this.minerPoolManagement.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
             this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
+        this.minerPoolManagement.minerPoolMining._miningWork.blockId = -1;
+
         socket.node.on("mining-pool/new-work", async (data)=>{
 
             try {
