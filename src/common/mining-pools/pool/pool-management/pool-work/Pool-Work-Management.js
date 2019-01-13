@@ -56,20 +56,19 @@ class PoolWorkManagement{
         this.poolWork.lastBlockElement.instances[minerInstance.socket.node.sckAddress.uuid] = this.poolWork.lastBlock;
 
         //for proof of stake it is necessary to know exactly the balance
-        let balances = undefined;
+        let balances;
 
-        if (BlockchainGenesis.isPoSActivated( this.poolWork.lastBlock.height )){
+        let isPOS = BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height );
+
+        if (isPOS){
 
             balances = [];
 
-
-            for (let i=0; i < minerInstance.addresses.length; i++){
-
+            for (let i=0; i < minerInstance.addresses.length; i++)
                 balances.push(this._getMinerBalance( minerInstance.addresses[i] ));
 
-            }
-
         }
+
 
         let answer = {
 
@@ -78,12 +77,12 @@ class PoolWorkManagement{
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
             m: this.blockchain.blocks.timestampBlocks.getMedianTimestamp( this.poolWork.lastBlock.height, this.poolWork.lastBlock.blockValidation),
-            lsig: ( BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ) ? this.blockchain.blocks[this.poolWork.lastBlock.height-1].posSignature : undefined,
+            lsig: BlockchainGenesis.isPoSActivated(this.poolWork.lastBlock.height - 1) ? this.blockchain.blocks[this.poolWork.lastBlock.height-1].posSignature : undefined,
 
-            start: this.poolWork.lastBlockNonce,
-            end: this.poolWork.lastBlockNonce + hashes,
+            start: isPOS ? 0 : this.poolWork.lastBlockNonce,
+            end: isPOS ? 0 : (this.poolWork.lastBlockNonce + hashes),
 
-            b: balances,
+            b: isPOS ? balances : undefined,
 
         };
 
