@@ -104,17 +104,19 @@ class MinerPoolMining extends InheritedPoolMining {
 
     async updatePoolMiningWork(work, poolSocket){
 
-        if (this._lastWorkdId < work.id)
-            this._lastWorkdId = work.id;
-
-        this.resetForced = true;
-        if (this._runningPromise) {
-            await this._runningPromise;
-        }
-
-        if (this._lastWorkdId > work.id)
+        if (work.I < this._miningWork.blockId)  return;
+        else
+        if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start)
             return;
 
+        this._miningWork.blockId = Math.max( this._miningWork.blockId || 0, work.I  );
+        this._miningWork.start = work.start;
+
+        this.resetForced = true;
+        await this._runningPromise;
+
+        if (this._miningWork.blockId > work.I)
+            return;
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){

@@ -137,14 +137,15 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
             //also solo miners need to subtract the transactions as well
             if ( !Blockchain.MinerPoolManagement.minerPoolSettings.minerPoolActivated ) {
-                let s = "";
+
+                console.log("Before Balance ", balance); let s = "";
                 for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - 30; i--) {
 
                     let block = this.blockValidation.getBlockCallBack(i + 1);
 
                     if (block === undefined) continue;
 
-                    //s += block.height + " ";
+                    s += block.height + " ";
 
                     block.data.transactions.transactions.forEach((tx) => {
                         tx.to.addresses.forEach((to) => {
@@ -153,6 +154,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                         });
                     });
                 }
+                console.log("After Balance ", balance, s);
             }
 
             if (balance === null || balance < 100 * WebDollarCoins.WEBD)
