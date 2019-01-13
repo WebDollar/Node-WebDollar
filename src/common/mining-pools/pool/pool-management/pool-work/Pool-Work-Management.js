@@ -124,22 +124,22 @@ class PoolWorkManagement{
                 throw {message: "miner instance - no block"};
 
             let args = [];
-            if ( BlockchainGenesis.isPoSActivated( (prevBlock || blockInformationMinerInstance.workBlock).height) ) {
+            if ( BlockchainGenesis.isPoSActivated( blockInformationMinerInstance.workBlock.height) ) {
 
                 work.nonce = 0;
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress, prevBlock) ];
+                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress, blockInformationMinerInstance.workBlock) ];
 
             } else {
                 args = [work.nonce];
             }
 
-             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
+             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ undefined, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
-            if (BlockchainGenesis.isPoSActivated( (prevBlock||blockInformationMinerInstance.workBlock).height) ) {
+            if (BlockchainGenesis.isPoSActivated( blockInformationMinerInstance.workBlock.height) ) {
                 blockInformationMinerInstance.workPosSignature = work.pos.posSignature;
                 blockInformationMinerInstance.workPosMinerAddress = work.pos.posMinerAddress;
                 blockInformationMinerInstance.workPosMinerPublicKey = work.pos.posMinerPublicKey;

@@ -102,10 +102,11 @@ class MinerPoolMining extends InheritedPoolMining {
 
     async updatePoolMiningWork(work, poolSocket){
 
-        if (work.I < this._miningWork.blockId)  return;
-        else
-        if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start)
-            return;
+        if (!this.resetForced) {
+            if (work.I < this._miningWork.blockId) return;
+            else if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start && this._miningWork.blockSerialized.equals(work.block))
+                return;
+        }
 
         if ( this._miningWork.blockId < work.I){
             this._miningWork.blockId = work.I ;
@@ -156,6 +157,8 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.blocks.push(block);
 
         this._miningWork.block = block;
+        this._miningWork.blockSerialized = work.block;
+
         this._miningWork.medianTimestamp = work.m;
 
         this._miningWork.height = work.h;
