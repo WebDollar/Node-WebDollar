@@ -263,12 +263,12 @@ class PoolWorkManagement{
         if (balance === null) balance = 0;
 
         //must be reverted
-        console.log("2 Before Balance ", balance); let s = "";
+        //console.log("2 Before Balance ", balance); let s = "";
         for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - 30; i--  ) {
 
             let block = this.blockchain.blocks[ i ];
 
-            s += block.height + " ";
+            //s += block.height + " ";
 
             block.data.transactions.transactions.forEach( (tx) => {
                 tx.to.addresses.forEach((to)=>{
@@ -278,7 +278,7 @@ class PoolWorkManagement{
             });
         }
 
-        console.log("2 After Balance ", balance, s);
+        //console.log("2 After Balance ", balance, s);
 
         return balance;
 
