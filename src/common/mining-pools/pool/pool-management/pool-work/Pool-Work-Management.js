@@ -127,7 +127,9 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( blockInformationMinerInstance.workBlock.height) ) {
 
                 work.nonce = 0;
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, this._getMinerBalance(work.pos.posMinerAddress, blockInformationMinerInstance.workBlock) ];
+                blockInformationMinerInstance.posMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, blockInformationMinerInstance.workBlock);
+
+                args = [ work.pos.timestamp, work.pos.posMinerAddress, blockInformationMinerInstance.posMinerAddressBalance ];
 
             } else {
                 args = [work.nonce];
@@ -235,7 +237,7 @@ class PoolWorkManagement{
 
             }
 
-            blockInformationMinerInstance.calculateDifficulty();
+            blockInformationMinerInstance.calculateDifficulty()  ;
             blockInformationMinerInstance.adjustDifficulty(undefined, true);
 
             //statistics

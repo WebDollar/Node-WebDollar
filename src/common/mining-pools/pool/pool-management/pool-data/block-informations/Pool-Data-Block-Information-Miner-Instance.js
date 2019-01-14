@@ -72,12 +72,25 @@ class PoolDataBlockInformationMinerInstance {
 
     calculateDifficulty(workHash){
 
-        if (workHash === undefined) workHash = this._workHash;
+        //POS difficulty
+        if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
 
-        // target     =     maximum target / difficulty
-        // difficulty =     maximum target / target
+            if ( !workHash )
+                workHash = this.posMinerAddressBalance.toString();
 
-        this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workHash.toString("hex") ) );
+            this._workDifficulty = new BigNumber( workHash );
+
+        } else { //POW difficulty
+
+            if ( !workHash )
+                workHash = this._workHash;
+
+            // target     =     maximum target / difficulty
+            // difficulty =     maximum target / target
+
+            this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workHash.toString("hex") ) );
+
+        }
 
     }
 
@@ -85,12 +98,24 @@ class PoolDataBlockInformationMinerInstance {
 
         if (difficulty === undefined) difficulty = this._workDifficulty;
 
-        if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
+        //POS difficulty
+        if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
 
             this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
             this.minerInstanceTotalDifficulty = difficulty;
 
-            this.calculateReward(useDeltaTime );
+            this.calculateReward( useDeltaTime );
+
+        } else { //POW difficulty
+
+            if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
+
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
+                this.minerInstanceTotalDifficulty = difficulty;
+
+                this.calculateReward( useDeltaTime );
+            }
+
         }
 
     }
