@@ -199,16 +199,18 @@ class MinerPoolMining extends InheritedPoolMining {
                 try {
 
                     //except the last block
-                    if (this.block)
+                    if (this.block){
                         for ( let i=this._miningWork.blocks.length-2; i >= 0; i-- )
                             if ( this._miningWork.blocks[i].height  < this.block.height  ){
                                 this._miningWork.blocks[i].destroyBlock();
                                 this._miningWork.blocks.splice(i, 1);
                             }
 
-                    let prevBlock = this.block;
-                    if (prevBlock !== undefined && prevBlock !== this._miningWork.block )
-                        prevBlock.destroyBlock();
+                        let prevBlock = this.block;
+
+                        if (prevBlock !== undefined && prevBlock !== this._miningWork.block )
+                            prevBlock.destroyBlock();
+                    }
 
                     let timeInitial = new Date().getTime();
 
