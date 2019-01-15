@@ -29,12 +29,14 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     mine (block, difficultyTarget, start, end, height){
 
+        let blockBuffer;
+
         //serialize the block
         if ( !Buffer.isBuffer( block ) && typeof block === 'object' ) {
-            block = Buffer.concat( [
+            blockBuffer = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( block.difficultyTargetPrev ),
-                this._computeBlockHeaderPrefix( true )
+                block._computeBlockHeaderPrefix( true )
             ]);
         }
 
@@ -52,16 +54,16 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this._nonce = start;
 
-
         this._workerFinished = false;
 
         let promiseResolve = new Promise ((resolve)=>{ this._workerResolve = resolve });
 
         //initialize new workers
 
-        this.workers.initializeWorkers(block, difficultyTarget );
+        this.workers.initializeWorkers(blockBuffer, difficultyTarget );
 
         return promiseResolve;
+
     }
 
 
