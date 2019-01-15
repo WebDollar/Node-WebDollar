@@ -120,14 +120,16 @@ class PoolWorkManagement{
 
             let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
 
-            if ( (prevBlock  || blockInformationMinerInstance.workBlock) === undefined)
+            prevBlock = prevBlock  || blockInformationMinerInstance.workBlock;
+
+            if ( prevBlock === undefined)
                 throw {message: "miner instance - no block"};
 
             let args = [];
-            if ( BlockchainGenesis.isPoSActivated( blockInformationMinerInstance.workBlock.height) ) {
+            if ( BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
 
                 work.nonce = 0;
-                blockInformationMinerInstance.posMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, blockInformationMinerInstance.workBlock);
+                blockInformationMinerInstance.posMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
 
                 args = [ work.pos.timestamp, work.pos.posMinerAddress, blockInformationMinerInstance.posMinerAddressBalance ];
 
@@ -135,13 +137,13 @@ class PoolWorkManagement{
                 args = [work.nonce];
             }
 
-             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ undefined, work.hash ].concat( args ),  )  )
+             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
 
             blockInformationMinerInstance.workHash = work.hash;
             blockInformationMinerInstance.workHashNonce = work.nonce;
 
-            if (BlockchainGenesis.isPoSActivated( blockInformationMinerInstance.workBlock.height) ) {
+            if (BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
                 blockInformationMinerInstance.workPosSignature = work.pos.posSignature;
                 blockInformationMinerInstance.workPosMinerAddress = work.pos.posMinerAddress;
                 blockInformationMinerInstance.workPosMinerPublicKey = work.pos.posMinerPublicKey;
@@ -157,12 +159,12 @@ class PoolWorkManagement{
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
-                    console.warn("WebDollar Block was mined in Pool 2 ", blockInformationMinerInstance.workBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
 
                     //returning false, because a new fork was changed in the mean while
-                    if (this.blockchain.blocks.length !== blockInformationMinerInstance.workBlock.height)
+                    if (this.blockchain.blocks.length !== prevBlock.height)
                         throw {message: "pool: block is already too old"};
 
                     let revertActions = new RevertActions(this.blockchain);
@@ -170,7 +172,7 @@ class PoolWorkManagement{
                     let block;
                     try {
 
-                        let workBlock = blockInformationMinerInstance.workBlock;
+                        let workBlock = prevBlock;
 
                         workBlock.hash = blockInformationMinerInstance.workHash;
 
@@ -184,7 +186,7 @@ class PoolWorkManagement{
                         else
                             workBlock.nonce = blockInformationMinerInstance.workHashNonce;
 
-                        let serialization = blockInformationMinerInstance.workBlock.serializeBlock();
+                        let serialization = prevBlock.serializeBlock();
                         block = this.blockchain.blockCreator.createEmptyBlock(workBlock.height, undefined );
                         block.deserializeBlock(serialization, workBlock.height, workBlock.reward,  );
 
