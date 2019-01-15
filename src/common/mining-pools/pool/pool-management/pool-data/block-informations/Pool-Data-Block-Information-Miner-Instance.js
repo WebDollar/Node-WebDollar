@@ -96,14 +96,29 @@ class PoolDataBlockInformationMinerInstance {
 
     adjustDifficulty(difficulty, useDeltaTime = false ){
 
+        if ( !this.workBlock )
+            return;
+
         if (difficulty === undefined) difficulty = this._workDifficulty;
 
-        if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
+        //POS difficulty
+        if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
 
             this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
             this.minerInstanceTotalDifficulty = difficulty;
 
             this.calculateReward( useDeltaTime );
+
+        } else { //POW difficulty
+
+            if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
+
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
+                this.minerInstanceTotalDifficulty = difficulty;
+
+                this.calculateReward( useDeltaTime );
+            }
+
         }
 
     }
