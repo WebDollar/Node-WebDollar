@@ -264,7 +264,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         this.end = 0;
 
-
         let balance = this.blockchain.accountantTree.getBalance( this.block.posMinerAddress || block.data.minerAddress );
 
         if (balance === null){
