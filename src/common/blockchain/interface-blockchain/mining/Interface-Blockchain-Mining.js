@@ -263,6 +263,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
     async _minePOS(block, difficultyTarget){
 
         this.end = 0;
+        this.block = block;
 
         let balance = this.blockchain.accountantTree.getBalance( this.block.posMinerAddress || block.data.minerAddress );
 
