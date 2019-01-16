@@ -1,5 +1,5 @@
 import {RpcMethod} from './../../../jsonRpc';
-import BlockchainGenesis from './../../../common/blockchain/global/Blockchain-Genesis';
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 /**
  * Returns an object with data about the sync status.

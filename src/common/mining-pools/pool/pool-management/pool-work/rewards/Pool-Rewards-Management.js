@@ -5,6 +5,7 @@ import consts from 'consts/const_global'
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import PoolPayouts from "./Payout/Pool-Payouts"
 import Log from 'common/utils/logging/Log';
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START = 40; //blocks
@@ -59,6 +60,31 @@ class PoolRewardsManagement{
 
         this._lastTimeCheckHeight = this.blockchain.blocks.length-1;
 
+        //check for penalties
+        for (let i = 0; i < this.poolData.blocksInfo.length; i++){
+
+            let blockInfo = this.poolData.blocksInfo[i].block;
+
+            if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks[blockInfo.height] && this.blockchain.blocks.length - blockInfo.height >= 10 )
+
+                if (BlockchainGenesis.isPoSActivated(blockInfo.height)){
+
+                    for (let j=0; j < this.poolData.blocksInfo[i].blockInformationMinersInstances.length; j++){
+
+                        let blockInformationMinerInstance = this.poolData.blocksInfo[i].blockInformationMinersInstances[j];
+                        if ( this.blockchain.blocks[blockInfo.height].data.minerAddress.equals( blockInformationMinerInstance.minerAddress ) ||  ( this.blockchain.blocks[blockInfo.height].posMinerAddress && this.blockchain.blocks[blockInfo.height].posMinerAddress.equals( blockInformationMinerInstance.minerAddress ) )){
+
+                            //redistribute all pool POS
+
+                        }
+
+                    }
+
+                }
+
+
+        }
+
         let confirmationsPool = 0;
         let confirmationsOthers = 0;
         let confirmationsOthersUnique = 0;
@@ -67,10 +93,10 @@ class PoolRewardsManagement{
 
         let confirmations = {};
 
-        //calcualte confirmations
-
+        //calculate confirmations
         if (CONFIRMATION_METHOD === 1)
             try {
+
                 let firstBlock;
                 for (let i = 0; i < this.poolData.blocksInfo.length; i++)
                     if (this.poolData.blocksInfo[i].block !== undefined)
@@ -79,11 +105,14 @@ class PoolRewardsManagement{
 
                 for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
 
-                    if (this.blockchain.mining.unencodedMinerAddress.equals(this.blockchain.blocks[i].data.minerAddress))
+                    let block = this.blockchain.blocks[i];
+
+                    if (this.blockchain.mining.unencodedMinerAddress.equals(block.data.minerAddress))
                         confirmationsPool++;
                     else {
-                        if (uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] === undefined) {
-                            uniques[this.blockchain.blocks[i].data.minerAddress.toString("hex")] = true;
+
+                        if (uniques[ block.data.minerAddress.toString("hex")] === undefined) {
+                            uniques[ block.data.minerAddress.toString("hex")] = true;
                             confirmationsOthersUnique++;
                         } else
                             confirmationsOthers++;
@@ -96,6 +125,7 @@ class PoolRewardsManagement{
                     }
 
                 }
+
             } catch (exception){
 
             }
