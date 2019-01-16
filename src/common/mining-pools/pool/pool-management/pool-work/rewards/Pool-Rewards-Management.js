@@ -76,6 +76,9 @@ class PoolRewardsManagement{
 
                             //redistribute all pool POS
 
+                            blockInformationMinerInstance.cancelReward();
+                            blockInformationMinerInstance.adjustDifficulty( blockInformationMinerInstance.minerInstanceTotalDifficulty, true );
+
                         }
 
                     }

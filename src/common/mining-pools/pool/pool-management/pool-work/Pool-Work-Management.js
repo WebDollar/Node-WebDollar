@@ -129,9 +129,9 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
 
                 work.nonce = 0;
-                blockInformationMinerInstance.posMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
+                blockInformationMinerInstance.workPosMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
 
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, blockInformationMinerInstance.posMinerAddressBalance ];
+                args = [ work.pos.timestamp, work.pos.posMinerAddress, blockInformationMinerInstance.workPosMinerAddressBalance ];
 
             } else {
                 args = [work.nonce];

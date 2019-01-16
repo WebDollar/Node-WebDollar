@@ -24,6 +24,13 @@ class PoolDataBlockInformationMinerInstance {
         this.workHashNonce = undefined;
         this.workBlock = undefined;
 
+        this.workPosMinerAddressBalance = undefined;
+        this.workPosSignature = undefined;
+        this.workPosMinerAddress = undefined;
+        this.workPosMinerPublicKey = undefined;
+        this.workPosTimestamp = undefined;
+
+
         this._workDifficulty = undefined;
 
         this.addresses = []; //received by pool for POS balances to be sent
@@ -104,7 +111,7 @@ class PoolDataBlockInformationMinerInstance {
         //POS difficulty
         if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
 
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty, BlockchainGenesis.isPoSActivated(this.workBlock.height) );
             this.minerInstanceTotalDifficulty = difficulty;
 
             this.calculateReward( useDeltaTime );
@@ -113,7 +120,7 @@ class PoolDataBlockInformationMinerInstance {
 
             if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
 
-                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty );
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty, BlockchainGenesis.isPoSActivated(this.workBlock.height) );
                 this.minerInstanceTotalDifficulty = difficulty;
 
                 this.calculateReward( useDeltaTime );

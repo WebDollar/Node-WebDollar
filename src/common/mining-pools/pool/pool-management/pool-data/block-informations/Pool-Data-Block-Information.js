@@ -59,8 +59,8 @@ class PoolDataBlockInformation {
 
     adjustBlockInformationDifficultyBestTarget (difficulty, prevDifficulty){
 
-        this.totalDifficultyMinus( prevDifficulty, true );
-        this.totalDifficultyPlus( difficulty );
+        this._totalDifficultyMinus( prevDifficulty, true );
+        this._totalDifficultyPlus( difficulty );
 
     }
 
@@ -72,7 +72,7 @@ class PoolDataBlockInformation {
         if (difficulty === undefined)
             difficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedToIntegerBy(new BigNumber("0x" + hash.toString("hex")));
 
-        this.totalDifficultyPlus( difficulty );
+        this._totalDifficultyPlus( difficulty );
 
     }
 
@@ -247,7 +247,7 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances[pos].cancelReward();
 
-        this.totalDifficultyMinus(this.blockInformationMinersInstances[pos].minerInstanceTotalDifficulty);
+        this._totalDifficultyMinus(this.blockInformationMinersInstances[pos].minerInstanceTotalDifficulty);
         this.blockInformationMinersInstances.splice(pos,1);
 
         for (let j=0; j<this.blockInformationMinersInstances.length; j++)
@@ -290,12 +290,15 @@ class PoolDataBlockInformation {
 
     }
 
-    totalDifficultyPlus(value){
+    _totalDifficultyPlus(value, avoidToCalculateRemaining = false){
+
         this.totalDifficulty = this.totalDifficulty.plus(value);
-        this._calculateTimeRemaining();
+
+        if (!avoidToCalculateRemaining)
+            this._calculateTimeRemaining();
     }
 
-    totalDifficultyMinus(value, avoidToCalculateRemaining = false){
+    _totalDifficultyMinus(value, avoidToCalculateRemaining = false){
         this.totalDifficulty = this.totalDifficulty.minus(value);
 
         if (!avoidToCalculateRemaining)
