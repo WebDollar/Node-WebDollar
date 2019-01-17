@@ -128,16 +128,24 @@ class InterfaceBlockchainBlocks{
     recalculateNetworkHashRate (){
 
         let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
-        let SumDiff = new BigNumber( 0 );
+        let diff;
+
+        let SumDiffPoS = new BigNumber( 0 );
+        let SumDiffPoW = new BigNumber( 0 );
 
         let last, first;
-        for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS); i<this.blockchain.blocks.endingPosition; i++) {
+        for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS*3); i<this.blockchain.blocks.endingPosition; i++) {
 
             if (this.blockchain.blocks[i] === undefined) continue;
+            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+
+            if( this.blockchain.blockchainGenesis.isPoSActivated(this.blockchain.blocks[i].height) )
+                SumDiffPoS = SumDiffPoS.plus( diff );
+            else
+                SumDiffPoW = SumDiffPoW.plus( diff );
 
             let diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
-            SumDiff = SumDiff.plus( diff );
-
+            SumDiffPoW = SumDiffPoW.plus( diff );
 
             if (!first) first = i;
             last = i;
@@ -145,13 +153,15 @@ class InterfaceBlockchainBlocks{
         }
 
         let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
+        let answer;
 
-        let answer = SumDiff.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
-        answer = parseFloat(answer);
+        if( this.blockchain.blockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
+            answer = SumDiffPoS.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
+        else
+            answer = SumDiffPoW.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
 
-        this.networkHashRate = answer;
-
-        return answer;
+        this.networkHashRate = parseFloat(answer);
+        return parseFloat(answer);
 
     }
 
