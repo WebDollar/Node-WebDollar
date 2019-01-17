@@ -265,9 +265,15 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         this.end = 0;
         this.block = block;
 
-        let balance = this.blockchain.accountantTree.getBalance( this.block.posMinerAddress || block.data.minerAddress );
+        let whoIsMining = this.block.posMinerAddress || block.data.minerAddress;
+        let balance;
 
-        if (balance === null){
+        if (this._miningBalances)
+            balance = this._miningBalances[ whoIsMining.toString("hex") ];
+        else
+            balance = this.blockchain.accountantTree.getBalance( whoIsMining );
+
+        if ( !balance ){
 
             await this.blockchain.sleep(1000);
 

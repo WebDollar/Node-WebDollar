@@ -66,7 +66,7 @@ class CLI {
                 await this.setMiningAddress();
                 break;
             case '8': //  Start Mining
-                await this.startMining();
+                this.startMining();
                 break;
             case '9': //  Start Mining Instantly
                 await this.startMining(true);

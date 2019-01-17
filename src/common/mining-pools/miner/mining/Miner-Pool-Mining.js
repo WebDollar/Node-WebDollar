@@ -56,6 +56,8 @@ class MinerPoolMining extends InheritedPoolMining {
         if (this._workers !== undefined)
             this._workers._in_pool = true;
 
+        this._miningBalances = {}
+
     }
 
     _startMinerPoolMining(){
@@ -126,14 +128,8 @@ class MinerPoolMining extends InheritedPoolMining {
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
 
-            for (let i=0 ; i< work.b.length; i++){
-
-                let prevVal = Blockchain.AccountantTree.getBalance( Blockchain.Wallet.addresses[i].unencodedAddress );
-                if (prevVal=== null ) prevVal = 0;
-
-                if (work.b[i] - prevVal !== 0)
-                    Blockchain.AccountantTree.updateAccount( Blockchain.Wallet.addresses[i].unencodedAddress, work.b[i] - prevVal, undefined, undefined, true );
-            }
+            for (let i=0 ; i< work.b.length; i++)
+                this._miningBalances[ Blockchain.Wallet.addresses[i].unencodedAddress.toString("hex") ] = work.b[i];
         }
 
         let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );
