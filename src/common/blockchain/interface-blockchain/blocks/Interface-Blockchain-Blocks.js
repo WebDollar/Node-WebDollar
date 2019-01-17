@@ -144,9 +144,6 @@ class InterfaceBlockchainBlocks{
             else
                 SumDiffPoW = SumDiffPoW.plus( diff );
 
-            let diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
-            SumDiffPoW = SumDiffPoW.plus( diff );
-
             if (!first) first = i;
             last = i;
 
