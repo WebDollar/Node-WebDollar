@@ -41,7 +41,6 @@ class BlockchainGenesis{
             return false;
         else {
 
-
             //0..19  pos
             //20..29 pow
             if ( height % 30 < 20) return true;
@@ -50,9 +49,7 @@ class BlockchainGenesis{
             //29,0..19  pos
             //20..29 pow
 
-
         }
-
 
     }
 
