@@ -273,16 +273,6 @@ class TransactionsDownloadManager{
                                 if (!this._transactionsQueue[txId])
                                     continue;
 
-                                if (this._transactionsQueue[txId].fails <= 5){
-
-                                    //Check if tx has socket and is still valid
-                                    if ( this._transactionsQueue[txId].socket !== undefined )
-                                        return {id:txId, index: index, };
-                                    else
-                                        this.removeTransaction(txId);
-
-                                }
-
                                 await this.blockchain.sleep(20);
                                 console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
 
