@@ -3,6 +3,7 @@ import StatusEvents from "common/events/Status-Events"
 
 const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
+import BlockchainGenesis from './../../../../common/blockchain/global/Blockchain-Genesis'
 
 import Serialization from "common/utils/Serialization";
 import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
@@ -139,7 +140,7 @@ class InterfaceBlockchainBlocks{
             if (this.blockchain.blocks[i] === undefined) continue;
             diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
 
-            if( this.blockchain.blockchainGenesis.isPoSActivated(this.blockchain.blocks[i].height) )
+            if( BlockchainGenesis.isPoSActivated( this.blockchain.blocks[i].height ) )
                 SumDiffPoS = SumDiffPoS.plus( diff );
             else
                 SumDiffPoW = SumDiffPoW.plus( diff );
@@ -152,7 +153,7 @@ class InterfaceBlockchainBlocks{
         let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
         let answer;
 
-        if( this.blockchain.blockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
+        if( BlockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
             answer = SumDiffPoS.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
         else
             answer = SumDiffPoW.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
