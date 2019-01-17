@@ -261,13 +261,11 @@ class TransactionsPendingQueue {
                     this._removePendingTransaction(this.listArray[i], i);
                     continue;
 
-                }else{
-                    if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
+                }else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
                             ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
                         (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
                         this._removePendingTransaction(this.listArray[i], i);
                         continue;
-                    }
                 }
 
                 if ( Blockchain.blockchain.agent.consensus )

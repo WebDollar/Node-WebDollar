@@ -284,11 +284,13 @@ class TransactionsDownloadManager{
 
                                     //If tx was not added into pending queue increase socket invalidTransactions
                                     if(!wasAdded) {
-                                        console.info("Not Addred", this._transactionsQueue[txId].buffer.toString('hex'));
+
+                                        console.info("Not Added", this._transactionsQueue[txId].buffer.toString('hex'));
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
 
-                                        // If socket sent over 5 consecutive invalid tx
-                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 50 ){
+                                        //TODO Change limits after multithread
+                                        // If socket sent over 100 consecutive invalid tx
+                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 10 ){
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
                                             let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
                                             this._unsubscribeSocket(suspiciousSocket);
@@ -319,9 +321,9 @@ class TransactionsDownloadManager{
                                     if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
-                                        // if( typeof this._transactionsQueue[txId] !== "undefined")
-                                        //     if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
-                                        //         this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                        if( typeof this._transactionsQueue[txId] !== "undefined")
+                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 100 )
+                                                this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                     }
                                 }
 
