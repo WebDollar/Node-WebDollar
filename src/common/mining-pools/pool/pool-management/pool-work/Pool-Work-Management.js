@@ -139,11 +139,11 @@ class PoolWorkManagement{
 
              if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
-            //
+
             // blockInformationMinerInstance.work = {};
             // blockInformationMinerInstance.work.hash = work.hash;
             // blockInformationMinerInstance.work.nonce = work.nonce;
-            //
+
 
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
@@ -269,12 +269,12 @@ class PoolWorkManagement{
         if (balance === null) balance = 0;
 
         //must be reverted
-        console.log("2 Before Balance ", balance); let s = "";
+        //console.log("2 Before Balance ", balance); let s = "";
         for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - 30; i--  ) {
 
             let block = this.blockchain.blocks[ i ];
 
-            s += block.height + " ";
+            //s += block.height + " ";
 
             block.data.transactions.transactions.forEach( (tx) => {
                 tx.to.addresses.forEach((to)=>{
@@ -284,7 +284,7 @@ class PoolWorkManagement{
             });
         }
 
-        console.log("2 After Balance ", balance, s);
+        //console.log("2 After Balance ", balance, s);
 
         return balance;
 

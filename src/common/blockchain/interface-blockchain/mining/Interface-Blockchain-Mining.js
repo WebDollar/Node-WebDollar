@@ -83,7 +83,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 }) === false) throw {message: "Mining1 returned False"};
 
         } catch (Exception){
-            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : '');
             revertActions.revertOperations();
         }
 
@@ -302,7 +302,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
-                    let hash = await this.calculateHash(   medianTimestamp + i, this.block.posMinerAddress);
+                    let hash = await this.calculateHash(   medianTimestamp + i, this.block.posMinerAddress, balance);
                     this.block.timeStamp = medianTimestamp + i;
 
                     if (hash.compare(this.bestHash) < 0) {
