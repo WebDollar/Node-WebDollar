@@ -510,7 +510,7 @@ if ( consts.DEBUG === true ) {
     //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://testnet2.hoste.ro:8002"],
+        "addr": ["http://86.126.138.61:2024"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
