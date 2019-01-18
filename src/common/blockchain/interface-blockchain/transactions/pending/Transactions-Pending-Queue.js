@@ -78,6 +78,14 @@ class TransactionsPendingQueue {
 
     _insertPendingTransaction(transaction,exceptSockets){
 
+        if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+            throw {message: "Transsaction validation failed"}
+
+        // if (this.blockchain.agent.light)
+        //     if(  transaction.timeLock < this.blockchain.blocks.length-1 ){
+        //         throw {message: "transaction is too old"};
+        //     }
+
         let inserted = false;
 
         for (let i=0; i<this.listArray.length ; i++ ) {
@@ -254,19 +262,23 @@ class TransactionsPendingQueue {
 
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
+            let removeThis = false;
+
             try{
 
-                if( this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
+                if (this.blockchain.agent.light)
+                    if( this.listArray[i].timeLock < this.blockchain.blocks.length-1 )
+                        removeThis=true;
 
-                    this._removePendingTransaction(this.listArray[i], i);
-                    continue;
+                if (this.listArray[i].nonce < this.blockchain.accountantTree.getAccountNonce(this.listArray[i].from.addresses[0].unencodedAddress))
+                    removeThis=true;
 
-                }else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
+                if( this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+                    removeThis=true;
+                else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
                             ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
-                        (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  )) {
-                        this._removePendingTransaction(this.listArray[i], i);
-                        continue;
-                }
+                        (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  ))
+                    removeThis=true;
 
                 if ( Blockchain.blockchain.agent.consensus )
                     this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType );
@@ -274,11 +286,18 @@ class TransactionsPendingQueue {
             } catch (exception){
 
                 if ( !exception.myNonce || Math.abs( exception.myNonce - exception.nonce) > consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
-                    this._removePendingTransaction(this.listArray[i], i)
+                    removeThis=true;
 
             }
 
+            if(removeThis){
+                this._removePendingTransaction(this.listArray[i], i);
+                continue;
+            }
+
         }
+
+        console.warn("Transactions stack -", this.listArray.length);
 
         setTimeout( this._removeOldTransactions.bind(this), 20000 );
 
