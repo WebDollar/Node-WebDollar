@@ -227,9 +227,9 @@ class MinerPoolMining extends InheritedPoolMining {
                             }
 
                             answer.timeDiff = new Date().getTime() - timeInitial;
+                            answer.id = workId;
 
                             if (!this.resetForced) {
-                                answer.id = workId;
                                 answer.hashes = workEnd - workStart;
                                 this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
                             } else {
