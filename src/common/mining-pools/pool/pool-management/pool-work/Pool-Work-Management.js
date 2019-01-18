@@ -129,9 +129,9 @@ class PoolWorkManagement{
             if ( BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
 
                 work.nonce = 0;
-                blockInformationMinerInstance.workPosMinerAddressBalance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
+                work.pos.balance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
 
-                args = [ work.pos.timestamp, work.pos.posMinerAddress, blockInformationMinerInstance.workPosMinerAddressBalance ];
+                args = [  work.pos.timestamp, work.pos.posMinerAddress, work.pos.balance ];
 
             } else {
                 args = [work.nonce];
@@ -139,27 +139,22 @@ class PoolWorkManagement{
 
              if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
-
-            blockInformationMinerInstance.workHash = work.hash;
-            blockInformationMinerInstance.workHashNonce = work.nonce;
-
-            if (BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
-                blockInformationMinerInstance.workPosSignature = work.pos.posSignature;
-                blockInformationMinerInstance.workPosMinerAddress = work.pos.posMinerAddress;
-                blockInformationMinerInstance.workPosMinerPublicKey = work.pos.posMinerPublicKey;
-                blockInformationMinerInstance.workPosTimestamp = work.pos.timestamp;
-            }
+            //
+            // blockInformationMinerInstance.work = {};
+            // blockInformationMinerInstance.work.hash = work.hash;
+            // blockInformationMinerInstance.work.nonce = work.nonce;
+            //
 
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
-                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, args ) ){
+                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, [prevBlock].concat( args )  ) ){
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
-                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", blockInformationMinerInstance.workHashNonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
 
@@ -175,16 +170,16 @@ class PoolWorkManagement{
                         let workBlock = prevBlock;
 
                         workBlock.hash = blockInformationMinerInstance.workHash;
+                        workBlock.nonce = work.nonce;
 
                         if (BlockchainGenesis.isPoSActivated(workBlock.height)) {
                             workBlock.nonce = 0;
-                            workBlock.posSignature = blockInformationMinerInstance.workPosSignature;
-                            workBlock.posMinerAddress = blockInformationMinerInstance.workPosMinerAddress;
-                            workBlock.posMinerPublicKey = blockInformationMinerInstance.workPosMinerPublicKey;
-                            workBlock.timeStamp = blockInformationMinerInstance.workPosTimestamp;
+                            workBlock.posSignature = work.pos.posSignature;
+                            workBlock.posMinerAddress = work.pos.posMinerAddress;
+                            workBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
+                            workBlock.timeStamp = work.pos.timestamp;
                         }
-                        else
-                            workBlock.nonce = blockInformationMinerInstance.workHashNonce;
+
 
                         let serialization = prevBlock.serializeBlock();
                         block = this.blockchain.blockCreator.createEmptyBlock(workBlock.height, undefined );
@@ -239,11 +234,18 @@ class PoolWorkManagement{
 
             }
 
-            blockInformationMinerInstance.calculateDifficulty()  ;
-            blockInformationMinerInstance.adjustDifficulty(undefined, true);
+            let workDone;
+
+            if (BlockchainGenesis.isPoSActivated(prevBlock.height))
+                workDone = work.pos.balance;
+            else
+                workDone = work.hash;
+
+            let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone )  ;
+            blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
 
             //statistics
-            this.poolManagement.poolStatistics.addStatistics(blockInformationMinerInstance._workDifficulty, minerInstance);
+            this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance);
 
             result = true;
 

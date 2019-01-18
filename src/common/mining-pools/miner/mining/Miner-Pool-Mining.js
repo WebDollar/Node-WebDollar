@@ -130,6 +130,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
             for (let i=0 ; i< work.b.length; i++)
                 this._miningBalances[ Blockchain.Wallet.addresses[i].unencodedAddress.toString("hex") ] = work.b[i];
+
         }
 
         let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );

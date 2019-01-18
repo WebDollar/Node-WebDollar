@@ -9,7 +9,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class PoolDataBlockInformationMinerInstance {
 
-    constructor(poolManagement, blockInformation, minerInstance, minerInstanceTotalDifficulty){
+    constructor(poolManagement, blockInformation, minerInstance){
 
         this.poolManagement = poolManagement;
 
@@ -20,25 +20,20 @@ class PoolDataBlockInformationMinerInstance {
         this.rewardForReferral = 0;
         this._prevRewardInitial = 0;
 
-        this._workHash = undefined;
-        this.workHashNonce = undefined;
-        this.workBlock = undefined;
-
-        this.workPosMinerAddressBalance = undefined;
-        this.workPosSignature = undefined;
-        this.workPosMinerAddress = undefined;
-        this.workPosMinerPublicKey = undefined;
-        this.workPosTimestamp = undefined;
-
-
-        this._workDifficulty = undefined;
-
         this.addresses = []; //received by pool for POS balances to be sent
 
-        if ( minerInstanceTotalDifficulty === undefined )
-            minerInstanceTotalDifficulty = BigNumber(0);
+        //current block
 
-        this.minerInstanceTotalDifficulty = minerInstanceTotalDifficulty;
+        this.minerInstanceTotalDifficultyPOW = BigNumber(0);
+        this.minerInstanceTotalDifficultyPOS = BigNumber(0);
+
+        this._minerInstanceTotalDifficultiesPOW = {
+        };
+        this._minerInstanceTotalDifficultiesPOS = {
+        };
+
+        this._lastHeight = undefined;
+
         this.socket = undefined;
 
     }
@@ -49,16 +44,9 @@ class PoolDataBlockInformationMinerInstance {
         this.blockInformation = undefined;
         this.minerInstance = undefined;
 
-        if (this.workBlock !== undefined)
-            this.workBlock.destroyBlock();
-
-        this.workBlock = undefined;
-
     }
 
     async validateWorkHash(prevBlock, workHash){
-
-        prevBlock = (prevBlock || this.workBlock);
 
         //validate hash
         let hash = await  prevBlock.computeHash.apply(  prevBlock, Array.prototype.slice.call( arguments, 2 ) );
@@ -69,75 +57,93 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    async wasBlockMined(){
+    async wasBlockMined(prevBlock){
 
-        if ( (await this.workBlock.computeHash.apply(this.workBlock, arguments)).compare(this.workBlock.difficultyTargetPrev) <= 0)
+        if ( (await prevBlock.computeHash.apply( prevBlock, Array.prototype.slice.call( arguments, 1 ) )).compare( prevBlock.difficultyTargetPrev ) <= 0)
             return true;
 
         return false;
     }
 
-    calculateDifficulty(workHash){
+
+    //for POW work is workHash
+    //for POS work is number of coins
+    calculateDifficulty(prevBlock, workDone ){
 
         //POS difficulty
-        if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
+        if (BlockchainGenesis.isPoSActivated(prevBlock.height)){
 
-            if ( !workHash )
-                workHash = this.posMinerAddressBalance.toString();
+            workDone = workDone.toString();
 
-            this._workDifficulty = new BigNumber( workHash );
+            return new BigNumber( workDone );
 
         } else { //POW difficulty
-
-            if ( !workHash )
-                workHash = this._workHash;
 
             // target     =     maximum target / difficulty
             // difficulty =     maximum target / target
 
-            this._workDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workHash.toString("hex") ) );
+            return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ workDone.toString("hex") ) );
 
         }
 
     }
 
-    adjustDifficulty(difficulty, useDeltaTime = false ){
+    adjustDifficulty(prevBlock, difficulty, useDeltaTime = false ){
 
-        if ( !this.workBlock )
-            return;
-
-        if (difficulty === undefined) difficulty = this._workDifficulty;
+        let height = prevBlock.height;
 
         //POS difficulty
-        if (BlockchainGenesis.isPoSActivated(this.workBlock.height)){
+        if (BlockchainGenesis.isPoSActivated( height )){
 
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty, BlockchainGenesis.isPoSActivated(this.workBlock.height) );
-            this.minerInstanceTotalDifficulty = difficulty;
+            let prevDifficulty = this._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
 
-            this.calculateReward( useDeltaTime );
+            if ( prevDifficulty.isLessThan( difficulty ) ){
+
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
+                prevDifficulty = prevDifficulty.plus(difficulty);
+
+                this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty );
+                this._minerInstanceTotalDifficultiesPOS[height] = prevDifficulty;
+
+                this.calculateReward( useDeltaTime );
+            }
 
         } else { //POW difficulty
 
-            if (this.minerInstanceTotalDifficulty.isLessThan(difficulty)) {
+            let prevDifficulty = this._minerInstanceTotalDifficultiesPOW[height]||BigNumber(0);
 
-                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, this.minerInstanceTotalDifficulty, BlockchainGenesis.isPoSActivated(this.workBlock.height) );
-                this.minerInstanceTotalDifficulty = difficulty;
+            if ( prevDifficulty.isLessThan(difficulty)) {
+
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
+                prevDifficulty = prevDifficulty.plus( difficulty);
+
+                this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus(difficulty);
+                this._minerInstanceTotalDifficultiesPOW[height] = prevDifficulty;
 
                 this.calculateReward( useDeltaTime );
             }
 
         }
 
+        this._lastHeight = Math.max(this._lastHeight, prevBlock.height);
+
     }
 
-    calculateReward(useDeltaTime = false){
+    cancelDifficulty(){
 
-        let height;
+    }
 
-        if ( this.blockInformation.block !== undefined ) height = this.blockInformation.block.height;
-        else if ( this.workBlock !== undefined) height = this.workBlock.height;
-        else if (Blockchain.blockchain.blocks.length > 0) height = Blockchain.blockchain.blocks.length-1;
-        else height = 100000;
+    cancelDifficulties(){
+
+        for (let height in this._minerInstanceTotalDifficultiesPOW)
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget(0, this._minerInstanceTotalDifficultiesPOW[height], height);
+
+        for (let height in this._minerInstanceTotalDifficultiesPOS)
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget(0, this._minerInstanceTotalDifficultiesPOS[height], height);
+
+    }
+
+    calculateReward( useDeltaTime = false ){
 
         let ratio = 1;
 
@@ -150,7 +156,12 @@ class PoolDataBlockInformationMinerInstance {
         }
 
 
-        let reward =  this.minerInstanceTotalDifficulty.dividedBy( this.blockInformation.totalDifficulty ).multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( height )  ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber();
+        let rewardPOW = this.minerInstanceTotalDifficultyPOW.dividedBy( this.blockInformation.totalDifficultyPOW ).multipliedBy( this.blockInformation.miningHeights.blocksPow ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
+        let rewardPOS = this.minerInstanceTotalDifficultyPOS.dividedBy( this.blockInformation.totalDifficultyPOS ).multipliedBy( this.blockInformation.miningHeights.blocksPos ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
+
+        let rewardDifficulty = rewardPOW.plus(rewardPOS);
+
+        let reward =  rewardDifficulty.multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( this._lastHeight)  ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber();
 
         if ( this.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0) {
 
@@ -182,11 +193,28 @@ class PoolDataBlockInformationMinerInstance {
 
     serializeBlockInformationMinerInstance() {
 
-        return Buffer.concat([
-
+        let buffers = [
             this.minerInstance.address,
-            Serialization.serializeBigNumber(this.minerInstanceTotalDifficulty),
+        ];
 
+        let pow =  [], pos= [];
+
+        for (let height in this._minerInstanceTotalDifficultiesPOW) {
+            pow.push( Serialization.serializeNumber3Bytes( height ) );
+            pow.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOW[ height ] ) );
+        }
+        buffers.push( Serialization.serializeNumber2Byte( pow.length / 2 ) );
+        buffers = buffers.concat( pow );
+
+        for (let height in this._minerInstanceTotalDifficultiesPOS) {
+            pos.push( Serialization.serializeNumber3Bytes( height ) );
+            pos.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOS[ height ] ) );
+        }
+        buffers.push( Serialization.serializeNumber2Byte( pos.length / 2 ) );
+        buffers = buffers.concat( pos );
+
+        return Buffer.concat([
+            buffers,
         ]);
 
     }
@@ -195,35 +223,17 @@ class PoolDataBlockInformationMinerInstance {
 
         let address;
 
-        //TODO: to be removed
+        //TODO: to be removed 0x02
 
-        if (version === 0x01) {
-
-            let adr = BufferExtended.substr(buffer, offset, consts.ADDRESSES.PUBLIC_KEY.LENGTH);
-            offset += consts.ADDRESSES.PUBLIC_KEY.LENGTH;
-
-            address = new Buffer(1);
-
-            for (let i=0; i< this.poolManagement.poolData.miners.length; i++)
-                if (this.poolManagement.poolData.miners[i].publicKeys !== undefined)
-                    for (let j=0; j<this.poolManagement.poolData.miners[i].publicKeys.length; j++)
-                        if (this.poolManagement.poolData.miners[i].publicKeys[j].equals(adr)){
-
-                            address = this.poolManagement.poolData.miners[i].address;
-                            break;
-
-                        }
-
-        } else {
+        if (version === 0x02) {
 
             address = BufferExtended.substr(buffer, offset, consts.ADDRESSES.ADDRESS.LENGTH);
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         }
 
-
         let miner = this.poolManagement.poolData.findMiner( address );
-        if (miner !== undefined && miner !== null) {
+        if ( !miner) {
             this.minerInstance = miner.addInstance({
                 _diff: Math.random(),
                 node: {
@@ -232,9 +242,34 @@ class PoolDataBlockInformationMinerInstance {
             });
         }
 
-        let answer = Serialization.deserializeBigNumber(buffer, offset);
-        this.minerInstanceTotalDifficulty = answer.number;
-        offset = answer.newOffset;
+        if (version === 0x02){
+
+            //TODO to be removed
+            let answer = Serialization.deserializeBigNumber(buffer, offset);
+            this.minerInstanceTotalDifficulty = answer.number;
+            offset = answer.newOffset;
+
+        } else if (version === 0x03) {
+
+            let powLength = Serialization.deserializeNumber2Bytes(buffer, offset); offset += 2;
+            for (let i=0; i  < powLength; i++){
+                let height = Serialization.deserializeNumber3Bytes(buffer, offset); offset += 3;
+                let difficultyBigNumber = Serialization.deserializeBigNumber(buffer, offset); offset= difficultyBigNumber.newOffset;
+                let difficulty = difficultyBigNumber.number;
+
+                this.adjustDifficulty({height: height}, difficulty, false);
+
+            }
+
+            let posLength = Serialization.deserializeNumber2Bytes(buffer, offset); offset += 2;
+            for (let i=0; i  < posLength; i++){
+                let height = Serialization.deserializeNumber3Bytes(buffer, offset); offset += 3;
+                let difficultyBigNumber = Serialization.deserializeBigNumber(buffer, offset); offset= difficultyBigNumber.newOffset;
+                let difficulty = difficultyBigNumber.number;
+                this.adjustDifficulty({height: height}, difficulty, false);
+            }
+
+        }
 
         return offset;
 

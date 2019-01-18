@@ -61,32 +61,52 @@ class PoolRewardsManagement{
         this._lastTimeCheckHeight = this.blockchain.blocks.length-1;
 
         //check for penalties
-        for (let i = 0; i < this.poolData.blocksInfo.length; i++){
 
-            let blockInfo = this.poolData.blocksInfo[i].block;
+        let penaltiesMinerInstances = {
+            length: 0,
+        };
+
+        this.poolData.blocksInfo.forEach( (blockInfo)=>{
 
             if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks[blockInfo.height] && this.blockchain.blocks.length - blockInfo.height >= 10 )
 
-                if (BlockchainGenesis.isPoSActivated(blockInfo.height)){
+                if (BlockchainGenesis.isPoSActivated(blockInfo.height))
 
-                    for (let j=0; j < this.poolData.blocksInfo[i].blockInformationMinersInstances.length; j++){
-
-                        let blockInformationMinerInstance = this.poolData.blocksInfo[i].blockInformationMinersInstances[j];
+                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) =>{
+11
                         if ( this.blockchain.blocks[blockInfo.height].data.minerAddress.equals( blockInformationMinerInstance.minerAddress ) ||  ( this.blockchain.blocks[blockInfo.height].posMinerAddress && this.blockchain.blocks[blockInfo.height].posMinerAddress.equals( blockInformationMinerInstance.minerAddress ) )){
 
-                            //redistribute all pool POS
-
-                            blockInformationMinerInstance.cancelReward();
-                            blockInformationMinerInstance.adjustDifficulty( blockInformationMinerInstance.minerInstanceTotalDifficulty, true );
+                            penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
+                            penaltiesMinerInstances.length ++;
 
                         }
 
-                    }
+                    });
 
-                }
+        });
 
+        //redistribute all pool POS
+        if (penaltiesMinerInstances.length > 0)
+            for (let minerAddress in penaltiesMinerInstances) {
 
-        }
+                this.poolData.blocksInfo.forEach( (blockInfo)=> {
+
+                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
+
+                        if (blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
+
+                            //redistribute all pool POS
+                            blockInformationMinerInstance.cancelDifficulties();
+                            blockInformationMinerInstance.cancelReward();
+
+                        }
+
+                    });
+
+                });
+
+            }
+
 
         let confirmationsPool = 0;
         let confirmationsOthers = 0;

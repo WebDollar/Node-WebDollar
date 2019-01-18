@@ -113,14 +113,17 @@ class PoolPayouts{
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
-                let totalDifficulty = new BigNumber(0);
+                let totalDifficultyPOW = new BigNumber(0);
+                let totalDifficultyPOS = new BigNumber(0);
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
-                    totalDifficulty = totalDifficulty.plus(blockInformationMinerInstance.minerInstanceTotalDifficulty);
+                    totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);
+                    totalDifficultyPOS = totalDifficultyPOS.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOS);
                 });
 
-                if (!totalDifficulty.isEqualTo(blocksConfirmed[i].totalDifficulty))
-                    throw {message: "Total Difficulty doesn't match", totalDifficulty: totalDifficulty,  blockConfirmedDifficulty: blocksConfirmed[i].totalDifficulty};
+                if ( !totalDifficultyPOW.isEqualTo(blocksConfirmed[i].totalDifficultyPOW) || !totalDifficultyPOS.isEqualTo(blocksConfirmed[i].totalDifficultyPOS) )
+                    throw { message: "Total Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOW };
+
 
                 let maxSumReward = BlockchainMiningReward.getReward( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
