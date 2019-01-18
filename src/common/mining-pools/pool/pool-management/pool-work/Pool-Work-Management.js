@@ -154,7 +154,7 @@ class PoolWorkManagement{
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
-                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", blockInformationMinerInstance.workHash.toString("hex"), " reward", (blockInformationMinerInstance.workBlock.reward / WebDollarCoins.WEBD), "WEBD", blockInformationMinerInstance.workBlock.data.minerAddress.toString("hex"));
+                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex"));
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
 
@@ -169,7 +169,7 @@ class PoolWorkManagement{
 
                         let workBlock = prevBlock;
 
-                        workBlock.hash = blockInformationMinerInstance.workHash;
+                        workBlock.hash = work.hash;
                         workBlock.nonce = work.nonce;
 
                         if (BlockchainGenesis.isPoSActivated(workBlock.height)) {
@@ -269,12 +269,12 @@ class PoolWorkManagement{
         if (balance === null) balance = 0;
 
         //must be reverted
-        //console.log("2 Before Balance ", balance); let s = "";
+        console.log("2 Before Balance ", balance); let s = "";
         for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - 30; i--  ) {
 
             let block = this.blockchain.blocks[ i ];
 
-            //s += block.height + " ";
+            s += block.height + " ";
 
             block.data.transactions.transactions.forEach( (tx) => {
                 tx.to.addresses.forEach((to)=>{
@@ -284,7 +284,7 @@ class PoolWorkManagement{
             });
         }
 
-        //console.log("2 After Balance ", balance, s);
+        console.log("2 After Balance ", balance, s);
 
         return balance;
 

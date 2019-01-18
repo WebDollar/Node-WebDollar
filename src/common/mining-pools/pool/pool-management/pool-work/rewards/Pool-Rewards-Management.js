@@ -68,17 +68,22 @@ class PoolRewardsManagement{
 
         this.poolData.blocksInfo.forEach( (blockInfo)=>{
 
-            if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks[blockInfo.height] && this.blockchain.blocks.length - blockInfo.height >= 10 )
-
+            let block = this.blockchain.blocks[blockInfo.height];
+            if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 10 )
                 if (BlockchainGenesis.isPoSActivated(blockInfo.height))
 
-                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) =>{
-11
-                        if ( this.blockchain.blocks[blockInfo.height].data.minerAddress.equals( blockInformationMinerInstance.minerAddress ) ||  ( this.blockchain.blocks[blockInfo.height].posMinerAddress && this.blockchain.blocks[blockInfo.height].posMinerAddress.equals( blockInformationMinerInstance.minerAddress ) )){
+                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
 
+                        let penalty;
+                        if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
+                            penalty = true;
+
+                        if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
+                            penalty = true;
+
+                        if (penalty) {
                             penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
-                            penaltiesMinerInstances.length ++;
-
+                            penaltiesMinerInstances.length++;
                         }
 
                     });

@@ -32,7 +32,7 @@ class PoolDataBlockInformationMinerInstance {
         this._minerInstanceTotalDifficultiesPOS = {
         };
 
-        this._lastHeight = undefined;
+        this._lastHeight = 60; //avoid genesis wallets
 
         this.socket = undefined;
 
@@ -100,10 +100,9 @@ class PoolDataBlockInformationMinerInstance {
             if ( prevDifficulty.isLessThan( difficulty ) ){
 
                 this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
-                prevDifficulty = prevDifficulty.plus(difficulty);
 
-                this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty );
-                this._minerInstanceTotalDifficultiesPOS[height] = prevDifficulty;
+                this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
+                this._minerInstanceTotalDifficultiesPOS[height] = difficulty;
 
                 this.calculateReward( useDeltaTime );
             }
@@ -117,8 +116,8 @@ class PoolDataBlockInformationMinerInstance {
                 this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
                 prevDifficulty = prevDifficulty.plus( difficulty);
 
-                this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus(difficulty);
-                this._minerInstanceTotalDifficultiesPOW[height] = prevDifficulty;
+                this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
+                this._minerInstanceTotalDifficultiesPOW[height] = difficulty;
 
                 this.calculateReward( useDeltaTime );
             }
@@ -156,8 +155,13 @@ class PoolDataBlockInformationMinerInstance {
         }
 
 
-        let rewardPOW = this.minerInstanceTotalDifficultyPOW.dividedBy( this.blockInformation.totalDifficultyPOW ).multipliedBy( this.blockInformation.miningHeights.blocksPow ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
-        let rewardPOS = this.minerInstanceTotalDifficultyPOS.dividedBy( this.blockInformation.totalDifficultyPOS ).multipliedBy( this.blockInformation.miningHeights.blocksPos ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
+        let rewardPOW = BigNumber(0);
+        if (this.blockInformation.totalDifficultyPOW.isGreaterThan(0))
+            rewardPOW = this.minerInstanceTotalDifficultyPOW.dividedBy( this.blockInformation.totalDifficultyPOW ).multipliedBy( this.blockInformation.miningHeights.blocksPow ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
+
+        let rewardPOS = BigNumber(0);
+        if (this.blockInformation.totalDifficultyPOS.isGreaterThan(0))
+            rewardPOS = this.minerInstanceTotalDifficultyPOS.dividedBy( this.blockInformation.totalDifficultyPOS ).multipliedBy( this.blockInformation.miningHeights.blocksPos ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
 
         let rewardDifficulty = rewardPOW.plus(rewardPOS);
 
@@ -203,19 +207,17 @@ class PoolDataBlockInformationMinerInstance {
             pow.push( Serialization.serializeNumber3Bytes( height ) );
             pow.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOW[ height ] ) );
         }
-        buffers.push( Serialization.serializeNumber2Byte( pow.length / 2 ) );
+        buffers.push( Serialization.serializeNumber2Bytes( pow.length / 2 ) );
         buffers = buffers.concat( pow );
 
         for (let height in this._minerInstanceTotalDifficultiesPOS) {
             pos.push( Serialization.serializeNumber3Bytes( height ) );
             pos.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOS[ height ] ) );
         }
-        buffers.push( Serialization.serializeNumber2Byte( pos.length / 2 ) );
+        buffers.push( Serialization.serializeNumber2Bytes( pos.length / 2 ) );
         buffers = buffers.concat( pos );
 
-        return Buffer.concat([
-            buffers,
-        ]);
+        return Buffer.concat( buffers,);
 
     }
 
