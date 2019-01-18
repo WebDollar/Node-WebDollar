@@ -104,6 +104,6 @@ export default {
         {"addr": ["http://testnet1.hoste.ro:8000"]}, // Thanks to Hostero
         {"addr": ["http://testnet2.hoste.ro:8001"]}, // Thanks to Hostero
         {"addr": ["http://testnet2.hoste.ro:8002"]}, // Thanks to Hostero
-        {"addr": ["http://86.126.138.61:2224"]}, // Thanks to Hostero
+        {"addr": ["http://86.126.138.61:2024"]}, // Thanks to Hostero
     ]
 }
