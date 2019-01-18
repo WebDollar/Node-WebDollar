@@ -43,11 +43,10 @@ class MiningTransactionsSelector{
         if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};
 
-        if (transaction.nonce <= this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
 
         return true;
-
 
     }
 
