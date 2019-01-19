@@ -115,19 +115,25 @@ class NanoWalletProtocol{
 
             for (let k in data.transactions){
 
-                let transaction = data.transactions[k];
+                try{
 
-                let tx = null;
-                if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
+                    let transaction = data.transactions[k];
 
-                let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
+                    let tx = null;
+                    if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined, false, false );
 
-                if ( foundTx === null) {
-                    Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
-                    foundTx = transaction;
+                    let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
+
+                    if ( foundTx === null) {
+                        Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all", true);
+                        foundTx = transaction;
+                    }
+
+                    foundTx.confirmed = transaction.confirmed;
+                    
+                }catch(exception){
+                    
                 }
-
-                foundTx .confirmed = transaction.confirmed;
 
             }
 

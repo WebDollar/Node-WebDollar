@@ -281,7 +281,7 @@ class PoolRewardsManagement{
                     minerInstance.miner.rewardTotal -= minerInstance.reward;
 
 
-                    if ( minerInstance.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0) {
+                    if ( minerInstance.miner.referrals.referralLinkMiner && this.poolManagement.poolSettings.poolReferralFee > 0) {
                         minerInstance.miner.referrals.referralLinkMiner.rewardReferralConfirmed += minerInstance.rewardForReferral;
                         minerInstance.miner.referrals.referralLinkMiner.rewardReferralTotal -= minerInstance.rewardForReferral;
                     }
@@ -437,13 +437,24 @@ class PoolRewardsManagement{
         if (lastBlockInformation.block !== undefined)
             lastBlockInformation = this.poolData.addBlockInformation();
 
-        for (let i=0; i<blockInformation.blockInformationMinersInstances.length; i++) {
+        blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
 
-            let lastBlockInformationMinerInstance = lastBlockInformation._addBlockInformationMinerInstance( blockInformation.blockInformationMinersInstances[i].minerInstance );
+            let lastBlockInformationMinerInstance = lastBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance );
 
-            blockInformation.blockInformationMinersInstances[i].cancelReward();
-            lastBlockInformationMinerInstance.adjustDifficulty(blockInformation.blockInformationMinersInstances[i].minerInstanceTotalDifficulty, true);
-        }
+            blockInformationMinersInstance.cancelReward();
+
+            for (let height in blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW)
+                lastBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height], true);
+
+            for (let height in blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS)
+                lastBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS[height], true);
+
+            blockInformationMinersInstance.cancelDifficulties();
+
+
+        });
+
+
 
         //clear the blockInformation
         this.poolData.deleteBlockInformation(index);

@@ -208,8 +208,6 @@ class PoolDataBlockInformation {
                 offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset, false);
                 this.block.difficultyTargetPrev = difficultyTargetPrev;
 
-                await this.block.computeHash();
-
             } catch (exception){
 
                 this.block = undefined;
@@ -260,13 +258,12 @@ class PoolDataBlockInformation {
                     break;
                 }
 
+        this.blockInformationMinersInstances[pos].cancelDifficulties();
         this.blockInformationMinersInstances[pos].cancelReward();
 
-        this._totalDifficultyMinus(this.blockInformationMinersInstances[pos].minerInstanceTotalDifficulty);
+
         this.blockInformationMinersInstances.splice(pos,1);
 
-        for (let j=0; j<this.blockInformationMinersInstances.length; j++)
-            this.blockInformationMinersInstances.adjustDifficulty(0);
 
 
     }
