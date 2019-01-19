@@ -104,8 +104,6 @@ class PoolDataBlockInformationMinerInstance {
                 this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
                 this._minerInstanceTotalDifficultiesPOS[height] = difficulty;
 
-                if (calculateReward)
-                    this.calculateReward( useDeltaTime );
             }
 
         } else { //POW difficulty
@@ -115,18 +113,19 @@ class PoolDataBlockInformationMinerInstance {
             if ( prevDifficulty.isLessThan(difficulty)) {
 
                 this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
-                prevDifficulty = prevDifficulty.plus( difficulty);
 
                 this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
                 this._minerInstanceTotalDifficultiesPOW[height] = difficulty;
 
-                if (calculateReward)
-                    this.calculateReward( useDeltaTime );
+
             }
 
         }
 
-        this._lastHeight = Math.max(this._lastHeight, prevBlock.height);
+        if (calculateReward)
+            this.calculateReward( useDeltaTime );
+
+        this._lastHeight = Math.max(this._lastHeight, height);
 
     }
 
@@ -137,10 +136,15 @@ class PoolDataBlockInformationMinerInstance {
     cancelDifficulties(){
 
         for (let height in this._minerInstanceTotalDifficultiesPOW)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget(0, this._minerInstanceTotalDifficultiesPOW[height], height);
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height );
+        this._minerInstanceTotalDifficultiesPOW = {};
+        this.minerInstanceTotalDifficultyPOW = BigNumber(0);
+
 
         for (let height in this._minerInstanceTotalDifficultiesPOS)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget(0, this._minerInstanceTotalDifficultiesPOS[height], height);
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOS[height], height );
+        this._minerInstanceTotalDifficultiesPOS = {};
+        this.minerInstanceTotalDifficultyPOS = BigNumber(0);
 
     }
 
@@ -206,14 +210,14 @@ class PoolDataBlockInformationMinerInstance {
         let pow =  [], pos= [];
 
         for (let height in this._minerInstanceTotalDifficultiesPOW) {
-            pow.push( Serialization.serializeNumber3Bytes( height ) );
+            pow.push( Serialization.serializeNumber3Bytes( Number.parseInt( height ) ) );
             pow.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOW[ height ] ) );
         }
         buffers.push( Serialization.serializeNumber2Bytes( pow.length / 2 ) );
         buffers = buffers.concat( pow );
 
         for (let height in this._minerInstanceTotalDifficultiesPOS) {
-            pos.push( Serialization.serializeNumber3Bytes( height ) );
+            pos.push( Serialization.serializeNumber3Bytes( Number.parseInt( height ) ) );
             pos.push( Serialization.serializeBigNumber( this._minerInstanceTotalDifficultiesPOS[ height ] ) );
         }
         buffers.push( Serialization.serializeNumber2Bytes( pos.length / 2 ) );

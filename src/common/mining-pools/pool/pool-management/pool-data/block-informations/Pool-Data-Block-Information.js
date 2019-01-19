@@ -67,6 +67,8 @@ class PoolDataBlockInformation {
 
     adjustBlockInformationDifficultyBestTarget (difficulty, prevDifficulty, height){
 
+        if (typeof height === "string") height = Number.parseInt(height);
+
         let pos = BlockchainGenesis.isPoSActivated(height);
 
         if (!this.miningHeights[height]) {

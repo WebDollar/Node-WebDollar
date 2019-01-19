@@ -432,22 +432,22 @@ class PoolRewardsManagement{
         blockInformation.block = undefined; //cancel the block
 
         //move the blockInformationMinerInstances to the latest non solved blockInformation
-        let lastBlockInformation = this.poolData.lastBlockInformation;
+        let newBlockInformation = this.poolData.lastBlockInformation;
 
-        if (lastBlockInformation.block !== undefined)
-            lastBlockInformation = this.poolData.addBlockInformation();
+        if (newBlockInformation.block !== undefined)
+            newBlockInformation = this.poolData.addBlockInformation();
 
         blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
 
-            let lastBlockInformationMinerInstance = lastBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance );
+            let newBlockInformationMinerInstance = newBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
             blockInformationMinersInstance.cancelReward();
 
             for (let height in blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW)
-                lastBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height], true);
+                newBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height], true);
 
             for (let height in blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS)
-                lastBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS[height], true);
+                newBlockInformationMinerInstance.adjustDifficulty( {height: height}, blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS[height], true);
 
             blockInformationMinersInstance.cancelDifficulties();
 

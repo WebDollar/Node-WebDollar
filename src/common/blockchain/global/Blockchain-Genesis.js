@@ -37,6 +37,8 @@ class BlockchainGenesis{
 
     isPoSActivated(height){
 
+        if (typeof height === "string") height = Number.parseInt(height);
+
         if (height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return false;
         else {

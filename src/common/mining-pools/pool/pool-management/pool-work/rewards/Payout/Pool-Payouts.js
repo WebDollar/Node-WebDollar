@@ -113,26 +113,29 @@ class PoolPayouts{
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
-                let totalDifficultyPOW = new BigNumber(0);
-                let totalDifficultyPOS = new BigNumber(0);
+                let totalDifficultyPOW = new BigNumber(0), totalDifficultyPOS = new BigNumber(0);
 
                 blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
                     totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);
                     totalDifficultyPOS = totalDifficultyPOS.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOS);
                 });
 
-                if ( !totalDifficultyPOW.isEqualTo(blocksConfirmed[i].totalDifficultyPOW) || !totalDifficultyPOS.isEqualTo(blocksConfirmed[i].totalDifficultyPOS) )
-                    throw { message: "Total Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOW };
+                if ( !totalDifficultyPOW.isEqualTo(blocksConfirmed[i].totalDifficultyPOW)  )
+                    throw { message: "Total POW Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOW };
+
+                if ( !totalDifficultyPOS.isEqualTo(blocksConfirmed[i].totalDifficultyPOS) )
+                    throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOS };
 
 
                 let maxSumReward = BlockchainMiningReward.getReward( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
                 let sumReward = 0;
-                for (let j = 0; j < blocksConfirmed[i].blockInformationMinersInstances.length; j++) {
-                    blocksConfirmed[i].blockInformationMinersInstances[j].calculateReward(false);
-                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].reward;
-                    sumReward += blocksConfirmed[i].blockInformationMinersInstances[j].rewardForReferral;
-                }
+
+                blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance )=>{
+                    blockInformationMinerInstance.calculateReward(false);
+                    sumReward += blockInformationMinerInstance.reward;
+                    sumReward += blockInformationMinerInstance.rewardForReferral;
+                });
 
                 let difference = (sumReward - maxSumReward) + poolForkDifferencePerBlock;
 
