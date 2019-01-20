@@ -198,14 +198,14 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    async _verifyPOSSignature(){
+    verifyPOSSignature(){
 
         if ( !InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(this.posMinerPublicKey, false).equals( this.posMinerAddress || this.data.minerAddress  ) )
             throw { message: "posPublicKey doesn't match with the minerAddress" }
 
         let data = this._computeBlockHeaderPrefix( true );
 
-        let answer = await ed25519.verify( this.posSignature, data , this.posMinerPublicKey );
+        let answer = ed25519.verify( this.posSignature, data , this.posMinerPublicKey );
 
         if (!answer)
             throw {message: "POS Signature is invalid"};
@@ -221,7 +221,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
             if ( !this.blockValidation.blockValidationType['skip-validation-PoS-signature'] )
-                await this._verifyPOSSignature();
+                this.verifyPOSSignature();
 
         }
 

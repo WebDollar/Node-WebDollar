@@ -260,13 +260,10 @@ class PoolDataBlockInformation {
                     break;
                 }
 
-        this.blockInformationMinersInstances[pos].cancelDifficulties();
         this.blockInformationMinersInstances[pos].cancelReward();
-
+        this.blockInformationMinersInstances[pos].cancelDifficulties();
 
         this.blockInformationMinersInstances.splice(pos,1);
-
-
 
     }
 

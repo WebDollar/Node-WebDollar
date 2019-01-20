@@ -451,7 +451,6 @@ class PoolRewardsManagement{
 
             blockInformationMinersInstance.cancelDifficulties();
 
-
         });
 
 
