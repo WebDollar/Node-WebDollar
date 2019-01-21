@@ -106,8 +106,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
         if (!this.resetForced) {
             if (work.I < this._miningWork.blockId) return;
-            else if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start && this._miningWork.blockSerialized.equals(work.block))
-                return;
+            // else if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start && this._miningWork.blockSerialized.equals(work.block))
+            //     return;
         }
 
         if ( this._miningWork.blockId < work.I){
@@ -229,7 +229,7 @@ class MinerPoolMining extends InheritedPoolMining {
                             answer.timeDiff = new Date().getTime() - timeInitial;
                             answer.id = workId;
 
-                            if (!this.resetForced) {
+                            if (!this.resetForced && !this._miningWork.resolved) {
                                 answer.hashes = workEnd - workStart;
                                 this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
                             } else {
