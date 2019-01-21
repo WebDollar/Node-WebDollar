@@ -81,10 +81,12 @@ class TransactionsPendingQueue {
         if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
             throw {message: "Transsaction validation failed"}
 
-        // if (this.blockchain.agent.light)
-        //     if(  transaction.timeLock < this.blockchain.blocks.length-1 ){
-        //         throw {message: "transaction is too old"};
-        //     }
+        //This is just for pool
+        //TODO remove on light consensus
+        if (this.blockchain.agent.light)
+            if(  transaction.timeLock < this.blockchain.blocks.length-1 ){
+                throw {message: "transaction is too old"};
+            }
 
         let inserted = false;
 
@@ -266,6 +268,8 @@ class TransactionsPendingQueue {
 
             try{
 
+                //This is just for pool
+                //TODO remove on light consensus
                 if (this.blockchain.agent.light)
                     if( this.listArray[i].timeLock < this.blockchain.blocks.length-1 )
                         removeThis=true;
