@@ -125,8 +125,10 @@ class PoolWorkManagement{
             if ( prevBlock === undefined)
                 throw {message: "miner instance - no block"};
 
+            let isPos = BlockchainGenesis.isPoSActivated(prevBlock.height);
+
             let args = [];
-            if ( BlockchainGenesis.isPoSActivated( prevBlock.height) ) {
+            if ( isPos ) {
 
                 work.nonce = 0;
                 work.pos.balance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
@@ -143,7 +145,7 @@ class PoolWorkManagement{
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
-            if (BlockchainGenesis.isPoSActivated(prevBlock.height)) {
+            if (isPos) {
                 prevBlock.nonce = 0;
                 prevBlock.posSignature = work.pos.posSignature;
                 prevBlock.posMinerAddress = work.pos.posMinerAddress;
@@ -163,10 +165,10 @@ class PoolWorkManagement{
                     console.warn("----------------------------------------------------------------------------");
 
                     //returning false, because a new fork was changed in the mean while
-                    if ( !BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-1 > prevBlock.height )
+                    if ( !isPos && this.blockchain.blocks.length-1 > prevBlock.height )
                         throw {message: "pool: block is already too old"};
 
-                    if ( BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-3 > prevBlock.height )
+                    if ( isPos&& this.blockchain.blocks.length-3 > prevBlock.height )
                         throw {message: "pool: block is already too old"};
 
                     let revertActions = new RevertActions(this.blockchain);
@@ -178,7 +180,7 @@ class PoolWorkManagement{
                         prevBlock.hash = work.hash;
                         prevBlock.nonce = work.nonce;
 
-                        if (BlockchainGenesis.isPoSActivated(prevBlock.height)) {
+                        if (isPos) {
                             prevBlock.nonce = 0;
                             prevBlock.posSignature = work.pos.posSignature;
                             prevBlock.posMinerAddress = work.pos.posMinerAddress;
@@ -241,18 +243,21 @@ class PoolWorkManagement{
 
             let workDone, storeDifficulty = true;
 
-            if (BlockchainGenesis.isPoSActivated(prevBlock.height)) workDone = work.pos.balance;
+            if (isPos) workDone = work.pos.balance;
             else workDone = work.hash;
 
             //for testing only
-            if (!BlockchainGenesis.isPoSActivated(prevBlock.height)) storeDifficulty = false;
+            if (consts.MINING_POOL.SKIP_POS_REWARDS && isPos) storeDifficulty = false;
+            else if ( consts.MINING_POOL.SKIP_POW_REWARDS && isPos ) storeDifficulty = false;
 
             if (storeDifficulty) {
+
                 let difficulty = blockInformationMinerInstance.calculateDifficulty(prevBlock, workDone);
                 blockInformationMinerInstance.adjustDifficulty(prevBlock, difficulty, true);
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics(difficulty, minerInstance);
+
             }
 
             result = true;
