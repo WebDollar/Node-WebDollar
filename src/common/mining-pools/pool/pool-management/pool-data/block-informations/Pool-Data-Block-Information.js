@@ -77,7 +77,7 @@ class PoolDataBlockInformation {
             this.miningHeights.length++;
 
             if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
-            else if ( !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
+            else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
         }
 
         this._totalDifficultyMinus( prevDifficulty, false, pos );
@@ -91,7 +91,7 @@ class PoolDataBlockInformation {
             this.miningHeights[height] = undefined;
 
             if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
-            else if ( !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
+            else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
 
         }
 

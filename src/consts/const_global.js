@@ -500,8 +500,8 @@ consts.NETWORK_TYPE = {
 
 if ( consts.DEBUG === true ) {
 
-    consts.MINING_POOL.SKIP_POW_REWARDS = false;
-    consts.MINING_POOL.SKIP_POS_REWARDS = true;
+    consts.MINING_POOL.SKIP_POW_REWARDS = true;
+    consts.MINING_POOL.SKIP_POS_REWARDS = false;
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;

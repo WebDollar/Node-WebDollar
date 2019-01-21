@@ -248,7 +248,7 @@ class PoolWorkManagement{
 
             //for testing only
             if (consts.MINING_POOL.SKIP_POS_REWARDS && isPos) storeDifficulty = false;
-            else if ( consts.MINING_POOL.SKIP_POW_REWARDS && isPos ) storeDifficulty = false;
+            else if ( consts.MINING_POOL.SKIP_POW_REWARDS && !isPos ) storeDifficulty = false;
 
             if (storeDifficulty) {
 
