@@ -166,6 +166,9 @@ class PoolWorkManagement{
                     if ( !BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-1 > prevBlock.height )
                         throw {message: "pool: block is already too old"};
 
+                    if ( BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-3 > prevBlock.height )
+                        throw {message: "pool: block is already too old"};
+
                     let revertActions = new RevertActions(this.blockchain);
 
                     let block;
@@ -188,9 +191,6 @@ class PoolWorkManagement{
                         block.deserializeBlock(serialization, prevBlock.height, prevBlock.reward,  );
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
-
-                        if ( !BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length !== prevBlock.height )
-                            throw {message: "pool: block is already too old"};
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 

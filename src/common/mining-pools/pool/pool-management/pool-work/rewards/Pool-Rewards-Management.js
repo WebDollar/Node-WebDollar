@@ -439,6 +439,9 @@ class PoolRewardsManagement{
 
         blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
 
+            if ( blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.isLessThanOrEqualTo(0) && blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.isLessThanOrEqualTo(0) )
+                return;
+
             let newBlockInformationMinerInstance = newBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
             blockInformationMinersInstance.cancelReward();
