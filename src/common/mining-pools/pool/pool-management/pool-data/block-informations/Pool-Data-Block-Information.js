@@ -76,12 +76,12 @@ class PoolDataBlockInformation {
             this.miningHeights[height] = true;
             this.miningHeights.length++;
 
-            if (pos) this.miningHeights.blocksPos++;
-            else this.miningHeights.blocksPow++;
+            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
+            else if ( !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
         }
 
-        this._totalDifficultyMinus( prevDifficulty, true, pos );
-        this._totalDifficultyPlus( difficulty, false, pos);
+        this._totalDifficultyMinus( prevDifficulty, false, pos );
+        this._totalDifficultyPlus( difficulty, true, pos);
 
         let totalDifficulty = this.totalDifficultyPOW;
         if (pos) totalDifficulty = this.totalDifficultyPOS;
@@ -90,8 +90,8 @@ class PoolDataBlockInformation {
 
             this.miningHeights[height] = undefined;
 
-            if (pos) this.miningHeights.blocksPos--;
-            else this.miningHeights.blocksPow--;
+            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
+            else if ( !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
 
         }
 
@@ -320,21 +320,21 @@ class PoolDataBlockInformation {
 
     }
 
-    _totalDifficultyPlus(value, avoidToCalculateRemaining = false, pos){
+    _totalDifficultyPlus(value, calculateRemaining = true, pos){
 
         if (pos) this.totalDifficultyPOS = this.totalDifficultyPOS.plus(value);
         else this.totalDifficultyPOW = this.totalDifficultyPOW.plus(value);
 
-        if (!avoidToCalculateRemaining)
+        if (calculateRemaining)
             this._calculateTimeRemaining();
     }
 
-    _totalDifficultyMinus(value, avoidToCalculateRemaining = false, pos){
+    _totalDifficultyMinus(value, calculateRemaining = true, pos){
 
         if (pos) this.totalDifficultyPOS = this.totalDifficultyPOS.minus(value);
         else this.totalDifficultyPOW = this.totalDifficultyPOW.minus(value);
 
-        if (!avoidToCalculateRemaining)
+        if (calculateRemaining)
             this._calculateTimeRemaining();
     }
 

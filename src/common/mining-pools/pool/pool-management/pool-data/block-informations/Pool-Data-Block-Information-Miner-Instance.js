@@ -160,7 +160,6 @@ class PoolDataBlockInformationMinerInstance {
                 ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining );
         }
 
-
         let rewardPOW = BigNumber(0);
         if (this.blockInformation.totalDifficultyPOW.isGreaterThan(0))
             rewardPOW = this.minerInstanceTotalDifficultyPOW.dividedBy( this.blockInformation.totalDifficultyPOW ).multipliedBy( this.blockInformation.miningHeights.blocksPow ).dividedBy( this.blockInformation.miningHeights.blocksPow + this.blockInformation.miningHeights.blocksPos );
