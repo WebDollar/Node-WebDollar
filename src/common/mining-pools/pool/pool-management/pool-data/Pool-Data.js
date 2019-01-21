@@ -285,6 +285,12 @@ class PoolData {
             let buffer = await this._db.get("blocksInformation", 60000, true);
 
             if (buffer !== null) {
+
+                if (consts.DEBUG) {
+                    console.log('Pool Data is not loaded in Debug');
+                    return true;
+                }
+
                 let response = await this._deserializeBlockInformation(buffer);
 
                 if (response !== true) {

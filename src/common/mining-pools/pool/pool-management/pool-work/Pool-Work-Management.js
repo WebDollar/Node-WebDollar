@@ -248,11 +248,13 @@ class PoolWorkManagement{
             if (!BlockchainGenesis.isPoSActivated(prevBlock.height)) storeDifficulty = false;
 
             if (storeDifficulty) {
+
                 let difficulty = blockInformationMinerInstance.calculateDifficulty(prevBlock, workDone);
                 blockInformationMinerInstance.adjustDifficulty(prevBlock, difficulty, true);
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics(difficulty, minerInstance);
+
             }
 
             result = true;
