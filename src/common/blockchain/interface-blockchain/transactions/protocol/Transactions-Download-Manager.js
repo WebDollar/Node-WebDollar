@@ -32,7 +32,7 @@ class TransactionsDownloadManager{
         });
 
         setTimeout( this._processSocket.bind(this), 10*1000 );
-        setTimeout( this._processTransactions.bind(this), 2*1000 );
+        setTimeout( this._processTransactions.bind(this), 10*1000 );
 
     }
 
@@ -238,7 +238,8 @@ class TransactionsDownloadManager{
 
     async _processTransactions() {
 
-        if( Blockchain.synchronized )
+        //TODO do this only blockchain is sync
+        //if( Blockchain.synchronized )
             for (let i = 0; i <= 20; i++){
 
                 try {
