@@ -241,14 +241,14 @@ class PoolWorkManagement{
 
             }
 
-            let workDone, storeDifficulty = true;
+            let workDone, storeDifficulty;
 
             if (isPos) workDone = work.pos.balance;
             else workDone = work.hash;
 
             //for testing only
-            if (consts.MINING_POOL.SKIP_POS_REWARDS && isPos) storeDifficulty = false;
-            else if ( consts.MINING_POOL.SKIP_POW_REWARDS && isPos ) storeDifficulty = false;
+            if (!consts.MINING_POOL.SKIP_POS_REWARDS && isPos) storeDifficulty = true;
+            else if ( !consts.MINING_POOL.SKIP_POW_REWARDS && !isPos ) storeDifficulty = true;
 
             if (storeDifficulty) {
 

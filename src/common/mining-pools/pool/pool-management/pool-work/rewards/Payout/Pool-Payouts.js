@@ -126,6 +126,8 @@ class PoolPayouts{
                 if ( !totalDifficultyPOS.isEqualTo(blockConfirmed.totalDifficultyPOS) )
                     throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOS };
 
+                if ( totalDifficultyPOS.isLessThanOrEqualTo(0) && totalDifficultyPOW.isLessThanOrEqualTo(0) )
+                    throw { message: "Total PS and POW are both zero", totalDifficultyPOS: totalDifficultyPOS, totalDifficultyPOW: totalDifficultyPOW };
 
                 let maxSumReward = BlockchainMiningReward.getReward( blockConfirmed.block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
