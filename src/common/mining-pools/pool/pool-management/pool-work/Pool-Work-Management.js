@@ -140,15 +140,19 @@ class PoolWorkManagement{
              if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
                 throw {message: "block was incorrectly mined", work: work };
 
-            // blockInformationMinerInstance.work = {};
-            // blockInformationMinerInstance.work.hash = work.hash;
-            // blockInformationMinerInstance.work.nonce = work.nonce;
-
-
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
 
-            if ( work.result  ) { //it is a solution and prevBlock is undefined
+            if (BlockchainGenesis.isPoSActivated(prevBlock.height)) {
+                prevBlock.nonce = 0;
+                prevBlock.posSignature = work.pos.posSignature;
+                prevBlock.posMinerAddress = work.pos.posMinerAddress;
+                prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
+                prevBlock.timeStamp = work.pos.timestamp;
+                prevBlock.verifyPOSSignature();
+            }
+
+            if ( work.result  ) { //it is a solution and prevBlock is undefine
 
                 if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, [prevBlock].concat( args )  ) ){
 
@@ -159,31 +163,32 @@ class PoolWorkManagement{
                     console.warn("----------------------------------------------------------------------------");
 
                     //returning false, because a new fork was changed in the mean while
-                    if (this.blockchain.blocks.length !== prevBlock.height)
+                    if ( !BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-1 > prevBlock.height )
+                        throw {message: "pool: block is already too old"};
+
+                    if ( BlockchainGenesis.isPoSActivated(prevBlock.height) && this.blockchain.blocks.length-3 > prevBlock.height )
                         throw {message: "pool: block is already too old"};
 
                     let revertActions = new RevertActions(this.blockchain);
 
                     let block;
+
                     try {
 
-                        let workBlock = prevBlock;
+                        prevBlock.hash = work.hash;
+                        prevBlock.nonce = work.nonce;
 
-                        workBlock.hash = work.hash;
-                        workBlock.nonce = work.nonce;
-
-                        if (BlockchainGenesis.isPoSActivated(workBlock.height)) {
-                            workBlock.nonce = 0;
-                            workBlock.posSignature = work.pos.posSignature;
-                            workBlock.posMinerAddress = work.pos.posMinerAddress;
-                            workBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
-                            workBlock.timeStamp = work.pos.timestamp;
+                        if (BlockchainGenesis.isPoSActivated(prevBlock.height)) {
+                            prevBlock.nonce = 0;
+                            prevBlock.posSignature = work.pos.posSignature;
+                            prevBlock.posMinerAddress = work.pos.posMinerAddress;
+                            prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
+                            prevBlock.timeStamp = work.pos.timestamp;
                         }
 
-
                         let serialization = prevBlock.serializeBlock();
-                        block = this.blockchain.blockCreator.createEmptyBlock(workBlock.height, undefined );
-                        block.deserializeBlock(serialization, workBlock.height, workBlock.reward,  );
+                        block = this.blockchain.blockCreator.createEmptyBlock(prevBlock.height, undefined );
+                        block.deserializeBlock(serialization, prevBlock.height, prevBlock.reward,  );
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
 
@@ -204,7 +209,7 @@ class PoolWorkManagement{
 
 
                         try {
-                            blockInformation.block = workBlock;
+                            blockInformation.block = prevBlock;
                         } catch (exception){
                             console.error("blockInformation block", exception);
                         }
@@ -222,7 +227,7 @@ class PoolWorkManagement{
                         console.error("PoolWork include raised an exception", exception);
                         revertActions.revertOperations();
 
-                        if (block !== undefined)
+                        if (block)
                             block.destroyBlock();
 
                     }
@@ -234,18 +239,21 @@ class PoolWorkManagement{
 
             }
 
-            let workDone;
+            let workDone, storeDifficulty = true;
 
-            if (BlockchainGenesis.isPoSActivated(prevBlock.height))
-                workDone = work.pos.balance;
-            else
-                workDone = work.hash;
+            if (BlockchainGenesis.isPoSActivated(prevBlock.height)) workDone = work.pos.balance;
+            else workDone = work.hash;
 
-            let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone )  ;
-            blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
+            //for testing only
+            if (!BlockchainGenesis.isPoSActivated(prevBlock.height)) storeDifficulty = false;
 
-            //statistics
-            this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance);
+            if (storeDifficulty) {
+                let difficulty = blockInformationMinerInstance.calculateDifficulty(prevBlock, workDone);
+                blockInformationMinerInstance.adjustDifficulty(prevBlock, difficulty, true);
+
+                //statistics
+                this.poolManagement.poolStatistics.addStatistics(difficulty, minerInstance);
+            }
 
             result = true;
 

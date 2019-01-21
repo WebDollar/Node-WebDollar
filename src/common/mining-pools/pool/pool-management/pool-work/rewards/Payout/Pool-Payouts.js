@@ -108,30 +108,30 @@ class PoolPayouts{
             let poolForkDifferencePerBlock = 0;
 
             if (poolFork > 0)
-                poolForkDifferencePerBlock = Math.ceil( poolFork / blocksConfirmed );
+                poolForkDifferencePerBlock = Math.ceil( poolFork / blocksConfirmed.length );
 
 
-            for (let i=0; i<blocksConfirmed.length; i++) {
+            blocksConfirmed.forEach((blockConfirmed)=>{
 
                 let totalDifficultyPOW = new BigNumber(0), totalDifficultyPOS = new BigNumber(0);
 
-                blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
+                blockConfirmed.blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
                     totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);
                     totalDifficultyPOS = totalDifficultyPOS.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOS);
                 });
 
-                if ( !totalDifficultyPOW.isEqualTo(blocksConfirmed[i].totalDifficultyPOW)  )
-                    throw { message: "Total POW Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOW };
+                if ( !totalDifficultyPOW.isEqualTo(blockConfirmed.totalDifficultyPOW)  )
+                    throw { message: "Total POW Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOW };
 
-                if ( !totalDifficultyPOS.isEqualTo(blocksConfirmed[i].totalDifficultyPOS) )
-                    throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blocksConfirmed[i].totalDifficultyPOS };
+                if ( !totalDifficultyPOS.isEqualTo(blockConfirmed.totalDifficultyPOS) )
+                    throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOS };
 
 
-                let maxSumReward = BlockchainMiningReward.getReward( blocksConfirmed[i].block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
+                let maxSumReward = BlockchainMiningReward.getReward( blockConfirmed.block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
                 let sumReward = 0;
 
-                blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance )=>{
+                blockConfirmed.blockInformationMinersInstances.forEach( (blockInformationMinerInstance )=>{
                     blockInformationMinerInstance.calculateReward(false);
                     sumReward += blockInformationMinerInstance.reward;
                     sumReward += blockInformationMinerInstance.rewardForReferral;
@@ -142,9 +142,9 @@ class PoolPayouts{
                 //reducing the price
                 if ( Math.abs( difference ) > 1 ) {
 
-                    difference = Math.ceil( difference  / blocksConfirmed[i].blockInformationMinersInstances.length );
+                    difference = Math.ceil( difference  / blockConfirmed.blockInformationMinersInstances.length );
 
-                    blocksConfirmed[i].blockInformationMinersInstances.forEach( (blockInformationMinerInstance)=>{
+                    blockConfirmed.blockInformationMinersInstances.forEach( (blockInformationMinerInstance)=>{
 
                         if (blockInformationMinerInstance.reward - difference > 0) {
                             blockInformationMinerInstance.miner.rewardConfirmed -= difference;
@@ -157,7 +157,7 @@ class PoolPayouts{
                 }
 
 
-                blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
+                blockConfirmed.blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
 
                     blockInformationMinerInstance.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.reward;
 
@@ -166,7 +166,8 @@ class PoolPayouts{
 
                 });
 
-            }
+
+            });
 
             Log.info("Payout: Blocks Confirmed Processed", Log.LOG_TYPE.POOLS);
 

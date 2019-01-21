@@ -83,6 +83,18 @@ class PoolDataBlockInformation {
         this._totalDifficultyMinus( prevDifficulty, true, pos );
         this._totalDifficultyPlus( difficulty, false, pos);
 
+        let totalDifficulty = this.totalDifficultyPOW;
+        if (pos) totalDifficulty = this.totalDifficultyPOS;
+
+        if (totalDifficulty.isLessThanOrEqualTo(0)){
+
+            this.miningHeights[height] = undefined;
+
+            if (pos) this.miningHeights.blocksPos--;
+            else this.miningHeights.blocksPow--;
+
+        }
+
     }
 
     // adjustBlockInformationDifficulty (difficulty, hash){
@@ -138,6 +150,13 @@ class PoolDataBlockInformation {
 
                 array.push(Serialization.serializeNumber4Bytes(this.block.height));
                 array.push(this.block.difficultyTargetPrev);
+
+                if (BlockchainGenesis.isPoSActivated(this.block.height)) {
+                    this.block.posMinerAddress = undefined;
+                    this.block.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+                    this.block.posMinerPublicKey = new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH);
+                }
+
                 array.push(this.block.serializeBlock());
 
             } catch (exception){
@@ -260,13 +279,10 @@ class PoolDataBlockInformation {
                     break;
                 }
 
-        this.blockInformationMinersInstances[pos].cancelDifficulties();
         this.blockInformationMinersInstances[pos].cancelReward();
-
+        this.blockInformationMinersInstances[pos].cancelDifficulties();
 
         this.blockInformationMinersInstances.splice(pos,1);
-
-
 
     }
 
