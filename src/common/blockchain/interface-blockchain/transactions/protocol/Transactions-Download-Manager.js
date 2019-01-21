@@ -114,7 +114,7 @@ class TransactionsDownloadManager{
                 if( currentTime - this._transactionsQueue[txId].lastTrialTime > 1000*10 || this._transactionsQueue[txId].lastTrialTime === undefined ){
 
                     //Check the maximum fails allowed per transaction hash
-                    if( this._transactionsQueue[txId].fails <= 5 ){
+                    if( this._transactionsQueue[txId].fails <= 2 ){
 
                         //Check if tx has socket and is still valid
                         if ( this._transactionsQueue[txId].socket !== undefined )
@@ -291,16 +291,14 @@ class TransactionsDownloadManager{
 
                                         //TODO Change limits after multithread
                                         // If socket sent over 100 consecutive invalid tx
-                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 10 ){
+                                        if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 20 ){
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
                                             let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
                                             this._unsubscribeSocket(suspiciousSocket);
-                                            // BansList.addBan(suspiciousSocket, 20*1000, "Sent over 10 invalid transactions");
                                             continue;
-                                        }else{
-                                            this._transactionsQueue[txId].fails++;
-                                            this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
                                         }
+
+                                        this.removeTransaction(txId);
 
                                     }else{
 
