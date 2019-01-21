@@ -169,8 +169,8 @@ class InterfaceBlockchainTransactionsWizard{
                     }
                 };
 
-                // if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
-                //     throw {message: "Transaction is invalid"};
+                if (!transaction.validateTransactionOnce( this.blockchain.blocks.length-1, blockValidationType ))
+                    throw {message: "Transaction is invalid"};
 
             }
 

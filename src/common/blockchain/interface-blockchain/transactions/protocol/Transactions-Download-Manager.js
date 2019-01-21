@@ -315,8 +315,12 @@ class TransactionsDownloadManager{
                                     }
 
                                 }else{
+
                                     this._transactionsQueue[txId].fails++;
                                     this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
+
+                                    if(this._transactionsQueue[txId].fails >= 2)
+                                        this.removeTransaction(txId);
 
                                     if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
