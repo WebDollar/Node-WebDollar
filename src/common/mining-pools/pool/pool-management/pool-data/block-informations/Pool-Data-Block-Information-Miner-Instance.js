@@ -172,15 +172,23 @@ class PoolDataBlockInformationMinerInstance {
 
         let reward =  rewardDifficulty.multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( this._lastHeight)  ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber();
 
-        if ( this.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0) {
+        let prevReward;
+        if ( this.miner.referrals.referralLinkMiner && this.poolManagement.poolSettings.poolReferralFee > 0) {
 
             this.rewardForReferral = reward * ( this.poolManagement.poolSettings.poolReferralFee);
             this.miner.referrals.referralLinkMiner.rewardReferralTotal += this.rewardForReferral - this._prevRewardInitial * this.poolManagement.poolSettings.poolReferralFee;
 
+            this.reward = Math.max( 0 , Math.floor ( reward * ( 1 - this.poolManagement.poolSettings.poolReferralFee) ) );
+            prevReward = Math.max( 0 , Math.floor ( this._prevRewardInitial * ( 1 - this.poolManagement.poolSettings.poolReferralFee) ) );
+
+        } else {
+
+            this.reward = Math.max( 0 , Math.floor ( reward ) );
+            prevReward = Math.max( 0 , Math.floor ( this._prevRewardInitial ) );
+
         }
 
-        this.reward = Math.max( 0 , Math.floor ( reward * ( 1 - this.poolManagement.poolSettings.poolReferralFee) ) );
-        let prevReward = Math.max( 0 , Math.floor ( this._prevRewardInitial * ( 1 - this.poolManagement.poolSettings.poolReferralFee) ) );
+
         this.minerInstance.miner.rewardTotal += this._reward - prevReward;
 
         this._prevRewardInitial = reward;

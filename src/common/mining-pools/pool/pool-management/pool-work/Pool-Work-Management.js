@@ -239,6 +239,11 @@ class PoolWorkManagement{
                 }
 
 
+            } else {
+
+                if (consts.DEBUG)
+                    console.log("valid work, but not solution", prevBlock.height, work.pos ? work.pos.balance : '' );
+
             }
 
             let workDone, storeDifficulty;

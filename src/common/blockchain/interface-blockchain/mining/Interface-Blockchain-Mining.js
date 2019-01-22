@@ -273,6 +273,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         else
             balance = this.blockchain.accountantTree.getBalance( whoIsMining );
 
+        this.block.posSignature = await this.block._signPOSSignature();
+
         if ( !balance ){
 
             await this.blockchain.sleep(1000);
@@ -283,8 +285,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 nonce: -1,
                 pos: {
                     timestamp: this.block.timeStamp,
-                    posSignature: new Buffer(64) ,
-                    posMinerAddress: this.block.posMinerAddress || this.block.data.minerAddress,
+                    posSignature: this.block.posSignature,
+                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
                     posMinerPublicKey: this.block.posMinerPublicKey,
                 }
             };
@@ -296,6 +298,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let exceptionLogged = false;
 
         let i = 0, done = false;
+
+        let errors = 0;
+
         while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
 
             try {
@@ -311,8 +316,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                         this.bestHashNonce = medianTimestamp + i;
 
                         if (this.bestHash.compare(difficultyTarget) <= 0) {
-
-                            this.block.posSignature = await this.block._signPOSSignature();
 
                             return {
 
@@ -341,13 +344,21 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     i++;
 
-                } else
+                } else {
+
                     await this.blockchain.sleep(100);
+                }
 
             } catch (exception){
 
-                if (typeof exception !== "object" || exception.message !== "Timestamp of block is less than the network-adjusted time"){
+                if (typeof exception === "object" && exception.message === "Timestamp of block is less than the network-adjusted time") {
 
+                    // if ( Blockchain.MinerPoolManagement.minerPoolStarted &&  errors > 30 )
+                    //     break;
+
+                    errors++;
+
+                } else {
                     done = true;
 
                     exceptionLogged = true;
@@ -358,8 +369,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 await this.blockchain.sleep(200);
 
             }
-
-            //this._hashesPerSecond = 1;
 
         }
 
@@ -372,7 +381,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nonce: 0,
             pos: {
                 timestamp: this.bestHashNonce,
-                posSignature: this.posSignature,
+                posSignature: this.block.posSignature,
                 posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
                 posMinerPublicKey: this.block.posMinerPublicKey,
             }

@@ -68,7 +68,7 @@ class PoolWorkValidation{
 
                 }
 
-                this._works.splice(0, PROCESS_COUNT);
+                this._works.splice(0, n);
 
             }catch (exception){
 
@@ -82,7 +82,7 @@ class PoolWorkValidation{
 
         let prevBlock = this.poolWorkManagement.poolWork.findBlockById( work.work.id, work.work.height );
 
-        if (prevBlock !== undefined)
+        if ( prevBlock )
             await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
         else
             Log.error("_validateWork didn't work as the block " + work.work.id + " was not found", Log.LOG_TYPE.POOLS, work.work );
