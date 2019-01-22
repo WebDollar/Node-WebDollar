@@ -66,6 +66,12 @@ class TransactionsDownloadManager{
     }
 
     createTransaction(txId,socket){
+
+        for(let i=this.blockchain.blocks.length-5; i<this.blockchain.blocks.length; i++)
+            for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
+                if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
+                    return false;
+
         this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
         this._transactionsQueueLength++;
     }
@@ -97,7 +103,6 @@ class TransactionsDownloadManager{
      * **/
     processTransactionsList(){
 
-        let index = 0;
         let foundVirginTransaction = false;
         let foundHighFailedTransaction = false;
 
@@ -106,19 +111,19 @@ class TransactionsDownloadManager{
             let currentTime = new Date().getTime();
 
             //Take only the most virgines tx
-            if ( this.smallestTrial <= this._transactionsQueue[txId].fails ){
+            if ( this.smallestTrial >= this._transactionsQueue[txId].fails ){
 
                 foundVirginTransaction = true;
 
                 //Check if past 10s from last download trial
-                if( currentTime - this._transactionsQueue[txId].lastTrialTime > 1000*10 || this._transactionsQueue[txId].lastTrialTime === undefined ){
+                if( currentTime - this._transactionsQueue[txId].lastTrialTime > 1000*10 || typeof this._transactionsQueue[txId].lastTrialTime === 'undefined' ){
 
                     //Check the maximum fails allowed per transaction hash
                     if( this._transactionsQueue[txId].fails <= 2 ){
 
                         //Check if tx has socket and is still valid
                         if ( this._transactionsQueue[txId].socket !== undefined )
-                            return {id:txId, index: index, };
+                            return {id:txId };
                         else
                             this.removeTransaction(txId);
 
@@ -132,18 +137,17 @@ class TransactionsDownloadManager{
 
         }
 
-        //If there is any tx to be processed
-        if(index!==0){
+        //Increase trials limit for processing next time or decrease it
+        if(!foundVirginTransaction){
 
-            //Increase trials limit for processing next time or decrease it
-            if(!foundVirginTransaction)
+            if(!foundHighFailedTransaction)
+                this.smallestTrial = this.smallestTrial === 0 ? 0 : this.smallestTrial--;
+            else{
                 this.smallestTrial ++;
-            else
-                if(!foundHighFailedTransaction)
-                    this.smallestTrial = this.smallestTrial === 0 ? 0 : this.smallestTrial--;
-        }
+                return this.processTransactionsList();
+            }
 
-        return undefined;
+        }
 
     }
 
@@ -275,7 +279,7 @@ class TransactionsDownloadManager{
                                     continue;
 
                                 await this.blockchain.sleep(20);
-                                console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1, "tx left to be processed for now",);
+                                console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1 <= 0 ? '0' : this._transactionsQueueLength-1, "tx left to be processed for now",);
 
                                 //If transaction was downloaded
                                 if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
@@ -319,9 +323,6 @@ class TransactionsDownloadManager{
                                     this._transactionsQueue[txId].fails++;
                                     this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
 
-                                    if(this._transactionsQueue[txId].fails >= 2)
-                                        this.removeTransaction(txId);
-
                                     if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
@@ -339,15 +340,16 @@ class TransactionsDownloadManager{
 
                         }
 
-                        if(!found){
-                            this._transactionsQueue[txId].totalSocketsProcessed++;
+                        if(typeof this._transactionsQueue[txId] !== "undefined")
+                            if(!found){
+                                this._transactionsQueue[txId].totalSocketsProcessed++;
 
-                            //If already processed all tx sockets start again until will be removed
-                            if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
-                                this._transactionsQueue[txId].totalSocketsProcessed=0;
-                        }else if(wasAdded){
-                            this.removeTransaction(txId);
-                        }
+                                //If already processed all tx sockets start again until will be removed
+                                if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
+                                    this._transactionsQueue[txId].totalSocketsProcessed=0;
+                            }else if(wasAdded){
+                                this.removeTransaction(txId);
+                            }
 
                     }
 
