@@ -68,9 +68,10 @@ class TransactionsDownloadManager{
     createTransaction(txId,socket){
 
         for(let i=this.blockchain.blocks.length-5; i<this.blockchain.blocks.length; i++)
-            for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
-                    return false;
+            if(typeof this.blockchain.blocks[i].data !== "undefined")
+                for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
+                    if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
+                        return false;
 
         this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
         this._transactionsQueueLength++;
