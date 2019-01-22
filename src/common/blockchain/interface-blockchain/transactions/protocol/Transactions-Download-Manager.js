@@ -341,16 +341,15 @@ class TransactionsDownloadManager{
 
                         }
 
-                        if(typeof this._transactionsQueue[txId] !== "undefined")
-                            if(!found){
-                                this._transactionsQueue[txId].totalSocketsProcessed++;
+                        if(!found && this._transactionsQueue[txId]){
+                            this._transactionsQueue[txId].totalSocketsProcessed++;
 
                                 //If already processed all tx sockets start again until will be removed
                                 if (this._transactionsQueue[txId].socket.length === this._transactionsQueue[txId].totalSocketsProcessed-1)
                                     this._transactionsQueue[txId].totalSocketsProcessed=0;
-                            }else if(wasAdded){
-                                this.removeTransaction(txId);
-                            }
+                        }else if(wasAdded){
+                            this.removeTransaction(txId);
+                        }
 
                     }
 
