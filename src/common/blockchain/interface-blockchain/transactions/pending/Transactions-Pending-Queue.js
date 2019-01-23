@@ -319,8 +319,7 @@ class TransactionsPendingQueue {
     propagateMissingNonce(addressBuffer,nonce){
 
         let found = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(addressBuffer,nonce);
-
-        if(!found) return;
+        if(found) return;
 
         this.transactionsProtocol.propagateNewMissingNonce(addressBuffer,nonce);
         this.transactionsProtocol.transactionsDownloadingManager.addMissingNonceList(addressBuffer,nonce);
