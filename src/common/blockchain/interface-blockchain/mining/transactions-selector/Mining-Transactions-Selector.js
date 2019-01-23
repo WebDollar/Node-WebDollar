@@ -98,7 +98,7 @@ class MiningTransactionsSelector{
                     //console.warn('Error Including Transaction', exception);
 
                     if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' )
-                        this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0],transaction.nonce);
+                        this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
                     bRemoveTransaction = true;
                 }
