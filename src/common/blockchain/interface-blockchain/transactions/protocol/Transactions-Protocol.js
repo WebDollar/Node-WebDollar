@@ -82,7 +82,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try {
 
-                if (!response.transaction) throw {message:"missing-nonce - Response is false"};
+                if (!response.result) throw {message:"missing-nonce - Response is false"};
 
                 this.transactionsDownloadingManager.addTransaction(socket, response.transaction, true );
 
