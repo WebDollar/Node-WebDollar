@@ -38,9 +38,13 @@ class NodesList {
         let consensusBlock;
         let consensusHeightNodes=0;
 
-        for(let i=0;i<this.nodes.length;i++)
-            if(typeof this.nodes[i].socket.node.protocol.block !== "undefined")
-                blocksList[this.nodes[i].socket.node.protocol.block]++;
+        if(typeof this.nodes !== "undefined")
+            for(let i=0;i<this.nodes.length;i++)
+                if(typeof this.nodes[i].socket.node.protocol.blocks !== "undefined")
+                    if(typeof blocksList[this.nodes[i].socket.node.protocol.blocks] === "undefined")
+                        blocksList[this.nodes[i].socket.node.protocol.blocks]=1;
+                    else
+                        blocksList[this.nodes[i].socket.node.protocol.blocks]++;
 
         for(let key in blocksList)
             if(blocksList[key] > consensusHeightNodes){
@@ -48,7 +52,7 @@ class NodesList {
                 consensusBlock = key;
             }
 
-        if(blockchainHeight-4 < key)
+        if(blockchainHeight>5 && blockchainHeight > consensusBlock-4)
             return true;
         else
             return false
