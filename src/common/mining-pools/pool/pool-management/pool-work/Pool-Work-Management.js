@@ -140,8 +140,11 @@ class PoolWorkManagement{
                 args = [work.nonce];
             }
 
-             if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
-                throw {message: "block was incorrectly mined " + ( isPos ? "pos" : "pow") , work: work };
+
+            //TODO remove !isPOS to throw the error message always
+            if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
+                if ( !isPos )
+                    throw {message: "block was incorrectly mined " + ( isPos ? "pos" : "pow") , work: work };
 
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
