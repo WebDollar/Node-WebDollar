@@ -1,5 +1,4 @@
 import consts from 'consts/const_global'
-import BufferExtended from "common/utils/BufferExtended"
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
 import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
 import Blockchain from "../../../../../main-blockchain/Blockchain";
@@ -87,7 +86,7 @@ class TransactionsPendingQueue {
         //This is just for pool
         //TODO remove on light consensus
         if (this.blockchain.agent.light)
-            if(  transaction.timeLock < this.blockchain.blocks.length-1 ){
+            if( transaction.timeLock < this.blockchain.blocks.length-1 ){
                 throw {message: "transaction is too old"};
             }
 
@@ -289,9 +288,6 @@ class TransactionsPendingQueue {
                             ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
                         (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  ))
                     removeThis=true;
-
-                if ( Blockchain.blockchain.agent.consensus )
-                    this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType );
 
             } catch (exception){
 

@@ -1,8 +1,6 @@
 import NodesList from 'node/lists/Nodes-List';
 import consts from "consts/const_global"
-import TransactionsPendingQueue from "../pending/Transactions-Pending-Queue";
 import Blockchain from "../../../../../main-blockchain/Blockchain";
-import BansList from "common/utils/bans/BansList";
 
 const MAX_TRANSACTIONS_LENGTH = 5000;
 
@@ -67,6 +65,7 @@ class TransactionsDownloadManager{
 
     createTransaction(txId,socket){
 
+        //Verify if was included in last blocks
         for(let i=this.blockchain.blocks.length-5; i<this.blockchain.blocks.length; i++)
             if( this.blockchain.blocks[i] )
                 for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
@@ -104,7 +103,7 @@ class TransactionsDownloadManager{
      * **/
     processTransactionsList(){
 
-        let foundVirginTransaction = false;
+        let foundPriorityTransaction = false;
         let foundHighFailedTransaction = false;
 
         for (let txId in this._transactionsQueue){
@@ -114,7 +113,7 @@ class TransactionsDownloadManager{
             //Take only the most virgines tx
             if ( this.smallestTrial >= this._transactionsQueue[txId].fails ){
 
-                foundVirginTransaction = true;
+                foundPriorityTransaction = true;
 
                 //Check if past 10s from last download trial
                 if( currentTime - this._transactionsQueue[txId].lastTrialTime > 1000*10 || typeof this._transactionsQueue[txId].lastTrialTime === 'undefined' ){
@@ -139,7 +138,7 @@ class TransactionsDownloadManager{
         }
 
         //Increase trials limit for processing next time or decrease it
-        if(!foundVirginTransaction){
+        if(!foundPriorityTransaction){
 
             if(!foundHighFailedTransaction)
                 this.smallestTrial = this.smallestTrial === 0 ? 0 : this.smallestTrial--;
@@ -172,9 +171,7 @@ class TransactionsDownloadManager{
 
         }else{
 
-            if(topPriority) this._transactionsQueue.fails=0;
-
-            let found = false;
+            if(topPriority) this._transactionsQueue[txId].fails=0;
 
             //Add socket in tx socketsList if is from different socket
             for( let i=0; i<this._transactionsQueue[txId.toString('hex')].socket.length; i++){
@@ -182,25 +179,20 @@ class TransactionsDownloadManager{
                 if( this._transactionsQueue[txId.toString('hex')].socket[i].node !== undefined )
                     if( this._transactionsQueue[txId.toString('hex')].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid ){
 
-                        found = true;
-
                         let socket1 = this._transactionsQueue[txId.toString('hex')].socket[i];
                         let socket2 = socket;
 
                         delete socket1.downloadFails;
                         delete socket2.downloadFails;
 
-                        if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket )
-                            found = false;
-
-                        break;
+                        if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket ){
+                            this._transactionsQueue[txId.toString('hex')].socket.push(socket);
+                            break;
+                        }
+                        
                     }
 
             }
-
-            if( found===false )
-                this._transactionsQueue[txId.toString('hex')].socket.push(socket);
-
 
         }
 
