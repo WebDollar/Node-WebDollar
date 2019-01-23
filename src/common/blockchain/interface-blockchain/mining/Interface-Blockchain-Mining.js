@@ -273,11 +273,14 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         else
             balance = this.blockchain.accountantTree.getBalance( whoIsMining );
 
-        this.block.posSignature = await this.block._signPOSSignature();
+        let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
 
         if ( !balance ){
 
-            await this.blockchain.sleep(1000);
+            await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 300 : 1000 );
+
+            this.block.timeStamp = medianTimestamp;
+            this.block.posSignature = await this.block._signPOSSignature();
 
             return {
                 result: false,
@@ -294,7 +297,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         }
 
         // try all timestamps
-        let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
         let exceptionLogged = false;
 
         let i = 0, done = false;
@@ -373,7 +375,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         }
 
-        this.block.timeStamp = this.bestHashNonce;
+        this.block.timeStamp = this.bestHashNonce > 0 ? this.bestHashNonce : medianTimestamp;
         this.block.posSignature = await this.block._signPOSSignature();
 
         return {
@@ -381,7 +383,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             hash: this.bestHash,
             nonce: 0,
             pos: {
-                timestamp: this.bestHashNonce,
+                timestamp: this.block.timeStamp,
                 posSignature: this.block.posSignature,
                 posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
                 posMinerPublicKey: this.block.posMinerPublicKey,
