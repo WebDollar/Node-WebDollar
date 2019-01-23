@@ -53,6 +53,7 @@ class MiningTransactionsSelector{
     selectNextTransactions(miningFeePerByte,showLogsOnlyOnce){
 
         this._transactions = [];
+        let missingFirstNonce = false;
 
         let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
         let i = 0;
@@ -97,8 +98,11 @@ class MiningTransactionsSelector{
                 } catch (exception){
                     //console.warn('Error Including Transaction', exception);
 
-                    if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' )
-                        this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
+                    if(!missingFirstNonce)
+                        if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' ){
+                            missingFirstNonce = true;
+                            this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce-1);
+                        }
 
                     bRemoveTransaction = true;
                 }
