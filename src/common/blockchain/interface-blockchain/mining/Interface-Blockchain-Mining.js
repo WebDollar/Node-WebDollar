@@ -280,17 +280,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 300 : 1000 );
 
             this.block.timeStamp = medianTimestamp;
-            this.block.posSignature = await this.block._signPOSSignature();
+            let posSignature = await this.block._signPOSSignature();
 
             return {
                 result: false,
                 hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: 0,
                 pos: {
-                    timestamp: this.block.timeStamp,
-                    posSignature: this.block.posSignature,
+                    timestamp: medianTimestamp,
+                    posSignature: posSignature.signature,
                     posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
-                    posMinerPublicKey: this.block.posMinerPublicKey,
+                    posMinerPublicKey: posSignature.publicKey,
                 }
             };
 
@@ -309,7 +309,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
 
-                    let hash = await this.calculateHash(   medianTimestamp + i, this.block.posMinerAddress, balance);
+                    let hash = await this.calculateHash(   medianTimestamp + i, whoIsMining, balance);
                     this.block.timeStamp = medianTimestamp + i;
 
                     if (hash.compare(this.bestHash) < 0) {
@@ -319,17 +319,17 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                         if (this.bestHash.compare(difficultyTarget) <= 0) {
 
-                            this.block.posSignature = await this.block._signPOSSignature();
+                            let posSignature = await this.block._signPOSSignature();
                             return {
 
                                 result: true,
                                 hash: hash,
                                 nonce: 0,
                                 pos: {
-                                    timestamp: this.block.timeStamp,
-                                    posSignature: this.block.posSignature,
+                                    timestamp: medianTimestamp + i,
+                                    posSignature: posSignature.signature,
                                     posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
-                                    posMinerPublicKey: this.block.posMinerPublicKey,
+                                    posMinerPublicKey: posSignature.publicKey,
                                 }
 
                             };
@@ -375,20 +375,20 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         }
 
-        this.block.timeStamp = this.bestHashNonce > 0 ? this.bestHashNonce : medianTimestamp;
-        let hash = await this.calculateHash(  this.block.timeStamp , this.block.posMinerAddress, balance);
+        this.block.timeStamp = medianTimestamp;
+        let hash = await this.calculateHash(  this.block.timeStamp , whoIsMining, balance);
 
-        this.block.posSignature = await this.block._signPOSSignature();
+        let posSignature = await this.block._signPOSSignature();
 
         return {
             result: false,
             hash: hash,
             nonce: 0,
             pos: {
-                timestamp: this.block.timeStamp,
-                posSignature: this.block.posSignature,
+                timestamp: medianTimestamp,
+                posSignature: posSignature.signature,
                 posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
-                posMinerPublicKey: this.block.posMinerPublicKey,
+                posMinerPublicKey: posSignature.publicKey,
             }
         };
 

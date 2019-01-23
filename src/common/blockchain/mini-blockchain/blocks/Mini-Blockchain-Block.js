@@ -193,8 +193,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         //storing the publicKey
         this.posMinerPublicKey = answer.publicKey;
+        this.posSignature = answer.signature;
 
-        return answer.signature;
+        return {
+            signature: answer.signature,
+            publicKey: answer.publicKey,
+        };
 
     }
 

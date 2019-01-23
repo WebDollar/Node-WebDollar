@@ -296,10 +296,8 @@ class TransactionsPendingQueue {
 
             }
 
-            if(removeThis){
+            if(removeThis)
                 this._removePendingTransaction(this.listArray[i], i);
-                continue;
-            }
 
         }
 

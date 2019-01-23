@@ -199,6 +199,11 @@ class MinerPoolMining extends InheritedPoolMining {
 
                         let answer = await this._run();
 
+                        if (!answer)
+                            answer = {
+
+                            };
+
                         answer.timeDiff = new Date().getTime() - timeInitial;
                         answer.id = workId;
 
