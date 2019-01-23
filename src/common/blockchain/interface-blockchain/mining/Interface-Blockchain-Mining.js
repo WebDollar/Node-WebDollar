@@ -354,8 +354,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (typeof exception === "object" && exception.message === "Timestamp of block is less than the network-adjusted time") {
 
-                    // if ( Blockchain.MinerPoolManagement.minerPoolStarted &&  errors > 30 )
-                    //     break;
+                    if ( Blockchain.MinerPoolManagement.minerPoolStarted &&  errors > 30 )
+                        break;
 
                     errors++;
 

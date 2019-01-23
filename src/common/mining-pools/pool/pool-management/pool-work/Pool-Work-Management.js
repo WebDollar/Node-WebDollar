@@ -141,7 +141,7 @@ class PoolWorkManagement{
             }
 
              if ( false === await blockInformationMinerInstance.validateWorkHash.apply( blockInformationMinerInstance, [ prevBlock, work.hash ].concat( args ),  )  )
-                throw {message: "block was incorrectly mined " + isPos ? "pos" : "pow", work: work };
+                throw {message: "block was incorrectly mined " + ( isPos ? "pos" : "pow") , work: work };
 
             if (Math.random() < 0.001)
                 console.log("Work: ", work);
@@ -272,6 +272,8 @@ class PoolWorkManagement{
 
             if (exception.message === "block was incorrectly mined" && Math.random() < 0.3 )
                 console.error("Pool Work Management raised an error", exception);
+            else if (consts.DEBUG)
+                console.error("error pool mining", exception)
 
         }
 
