@@ -236,7 +236,7 @@ class TransactionsDownloadManager{
     async _processTransactions() {
 
         //TODO do this only blockchain is sync
-        //if( Blockchain.synchronized )
+        if( NodesList.isConsensus(this.blockchain.blocks.length) )
             for (let i = 0; i <= 20; i++){
 
                 try {

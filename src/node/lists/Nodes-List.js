@@ -32,6 +32,28 @@ class NodesList {
         this.removeDisconnectedSockets();
     }
 
+    isConsensus(blockchainHeight){
+
+        let blocksList={};
+        let consensusBlock;
+        let consensusHeightNodes=0;
+
+        for(let i=0;i<this.nodes.length;i++)
+            if(typeof this.nodes[i].socket.node.protocol.block !== "undefined")
+                blocksList[this.nodes[i].socket.node.protocol.block]++;
+
+        for(let key in blocksList)
+            if(blocksList[key] > consensusHeightNodes){
+                consensusHeightNodes = blocksList[key];
+                consensusBlock = key;
+            }
+
+        if(blockchainHeight-4 < key)
+            return true;
+        else
+            return false
+
+    }
 
     searchNodeSocketByAddress(sckAddress, connectionType, validationDoubleConnectionsTypes){
 
@@ -122,7 +144,6 @@ class NodesList {
 
     //Removing socket from the list (the connection was terminated)
     async disconnectSocket(socket, connectionType){
-
 
         if (socket !== null && !socket.hasOwnProperty("node") ) {
 
