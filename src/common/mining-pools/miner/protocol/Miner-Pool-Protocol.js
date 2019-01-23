@@ -230,25 +230,11 @@ class MinerProtocol extends PoolProtocolList{
 
             try {
 
-                let suffix = '';
-
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                Log.info("Sending Partial Work: ("+this.minerPoolManagement.minerPoolMining._miningWork.height+")"+ this.minerPoolManagement.minerPoolMining.bestHash.toString("hex") , Log.LOG_TYPE.POOLS);
+                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
-                if ( (this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 && this.minerPoolManagement.minerPoolMining.bestHashNonce !== -1) || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
-                    socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
-                        work: {
-                            result: false,
-                            hash: new Buffer(this.minerPoolManagement.minerPoolMining.bestHash),
-                            nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                            id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
-                        }
-                    });
-                else
-                    Log.warn("Sending Partial Work was skipped" , Log.LOG_TYPE.POOLS);
-
-                await this._validateRequestWork(data.work, socket);
+                //await this._validateRequestWork(data.work, socket);
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
@@ -258,8 +244,6 @@ class MinerProtocol extends PoolProtocolList{
             }
 
         });
-
-
 
     }
 
@@ -333,10 +317,9 @@ class MinerProtocol extends PoolProtocolList{
                 work: miningAnswer,
             }, "answer", 6000);
 
-            Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
-            if (miningAnswer.pos){
+            Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") + " id: " + miningAnswer.id, Log.LOG_TYPE.POOLS);
+            if (miningAnswer.pos)
                 Log.info( "timestamp " + miningAnswer.pos.timestamp + "   " + "balance " + (Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
-            }
 
             if (!miningAnswer.result){
 

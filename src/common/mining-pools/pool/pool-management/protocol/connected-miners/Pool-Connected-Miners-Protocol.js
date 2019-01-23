@@ -305,7 +305,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (socket.node.protocol.minerPool === undefined) return;
 
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
-                if (minerInstance === null || minerInstance === undefined) throw {message: "publicKey was not found"};
+                if ( !minerInstance ) throw {message: "publicKey was not found"};
 
                 await this.poolManagement.receivePoolWork(minerInstance, data.work);
 

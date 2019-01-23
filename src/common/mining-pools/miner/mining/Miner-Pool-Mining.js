@@ -56,7 +56,7 @@ class MinerPoolMining extends InheritedPoolMining {
         if (this._workers !== undefined)
             this._workers._in_pool = true;
 
-        this._miningBalances = {}
+        this._miningBalances = {};
 
     }
 
@@ -103,27 +103,6 @@ class MinerPoolMining extends InheritedPoolMining {
     }
 
     async updatePoolMiningWork(work, poolSocket){
-
-        if (!this.resetForced) {
-            if (work.I < this._miningWork.blockId) return;
-            // else if (work.I === this._miningWork.blockId && work.start <= this._miningWork.start && this._miningWork.blockSerialized.equals(work.block))
-            //     return;
-        }
-
-        if ( this._miningWork.blockId < work.I){
-            this._miningWork.blockId = work.I ;
-            this._miningWork.start = work.start;
-        }
-
-        if (this._isBeingMining) {
-            this.resetForced = true;
-            await this._isBeingMining;
-        }
-
-        if (this._miningWork.blockId > work.I)
-            return;
-
-        this.resetForced = false;
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
@@ -211,50 +190,34 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     let timeInitial = new Date().getTime();
 
-                    this._isBeingMining = new Promise( async (resolve)=>{
+                    try {
 
-                        try {
+                        let workHeight = this._miningWork.height;
+                        let workId = this._miningWork.blockId;
+                        let workEnd = this._miningWork.end;
+                        let workStart = this._miningWork.start;
 
-                            let workHeight = this._miningWork.height;
-                            let workId = this._miningWork.blockId;
-                            let workEnd = this._miningWork.end;
-                            let workStart = this._miningWork.start;
+                        let answer = await this._run();
 
-                            let answer = await this._run();
+                        answer.timeDiff = new Date().getTime() - timeInitial;
+                        answer.id = workId;
 
-                            if (answer === null) {
-                                resolve(false)
-                            }
-
-                            answer.timeDiff = new Date().getTime() - timeInitial;
-                            answer.id = workId;
-
-                            if (!this.resetForced && !this._miningWork.resolved) {
-                                answer.hashes = workEnd - workStart;
-                                this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
-                            } else {
-                                this.resetForced = false;
-                            }
-
-                            this._miningWork.resolved = true;
-
-                            resolve(true);
-
-                        } catch (exception){
-                            console.log("Pool Mining Exception", exception);
-                            this.stopMining();
-
-                            resolve(false);
+                        if (!this._miningWork.resolved) {
+                            answer.hashes = workEnd - workStart;
                         }
 
-                    })
+                        this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
 
+                        this.resetForced = false;
+                        this._miningWork.resolved = true;
 
-                    await this._isBeingMining;
+                    } catch (exception){
+                        console.log("Pool Mining Exception", exception);
+                        this.stopMining();
+
+                    }
 
                 } catch (exception) {
-                    console.log("Pool Mining Exception", exception);
-                    this.stopMining();
                 }
 
             }
@@ -299,8 +262,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
         try {
 
-            if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
-                await this.minerPoolManagement.minerPoolProtocol.requestWork();
+            // if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
+            //     await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
             if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 180000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
 

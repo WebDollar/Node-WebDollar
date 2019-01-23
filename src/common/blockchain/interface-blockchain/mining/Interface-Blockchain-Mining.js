@@ -317,6 +317,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                         if (this.bestHash.compare(difficultyTarget) <= 0) {
 
+                            this.block.posSignature = await this.block._signPOSSignature();
                             return {
 
                                 result: true,
