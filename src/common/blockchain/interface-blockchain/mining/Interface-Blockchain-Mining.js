@@ -72,15 +72,15 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
-                async ()=>{
+                    async ()=>{
 
-                    return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
-                        async ()=>{
-                            return await this._simulatedNextBlockMining(nextBlock, false);
-                        },
-                        false); //avoid displaying the changes
+                        return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                            async ()=>{
+                                return await this._simulatedNextBlockMining(nextBlock, false);
+                            },
+                            false); //avoid displaying the changes
 
-                }) === false) throw {message: "Mining1 returned False"};
+                    }) === false) throw {message: "Mining1 returned False"};
 
         } catch (Exception){
             console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : '');
@@ -209,16 +209,16 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-                        block.hash = answer.hash;
-                        block.nonce = answer.nonce;
+                            block.hash = answer.hash;
+                            block.nonce = answer.nonce;
 
-                        //returning false, because a new fork was changed in the mean while
-                        if (this.blockchain.blocks.length !== block.height)
-                            return false;
+                            //returning false, because a new fork was changed in the mean while
+                            if (this.blockchain.blocks.length !== block.height)
+                                return false;
 
-                        return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
+                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
 
-                    }) === false) throw {message: "Mining2 returned false"};
+                        }) === false) throw {message: "Mining2 returned false"};
 
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 
@@ -285,7 +285,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             return {
                 result: false,
                 hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
-                nonce: -1,
+                nonce: 0,
                 pos: {
                     timestamp: this.block.timeStamp,
                     posSignature: this.block.posSignature,
@@ -376,11 +376,13 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         }
 
         this.block.timeStamp = this.bestHashNonce > 0 ? this.bestHashNonce : medianTimestamp;
+        let hash = await this.calculateHash(  this.block.timeStamp , this.block.posMinerAddress, balance);
+
         this.block.posSignature = await this.block._signPOSSignature();
 
         return {
             result: false,
-            hash: this.bestHash,
+            hash: hash,
             nonce: 0,
             pos: {
                 timestamp: this.block.timeStamp,
