@@ -276,7 +276,16 @@ class InterfaceBlockchainTransactionsProtocol {
 
     }
 
-    propagateNewPendingTransaction(transaction, exceptSockets){
+    propagateNewPendingTransaction(transaction, exceptSockets = []){
+
+        if (!Array.isArray(exceptSockets) )11
+            exceptSockets = [exceptSockets];
+
+        if (Blockchain.PoolManagement.poolStarted)
+            Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list.forEach( (element)=>{
+                exceptSockets.push(element);
+            });
+
 
         // NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );

@@ -275,9 +275,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
 
-        if ( !balance ){
+        if ( !balance || balance < consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT * WebDollarCoins.WEBD ){
 
-            await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 300 : 1000 );
+            await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 10000 : 1000 );
 
             this.block.timeStamp = medianTimestamp;
             let posSignature = await this.block._signPOSSignature();
