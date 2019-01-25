@@ -51,7 +51,7 @@ class MiningTransactionsSelector{
         if(!this.validateTransactionId(transaction.txId))
             throw {message: "This transaction was already inserted by txId"};
 
-        if (transaction.nonce <= this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
 
         if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
