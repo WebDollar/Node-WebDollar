@@ -145,7 +145,7 @@ class NodeProtocol {
 
         let nodes = NodesList.getNodesByConnectionType(connectionType);
 
-        if (exceptSockets !== undefined && exceptSockets !== null && !Array.isArray(exceptSockets))
+        if ( exceptSockets && !Array.isArray(exceptSockets))
             exceptSockets = [exceptSockets];
 
         //console.log("request nodes.length", nodes.length, request, data, )
@@ -155,7 +155,7 @@ class NodeProtocol {
 
             let broadcast = false;
 
-            if (exceptSockets === undefined) broadcast = true;
+            if ( !exceptSockets ) broadcast = true;
             else
             if (Array.isArray(exceptSockets)){
 

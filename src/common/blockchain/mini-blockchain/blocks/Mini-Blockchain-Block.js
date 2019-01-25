@@ -161,7 +161,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 //console.log("After Balance ", balance, s);
             }
 
-            if (balance === null || balance < 100 * WebDollarCoins.WEBD)
+            if (balance === null || balance < consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT * WebDollarCoins.WEBD)
                 return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
 
             let number = new BigInteger( hash.toString("hex"), 16);
