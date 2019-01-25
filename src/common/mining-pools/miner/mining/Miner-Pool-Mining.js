@@ -206,6 +206,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
                         answer.timeDiff = new Date().getTime() - timeInitial;
                         answer.id = workId;
+                        answer.h = workHeight;
 
                         if (!this._miningWork.resolved) {
                             answer.hashes = workEnd - workStart;

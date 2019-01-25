@@ -1,6 +1,8 @@
 import Log from 'common/utils/logging/Log';
 const PROCESS_COUNT = 30;
 
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+
 class PoolWorkValidation{
 
     constructor(poolManagement, poolWorkManagement){
@@ -13,7 +15,7 @@ class PoolWorkValidation{
 
     startPoolWorkValidation(){
 
-        if (this._timeoutPoolWorkValidation === undefined)
+        if ( !this._timeoutPoolWorkValidation )
             this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), 100 );
 
     }
@@ -40,14 +42,14 @@ class PoolWorkValidation{
             minerInstance: minerInstance
         };
 
+        if (typeof work.h === "number" && BlockchainGenesis.isPoSActivated(work.h))
+            forced = true;
 
-        if (work.result || forced){
+        if (work.result || forced  ){
 
             await this._validateWork(workData);
 
-            return;
-        }
-
+        } else
         this._works.push(workData);
 
     }
@@ -56,23 +58,29 @@ class PoolWorkValidation{
 
         Log.info("Total amount of work to validate: "+this._works.length, Log.LOG_TYPE.POOLS );
 
-        if (this.poolManagement.blockchain.semaphoreProcessing._list.length === 0 )
+        if (this.poolManagement.blockchain.semaphoreProcessing._list.length === 0 ) {
 
-            try{
+            let index = -1;
+
+            try {
 
                 let n = Math.min(PROCESS_COUNT, this._works.length);
 
-                for (let i=0; i<n; i++){
+                for (let i = 0; i < n; i++) {
 
                     await this._validateWork(this._works[i]);
 
+                    index = i;
                 }
 
-                this._works.splice(0, n);
-
-            }catch (exception){
+            } catch (exception) {
 
             }
+
+            if (index >= 0)
+                this._works.splice(0, index);
+
+        }
 
         this._timeoutPoolWorkValidation = setTimeout( this.processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, 50000/this._works.length)) );
 
