@@ -53,7 +53,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._isBeingMining = undefined;
 
-        if (this._workers !== undefined)
+        if (this._workers)
             this._workers._in_pool = true;
 
         this._miningBalances = {};
@@ -62,7 +62,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
     _startMinerPoolMining(){
 
-        if (this._checkForWorkInterval === undefined)
+        if ( !this._checkForWorkInterval )
             this._checkForWorkInterval = this._checkForWorkIntervalCallback();
 
         this._miningWork.date = new Date().getTime();
@@ -72,7 +72,11 @@ class MinerPoolMining extends InheritedPoolMining {
     _stopMinerPoolMining(){
 
         clearTimeout(this._checkForWorkInterval);
+
+        this.started = false;
         this._checkForWorkInterval = undefined;
+
+        InheritedPoolMining.prototype.stopMining.call(this);
 
     }
 
@@ -168,7 +172,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         while (this.started && !global.TERMINATED){
 
-            if (this._miningWork.block === undefined || this._miningWork.resolved)
+            if ( !this._miningWork.block || this._miningWork.resolved)
                 await Blockchain.blockchain.sleep(5);
             else {
 
@@ -190,38 +194,46 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     let timeInitial = new Date().getTime();
 
-                    try {
+                    this._isBeingMining = new Promise( async (resolve)=>{
 
-                        let workHeight = this._miningWork.height;
-                        let workId = this._miningWork.blockId;
-                        let workEnd = this._miningWork.end;
-                        let workStart = this._miningWork.start;
+                        try {
 
-                        let answer = await this._run();
+                            let workHeight = this._miningWork.height;
+                            let workId = this._miningWork.blockId;
+                            let workEnd = this._miningWork.end;
+                            let workStart = this._miningWork.start;
 
-                        if (!answer)
-                            answer = {
+                            let answer = await this._run();
 
-                            };
+                            if (!answer)
+                                answer = {
 
-                        answer.timeDiff = new Date().getTime() - timeInitial;
-                        answer.id = workId;
-                        answer.h = workHeight;
+                                };
 
-                        if (!this._miningWork.resolved) {
-                            answer.hashes = workEnd - workStart;
+                            answer.timeDiff = new Date().getTime() - timeInitial;
+                            answer.id = workId;
+                            answer.h = workHeight;
+
+                            if (!this._miningWork.resolved) {
+                                answer.hashes = workEnd - workStart;
+                            }
+
+                            this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
+
+                            this.resetForced = false;
+                            this._miningWork.resolved = true;
+
+                        } catch (exception){
+                            console.log("Pool Mining Exception", exception);
+                            this.stopMining();
+
                         }
 
-                        this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
+                        resolve(true);
 
-                        this.resetForced = false;
-                        this._miningWork.resolved = true;
+                    });
 
-                    } catch (exception){
-                        console.log("Pool Mining Exception", exception);
-                        this.stopMining();
-
-                    }
+                    await this._isBeingMining;
 
                 } catch (exception) {
                 }

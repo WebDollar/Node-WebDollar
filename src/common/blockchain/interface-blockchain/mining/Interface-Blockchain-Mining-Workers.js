@@ -122,6 +122,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     async startMining(){
 
+        if (this.started)
+            return;
+
         InterfaceBlockchainMining.prototype.startMining.call(this);
 
         if (this.workers.workers === 0)

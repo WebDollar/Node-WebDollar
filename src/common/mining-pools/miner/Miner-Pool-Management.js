@@ -122,20 +122,22 @@ class MinerProtocol {
 
                     this.blockchain.agent.consensus = false;
 
-                    if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
+                    if (this.blockchain && this.blockchain.prover )
                         this.blockchain.prover.proofActivated = false;
 
                     await this.minerPoolProtocol.insertServersListWaitlist(this.minerPoolSettings.poolServers);
                     await this.minerPoolMining._startMinerPoolMining();
 
                     if (!this.minerPoolMining.started) {
-                        let workers;
-                        if (Blockchain.blockchain.miningSolo.workers !== undefined) workers = Blockchain.blockchain.miningSolo.workers.workers;
+
+                        let workers = Blockchain.blockchain.miningSolo.workers ? Blockchain.blockchain.miningSolo.workers.workers : undefined;
 
                         Blockchain.blockchain.miningSolo.stopMining();
+
+                        this.minerPoolMining._stopMinerPoolMining();
                         await this.minerPoolProtocol._startMinerProtocol();
 
-                        if (workers !== undefined) this.minerPoolMining.setWorkers(workers);
+                        if ( workers ) this.minerPoolMining.setWorkers(workers);
                     }
 
                     await this.minerPoolReferrals.startLoadMinerPoolReferrals();
@@ -148,15 +150,17 @@ class MinerProtocol {
                     Blockchain.Mining = Blockchain.blockchain.miningSolo;
 
                     if (this.minerPoolMining.started) {
+
                         await this.minerPoolProtocol._stopMinerProtocol();
 
-                        let workers;
-                        if (this.minerPoolMining.workers !== undefined) workers = this.minerPoolMining.workers.workers;
+                        let workers = this.minerPoolMining.workers ? this.minerPoolMining.workers.workers : undefined;
 
-                        await this.minerPoolMining._stopMinerPoolMining();
+                        this.minerPoolMining._stopMinerPoolMining();
+
+                        Blockchain.blockchain.miningSolo.stopMining();
                         Blockchain.blockchain.miningSolo.startMining();
 
-                        if (workers !== undefined) Blockchain.blockchain.miningSolo.setWorkers(workers);
+                        if (workers) Blockchain.blockchain.miningSolo.setWorkers(workers);
                     }
 
                     await this.minerPoolReferrals.stopLoadMinerPoolReferrals();

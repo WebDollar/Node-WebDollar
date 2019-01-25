@@ -35,7 +35,7 @@ class PoolWorkValidation{
 
         }
 
-        minerInstance.dateActivity = new Date().getTime()/1000;
+        minerInstance.dateActivity = new Date().getTime() / 1000;
 
         let workData = {
             work: work,

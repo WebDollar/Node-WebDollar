@@ -149,6 +149,9 @@ class InterfaceBlockchainMiningBasic {
 
     async startMining(){
 
+        if (this.started)
+            return;
+
         this.started = true;
         this.reset = false;
 

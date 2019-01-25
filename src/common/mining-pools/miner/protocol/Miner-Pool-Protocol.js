@@ -224,7 +224,10 @@ class MinerProtocol extends PoolProtocolList{
         if (this.minerPoolManagement.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
             this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
-        this.minerPoolManagement.minerPoolMining._miningWork.blockId = -1;
+        this.minerPoolManagement.minerPoolMining.resetForced = true;
+
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
@@ -234,7 +237,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 this.minerPoolManagement.minerPoolMining.resetForced = true;
 
-                //await this._validateRequestWork(data.work, socket);
+                await this._validateRequestWork(data.work, socket);
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
@@ -308,10 +311,10 @@ class MinerProtocol extends PoolProtocolList{
 
         try {
 
-            if (poolSocket === undefined)
+            if (!poolSocket )
                 poolSocket = this.connectedPools[0];
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
+            if (!poolSocket ) throw {message: "You are disconnected"};
 
             let answer = poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
