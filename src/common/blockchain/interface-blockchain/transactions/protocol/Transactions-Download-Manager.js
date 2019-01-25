@@ -274,7 +274,7 @@ class TransactionsDownloadManager{
                                     continue;
 
                                 await this.blockchain.sleep(20);
-                                console.info("Processing tx ",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1 <= 0 ? '0' : this._transactionsQueueLength-1, "tx left to be processed for now",);
+                                console.info("Processing TX",this._transactionsQueue[txId].buffer ? "SUCCEED, from" : "FAILED, from", totalSocketsProcessed, "-", this._transactionsQueue[txId].socket.length, txId.toString('hex'), "-", this._transactionsQueueLength-1 <= 0 ? '0' : this._transactionsQueueLength-1, "tx left to be processed",);
 
                                 //If transaction was downloaded
                                 if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
