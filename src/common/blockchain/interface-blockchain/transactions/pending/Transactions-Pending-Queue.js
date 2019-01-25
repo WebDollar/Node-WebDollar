@@ -288,7 +288,7 @@ class TransactionsPendingQueue {
 
         }
 
-        console.warn("Transactions stack -", this.listArray.length);
+        console.warn("Transactions stack -", this.listArray.length, "after removing old");
 
     }
 

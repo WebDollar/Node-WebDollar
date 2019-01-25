@@ -12,6 +12,19 @@ class MiningTransactionsSelector{
 
     }
 
+    validateTransactionId(txId){
+
+        //Verify if was included in last blocks
+        for(let i=this.blockchain.blocks.length-consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH; i<this.blockchain.blocks.length; i++)
+            if( this.blockchain.blocks[i] )
+                for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
+                    if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
+                        return false;
+
+        return true;
+
+    }
+
     validateTransaction(transaction, miningFeePerByte){
 
         //don't upset the SPAM_GUARDIAN
@@ -35,8 +48,17 @@ class MiningTransactionsSelector{
 
         }
 
+        if(!this.validateTransactionId(transaction.txId))
+            throw {message: "This transaction was already inserted by txId"};
+
         if (transaction.nonce <= this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
+
+        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+            throw {message: "transaction is too old"};
+
+        if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
+            throw {message: "transaction is in future"};
 
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )

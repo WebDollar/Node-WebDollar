@@ -65,15 +65,12 @@ class TransactionsDownloadManager{
 
     createTransaction(txId,socket){
 
-        //Verify if was included in last blocks
-        for(let i=this.blockchain.blocks.length-5; i<this.blockchain.blocks.length; i++)
-            if( this.blockchain.blocks[i] )
-                for(let j=0; i<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                    if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
-                        return false;
+        if(this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
+            this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
+            this._transactionsQueueLength++;
+        }else
+            console.log("I already had this transaction")
 
-        this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
-        this._transactionsQueueLength++;
     }
 
     addSocket(socket){
@@ -107,6 +104,9 @@ class TransactionsDownloadManager{
         let foundHighFailedTransaction = false;
 
         for (let txId in this._transactionsQueue){
+
+            if(!this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId))
+                this.removeTransaction(txId);
 
             let currentTime = new Date().getTime();
 
@@ -364,12 +364,6 @@ class TransactionsDownloadManager{
         try {
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
-
-            if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-                throw {message: "transaction is too old"};
-
-            if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
-                throw {message: "transaction is in future"};
 
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "Transsaction validation failed"};

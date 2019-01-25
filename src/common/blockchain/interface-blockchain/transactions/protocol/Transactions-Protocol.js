@@ -157,8 +157,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 }
 
-                console.warn("Sent hashes list with",list.length,"tx hashes, from", response.start, "to", length);
-
                 socket.node.sendRequest('transactions/get-pending-transactions-ids/answer', { result: true, format: response.format, transactions: list, next: response.start + response.count, length: this.blockchain.transactions.pendingQueue.listArray.length } );
 
             } catch (exception){
