@@ -163,10 +163,11 @@ class NodeProtocol {
 
                 let found = false;
                 for (let j=0; j<exceptSockets.length; j++)
-                    if (typeof exceptSockets[j] !== "undefined" && exceptSockets[j] !== null && nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, ["uuid"] )) {
-                        found = true;
-                        break;
-                    }
+                    if(typeof exceptSockets[j].node !== "undefined" && typeof exceptSockets[j].node.sckAddress !== "undefined")
+                        if (nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, ["uuid"] )) {
+                            found = true;
+                            break;
+                        }
 
                 if (!found)
                     broadcast = true;
