@@ -68,13 +68,9 @@ class TransactionsPendingQueue {
         if(this.transactionsProtocol.transactionsDownloadingManager._transactionsQueueLength < 10)
             if( typeof this.listArray[i+1] !== "undefined")
                 if (this.listArray[i + 1].nonce - this.listArray[i].nonce > 1)
-                    if (this.listArray[i + 1].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0) {
-
-                        //Check all missing nonces for this address
-                        for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
+                    for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
+                        if (this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
                             this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
-
-                    }
 
     }
 
@@ -171,6 +167,8 @@ class TransactionsPendingQueue {
         if(this.listArray.length){
 
             let selectedTwice = false;
+            let searchedNonceIsSmaller;
+
             //Binary search for address
             while(Left <= Right)
             {
@@ -180,16 +178,16 @@ class TransactionsPendingQueue {
 
                 if(selectedTwice!==selected) selectedTwice = selected;
                 else {
-                    console.warn("missing nonce - not found address in binary search");
+                    console.warn("missing nonce - not found address in binary search", address);
                     return false;
                 }
 
                 if(compare === 0)
                     break;
                 if(compare > 0)
-                    Left = selected--;
+                    Left = selected+1;
                 if(compare < 0)
-                    Right = selected++;
+                    Right = selected-1;
             }
 
             let closerSelected = undefined;
@@ -202,10 +200,13 @@ class TransactionsPendingQueue {
                 if( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
                     selected = closerSelected;
 
-            let searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
+            console.log("selected", selected, this.listArray[selected])
+            if(typeof this.listArray[selected] !== "undefined"){
+                searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
 
-            if( this.listArray[selected].nonce === searchedNonce )
-                return this.listArray[selected].txId;
+                if( this.listArray[selected].nonce === searchedNonce )
+                    return this.listArray[selected].txId;
+            }
 
             let stop = false;
 
@@ -261,12 +262,6 @@ class TransactionsPendingQueue {
 
     _removeOldTransactions (){
 
-        let blockValidationType = {
-            "take-transactions-list-in-consideration": {
-                validation: true
-            }
-        };
-
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
             let removeThis = false;
@@ -281,13 +276,6 @@ class TransactionsPendingQueue {
 
                 if (this.listArray[i].nonce < this.blockchain.accountantTree.getAccountNonce(this.listArray[i].from.addresses[0].unencodedAddress))
                     removeThis=true;
-
-                // if( this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-                //     removeThis=true;
-                // else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
-                //             ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
-                //         (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  ))
-                //     removeThis=true;
 
             } catch (exception){
 

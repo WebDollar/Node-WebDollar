@@ -171,7 +171,9 @@ class TransactionsDownloadManager{
 
         }else{
 
-            if(topPriority) this._transactionsQueue[txId].fails=0;
+            if(topPriority)
+                if(typeof this._transactionsQueue[txId] !== "undefined")
+                    this._transactionsQueue[txId].fails=0;
 
             //Add socket in tx socketsList if is from different socket
             for( let i=0; i<this._transactionsQueue[txId.toString('hex')].socket.length; i++){
@@ -363,13 +365,14 @@ class TransactionsDownloadManager{
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
-            if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length ){
-                throw {message: "transaction is too old"};
-            }
+            if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+                throw {message: "transaction is too old | via nonce"};
 
-            if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length ){
+            if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+                throw {message: "transaction is too old"};
+
+            if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
                 throw {message: "transaction is in future"};
-            }
 
             if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "Transsaction validation failed"};

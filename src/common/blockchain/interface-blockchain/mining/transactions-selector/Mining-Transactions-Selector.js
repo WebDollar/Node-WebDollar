@@ -35,6 +35,9 @@ class MiningTransactionsSelector{
 
         }
 
+        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+            throw {message: "This transaction was already inserted"};
+
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
             return true;
@@ -42,9 +45,6 @@ class MiningTransactionsSelector{
         //verify fee
         if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};
-
-        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
-            throw {message: "This transaction was already inserted"};
 
         return true;
 
@@ -110,8 +110,6 @@ class MiningTransactionsSelector{
 
                 if (bRemoveTransaction)
                     ; //to nothing
-
-
 
             } catch (exception){
 

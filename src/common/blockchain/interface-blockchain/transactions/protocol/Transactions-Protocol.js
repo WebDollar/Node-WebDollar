@@ -230,8 +230,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
 
-            console.warn ("Will process tx from", start, "to", start+count);
-
             for (let i=0; i<answer.transactions.length; i++)
                 this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
 
