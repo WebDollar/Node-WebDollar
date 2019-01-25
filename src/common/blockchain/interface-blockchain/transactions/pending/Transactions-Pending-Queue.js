@@ -282,12 +282,12 @@ class TransactionsPendingQueue {
                 if (this.listArray[i].nonce < this.blockchain.accountantTree.getAccountNonce(this.listArray[i].from.addresses[0].unencodedAddress))
                     removeThis=true;
 
-                if( this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-                    removeThis=true;
-                else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
-                            ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
-                        (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  ))
-                    removeThis=true;
+                // if( this.listArray[i].timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+                //     removeThis=true;
+                // else if ( (  (this.blockchain.blocks.length > this.listArray[i].pendingDateBlockHeight + consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION) ||
+                //             ( Blockchain.blockchain.agent.consensus && !this.listArray[i].validateTransactionEveryTime(undefined, blockValidationType ))  ) &&
+                //         (this.listArray[i].timeLock === 0 || this.listArray[i].timeLock < this.blockchain.blocks.length - consts.SETTINGS.MEM_POOL.TIME_LOCK.TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION  ))
+                //     removeThis=true;
 
             } catch (exception){
 
