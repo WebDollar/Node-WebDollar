@@ -35,7 +35,7 @@ class MiningTransactionsSelector{
 
         }
 
-        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+        if (transaction.nonce <= this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
 
         //validating its own transaction

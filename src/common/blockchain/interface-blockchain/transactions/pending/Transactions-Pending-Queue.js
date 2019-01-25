@@ -270,11 +270,10 @@ class TransactionsPendingQueue {
 
                 //This is just for pool
                 //TODO remove on light consensus
-                if (this.blockchain.agent.light)
-                    if( this.listArray[i].timeLock < this.blockchain.blocks.length-1 )
-                        removeThis=true;
+                if( this.blockchain.agent.light && this.listArray[i].timeLock < this.blockchain.blocks.length-1 )
+                    removeThis=true;
 
-                if (this.listArray[i].nonce < this.blockchain.accountantTree.getAccountNonce(this.listArray[i].from.addresses[0].unencodedAddress))
+                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( this.listArray[i] ))
                     removeThis=true;
 
             } catch (exception){

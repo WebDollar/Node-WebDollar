@@ -365,9 +365,6 @@ class TransactionsDownloadManager{
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
-            if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
-                throw {message: "transaction is too old | via nonce"};
-
             if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
                 throw {message: "transaction is too old"};
 
