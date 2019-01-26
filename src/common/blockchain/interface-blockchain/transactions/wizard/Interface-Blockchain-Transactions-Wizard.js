@@ -26,10 +26,6 @@ class InterfaceBlockchainTransactionsWizard{
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
-        if(!this.blockchain.agent.light)
-            if(NodesList.isConsensus(this.blockchain.blocks.length))
-                return;
-
         let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
 
         if(process.result)
