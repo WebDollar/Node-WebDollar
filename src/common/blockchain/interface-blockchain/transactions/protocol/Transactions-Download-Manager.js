@@ -326,7 +326,7 @@ class TransactionsDownloadManager{
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
 
                                         if( typeof this._transactionsQueue[txId] !== "undefined")
-                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 100 )
+                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
                                                 this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                     }
                                 }
