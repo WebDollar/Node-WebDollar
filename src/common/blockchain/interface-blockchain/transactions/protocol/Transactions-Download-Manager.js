@@ -51,9 +51,9 @@ class TransactionsDownloadManager{
 
     }
 
-    removeMissingNonceList(id){
+    removeMissingNonceList(address,nonce){
 
-        delete this._missingNonceList[id];
+        delete this._missingNonceList[address.toString('hex') + nonce];
         this._missingNonceListLength--;
 
     }
@@ -184,8 +184,8 @@ class TransactionsDownloadManager{
                         let socket1 = this._transactionsQueue[txId.toString('hex')].socket[i];
                         let socket2 = socket;
 
-                        delete socket1.downloadFails;
-                        delete socket2.downloadFails;
+                        socket1.downloadFails = 0;
+                        socket2.downloadFails = 0;
 
                         if( this._transactionsQueue[txId.toString('hex')].socket[i] !== socket ){
                             this._transactionsQueue[txId.toString('hex')].socket.push(socket);
@@ -323,7 +323,10 @@ class TransactionsDownloadManager{
                                     this._transactionsQueue[txId].lastTrialTime = new Date().getTime();
 
                                     if( typeof this._transactionsQueue[txId].socket[totalSocketsProcessed] !== "undefined" ){
-                                        this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
+                                        if(typeof this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails === "number")
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails++;
+                                        else
+                                            this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails = 0;
 
                                         if( typeof this._transactionsQueue[txId] !== "undefined")
                                             if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )

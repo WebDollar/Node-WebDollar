@@ -123,8 +123,12 @@ class MiningTransactionsSelector{
                     if(!missingFirstNonce)
                         if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' ){
                             missingFirstNonce = true;
+                            let alreadyInserted = 0;
                             for(let i=this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress)+1;i<transaction.nonce;i++)
-                                this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,i);
+                                if(alreadyInserted<=5){
+                                    this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,i);
+                                    alreadyInserted++;
+                                }
                         }
 
                     bRemoveTransaction = true;

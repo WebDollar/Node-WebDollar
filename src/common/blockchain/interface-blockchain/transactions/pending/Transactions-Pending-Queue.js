@@ -65,12 +65,18 @@ class TransactionsPendingQueue {
 
     analyseMissingNonce(i){
 
+        let alreadyPropagated = 0;
+
         if(this.transactionsProtocol.transactionsDownloadingManager._transactionsQueueLength < 10)
             if( typeof this.listArray[i+1] !== "undefined")
                 if (this.listArray[i + 1].nonce - this.listArray[i].nonce > 1)
                     for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
                         if (this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
-                            this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
+                            if(alreadyPropagated <=5){
+                                this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
+                                alreadyPropagated++;
+                            }
+
 
     }
 
@@ -310,11 +316,15 @@ class TransactionsPendingQueue {
 
     propagateMissingNonce(addressBuffer,nonce){
 
-        let found = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(addressBuffer,nonce);
-        if(found) return;
+        if (nonce > this.blockchain.accountantTree.getAccountNonce(addressBuffer)){
 
-        this.transactionsProtocol.propagateNewMissingNonce(addressBuffer,nonce);
-        this.transactionsProtocol.transactionsDownloadingManager.addMissingNonceList(addressBuffer,nonce);
+            let found = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(addressBuffer,nonce);
+            if(found) return;
+
+            this.transactionsProtocol.propagateNewMissingNonce(addressBuffer,nonce);
+            this.transactionsProtocol.transactionsDownloadingManager.addMissingNonceList(addressBuffer,nonce);
+
+        }
 
     }
 
