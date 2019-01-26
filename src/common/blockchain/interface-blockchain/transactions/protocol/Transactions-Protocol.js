@@ -294,7 +294,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
     propagateNewMissingNonce(addressBuffer,nonce){
         NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
-        console.warn("broadcasted missing nonce", nonce);
+        console.warn("I miss nonce", nonce, "for", addressBuffer);
     }
 
 }
