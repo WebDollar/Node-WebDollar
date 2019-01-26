@@ -5,6 +5,8 @@ import consts from 'consts/const_global'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
+import AdvancedMessages from "../../../../node/menu/Advanced-Messages";
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class InterfaceBlockchainMiningBasic {
 
@@ -15,7 +17,7 @@ class InterfaceBlockchainMiningBasic {
 
         this.blockchain = blockchain;
 
-        if (minerAddress !== undefined)
+        if ( minerAddress )
             this.minerAddress = minerAddress;
 
         if (miningFeePerByte === undefined) miningFeePerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
@@ -80,7 +82,7 @@ class InterfaceBlockchainMiningBasic {
 
     async saveMinerAddress(minerAddress){
 
-        if (minerAddress === undefined)
+        if (minerAddress)
             minerAddress = this.minerAddress;
 
         if (typeof minerAddress === "object" && minerAddress.hasOwnProperty("address"))
@@ -157,6 +159,14 @@ class InterfaceBlockchainMiningBasic {
 
         StatusEvents.emit('mining/status-changed', true);
 
+        if ( !this.minerAddress ){
+
+            AdvancedMessages.alert("Mining suspended. No Mining Address", "Mining Error", "error", 5000);
+            this.stopMining();
+
+            return false;
+        }
+
         this._startMiningHashRateInterval();
 
         await this.mineNextBlock();
@@ -227,6 +237,24 @@ class InterfaceBlockchainMiningBasic {
 
         }
 
+    }
+
+    // if it is in terminal asking for the password (required in POS)
+    async setPrivateKeyAddressForMiningAddress(){
+
+        let foundAddress = Blockchain.Wallet.getAddress(this.minerAddress);
+
+        let password = await foundAddress.getPrivateKey();
+
+        if (password){
+            foundAddress._privateKeyForMining = password;
+            console.warn("Mining Address ready for mining" + this.minerAddress );
+        } else {
+            console.warn("Password is invalid");
+            return false;
+        }
+
+        return true;
     }
 
 }

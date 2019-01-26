@@ -93,6 +93,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
+
     /**
      * mine next block
      */
@@ -101,15 +102,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         let showLogsOnlyOnce = true;
 
         while (this.started && !global.TERMINATED){
-
-            if (this.minerAddress === undefined){
-
-                AdvancedMessages.alert("Mining suspended. No Mining Address", "Mining Error", "error", 5000);
-                this.stopMining();
-
-                return;
-            }
-
 
             //mining next blocks
 

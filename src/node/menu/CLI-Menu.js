@@ -89,6 +89,9 @@ class CLI {
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
+            case '30':  // Set Password
+                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
+                break;
             case 'exit':
                 this._exitMenu = true;
                 break;
@@ -235,11 +238,11 @@ class CLI {
 
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
-            if (address === miningAddress) {
+            if (address === miningAddress)
                 console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-            } else {
+            else
                 console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
-            }
+
         }
 
         let balance = 0;
@@ -662,6 +665,7 @@ const commands = [
         '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
+        '30. Set Password for Mining Address',
     ];
 
 const lineSeparator =

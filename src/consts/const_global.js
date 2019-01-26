@@ -481,20 +481,18 @@ consts.JSON_RPC = {
     }
 };
 
-if (typeof process.env.JSON_RPC_BASIC_AUTH_USER !== 'undefined' && typeof process.env.JSON_RPC_BASIC_AUTH_PASS !== 'undefined')
-{
+if ( process.env.JSON_RPC_BASIC_AUTH_USER  && process.env.JSON_RPC_BASIC_AUTH_PASS ) {
+
     consts.JSON_RPC.basicAuth.users[process.env.JSON_RPC_BASIC_AUTH_USER] = process.env.JSON_RPC_BASIC_AUTH_PASS;
 
-    if (typeof consts.JSON_RPC.basicAuth.isEnabled === 'undefined')
-    {
+    if ( consts.JSON_RPC.basicAuth.isEnabled )
         consts.JSON_RPC.basicAuth.isEnabled = true;
-    }
 }
 
-if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
+if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER )
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
-if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
+if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL;
 
 consts.NETWORK_TYPE = {
@@ -505,7 +503,7 @@ consts.NETWORK_TYPE = {
 if ( consts.DEBUG === true ) {
 
     consts.MINING_POOL.SKIP_POW_REWARDS = false;
-    consts.MINING_POOL.SKIP_POS_REWARDS = true;
+    consts.MINING_POOL.SKIP_POS_REWARDS = false;
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
@@ -529,8 +527,8 @@ if ( consts.DEBUG === true ) {
 
 }
 
-if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
-{
+if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet') {
+
     FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
 
     consts.NETWORK_TYPE = {
