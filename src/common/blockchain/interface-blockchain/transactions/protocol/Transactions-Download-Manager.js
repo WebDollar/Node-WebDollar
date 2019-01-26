@@ -203,35 +203,39 @@ class TransactionsDownloadManager{
 
     async _processSocket(socketID=undefined){
 
-        console.warn("Process Socket");
+        if( NodesList.isConsensus(this.blockchain.blocks.length) ){
 
-        try{
+            console.warn("Process Socket");
 
-            let selectedSocket;
+            try{
 
-            if(socketID){
+                let selectedSocket;
 
-                selectedSocket = socketID;
+                if(socketID){
 
-            }else{
+                    selectedSocket = socketID;
 
-                //Select random socket for being processed
-                let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
-                randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
-                selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
+                }else{
+
+                    //Select random socket for being processed
+                    let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
+                    randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
+                    selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
+
+                }
+
+                if(this._socketsQueueLength > 0)
+                    await this.transactionsProtocol.downloadTransactions( this._socketsQueue[selectedSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
+
+            } catch (exception){
+
+                console.warn("Faield to process socket");
 
             }
 
-            if(this._socketsQueueLength > 0)
-                await this.transactionsProtocol.downloadTransactions( this._socketsQueue[selectedSocket], 0, 40, consts.SETTINGS.MEM_POOL.MAXIMUM_TRANSACTIONS_TO_DOWNLOAD );
-
-        } catch (exception){
-
-            console.warn("Faield to process socket");
-
         }
-
-        // setTimeout( this._processSocket.bind(this), 40*1000);
+        else
+            setTimeout( this._processSocket.bind(this), 40*1000);
 
     }
 
