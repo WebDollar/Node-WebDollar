@@ -290,7 +290,7 @@ class TransactionsPendingQueue {
 
             } catch (exception){
 
-                if(!exception.myNonce)
+                if(exception.myNonce)
                     if ( Math.abs( exception.myNonce - exception.nonce) < consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
                         if(!removeThis)
                             continue;
