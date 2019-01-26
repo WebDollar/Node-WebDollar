@@ -71,11 +71,12 @@ class TransactionsPendingQueue {
             if( typeof this.listArray[i+1] !== "undefined")
                 if (this.listArray[i + 1].nonce - this.listArray[i].nonce > 1)
                     for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
-                        if (this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
-                            if(alreadyPropagated <=5){
-                                this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
-                                alreadyPropagated++;
-                            }
+                        if( typeof this.listArray[j] !== "undefined")
+                            if (this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
+                                if(alreadyPropagated <=5){
+                                    this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
+                                    alreadyPropagated++;
+                                }
 
 
     }
