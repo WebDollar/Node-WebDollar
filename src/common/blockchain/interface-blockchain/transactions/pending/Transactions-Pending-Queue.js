@@ -207,7 +207,6 @@ class TransactionsPendingQueue {
                 if( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
                     selected = closerSelected;
 
-            console.log("selected", selected)
             if(typeof this.listArray[selected] !== "undefined")
                 if( this.listArray[selected].nonce === searchedNonce )
                     return this.listArray[selected].txId;
