@@ -1,6 +1,7 @@
 /* eslint-disable */
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
+import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
@@ -24,6 +25,10 @@ class InterfaceBlockchainTransactionsWizard{
     }
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+
+        if(!this.blockchain.agent.light)
+            if(NodesList.isConsensus(this.blockchain.blocks.length))
+                return;
 
         let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
 

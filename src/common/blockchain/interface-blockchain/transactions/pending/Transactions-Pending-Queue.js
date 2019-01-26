@@ -174,7 +174,10 @@ class TransactionsPendingQueue {
             {
 
                 selected = Math.floor((Left+Right) / 2);
-                compare = this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
+                if(selected !== this.listArray.length)
+                    compare = this.listArray[selected].from.addresses[0].unencodedAddress.compare(address);
+                else
+                    return false;
 
                 if(selectedTwice!==selected) selectedTwice = selected;
                 else {
@@ -190,23 +193,26 @@ class TransactionsPendingQueue {
                     Right = selected-1;
             }
 
+            if(selected===0)
+                if(this.listArray[selected].from.addresses[0].unencodedAddress.compare(address) !== 0)
+                    return false;
+
             let closerSelected = undefined;
             if( this.listArray[selected].nonce > searchedNonce )
-                closerSelected = selected - (this.listArray[selected].nonce-searchedNonce-1);
+                closerSelected = selected - (this.listArray[selected].nonce-searchedNonce);
             else
-                closerSelected = selected + (searchedNonce - this.listArray[selected].nonce-1);
+                closerSelected = selected + (searchedNonce - this.listArray[selected].nonce);
 
             if( typeof this.listArray[closerSelected] !== "undefined")
                 if( this.listArray[closerSelected].from.addresses[0].unencodedAddress.compare(address) === 0);
                     selected = closerSelected;
 
-            console.log("selected", selected, this.listArray[selected])
-            if(typeof this.listArray[selected] !== "undefined"){
-                searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
-
+            console.log("selected", selected)
+            if(typeof this.listArray[selected] !== "undefined")
                 if( this.listArray[selected].nonce === searchedNonce )
                     return this.listArray[selected].txId;
-            }
+                else
+                    searchedNonceIsSmaller = this.listArray[selected].nonce > searchedNonce ? true : false;
 
             let stop = false;
 
@@ -216,7 +222,7 @@ class TransactionsPendingQueue {
                     if(i<0) return false;
                 }
                 else if(!searchedNonceIsSmaller){
-                    if(i>this.listArray.length) return false;
+                    if(i=>this.listArray.length) return false;
                 }
 
                 if( this.listArray[i].from.addresses[0].unencodedAddress.compare(address) === 0 ){
