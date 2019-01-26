@@ -126,10 +126,10 @@ class MinerPoolMining extends InheritedPoolMining {
         if (BlockchainGenesis.isPoSActivated(work.h-1))
             block.blockValidation.getBlockCallBack = ( height ) =>{
 
-                if (height !== work.h) throw "invalid height for pool miner";
+                if (height !== this._miningWork.height ) throw "invalid height for pool miner";
 
                 return {
-                    posSignature: work.lsig,
+                    posSignature: this._miningWork.blockLastSignature
                 }
 
             };
@@ -143,6 +143,8 @@ class MinerPoolMining extends InheritedPoolMining {
 
         this._miningWork.height = work.h;
         this._miningWork.blockId = work.I||work.h;
+
+        this._miningWork.blockLastSignature = work.lsig || new Buffer(0 );
 
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;

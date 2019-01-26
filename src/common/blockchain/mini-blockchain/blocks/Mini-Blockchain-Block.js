@@ -146,7 +146,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                     let block = this.blockValidation.getBlockCallBack(i + 1);
 
-                    if (block === undefined) continue;
+                    if ( !block ) continue;
 
                     //s += block.height + " ";
 

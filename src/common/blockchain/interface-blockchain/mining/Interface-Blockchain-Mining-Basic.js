@@ -247,9 +247,12 @@ class InterfaceBlockchainMiningBasic {
         let password = await foundAddress.getPrivateKey();
 
         if (password){
+
             foundAddress._privateKeyForMining = password;
             console.warn("Mining Address ready for mining" + this.minerAddress );
+
         } else {
+
             console.warn("Password is invalid");
             return false;
         }
