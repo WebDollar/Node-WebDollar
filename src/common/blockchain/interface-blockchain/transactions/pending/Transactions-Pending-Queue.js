@@ -19,8 +19,8 @@ class TransactionsPendingQueue {
 
         this.db = db;
 
-        StatusEvents.on("blockchain/blocks-count-changed", async (data)=>{
-            this._removeOldTransactions.bind(this);
+        StatusEvents.on("blockchain/block-inserted", async (data)=>{
+            this._removeOldTransactions();
         });
 
     }
