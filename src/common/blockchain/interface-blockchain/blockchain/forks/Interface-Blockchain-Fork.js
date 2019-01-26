@@ -139,13 +139,13 @@ class InterfaceBlockchainFork {
 
                 }
 
-                if(!consts.DEBUG)
-                    if (addresses.length >= 1)  //in my fork, there were also other miners, and not just me
-                        throw {message: "Validate for Immutability failed"};
-                    else
-                        return true; //there were just 3 miners, probably it is my own fork...
+                if(consts.DEBUG) return true;
+
+                if (addresses.length >= 1)  //in my fork, there were also other miners, and not just me
+                    throw {message: "Validate for Immutability failed"};
                 else
-                    return true;
+                    return true; //there were just 3 miners, probably it is my own fork...
+
 
             }
 
