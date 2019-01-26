@@ -63,19 +63,6 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
-    _getHashPOWData(newNonce){
-
-        if (!BlockchainGenesis.isPoSActivated(this.height - 1))
-            return inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce);
-
-        return Buffer.concat([
-            inheritBlockchainBlock.prototype._getHashPOWData.call(this, newNonce),
-            this.blockValidation.getBlockCallBack(this.height).posSignature,
-        ]);
-
-        return data;
-
-    }
 
     /**
      *
@@ -182,7 +169,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         let address =  Blockchain.Wallet.getAddress( { unencodedAddress: this.posMinerAddress || this.data.minerAddress } );
 
-        if (address === null)
+        if ( ! address )
             if( typeof this.data.minerAddress !== "undefined")
                 throw {message: "Can not sign POS because the address doesn't exist in your wallet " + (this.posMinerAddress||this.data.minerAddress).toString('hex') };
             else

@@ -123,17 +123,6 @@ class MinerPoolMining extends InheritedPoolMining {
         if (BlockchainGenesis.isPoSActivated(work.h))
             block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
 
-        if (BlockchainGenesis.isPoSActivated(work.h-1))
-            block.blockValidation.getBlockCallBack = ( height ) =>{
-
-                if (height !== this._miningWork.height ) throw "invalid height for pool miner";
-
-                return {
-                    posSignature: this._miningWork.blockLastSignature
-                }
-
-            };
-
         this._miningWork.blocks.push(block);
 
         this._miningWork.block = block;
