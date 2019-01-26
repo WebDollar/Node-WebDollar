@@ -329,7 +329,7 @@ class TransactionsDownloadManager{
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails = 0;
 
                                         if( typeof this._transactionsQueue[txId] !== "undefined")
-                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 20 )
+                                            if( this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].downloadFails > 500 )
                                                 this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
                                     }
                                 }
