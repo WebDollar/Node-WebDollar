@@ -48,19 +48,19 @@ if ( !isBrowser && process && !process.env.BROWSER && process.env.COLLECT_STATS 
     var console_error = console.error;
 
     console.error = function() {
+
       console_error.apply(null, arguments);
 
       if (arguments.length > 1) {
         var e = arguments[1];
 
-        if (e.stack && e.message) {
-          Raven.captureException(e);
-        } else {
-          Raven.captureMessage(arguments);
-        }
-      } else {
-        Raven.captureMessage(arguments);
+        if (e.stack && e.message)
+          return Raven.captureException(e);
+
       }
+
+      return Raven.captureMessage(arguments);
+
     };
 }
 
