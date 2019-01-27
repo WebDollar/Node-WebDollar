@@ -275,7 +275,7 @@ class TransactionsPendingQueue {
             this.transactions.emitTransactionChangeEvent(transaction, true);
 
             if (callDestroy)
-                this.listObject[transaction.txId.toString('hex')].destroyTransaction();
+                transaction.destroyTransaction();
 
         }
     }
