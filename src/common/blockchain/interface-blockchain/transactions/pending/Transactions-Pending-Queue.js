@@ -268,14 +268,15 @@ class TransactionsPendingQueue {
 
         if (this.listObject[transaction.txId.toString('hex')]){
 
-            if (callDestroy)
-                this.listObject[transaction.txId.toString('hex')].destroyTransaction();
-
             delete this.listObject[transaction.txId.toString('hex')];
 
             this.listArray.splice(index, 1);
 
             this.transactions.emitTransactionChangeEvent(transaction, true);
+
+            if (callDestroy)
+                this.listObject[transaction.txId.toString('hex')].destroyTransaction();
+            
         }
     }
 
