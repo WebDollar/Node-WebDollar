@@ -394,7 +394,6 @@ class InterfaceBlockchainFork {
 
                 } catch (exception){
                     Log.error("preForkBefore raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
-                    this.forkIsSaving = false;
                     return false;
                 }
 
@@ -417,7 +416,6 @@ class InterfaceBlockchainFork {
                         Log.error("revertFork rasied an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
                     }
 
-                    this.forkIsSaving = false;
                     return false;
                 }
 

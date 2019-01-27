@@ -32,6 +32,7 @@ class PoolWorkValidation{
 
             let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
             minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
+            minerInstance.realHashesPerSecond = Math.floor(work.hashes / work.timeDiff * 1000);
 
         }
 

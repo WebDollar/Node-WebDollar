@@ -102,6 +102,15 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
         return InterfaceMerkleTreeNode.prototype._refreshHash.call(this, forced);
     }
 
+    _calculateHashTree(){
+
+        for (let i=0; i<this.edges.length; i++)
+            this.edges[i].targetNode._calculateHashTree();
+
+        this._computeHash(true);
+
+    }
+
 
 }
 

@@ -3,6 +3,7 @@ const ipaddr = require('ipaddr.js');
 import {getContinentFromCountry} from './data/continents.js';
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
+import consts from 'consts/const_global'
 import DownloadHelper from "common/utils/helpers/Download-Helper"
 import Utils from "common/utils/helpers/Utils";
 
@@ -10,6 +11,7 @@ class GeoHelper {
 
     async getLocationFromAddress(address, skipSocketAddress){
 
+        if (consts.SETTINGS.GEO_IP_ENABLED === false) return;
 
         if ( skipSocketAddress === undefined) skipSocketAddress = false;
 
@@ -33,7 +35,8 @@ class GeoHelper {
             }
 
             let list = [];
-            list.push("https://geoip.tools/v1/json/?q="+address);
+            list.push("https://geo.xoip.ro/?address="+address);
+            // list.push("https://geoip.tools/v1/json/?q="+address);
             // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
 
             let data = await DownloadHelper.downloadMultipleFiles( list, 20000 );

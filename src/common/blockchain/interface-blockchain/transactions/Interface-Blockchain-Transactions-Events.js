@@ -74,7 +74,7 @@ class InterfaceBlockchainTransactionsEvents{
         this.blockchain.transactions.pendingQueue.listArray.forEach((transaction)=>{
 
             try {
-                if (transaction.validateTransactionEveryTime(undefined, blockValidationType)) {
+
 
                     if (this._searchAddressInTransaction(unencodedAddress, transaction)) {
 
@@ -82,7 +82,7 @@ class InterfaceBlockchainTransactionsEvents{
                         result[txId.toString("hex")] = transaction.toJSON();
                     }
 
-                }
+
             } catch (exception){
             }
 

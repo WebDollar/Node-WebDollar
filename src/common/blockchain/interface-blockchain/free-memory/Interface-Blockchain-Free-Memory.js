@@ -13,6 +13,8 @@ class InterfaceFreeMemory{
 
             if (this.blockchain.blocks[i] === undefined ) continue;
 
+            this.blockchain.blocks[i].computedBlockPrefix = undefined;
+
             for (let j=0; j<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
                 this.blockchain.blocks[i].data.transactions.transactions[j]._serializated = undefined;
 

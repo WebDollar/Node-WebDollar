@@ -13,6 +13,8 @@ import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import AdvancedMessages from "node/menu/Advanced-Messages";
 import Blockchain from "../Blockchain";
 
+import NanoWalletProtocol from "common/blockchain/interface-blockchain/agents/Nano/Nano-Wallet-Protocol"
+
 const EventEmitter = require('events');
 const FileSystem = require('fs');
 
@@ -32,6 +34,8 @@ class MainBlockchainWallet {
 
         this.emitter = new EventEmitter();
         this.emitter.setMaxListeners(100);
+
+        NanoWalletProtocol.initializeNanoProtocolWallet(this);
 
     }
 

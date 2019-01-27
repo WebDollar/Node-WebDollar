@@ -10,7 +10,7 @@ import Argon2BrowserAntelleMain from './main'
 
 var global =  typeof window === "undefined" ? self : window;
 //var root =  window === undefined ? '../' : '';
-var root = "https://antelle.net/argon2-browser/";
+var root = "https://webdollar.io/public/WebDollar-dist/argon2/";
 
 class Argon2BrowserWebAssemblyCalc{
 

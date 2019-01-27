@@ -11,6 +11,11 @@ export default {
 
         {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
 
+        {"addr": ["https://ez.cnbacolt.com:443"]},
+        {"addr": ["https://server.cnbacolt.com:443"]},
+
+        {"addr": ["https://webdollar-vps1.ddns.net:80"]},
+
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node3.petreus.ro:443"]}, // Thanks to Dani Petreus
@@ -23,6 +28,9 @@ export default {
         {"addr": ["https://node10.petreus.ro:443"]}, // Thanks to Dani Petreus
 
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
+        {"addr": ["https://us.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
+        {"addr": ["https://losangeles.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
+        {"addr": ["https://singapore.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
         {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet        
@@ -38,9 +46,12 @@ export default {
         {"addr": ["https://node-eu.int-webd.com:5007"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5008"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd        
+        {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd
         
-        // ----------------------------------------- inactive nodes        
+        {"addr": ["https://cryptocoingb.ddns.net:80"]}, // Thanks to CryptoCoinGB
+        {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
+
+        // ----------------------------------------- inactive nodes
         // {"addr": ["https://webdollar.bitcoinplusplus.com:443"]},
         // {"addr": ["https://amsterdam.wdpool.io:443"]},
         // {"addr": ["https://strasbourg.wdpool.io:443"]},
@@ -81,17 +92,8 @@ export default {
 
         //{"addr": ["https://webdollar.ddns.net:80"]},
 
-        {"addr": ["https://chucknorris.webdollarvpn.io:80"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:443"]}, // Thanks to @cbusuioceanu        
-        {"addr": ["https://chucknorris.webdollarvpn.io:8080"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8081"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8082"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8083"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8084"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8085"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8086"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8087"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://chucknorris.webdollarvpn.io:8088"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:80"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8080"]}, // Thanks to @cbusuioceanu
 
         {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
         {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor

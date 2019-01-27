@@ -75,6 +75,18 @@ class InterfaceBlockchainTransaction{
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
+
+        if(validateNonce)
+            if (nonce === undefined || nonce === null)
+                nonce = this._computeNonce();
+
+        if(validateVersion)
+            if (version === 0x00) nonce = nonce % 0x100;
+            else if (version >= 0x01) nonce = nonce % 0X10000;
+
+        this.nonce = nonce; //1 bytes
+
+
         try {
 
             if (validateFrom)
@@ -97,17 +109,7 @@ class InterfaceBlockchainTransaction{
 
         }
 
-        if(validateNonce)
-            if (nonce === undefined || nonce === null)
-                nonce = this._computeNonce();
-
-        if(validateVersion)
-            if (version === 0x00) nonce = nonce % 0x100;
-            else if (version >= 0x01) nonce = nonce % 0X10000;
-
-        this.nonce = nonce; //1 bytes
-
-        if(validateTxId)
+        if (validateTxId)
             if (txId === undefined || txId === null)
                 txId = this._computeTxId();
 
@@ -116,12 +118,25 @@ class InterfaceBlockchainTransaction{
         this._serializated = undefined;
     }
 
-    destroyTransaction(){
+    destroyTransaction(pendingTransactionsWereIncluded){
 
-        if ( this.pendingTransactionsIncluded !== undefined && this.pendingTransactionsIncluded > 0)
+        //avoid to delete
+        if (pendingTransactionsWereIncluded)
+            this.pendingTransactionsIncluded--;
+
+        if ( this.pendingTransactionsIncluded && this.pendingTransactionsIncluded > 0)
             return;
 
+        this.blockchain.transactions.pendingQueue.removePendingTransaction(this, undefined, false);
+
         this.blockchain = undefined;
+
+        delete this._serializated;
+        delete this.from.addresses;
+        delete this.from.currencyTokenId;
+        delete this.to.addresses;
+        delete this.txId;
+
     }
 
     _createTransactionFrom(from){
@@ -226,11 +241,11 @@ class InterfaceBlockchainTransaction{
 
     validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
-        if (this.blockchain === undefined) throw {message: "blockchain is empty"};
+        if ( !this.blockchain ) throw {message: "blockchain is empty"};
 
-        if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
+        if ( !blockValidationType || !blockValidationType['skip-validation-transactions-from-values']){
 
-            if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
+            if ( !blockHeight ) blockHeight = this.blockchain.blocks.length-1;
 
             if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
@@ -258,9 +273,8 @@ class InterfaceBlockchainTransaction{
 
         } catch (exception){
 
-            if (showDebug)
+            //if (showDebug)
                 // console.warn ("Transaction Problem", exception);
-                //Todo remove comment on main net
 
             return false;
         }
@@ -273,6 +287,8 @@ class InterfaceBlockchainTransaction{
     }
 
     serializeTransaction(rewrite = false){
+
+        // return this._serializeTransaction();
 
         if ( !this._serializated || rewrite )
             this._serializated = this._serializeTransaction();
@@ -421,7 +437,7 @@ class InterfaceBlockchainTransaction{
     }
 
     get confirmed(){
-        return this._confirmed;11
+        return this._confirmed;
     }
 
     set confirmed(newValue){

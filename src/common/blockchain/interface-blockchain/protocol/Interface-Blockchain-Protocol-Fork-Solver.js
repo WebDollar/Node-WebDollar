@@ -252,7 +252,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (this.blockchain.agent.light)
                 if ([ "FORK is empty", "fork is something new",
                         "discoverAndProcessFork - fork already found by socket",
-                        "same proof, but your blockchain is smaller than mine", "Your proof is worst than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
+                        "same proof, but your blockchain is smaller than mine", "Your proof is worse than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
                     bIncludeBan = false;
 
             if (bIncludeBan) {
@@ -310,29 +310,36 @@ class InterfaceBlockchainProtocolForkSolver{
 
             let howManyBlocks = Math.min( fork.forkChainLength - (fork.forkStartingHeight + fork.forkBlocks.length), consts.SETTINGS.PARAMS.CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER);
             let downloadingList = [];
-            let trialsList = [];
+            let trialsList = {};
             let alreadyDownloaded = 0;
             let resolved = false;
 
             let socketIndex = 0;
             let finished = new Promise((resolve)=>{
 
-                let downloadingBlock = (index)=>{
+                let downloadingBlock = async (index)=>{
 
-                    if (trialsList[index] > 5 && !resolved){
+                    if ( (trialsList[index] > 5 || global.TERMINATED) && !resolved ) {
                         resolved = true;
                         resolve(false);
                         return;
                     }
 
                     socketIndex++;
-                    if (typeof trialsList[index] === undefined) trialsList[index] = 0
+                    if (! trialsList[index] ) trialsList[index] = 0
                     trialsList[index] ++ ;
 
                     let socket = fork.getForkSocket(socketIndex);
 
-                    if (socket === undefined)
-                        return downloadingBlock(index);
+                    if ( !socket ) {
+
+                        await this.blockchain.sleep(5);
+
+                        if (!resolved)
+                            downloadingBlock(index);
+
+                        return;
+                    }
 
                     let waitingTime = socket.latency === 0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : ( socket.latency + Math.random()*2000 );
 
@@ -342,6 +349,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     answer.then( (result)=>{
 
                         if (result === undefined || result === null) {
+
                             downloadingList[index] = undefined;
                             socket.latency += Math.random()*1500;
 
@@ -350,27 +358,44 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         }
                         else {
+
                             alreadyDownloaded++;
                             downloadingList[index] = result;
 
-                            if ( (alreadyDownloaded === howManyBlocks) || global.TERMINATED && !resolved) {
+                            if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
                                 resolved = true;
                                 resolve(true);
                             }
 
                         }
 
+                    }).catch( (exception)=>{
+
+                        if (!resolved)
+                            downloadingBlock(index);
+
                     });
                 };
 
+                console.info("Downloading Blocks...", howManyBlocks);
+
                 for (let i=0; i < howManyBlocks; i++)
-                    if (downloadingList[i] === undefined)
+                    trialsList[i] = 0;
+
+                for (let i=0; i < howManyBlocks; i++)
+                    if ( !downloadingList[i] )
                         downloadingBlock(i);
 
 
             });
 
-            await finished;
+            try {
+                await finished;
+            } catch (exception){
+                console.error("Downloading blocks raised an error", exception);
+                resolved = true;
+                finished = false;
+            }
 
             //verify if all blocks were downloaded
 
@@ -415,7 +440,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (result){
 
                     if (nextBlockHeight % 10 === 0)
-                        console.log("Block " + nextBlockHeight + " successful downloaded!");
+                        console.log("Block " + nextBlockHeight + " successfully downloaded!");
 
                     nextBlockHeight++;
                 }

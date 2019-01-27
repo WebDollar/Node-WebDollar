@@ -2,8 +2,8 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const https = require('https');
 const http = require('http');
-const path = require('path')
-const express = require('express')
+const path = require('path');
+const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const bodyParser = require('body-parser');
@@ -94,6 +94,7 @@ class NodeExpress{
                         break;
                     }
 
+                if (privateKey === '' && cert === '' && caBundle === '') throw {message: "HTTPS server couldn't be started. Starting HTTP"};
                 if (privateKey === '') throw {message: "HTTPS server couldn't be started because certificate private.key was not found"};
                 if (cert === '') throw {message: "HTTPS server couldn't be started because certificate certificate.crt was not found"};
                 if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};
@@ -177,7 +178,7 @@ class NodeExpress{
 
         NodeAPIRouter._routesEnabled = true;
         NodeAPIRouter.initializeRouter( this.app.all.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
-        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter._routesEnabled = false;
 
     }
@@ -201,7 +202,7 @@ class NodeExpress{
                 req.params[k] = decodeURIComponent(req.params[k]);
 
             let merged = req.body ? Object.assign(req.params, req.body) : req.params;
-            
+
             let answer = await callback(merged, res);
             res.json(answer);
 
@@ -214,8 +215,8 @@ class NodeExpress{
     async _expressMiddlewareCallback(req, res, callback){
 
         try {
-            for (let k in req)
-                req[k] = decodeURIComponent(req[k]);
+            for (let k in req.params)
+                req.params[k] = decodeURIComponent(req.params[k]);
 
             let url = req.url;
 

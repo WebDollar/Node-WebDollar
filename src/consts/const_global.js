@@ -31,6 +31,7 @@ consts.BLOCKCHAIN = {
 
     POS: {
         MINIMUM_AMOUNT: 100,
+        MINIMUM_POS_TRANSFERS: 30,
     },
 
     BLOCKS_POW_LENGTH: 32,
@@ -48,11 +49,11 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
-        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 60, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
-        GZIPPED: true,
+        GZIPPED: false,
 
     },
 
@@ -65,24 +66,16 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
-        TRANSACTIONS_INCLUDING_ONLY_HEADER: 100,
-
-        TRANSACTIONS_BUG_2_BYTES: 60,
-
-        TRANSACTIONS_OPTIMIZATION: 70,
-        DIFFICULTY_TIME_BIGGER: 70,
         WALLET_RECOVERY: 153060,
 
-        DIFFICULTY_REMOVED_CONDITION: 80,
+        TRANSACTIONS_BUG_2_BYTES: 46950,
+        TRANSACTIONS_OPTIMIZATION: 153060,
+        TRANSACTIONS_INCLUDING_ONLY_HEADER: 564500,
 
-        // TRANSACTIONS_BUG_2_BYTES: 46950,
-        //
-        // TRANSACTIONS_OPTIMIZATION: 153060,
-        // DIFFICULTY_TIME_BIGGER: 153060,
+        DIFFICULTY_TIME_BIGGER: 153060,
+        DIFFICULTY_REMOVED_CONDITION: 161990,
 
-        // DIFFICULTY_REMOVED_CONDITION: 161990,
-
-        POS_ACTIVATION: 90,
+        POS_ACTIVATION: 564500,
 
     }
 
@@ -202,7 +195,7 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://antelle.github.io/argon2-browser/dist'
+    distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
 };
 
 // change also to Browser-Mining-WebWorker.js
@@ -271,7 +264,6 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-
 
         VERSION: "1.200.0",
 
@@ -411,7 +403,9 @@ consts.SETTINGS = {
 
         MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
 
-    }
+    },
+    GEO_IP_ENABLED: true,
+    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -434,7 +428,7 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: "cpu", //cpu-cpp
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu", //cpu-cpp, or gpu
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
@@ -458,6 +452,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
+
     CPU_MAX: -1, //for CPU-CPP use, 2x or even 3x threads
 };
 
@@ -479,7 +474,10 @@ consts.JSON_RPC = {
         windowMs : process.env.JSON_RPC_RATE_LIMIT_WINDOW       || 60 * 1000, // 1 minute
         max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
         isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
-    }
+    },
+
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
+
 };
 
 if ( process.env.JSON_RPC_BASIC_AUTH_USER  && process.env.JSON_RPC_BASIC_AUTH_PASS ) {
@@ -511,20 +509,26 @@ if ( consts.DEBUG === true ) {
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 2024;
+    consts.SETTINGS.NODE.PORT = 8086;
 
-    //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
+    //hard-forks
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 60;
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION = 80;
+    consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION = 90;
 
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
+        //"addr": ["http://86.126.138.61:2024"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.210.0";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.0";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.0";
+    consts.SETTINGS.NODE.VERSION = "1.210.1";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.1";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.1";
 
 }
 
@@ -536,6 +540,10 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
         id: 2,
         name: "Webdollar TestNet"
     };
+
 }
+
+if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
 
 export default consts;

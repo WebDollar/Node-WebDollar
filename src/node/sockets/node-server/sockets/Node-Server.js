@@ -23,12 +23,12 @@ const ROOMS = {
 
     TERMINALS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 30,
+        SERVER_FREE_ROOM : 20,
     },
 
     BROWSERS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 50,
+        SERVER_FREE_ROOM : 20,
     },
 
 };

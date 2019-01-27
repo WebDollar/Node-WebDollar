@@ -110,7 +110,10 @@ class ProcessWorker{
     }
 
     kill(param){
-        return this._child.kill(param);
+
+        clearTimeout(this._timeoutValidation);
+        this._child.kill(param);
+
     }
 
     async send(length, block, difficulty, start, end, batch){
