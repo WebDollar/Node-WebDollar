@@ -72,7 +72,8 @@ class BlockchainDifficulty{
                 //the difference between Ti-(Ti-1) is actually the time for Ti
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
                 how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
-                console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
+
+                //console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
             }
 
             //adding block 9
@@ -152,7 +153,7 @@ class BlockchainDifficulty{
                 how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
                 how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
-                console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
+                //console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
             }
 
 
