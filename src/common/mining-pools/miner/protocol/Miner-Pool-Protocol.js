@@ -14,6 +14,7 @@ import consts from "consts/const_global"
 import Log from 'common/utils/logging/Log';
 import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-Status";
 import WebDollarCoins from "../../../utils/coins/WebDollar-Coins";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class MinerProtocol extends PoolProtocolList{
 
@@ -308,6 +309,10 @@ class MinerProtocol extends PoolProtocolList{
     }
 
     async pushWork( miningAnswer, poolSocket){
+
+        //MAX_TARGET during POS is sent to ensure that my activity is taken in consideration
+        if ( miningAnswer.h && !BlockchainGenesis.isPoSActivated( miningAnswer.h ) && miningAnswer.hash.equals( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ) )
+            return;
 
         try {
 
