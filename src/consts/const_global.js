@@ -65,24 +65,16 @@ consts.BLOCKCHAIN = {
 
     HARD_FORKS : {
 
-        TRANSACTIONS_INCLUDING_ONLY_HEADER: 100,
-
-        TRANSACTIONS_BUG_2_BYTES: 60,
-
-        TRANSACTIONS_OPTIMIZATION: 70,
-        DIFFICULTY_TIME_BIGGER: 70,
         WALLET_RECOVERY: 153060,
 
-        DIFFICULTY_REMOVED_CONDITION: 80,
+        TRANSACTIONS_BUG_2_BYTES: 46950,
+        TRANSACTIONS_OPTIMIZATION: 153060,
+        TRANSACTIONS_INCLUDING_ONLY_HEADER: 564500,
 
-        // TRANSACTIONS_BUG_2_BYTES: 46950,
-        //
-        // TRANSACTIONS_OPTIMIZATION: 153060,
-        // DIFFICULTY_TIME_BIGGER: 153060,
+        DIFFICULTY_TIME_BIGGER: 153060,
+        DIFFICULTY_REMOVED_CONDITION: 161990,
 
-        // DIFFICULTY_REMOVED_CONDITION: 161990,
-
-        POS_ACTIVATION: 90,
+        POS_ACTIVATION: 564500,
 
     }
 
@@ -481,7 +473,7 @@ consts.JSON_RPC = {
         windowMs : process.env.JSON_RPC_RATE_LIMIT_WINDOW       || 60 * 1000, // 1 minute
         max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
         isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
-    }
+    },
 
     CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
 
@@ -518,7 +510,12 @@ if ( consts.DEBUG === true ) {
 
     consts.SETTINGS.NODE.PORT = 2024;
 
-    //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
+    //hard-forks
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 60;
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION = 80;
+    consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION = 90;
 
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
@@ -527,9 +524,9 @@ if ( consts.DEBUG === true ) {
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.210.0";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.0";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.0";
+    consts.SETTINGS.NODE.VERSION = "1.210.1";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.1";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.1";
 
 }
 
@@ -541,8 +538,7 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
         id: 2,
         name: "Webdollar TestNet"
     };
-}
-    
+
 }
 
 if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')

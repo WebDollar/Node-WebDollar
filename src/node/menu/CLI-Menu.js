@@ -1,7 +1,7 @@
 /* eslint-disable */
 const FileSystem = require('fs');
 import {JsonRpcServer} from './../jsonRpc';
-let NodeExpress;
+let NodeExpress, NodeServer;
 
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
