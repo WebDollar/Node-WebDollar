@@ -276,7 +276,7 @@ class TransactionsPendingQueue {
 
             if (callDestroy)
                 this.listObject[transaction.txId.toString('hex')].destroyTransaction();
-            
+
         }
     }
 
