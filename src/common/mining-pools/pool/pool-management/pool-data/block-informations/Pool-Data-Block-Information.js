@@ -226,8 +226,8 @@ class PoolDataBlockInformation {
 
             try {
 
-                offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset, false);
-                this.block.difficultyTargetPrev = difficultyTargetPrev;
+                offset = this.block.deserializeBlock(buffer, height, undefined, undefined, offset, false, true);
+                this.block._difficultyTargetPrev = difficultyTargetPrev;
 
             } catch (exception){
 

@@ -48,11 +48,11 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
-        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 60, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
-        GZIPPED: true,
+        GZIPPED: false,
 
     },
 
@@ -202,7 +202,7 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://antelle.github.io/argon2-browser/dist'
+    distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
 };
 
 // change also to Browser-Mining-WebWorker.js
@@ -271,7 +271,6 @@ consts.SETTINGS = {
     UUID: uuid.v4(),
 
     NODE: {
-
 
         VERSION: "1.200.0",
 
@@ -411,7 +410,9 @@ consts.SETTINGS = {
 
         MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
 
-    }
+    },
+    GEO_IP_ENABLED: true,
+    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -434,7 +435,7 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: "cpu", //cpu-cpp
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp", //cpu-cpp, or gpu
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
@@ -458,6 +459,7 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
+
     CPU_MAX: -1, //for CPU-CPP use, 2x or even 3x threads
 };
 
@@ -480,6 +482,9 @@ consts.JSON_RPC = {
         max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
         isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
     }
+
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
+
 };
 
 if ( process.env.JSON_RPC_BASIC_AUTH_USER  && process.env.JSON_RPC_BASIC_AUTH_PASS ) {
@@ -537,5 +542,10 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
         name: "Webdollar TestNet"
     };
 }
+    
+}
+
+if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
 
 export default consts;

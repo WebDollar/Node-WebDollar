@@ -57,6 +57,9 @@ class PoolWork {
         this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
+            this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
+            this.lastBlock._hashPrev = this.lastBlock.hashPrev;
+
             this.lastBlockNonce = 0;
 
             //fill with blank info
@@ -66,7 +69,17 @@ class PoolWork {
                 this.lastBlock.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH );
             }
 
-            this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
+            let error = false;
+            try{
+
+                this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
+
+            } catch (exception){
+
+                error = true;
+
+            }
+
 
             this.lastBlockId ++ ;
 
@@ -81,6 +94,12 @@ class PoolWork {
             };
 
             this._blocksList.push( this.lastBlockElement );
+
+            if (error) {
+                resolve(false);
+                console.error("Error creating Pool block");
+                return;
+            }
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
                 console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");

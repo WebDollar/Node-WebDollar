@@ -5,7 +5,7 @@ let NodeExpress;
 
 if (!process.env.BROWSER) {
     NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
-    // NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+    NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
 }
 
 
@@ -66,7 +66,7 @@ class CLI {
                 await this.setMiningAddress();
                 break;
             case '8': //  Start Mining
-                this.startMining();
+                await this.startMining();
                 break;
             case '9': //  Start Mining Instantly
                 await this.startMining(true);
@@ -91,6 +91,9 @@ class CLI {
                 break;
             case '30':  // Set Password
                 await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
+                break;
+            case '21': // Disable Forks Immutability
+                await this.disableForksImmutability();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -647,6 +650,19 @@ class CLI {
 
     }
 
+
+    disableForksImmutability(){
+
+        consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH += 10000;
+
+        setTimeout( ()=>{
+
+            consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH -= 10000;
+
+        }, 10*60*1000);
+
+    }
+
 }
 
 const commands = [
@@ -665,8 +681,10 @@ const commands = [
         '12. Server for Mining Pool: Create a new Server for Mining Pool (Optional and Advanced)',
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
+        '21. Disable Node Immutability',
         '30. Set Password for Mining Address',
     ];
+
 
 const lineSeparator =
     "\n|_______|____________________________________________|_________________|";

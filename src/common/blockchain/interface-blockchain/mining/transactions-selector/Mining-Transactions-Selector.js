@@ -65,7 +65,7 @@ class MiningTransactionsSelector{
             return true;
 
         //verify fee
-        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard(transaction.serializeTransaction(), miningFeePerByte ) )
+        if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard( transaction.serializeTransaction(), miningFeePerByte ) )
             throw {message: "fee is too small"};
 
         return true;
@@ -77,7 +77,8 @@ class MiningTransactionsSelector{
         this._transactions = [];
         let missingFirstNonce = false;
 
-        let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
+        //let size = consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES - 600;
+        let size = 200 * 1024 - 800;
         let i = 0;
 
         while (size > 0 && i < this.blockchain.transactions.pendingQueue.listArray.length ){
@@ -89,6 +90,13 @@ class MiningTransactionsSelector{
                 if (this._transactions.length.length <= 20)
                     console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
 
+                if ( !transaction.blockchain ) {
+                    i++;
+                    continue;
+                }
+
+                console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
+
                 this.validateTransaction( transaction, miningFeePerByte );
 
                 let bRemoveTransaction = false;
@@ -97,14 +105,15 @@ class MiningTransactionsSelector{
 
                     let blockValidationType = {
                         "take-transactions-list-in-consideration": {
-                            // validation: true allows to complex transactions flow
-                                             // like the following: tx1: A=>B,  tx2: B=>C; tx3 C=>D
+                            //validation: true => allows to complex transactions flow
+                            //                    like the following: tx1: A=>B,  tx2: B=>C; tx3 C=>D
                             validation: true,
                             transactions: this._transactions,
 
                             // validation: false,
-                            // transactions: [],
-                        }
+                            //transactions: [],
+                        },
+                        "validate-fast-transactions": true,
                     };
 
                     if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
@@ -158,17 +167,19 @@ class MiningTransactionsSelector{
 
         let count = 0;
 
+        //safe compare is not necessary
+
         this._transactions.forEach((transaction)=>{
 
             if (from)
                 transaction.from.addresses.forEach((address)=>{
-                    if (BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if (address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 });
 
             if (to)
                 transaction.to.addresses.forEach((address)=>{
-                    if ( BufferExtended.safeCompare(address.unencodedAddress, unencodedAddress))
+                    if ( address.unencodedAddress.equals( unencodedAddress ))
                         count++;
                 })
 

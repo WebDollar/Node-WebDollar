@@ -23,7 +23,7 @@ class InterfaceBlockchainBlock {
 
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        this.hashPrev = hashPrev||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
+        //this._hashPrev;
 
         this.hashChain = hashChain||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
@@ -31,7 +31,7 @@ class InterfaceBlockchainBlock {
 
         this.height = (typeof height === "number" ? height : null); // index set by me
 
-        if (blockValidation === undefined)
+        if (!blockValidation )
             blockValidation = this.blockchain.createBlockValidation();
 
         this.blockValidation = blockValidation;
@@ -63,7 +63,7 @@ class InterfaceBlockchainBlock {
 
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
-        if (data === undefined || data === null)
+        if ( !data )
             data = this.blockchain.blockCreator.createEmptyBlockData();
 
         this.data = data;
@@ -73,7 +73,7 @@ class InterfaceBlockchainBlock {
         this.computedSerialization = undefined;
 
         this.difficultyTarget = null; // difficulty set by Blockchain
-        this.difficultyTargetPrev = null; // difficulty set by Blockchain
+        //this.difficultyTargetPrev = null; // difficulty set by Blockchain
 
         this.reward = undefined;
 
@@ -82,6 +82,24 @@ class InterfaceBlockchainBlock {
         this._socketPropagatedBy = undefined;
 
         this._workDone = undefined;
+
+    }
+
+    get difficultyTargetPrev(){
+
+        if (this._difficultyTargetPrev  !== undefined) return this._difficultyTargetPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getDifficultyTarget(this.height);
+
+        return this.blockValidation.getDifficultyCallback(this.height);
+
+    }
+
+    get hashPrev(){
+
+        if (this._hashPrev !== undefined) return this._hashPrev;
+        if (this.blockValidation === undefined) return this.blockchain.getHashPrev(this.height);
+
+        return this.blockValidation.getHashPrevCallback(this.height);
 
     }
 
@@ -315,10 +333,6 @@ class InterfaceBlockchainBlock {
     /**
      * Computes a hash based on static block data
      * @param newNonce
-     * @param height
-     * @param difficultyTargetPrev
-     * @param computedBlockPrefix
-     * @param blockNonce
      * @returns {Promise<Buffer>}
      */
     static async computeHashStatic(blockSerialized, newNonce) {
@@ -369,7 +383,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false, usePrevHash = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
@@ -378,7 +392,7 @@ class InterfaceBlockchainBlock {
         if (reward !== undefined) this.reward = reward;
         else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
 
-        if (difficultyTargetPrev !== undefined) this.difficultyTargetPrev = difficultyTargetPrev;
+        if (difficultyTargetPrev !== undefined) this._difficultyTargetPrev = difficultyTargetPrev;
 
         if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -392,7 +406,8 @@ class InterfaceBlockchainBlock {
             offset += 2;
 
             //TODO  put hashPrev into block.data
-            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            if (usePrevHash)
+                this._hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
             this.timeStamp = Serialization.deserializeNumber4Bytes( buffer, offset);
@@ -516,17 +531,19 @@ class InterfaceBlockchainBlock {
 
         this.height = json.height;
         this.hash = json.hash;
-        this.hashPrev = json.hashPrev;
-        this.hashChain = json.hashChain;
         this.data.hashData = json.data.hashData;
+
+        this.hashChain = json.hashChain;
+        this._hashPrev = json.hashPrev;
+        this._difficultyTargetPrev = json.difficultyTargetPrev;
+
         this.nonce = json.nonce;
 
         this.version = json.version;
         this.timeStamp = json.timeStamp;
-        this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         //calculate Hash
-        this._computeBlockHeaderPrefix( true );
+        this._computeBlockHeaderPrefix(true);
         await this.computeHash();
     }
 
@@ -549,11 +566,13 @@ class InterfaceBlockchainBlock {
      */
     get workDone(){
 
-        if (this._workDone !== undefined) return this._workDone;
+        return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
 
-        this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
-
-        return this._workDone;
+        // if (this._workDone !== undefined) return this._workDone;
+        //
+        // this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
+        //
+        // return this._workDone;
 
     }
 

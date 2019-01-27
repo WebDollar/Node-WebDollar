@@ -329,8 +329,8 @@ class InterfaceTree{
     }
 
 
-    _serializeTree(includeHashes){
-        return this.root.serializeNode(true, includeHashes);
+    _serializeTree(includeHashes, sleepNodes){
+        return this.root.serializeNode(true, includeHashes, sleepNodes);
     }
 
     _deserializeTree(buffer, offset, includeHashes){

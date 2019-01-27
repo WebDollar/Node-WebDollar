@@ -25,9 +25,10 @@ class InterfaceBlockchainBlocks{
         this._networkHashRate = 0 ;
 
         this._chainWork =  new BigInteger(0);
-
-
         this.chainWorkSerialized = new Buffer(0);
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
+            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
 
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
     }
@@ -191,6 +192,23 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
+    _freeAllBlocksTransactionsFromMemory(){
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
+
+        try {
+
+            for (let i = 0; i < Math.max(0, Math.floor( this.length - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER ) ); i++)
+                if (this[i] !== undefined)
+                    this[i].data.transactions.freeTransactionsFromMemory();
+
+        } catch (exception){
+            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
+        }
+
+        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+
+    }
 
 
 }
