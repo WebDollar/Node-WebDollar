@@ -18,7 +18,7 @@ class MiningTransactionsSelector{
         for(let i=this.blockchain.blocks.length-consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH; i<this.blockchain.blocks.length; i++)
             if( this.blockchain.blocks[i] )
                 for(let j=0; j<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                    if(txId === this.blockchain.blocks[i].data.transactions.transactions[j].txId)
+                    if(txId.toString('hex') === this.blockchain.blocks[i].data.transactions.transactions[j].txId.toString('hex'))
                         return false;
 
         return true;

@@ -68,8 +68,7 @@ class TransactionsDownloadManager{
         if(this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
             this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
             this._transactionsQueueLength++;
-        }else
-            console.log("I already had this transaction")
+        }
 
     }
 
