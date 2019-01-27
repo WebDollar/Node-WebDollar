@@ -44,7 +44,7 @@ class TransactionsPendingQueue {
 
     includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
-        if ( this.findPendingTransaction(transaction.txId) !== null )
+        if ( this.findPendingTransaction(transaction.txId)  )
             return false;
 
         let blockValidationType = {
@@ -161,7 +161,7 @@ class TransactionsPendingQueue {
     }
 
     findPendingTransaction(txId){
-        return this.listObject[txId.toString('hex')] ? this.listObject[txId.toString('hex')] : null;
+        return this.listObject[ txId.toString('hex') ]
     }
 
     findPendingTransactionByAddressAndNonce(address,searchedNonce){

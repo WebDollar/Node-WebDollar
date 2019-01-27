@@ -102,7 +102,10 @@ class PoolWork {
             }
 
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
-                console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
+
+                if (consts.DEBUG)
+                    console.error("ERROR!!! POOL MINING LAST BLOCK WAS CHANGED. HASHPREV DOESN'T MATCH blocks.last.hash");
+
                 resolve(false);
                 return;
             }

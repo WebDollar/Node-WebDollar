@@ -66,6 +66,7 @@ class InterfaceBlockchainTransactionsProtocol {
                 if (response.nonce > this.blockchain.accountantTree.getAccountNonce(response.buffer)){
 
                     if( typeof response === "object"){
+
                         transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
 
                         if(transaction){
@@ -194,7 +195,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                     transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
 
-                    if (transaction === null || transaction === undefined) {
+                    if ( !transaction ) {
                         await this.blockchain.sleep(20);
                         continue;
                     }

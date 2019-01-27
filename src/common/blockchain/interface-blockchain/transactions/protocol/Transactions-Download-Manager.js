@@ -92,7 +92,7 @@ class TransactionsDownloadManager{
     }
 
     findTransactionById(txId){
-        return this._transactionsQueue[txId] ? this._transactionsQueue[txId] : null;
+        return this._transactionsQueue[txId];
     }
 
     /**
@@ -163,10 +163,10 @@ class TransactionsDownloadManager{
             return false;
         }
 
-        if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction( txId.toString('hex') ) !== null )
+        if ( Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction( txId )  )
             return true;
 
-        if ( this.findTransactionById(txId.toString('hex')) === null) {
+        if ( !this.findTransactionById(txId.toString('hex')) ) {
 
             this.createTransaction(txId.toString('hex'),socket);
             return true;
