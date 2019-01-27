@@ -393,8 +393,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             try {
 
-                for (index = indexStart; index < numBlocks; ++index ) {
+                //for POS it is required to have the transactions for the last 30 blocks
+                let prevBlockFreedAlready = 0;
 
+                for (index = indexStart; index < numBlocks; ++index ) {
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
@@ -405,8 +407,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     block.blockValidation.blockValidationType = {};
 
 
-                    if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0 && index < numBlocks )
-                        block.data.transactions.freeTransactionsFromMemory();
+                    if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0 && index < numBlocks ){
+
+                        for (let j = prevBlockFreedAlready; j < index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 ; j++)
+                            this.blocks[j].data.transactions.freeTransactionsFromMemory();
+
+                        prevBlockFreedAlready = Math.max( prevBlockFreedAlready, index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 );
+
+                    }
 
                     if (index > 0 && index % 10000 === 0) {
                         await this.db.restart();

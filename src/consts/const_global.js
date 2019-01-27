@@ -31,6 +31,7 @@ consts.BLOCKCHAIN = {
 
     POS: {
         MINIMUM_AMOUNT: 100,
+        MINIMUM_POS_TRANSFERS: 30,
     },
 
     BLOCKS_POW_LENGTH: 32,

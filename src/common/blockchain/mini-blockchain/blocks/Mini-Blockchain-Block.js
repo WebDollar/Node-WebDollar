@@ -129,7 +129,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 //console.log("Before Balance ", balance); let s = "";
 
-                for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - 30; i--) {
+                for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--) {
 
                     let block = this.blockValidation.getBlockCallBack(i + 1);
 
