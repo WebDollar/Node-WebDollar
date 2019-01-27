@@ -179,9 +179,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
-    getBlock(height){
-
-        if ( !height ) height = this.blocks.length;
+    getBlock(height = this.blocks.length){
 
         if (height <= 0) return BlockchainGenesis;
 
@@ -192,9 +190,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    getDifficultyTarget(height, POSRecalculation = true){
-
-        if ( !height ) height = this.blocks.length;
+    getDifficultyTarget(height = this.blocks.length, POSRecalculation = true){
 
         if (height <= 0) return BlockchainGenesis.difficultyTarget;
 
@@ -213,9 +209,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    getTimeStamp(height){
-
-        if ( !height ) height = this.blocks.length;
+    getTimeStamp(height = this.blocks.length){
 
         if (height <= 0) return BlockchainGenesis.timeStamp;
 
@@ -226,9 +220,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    getHashPrev(height){
-
-        if ( !height ) height = this.blocks.length;
+    getHashPrev(height = this.blocks.length){
 
         if (height <= 0)
             return BlockchainGenesis.hashPrev;
@@ -241,9 +233,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         }
     }
 
-    getChainHash(height){
-
-        if ( !height ) height = this.blocks.length;
+    getChainHash(height = this.blocks.length){
 
         if (height <= 0)
             return BlockchainGenesis.hash;
