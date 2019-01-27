@@ -387,10 +387,7 @@ class TransactionsDownloadManager{
         } catch (exception) {
 
             console.error("Create transaction Error", exception);
-
-            if (transaction !== undefined && transaction !== null)
-                if (this.blockchain.transactions.pendingQueue.findPendingTransaction(transaction.txId) === null)
-                    this.removeTransaction(transaction.txId);
+            this.removeTransaction(transaction.txId);
 
         }
 
