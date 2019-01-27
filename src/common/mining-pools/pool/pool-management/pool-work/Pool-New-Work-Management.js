@@ -72,8 +72,8 @@ class PoolNewWorkManagement{
             if (minerInstance.socket.disconnected)
                 return false;
 
-            if ( blockInformationMinerInstance === undefined ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
-            if ( blockInformationMinerInstance === undefined ) return false;
+            if ( !blockInformationMinerInstance ) blockInformationMinerInstance = minerInstance.lastBlockInformation;
+            if ( !blockInformationMinerInstance ) return false;
 
             let newWork = await this.poolWorkManagement.getWork( minerInstance, blockInformationMinerInstance );
 
@@ -82,9 +82,21 @@ class PoolNewWorkManagement{
             // i have sent it already in the last - no new work
             if (minerInstance.lastWork !== undefined && newWork.s.equals(minerInstance.lastWork.s) ) return false; //already sent
 
-            minerInstance.socket.node.sendRequest("mining-pool/new-work", {  work: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
-                h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
-                b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,  } );
+            minerInstance.socket.node.sendRequest("mining-pool/new-work", {
+                work: newWork,
+                reward: minerInstance.miner.rewardTotal||0,
+                confirmed: minerInstance.miner.rewardConfirmedTotal||0,
+                refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,
+                refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
+                h:this.poolManagement.poolStatistics.poolHashes,
+                m: this.poolManagement.poolStatistics.poolMinersOnline.length,
+                t: this.poolManagement.poolStatistics.poolTimeRemaining,
+                n: Blockchain.blockchain.blocks.networkHashRate,
+                b: this.poolManagement.poolStatistics.poolBlocksConfirmed,
+                bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,
+                ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,
+                bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,
+            } );
 
             blockInformationMinerInstance.lastWork = newWork;
 
