@@ -140,7 +140,8 @@ consts.SPAM_GUARDIAN = {
     TRANSACTIONS:{
         MAXIMUM_IDENTICAL_INPUTS: 10,
         MAXIMUM_IDENTICAL_OUTPUTS: 255,
-        MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE: 500
+        MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE: 500,
+        MAXIMUM_MISSING_NONCE_SEARCH: 5
     }
 
 };
@@ -536,9 +537,5 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
         name: "Webdollar TestNet"
     };
 }
-
-
-
-
 
 export default consts;

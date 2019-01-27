@@ -68,10 +68,11 @@ class InterfaceBlockchainTransactionsProtocol {
                     if( typeof response === "object"){
                         transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
 
-                        if(transaction)
+                        if(transaction){
                             console.warn("Sending missing nonce", transaction);
+                            socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
+                        }
 
-                        socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
                     }
 
                 }

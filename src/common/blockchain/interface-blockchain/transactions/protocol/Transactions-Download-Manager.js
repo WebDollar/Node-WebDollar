@@ -104,8 +104,10 @@ class TransactionsDownloadManager{
 
         for (let txId in this._transactionsQueue){
 
-            if(!this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId))
+            if(!this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
                 this.removeTransaction(txId);
+                continue;
+            }
 
             let currentTime = new Date().getTime();
 

@@ -170,6 +170,9 @@ class TransactionsPendingQueue {
 
     findPendingTransactionByAddressAndNonce(address,searchedNonce){
 
+        if ( this.blockchain.accountantTree.getAccountNonce(address) + consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_MISSING_NONCE_SEARCH > searchedNonce )
+            return false;
+
         let selected = undefined, Left = 0, Right = this.listArray.length, compare = undefined;
         if(this.listArray.length){
 
