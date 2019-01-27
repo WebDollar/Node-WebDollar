@@ -155,8 +155,6 @@ class TransactionsPendingQueue {
             this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
         }
 
-        console.warn("Transactions stack -", this.listArray.length);
-
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
 
