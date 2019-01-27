@@ -124,8 +124,10 @@ class InterfaceBlockchainTransaction{
         if (pendingTransactionsWereIncluded)
             this.pendingTransactionsIncluded--;
 
-        if (this.pendingTransactionsIncluded !== undefined && this.pendingTransactionsIncluded > 0)
+        if ( this.pendingTransactionsIncluded && this.pendingTransactionsIncluded > 0)
             return;
+
+        this.blockchain.transactions.pendingQueue.removePendingTransaction(this, undefined, false);
 
         this.blockchain = undefined;
 

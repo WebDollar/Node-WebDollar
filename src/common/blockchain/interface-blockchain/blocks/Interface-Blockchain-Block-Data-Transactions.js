@@ -24,7 +24,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.transactions.forEach((transaction) => {
             transaction.confirmed = true;
-            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+            this.blockData.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
         });
 
     }
@@ -52,7 +52,7 @@ class InterfaceBlockchainBlockDataTransactions {
             return;
 
         for (let i=0; i<this.transactions.length; i++) {
-            if (this.transactions[i].pendingTransactionsIncluded === undefined) this.transactions[i].pendingTransactionsIncluded = 0;
+            if ( !this.transactions[i].pendingTransactionsIncluded ) this.transactions[i].pendingTransactionsIncluded = 0;
             this.transactions[i].pendingTransactionsIncluded++;
         }
 

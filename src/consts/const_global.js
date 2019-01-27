@@ -540,16 +540,16 @@ if ( consts.DEBUG === true ) {
     consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION = 90;
 
     FallBackNodesList.nodes = [{
-        //"addr": ["http://testnet2.hoste.ro:8001"],
-        "addr": ["http://86.126.138.61:2024"],
+        "addr": ["http://testnet2.hoste.ro:8001"],
+        //"addr": ["http://86.126.138.61:2024"],
     }];
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.210.1";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.1";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.1";
+    consts.SETTINGS.NODE.VERSION = "1.210.0";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.0";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.0";
 
 }
 

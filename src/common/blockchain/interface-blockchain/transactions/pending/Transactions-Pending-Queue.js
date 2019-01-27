@@ -67,16 +67,14 @@ class TransactionsPendingQueue {
 
         let alreadyPropagated = 0;
 
-        if(this.transactionsProtocol.transactionsDownloadingManager._transactionsQueueLength < 10)
-            if( typeof this.listArray[i+1] !== "undefined")
+        if (this.transactionsProtocol.transactionsDownloadingManager._transactionsQueueLength < 10)
+            if( this.listArray[i+1] )
                 if (this.listArray[i + 1].nonce - this.listArray[i].nonce > 1)
                     for (let j = this.listArray[i].nonce + 1; j < this.listArray[i + 1].nonce; j++)
-                        if( typeof this.listArray[j] !== "undefined")
-                            if (this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0)
-                                if(alreadyPropagated <=5){
-                                    this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
-                                    alreadyPropagated++;
-                                }
+                        if ( this.listArray[j] && this.listArray[j].from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress) === 0 && alreadyPropagated <=5){
+                            this.propagateMissingNonce(this.listArray[i].from.addresses[0].unencodedAddress, j);
+                            alreadyPropagated++;
+                        }
 
 
     }
@@ -259,13 +257,19 @@ class TransactionsPendingQueue {
 
     }
 
-    _removePendingTransaction (transaction, index){
+    removePendingTransaction (transaction, index, callDestroy = true){
 
-        if (index === null)
-            return true;
+        if ( !index && typeof index !== "number")
+            for (let i=0; i < this.listArray.length; i++)
+                if ( this.listArray[i].txId.equals( transaction.txId )){
+                    index = i;
+                    break;
+                }
 
-        if(this.listObject[transaction.txId.toString('hex')]){
-            this.listObject[transaction.txId.toString('hex')].destroyTransaction();
+        if (this.listObject[transaction.txId.toString('hex')]){
+
+            if (callDestroy)
+                this.listObject[transaction.txId.toString('hex')].destroyTransaction();
 
             delete this.listObject[transaction.txId.toString('hex')];
 
@@ -303,7 +307,7 @@ class TransactionsPendingQueue {
             }
 
             if(removeThis)
-                this._removePendingTransaction(this.listArray[i], i);
+                this.removePendingTransaction(this.listArray[i], i);
 
         }
 
