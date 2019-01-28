@@ -226,14 +226,14 @@ class MinerProtocol extends PoolProtocolList{
             this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         this.minerPoolManagement.minerPoolMining.resetForced = true;
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
             try {
 
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
-
-                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
                 await this._validateRequestWork(data.work, socket);
 
@@ -270,9 +270,6 @@ class MinerProtocol extends PoolProtocolList{
             if (!Buffer.isBuffer(work.sig) || work.sig.length < 10) throw {message: "pool: signature is invalid"};
             if (!ed25519.verify(work.sig, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
         }
-
-        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
-            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         await this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
 

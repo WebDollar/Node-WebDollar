@@ -26,32 +26,44 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
-        if (typeof work.timeDiff === "number") {
+        try{
 
-            let hashesFactor = Math.max(0.5, Math.min(2, ( 80000 / work.timeDiff ))); //80 sec
+            if (typeof work.timeDiff === "number") {
 
-            let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
-            minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
-            minerInstance.realHashesPerSecond = Math.floor(work.hashes / work.timeDiff * 1000);
+                let hashesFactor = Math.max(0.5, Math.min(2, ( 80000 / work.timeDiff ))); //80 sec
+
+                let hashesPerSecond = Math.floor( minerInstance.hashesPerSecond * hashesFactor);
+                minerInstance.hashesPerSecond = Math.max( 100, Math.min( hashesPerSecond, 3000000 ));
+                minerInstance.realHashesPerSecond = Math.floor(work.hashes / work.timeDiff * 1000);
+
+            }
+
+            minerInstance.dateActivity = new Date().getTime() / 1000;
+
+            let workData = {
+                work: work,
+                minerInstance: minerInstance
+            };
+
+            if (BlockchainGenesis.isPoSActivated(work.h))
+                forced = true;
+
+            if (work.result || forced  ){
+
+                await this._validateWork(workData);
+
+            } else {
+
+                if (!BlockchainGenesis.isPoSActivated(work.h) && work.hash.equals( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ))
+                    return;
+
+                this._works.push(workData);
+            }
+
+        }catch (exception){
 
         }
 
-        minerInstance.dateActivity = new Date().getTime() / 1000;
-
-        let workData = {
-            work: work,
-            minerInstance: minerInstance
-        };
-
-        if (typeof work.h === "number" && BlockchainGenesis.isPoSActivated(work.h))
-            forced = true;
-
-        if (work.result || forced  ){
-
-            await this._validateWork(workData);
-
-        } else
-        this._works.push(workData);
 
     }
 

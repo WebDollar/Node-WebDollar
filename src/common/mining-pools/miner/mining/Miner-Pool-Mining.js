@@ -108,6 +108,11 @@ class MinerPoolMining extends InheritedPoolMining {
 
     async updatePoolMiningWork(work, poolSocket){
 
+        this.minerPoolManagement.minerPoolMining.resetForced = true;
+
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
+
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
 
@@ -149,6 +154,7 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.poolSocket = poolSocket;
         this._miningWork.resolved = false;
 
+        this.minerPoolManagement.minerPoolMining.resetForced = false;
 
         Log.info("New Work: "+ (work.end - work.start) + "   starting at: "+work.start + " block: "+this._getBlockSuffix(), Log.LOG_TYPE.POOLS );
 
