@@ -235,7 +235,8 @@ class MinerProtocol extends PoolProtocolList{
 
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                await this._validateRequestWork(data.work, socket);
+                //await this._validateRequestWork( data.work, socket );
+                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
