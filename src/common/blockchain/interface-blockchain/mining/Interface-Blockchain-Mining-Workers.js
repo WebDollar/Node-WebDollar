@@ -189,9 +189,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             if ( worker.suspended )
                 return; //I am no longer interested
 
-            if (event.data.hash === undefined){
+            if ( !event.data.hash )
                 console.log("Worker Error");
-            } else{
+            else{
 
                 let compare = 0;
 

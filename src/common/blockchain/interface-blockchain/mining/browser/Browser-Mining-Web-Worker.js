@@ -2,7 +2,7 @@
 
 let jobTerminated = false; //is not working and jobTermianted is not reliable in the Worker....
 let block = undefined;
-let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 2, type: 0, hashLen: 32, distPath: 'https://webdollar.io/public/WebDollar-dist/argon2/dist'}
+let ARGON2_PARAM = { salt: 'Satoshi_is_Finney', time: 2, mem: 256, parallelism: 2, type: 0, hashLen: 32}
 
 let algorithm = undefined;
 

@@ -6,11 +6,11 @@
     Removed setTimeOut... because we need it to be synchronized through promises
  */
 
-import Argon2BrowserAntelleMain from './main'
-
 var global =  typeof window === "undefined" ? self : window;
 //var root =  window === undefined ? '../' : '';
-var root = "https://webdollar.io/public/WebDollar-dist/argon2/";
+
+//var root = "https://webdollar.io/public/WebDollar-dist/argon2/";
+var root = 'https://antelle.github.io/argon2-browser/dist';
 
 class Argon2BrowserWebAssemblyCalc{
 

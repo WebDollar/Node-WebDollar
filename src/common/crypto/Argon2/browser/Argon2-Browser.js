@@ -20,7 +20,6 @@ const HASH_ARGON2_OPTIONS = {
     parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
     type: consts.HASH_ARGON2_PARAMS.algoBrowser,
     hashLen: consts.HASH_ARGON2_PARAMS.hashLen,
-    distPath: consts.HASH_ARGON2_PARAMS.distPath
 }
 
 class Argon2Browser{

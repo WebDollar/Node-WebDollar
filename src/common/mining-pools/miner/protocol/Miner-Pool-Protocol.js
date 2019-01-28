@@ -367,17 +367,17 @@ class MinerProtocol extends PoolProtocolList{
 
         try {
 
-            if (poolSocket === undefined)
+            if (!poolSocket )
                 poolSocket = this.connectedPools[0];
 
-            if (newAddress === undefined)
+            if (!newAddress )
                 newAddress = Blockchain.Wallet.addresses[0].address;
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
+            if (!poolSocket ) throw {message: "You are disconnected"};
 
             oldAddress = Blockchain.Wallet.getAddress(oldAddress||this.minerPoolManagement.minerPoolMining.minerAddress);
 
-            if (oldAddress === null || oldAddress === undefined){
+            if ( !oldAddress ){
 
                 AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress, "Wallet Error", "error", 5000 );
                 return;
@@ -424,7 +424,8 @@ class MinerProtocol extends PoolProtocolList{
 
             console.error("Couldn't change the wallet", exception.message);
 
-            await this.minerPoolManagement.minerPoolMining._setAddress(  oldAddress.address , false, true);
+            if (oldAddress)
+                await this.minerPoolManagement.minerPoolMining._setAddress(  oldAddress.address , false, true);
 
             return false;
 
