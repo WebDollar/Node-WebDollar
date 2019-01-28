@@ -75,20 +75,19 @@ class PoolWorkValidation{
 
             let index = -1;
 
-            try {
+            let n = Math.min(PROCESS_COUNT, this._works.length);
 
-                let n = Math.min(PROCESS_COUNT, this._works.length);
+            for (let i = 0; i < n; i++) {
 
-                for (let i = 0; i < n; i++) {
-
+                try {
                     await this._validateWork(this._works[i]);
+                } catch (exception){
 
-                    index = i;
                 }
 
-            } catch (exception) {
-
+                index = i;
             }
+
 
             if (index >= 0)
                 this._works.splice(0, index);
