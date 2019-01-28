@@ -138,14 +138,6 @@ class InterfaceBlockchainMiningBasic {
         }
     }
 
-
-
-
-
-
-
-
-
     async startMining(){
 
         if (this.started)
