@@ -9,8 +9,8 @@
 var global =  typeof window === "undefined" ? self : window;
 //var root =  window === undefined ? '../' : '';
 
-//var root = "https://webdollar.io/public/WebDollar-dist/argon2/";
-var root = "https://antelle.net/argon2-browser/";
+//var root = "https://webdollar.io/public/";
+var root = "http://127.0.0.1:2224/public/";
 
 class Argon2BrowserWebAssemblyCalc{
 
@@ -58,7 +58,7 @@ class Argon2BrowserWebAssemblyCalc{
             var ts = this.now();
             //this.log('Loading script...');
 
-            this.loadScript(root + 'dist/argon2-asm.min.js', () => {
+            this.loadScript(root + 'WebDollar-dist/argon2/argon2-asm.min.js', () => {
                 //this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                 //this.log('Calculating hash....');
 
@@ -142,9 +142,9 @@ class Argon2BrowserWebAssemblyCalc{
                 setStatus: this.log,
                 wasmBinary: null,
                 wasmJSMethod: method,
-                asmjsCodeFile: root + 'dist/argon2-asm.min.asm.js',
-                wasmBinaryFile: root + 'dist/argon2.wasm',
-                wasmTextFile: root + 'dist/argon2.wast',
+                asmjsCodeFile: root + 'WebDollar-dist/argon2/argon2-asm.min.asm.js',
+                wasmBinaryFile: root + 'WebDollar-dist/argon2/argon2.wasm',
+                wasmTextFile: root + 'WebDollar-dist/argon2/argon2.wast',
                 wasmMemory: wasmMemory,
                 buffer: wasmMemory.buffer,
                 TOTAL_MEMORY: initialMemory * WASM_PAGE_SIZE
@@ -152,7 +152,7 @@ class Argon2BrowserWebAssemblyCalc{
 
             this.log('Loading wasm...');
             var xhr = new XMLHttpRequest();
-            xhr.open('GET', root + 'dist/argon2.wasm', true);
+            xhr.open('GET', root + 'WebDollar-dist/argon2/argon2.wasm', true);
             xhr.responseType = 'arraybuffer';
             xhr.onload = () => {
                 global.Module.wasmBinary = xhr.response;
@@ -160,7 +160,7 @@ class Argon2BrowserWebAssemblyCalc{
                 var ts = this.now();
                 this.log('Wasm loaded, loading script...');
 
-                this.loadScript(root + 'dist/argon2.min.js', () => {
+                this.loadScript(root + 'WebDollar-dist/argon2/argon2.min.js', () => {
                     this.log('Script loaded in ' + Math.round(this.now() - ts) + 'ms');
                     this.log('Calculating hash....');
 
