@@ -456,9 +456,9 @@ class TransactionsDownloadManager{
                 //console.log(NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints);
                 //console.log(new Date().getTime() - NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate);
 
-                if (NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints >= 10 && (new Date().getTime() - NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate) > 30 * 1000) {
-                    NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyDate = new Date().getTime();
-                    NodesList.nodes[i].socket.node.protocol.transactionsDownloadingManager.penaltyPoints--;
+                if (NodesList.nodes[i].socket.node.protocol.penalty.penaltyPoints >= 10 && (new Date().getTime() - NodesList.nodes[i].socket.node.protocol.penalty.penaltyDate) > 30 * 1000) {
+                    NodesList.nodes[i].socket.node.protocol.penalty.penaltyDate = new Date().getTime();
+                    NodesList.nodes[i].socket.node.protocol.penalty.penaltyPoints--;
                 }
             }
 

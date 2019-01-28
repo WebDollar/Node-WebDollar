@@ -171,7 +171,7 @@ class MinerProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
-                if (answer.work !== undefined)
+                if (answer.work)
                     await this._validateRequestWork(answer.work, socket);
 
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
@@ -227,9 +227,6 @@ class MinerProtocol extends PoolProtocolList{
 
         this.minerPoolManagement.minerPoolMining.resetForced = true;
 
-        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
-            await this.minerPoolManagement.minerPoolMining._isBeingMining;
-
         socket.node.on("mining-pool/new-work", async (data)=>{
 
             try {
@@ -273,6 +270,9 @@ class MinerProtocol extends PoolProtocolList{
             if (!Buffer.isBuffer(work.sig) || work.sig.length < 10) throw {message: "pool: signature is invalid"};
             if (!ed25519.verify(work.sig, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
         }
+
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         await this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
 

@@ -207,7 +207,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             //in case there is an suffix in the answer
             let suffix = "";
-            if ( data !== null && data !== undefined && typeof data.suffix === "string")
+            if ( data && typeof data.suffix === "string")
                 suffix = '/'+data.suffix;
 
             try {
