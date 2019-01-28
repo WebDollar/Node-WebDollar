@@ -641,12 +641,12 @@ class InterfaceBlockchainFork {
 
             });
 
-            this.forkBlocks.forEach((block)=> {
-
-                if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.confirmTransactions();
-
-            });
+            // this.forkBlocks.forEach((block)=> {
+            //
+            //     if (block.data !==  undefined && block.data.transactions !== undefined)
+            //         block.data.transactions.confirmTransactions();
+            //
+            // });
 
         } else {
 
@@ -657,13 +657,12 @@ class InterfaceBlockchainFork {
 
             });
 
-
-            this._blocksCopy.forEach( (block) => {
-
-                if (block.data !==  undefined && block.data.transactions !== undefined)
-                    block.data.transactions.confirmTransactions();
-
-            });
+            // this._blocksCopy.forEach( (block) => {
+            //
+            //     if (block.data !==  undefined && block.data.transactions !== undefined)
+            //         block.data.transactions.confirmTransactions();
+            //
+            // });
 
         }
 
