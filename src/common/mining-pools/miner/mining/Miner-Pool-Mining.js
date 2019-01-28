@@ -84,13 +84,14 @@ class MinerPoolMining extends InheritedPoolMining {
         return this._miningWork.medianTimestamp;
     }
 
-    async _setAddress(newAddress, save, skipChangingAddress=false ){
+    async _setAddress(newAddress, save , skipChangingAddress=false ){
+
+        await InheritedPoolMining.prototype._setAddress.call( this, newAddress, save);
 
         if (this._minerAddress === newAddress)
             return;
 
         let oldMinerAddress = this._minerAddress;
-        await InheritedPoolMining.prototype._setAddress.call( this, newAddress, true );
 
         if (skipChangingAddress) return;
 

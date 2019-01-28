@@ -24,10 +24,13 @@ class BlockchainNetworkAdjustedTime {
 
     get networkAdjustedTime(){
 
-        if (this.networkAdjustedTimeClusters.clusterBest !== null )
-            return ( this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset +  this.blockchainTimestamp.timeUTC );
-        else
-            return this.blockchainTimestamp.timeUTC;
+        // DISABLED FOR POS
+        // if (this.networkAdjustedTimeClusters.clusterBest !== null )
+        //     return ( this.networkAdjustedTimeClusters.clusterBest.meanTimeUTCOffset +  this.blockchainTimestamp.timeUTC );
+        // else
+        //     return this.blockchainTimestamp.timeUTC;
+
+        return this.blockchainTimestamp.timeUTC
 
     }
 

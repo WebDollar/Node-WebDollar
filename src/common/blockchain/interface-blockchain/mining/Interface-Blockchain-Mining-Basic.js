@@ -67,7 +67,7 @@ class InterfaceBlockchainMiningBasic {
 
         this._minerAddress = newAddress;
 
-        if (newAddress === undefined)
+        if ( !newAddress )
             this._unencodedMinerAddress = undefined;
         else
             this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(newAddress);
@@ -80,10 +80,7 @@ class InterfaceBlockchainMiningBasic {
             return this.saveMinerAddress();
     }
 
-    async saveMinerAddress(minerAddress){
-
-        if (minerAddress)
-            minerAddress = this.minerAddress;
+    async saveMinerAddress(minerAddress = this.minerAddress){
 
         if (typeof minerAddress === "object" && minerAddress.hasOwnProperty("address"))
             minerAddress = minerAddress.address;
