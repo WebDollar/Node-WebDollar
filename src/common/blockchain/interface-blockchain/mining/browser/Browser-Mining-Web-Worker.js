@@ -18,7 +18,7 @@ var _libraryLoadPromise = false;
 
 var global = typeof window === 'undefined' ? self : window;
 //var root = "https://webdollar.io/public/";
-var root = "/public/WebDollar-dist/argon2/"; // for localhost only
+var root = "https://antelle.net/argon2-browser"; // for localhost only
 
 var log;
 
@@ -48,7 +48,7 @@ function calcAsmJs() {
         var ts = now();
         //log('Loading script...');
 
-        loadScript(root + 'argon2-asm.min.js', () => {
+        loadScript(root + '/dist/argon2-asm.min.js', () => {
             //log('Script loaded in ' + Math.round(now() - ts) + 'ms');
             //log('Calculating hash....');
 
@@ -127,9 +127,9 @@ function calcBinaryen(method) {
             setStatus: log,
             wasmBinary: null,
             wasmJSMethod: method,
-            asmjsCodeFile: root + 'argon2-asm.min.asm.js',
-            wasmBinaryFile: root + 'argon2.wasm',
-            wasmTextFile: root + 'argon2.wast',
+            asmjsCodeFile: root + '/dist/argon2-asm.min.asm.js',
+            wasmBinaryFile: root + '/dist/argon2.wasm',
+            wasmTextFile: root + '/dist/argon2.wast',
             wasmMemory: wasmMemory,
             buffer: wasmMemory.buffer,
             TOTAL_MEMORY: initialMemory * WASM_PAGE_SIZE
@@ -137,14 +137,14 @@ function calcBinaryen(method) {
 
         log('Loading wasm...');
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', root + 'argon2.wasm', true);
+        xhr.open('GET', root + '/dist/argon2.wasm', true);
         xhr.responseType = 'arraybuffer';
         xhr.onload = () => {
             global.Module.wasmBinary = xhr.response;
             global.Module.postRun = () => resolve(calcHash());
             var ts = now();
             log('Wasm loaded, loading script...');
-            loadScript(root + 'argon2.min.js', () => {
+            loadScript(root + '/dist/argon2.min.js', () => {
                 log('Script loaded in ' + Math.round(now() - ts) + 'ms');
                 log('Calculating hash....');
 
