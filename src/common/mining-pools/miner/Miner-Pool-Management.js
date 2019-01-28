@@ -56,11 +56,11 @@ class MinerProtocol {
             }
 
             if (poolURL !== undefined)
-                await this.minerPoolSettings.setPoolURL(poolURL);
+                await this.minerPoolSettings.setPoolURL(poolURL, skipSaving);
 
             if (this.minerPoolSettings.poolURL !== undefined && this.minerPoolSettings.poolURL !== '') {
                 this._minerPoolStarted = false;
-                return await this.setMinerPoolStarted(true, true, skipSaving);
+                return await this.setMinerPoolStarted(true, forceStartMinerPool, skipSaving);
             }
             else {
                 console.error("Couldn't start MinerPool");
