@@ -195,7 +195,8 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
+    // distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
+    distPath: 'https://antelle.net/argon2-browser/'
 };
 
 // change also to Browser-Mining-WebWorker.js
@@ -509,8 +510,6 @@ if ( consts.DEBUG === true ) {
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8086;
-
     //hard-forks
     consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 60;
     consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION = 70;
@@ -518,6 +517,8 @@ if ( consts.DEBUG === true ) {
     consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION = 80;
     consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION = 90;
     consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_INCLUDING_ONLY_HEADER = consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION;
+
+    consts.SETTINGS.NODE.PORT = 2024;
 
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
@@ -527,9 +528,9 @@ if ( consts.DEBUG === true ) {
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.210.2";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.1";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.1";
+    consts.SETTINGS.NODE.VERSION = "1.210.3";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.3";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.3";
 
 }
 
