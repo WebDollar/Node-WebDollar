@@ -80,8 +80,10 @@ class BlockchainDifficulty{
             how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
             how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
-            console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - getTimeStampCallback(blockNumber) );
-            console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
+            if(consts.DEBUG){
+                console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - getTimeStampCallback(blockNumber) );
+                console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
+            }
 
             if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION && blockNumber < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
                 if ( how_much_it_took_to_mine_X_Blocks <= (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER ? consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK : 5 * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK ) )
