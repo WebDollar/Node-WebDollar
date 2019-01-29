@@ -209,6 +209,10 @@ class MinerProtocol extends PoolProtocolList{
 
     async _connectionEstablishedWithPool(socket ){
 
+        this.minerPoolManagement.minerPoolMining.resetForced = true;
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
+
         socket.node.protocol.pool = {
         };
 
@@ -224,10 +228,6 @@ class MinerProtocol extends PoolProtocolList{
 
         if (this.minerPoolManagement.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
             this.minerPoolManagement.blockchain.agent.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
-
-        this.minerPoolManagement.minerPoolMining.resetForced = true;
-        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
-            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
