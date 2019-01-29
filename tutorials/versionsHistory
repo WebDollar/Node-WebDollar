@@ -1,0 +1,13 @@
+# 1.200.0
+
+   COMPATIBILITY:
+
+   - Miners: 1.200.0
+   - Pool-Miners: 1.200.0
+
+   UPDATES:
+
+   - Hibrid Mining (33,(3)% POS & 66,(6)% POS)
+   - Transactions hash using only transaction hash instead whole transaction
+   - Download transactions manager
+   - Transactions pending queue fix
