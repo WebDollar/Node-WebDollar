@@ -8,7 +8,7 @@ const BigInteger = require('big-integer');
 
 let consts = {
 
-    DEBUG: true,
+    DEBUG: false,
     OPEN_SERVER: true,
 
 };
@@ -74,8 +74,8 @@ consts.BLOCKCHAIN = {
         DIFFICULTY_TIME_BIGGER: 153060,
         DIFFICULTY_REMOVED_CONDITION: 161990,
 
-        TRANSACTIONS_INCLUDING_ONLY_HEADER: 566400, // SAME AS POS
-        POS_ACTIVATION: 566500,
+        TRANSACTIONS_INCLUDING_ONLY_HEADER: 567800, // SAME AS POS
+        POS_ACTIVATION: 567800,
 
     }
 
