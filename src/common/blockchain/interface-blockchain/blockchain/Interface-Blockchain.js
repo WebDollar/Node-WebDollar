@@ -315,7 +315,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-recalculating-hash-rate"] = true;
 
-                if (Math.random() > 0.0001)
+                if (Math.random() > 0.0001 || BlockchainGenesis.isPoSActivated( i ))
                     validationType["skip-validation-PoW-hash"] = true;
 
             }
@@ -407,7 +407,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     block.blockValidation.blockValidationType = {};
 
 
-                    if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0 && index < numBlocks ){
+                    if ( index < consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER  ){
 
                         for (let j = prevBlockFreedAlready; j < index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 ; j++)
                             this.blocks[j].data.transactions.freeTransactionsFromMemory();

@@ -135,9 +135,9 @@ class InterfaceBlockchainBlock {
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty'};
         if (typeof this.timeStamp !== 'number') throw {message: 'timeStamp is empty'};
 
-        if (this.hash === undefined || this.hash === null || !Buffer.isBuffer(this.hash) ) throw {message: 'hash is empty'};
-        if (this.hashPrev === undefined || this.hashPrev === null || !Buffer.isBuffer(this.hashPrev) ) throw {message: 'hashPrev is empty'};
-        if (this.hashChain === undefined || this.hashChain === null || !Buffer.isBuffer(this.hashChain) ) throw {message: 'hashChain is empty'};
+        if ( !this.hash || !Buffer.isBuffer(this.hash) ) throw {message: 'hash is empty'};
+        if ( !this.hashPrev || !Buffer.isBuffer(this.hashPrev) ) throw {message: 'hashPrev is empty'};
+        if ( !this.hashChain || !Buffer.isBuffer(this.hashChain) ) throw {message: 'hashChain is empty'};
 
         //timestamp must be on 4 bytes
         if (this.timeStamp < 0 || this.timeStamp >= 0xFFFFFFFF) throw {message: 'timeStamp is invalid'};
@@ -465,7 +465,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height, undefined, this.blockValidation.getDifficultyCallback(this.height) );
+            this.deserializeBlock(buffer, this.height );
 
             return true;
         }

@@ -149,7 +149,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             this.workers.suspendWorkers();
             this._suspendMiningWorking();
 
-            if (this._workerResolve !== null && this._workerResolve !== undefined)
+            if ( this._workerResolve )
                 this._workerResolve( { //we didn't find anything
                     result: false,
                     hash: this.bestHash,
