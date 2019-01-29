@@ -277,7 +277,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 91, //port
+        PORT: 80, //port
         MINER_POOL_PORT: 8086, //port
 
     },
