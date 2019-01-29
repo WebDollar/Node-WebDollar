@@ -7,7 +7,7 @@
 
    UPDATES:
 
-   - Hibrid Mining (33,(3)% POS & 66,(6)% POS)
+   - Hybrid Mining (33,(3)% POW & 66,(6)% POS)
    - Transactions hash using only transaction hash instead whole transaction
    - Download transactions manager
    - Transactions pending queue fix
