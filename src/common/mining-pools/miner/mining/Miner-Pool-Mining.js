@@ -273,8 +273,9 @@ class MinerPoolMining extends InheritedPoolMining {
 
         try {
 
-            // if (this._miningWork.poolSocket !== null && this._miningWork.resolved)
-            //     await this.minerPoolManagement.minerPoolProtocol.requestWork();
+            if ( this._miningWork.poolSocket && !this._miningWork.resolved)
+                this.minerPoolManagement.minerPoolMining.resetForced = true;
+                //await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
             if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 180000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
 
@@ -291,7 +292,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         }
 
-        this._checkForWorkInterval = setTimeout( this._checkForWorkIntervalCallback.bind(this), 5000);
+        this._checkForWorkInterval = setTimeout( this._checkForWorkIntervalCallback.bind(this), 10000);
 
     }
 
