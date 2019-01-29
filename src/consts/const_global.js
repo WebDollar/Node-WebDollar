@@ -467,7 +467,7 @@ consts.JSON_RPC = {
     // @see express-basic-auth package for configuration (except isEnabled)
     basicAuth: {
         users    : {},
-        isEnabled: process.env.JSON_RPC_BASIC_AUTH_ENABLE
+        isEnabled: process.env.JSON_RPC_BASIC_AUTH_ENABLE || false
     },
 
     // @see express-rate-limit package for configuration (except isEnabled)
