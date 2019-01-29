@@ -454,7 +454,7 @@ consts.TERMINAL_WORKERS = {
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
 
-    CPU_MAX: -1, //for CPU-CPP use, 2x or even 3x threads
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 2, //for CPU-CPP use, 2x or even 3x threads
 };
 
 consts.JSON_RPC = {
@@ -476,8 +476,6 @@ consts.JSON_RPC = {
         max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
         isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
     },
-
-    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
 
 };
 
