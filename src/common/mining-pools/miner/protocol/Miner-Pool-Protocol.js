@@ -171,9 +171,6 @@ class MinerProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
-                if (answer.work)
-                    await this._validateRequestWork(answer.work, socket);
-
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolAddress = poolAddress;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
@@ -189,6 +186,9 @@ class MinerProtocol extends PoolProtocolList{
 
                 this._updateStatistics(answer);
                 this.minerPoolManagement.minerPoolReward.setReward(answer);
+
+                if (answer.work)
+                    await this._validateRequestWork(answer.work, socket);
 
                 return true;
 
