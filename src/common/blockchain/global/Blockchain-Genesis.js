@@ -9,7 +9,7 @@ class BlockchainGenesis{
 
         this.timeStamp = 0;
 
-        if(consts.DEBUG)
+        if(!consts.DEBUG)
             this.timeStampOffset = 1524742312; //main net
         else
             this.timeStampOffset = 1529344475; //test net
