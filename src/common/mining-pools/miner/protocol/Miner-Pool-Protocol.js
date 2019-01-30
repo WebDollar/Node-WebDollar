@@ -308,10 +308,6 @@ class MinerPoolProtocol extends PoolProtocolList{
 
     async pushWork( miningAnswer, poolSocket){
 
-        //MAX_TARGET during POS is sent to ensure that my activity is taken in consideration
-        if ( miningAnswer.h && !BlockchainGenesis.isPoSActivated( miningAnswer.h ) && miningAnswer.hash.equals( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ) )
-            return;
-
         try {
 
             if (!poolSocket )
@@ -321,7 +317,7 @@ class MinerPoolProtocol extends PoolProtocolList{
 
             let answer = poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
-            }, "answer", undefined);
+            }, "answer", null);
 
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") + " id: " + miningAnswer.id, Log.LOG_TYPE.POOLS);
             if (miningAnswer.pos)

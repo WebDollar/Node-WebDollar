@@ -107,7 +107,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    async updatePoolMiningWork(work, poolSocket){
+    updatePoolMiningWork(work, poolSocket){
 
         //update manually the balances
         if (work.b && work.b.length === Blockchain.Wallet.addresses.length){
@@ -181,7 +181,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
                         let prevBlock = this.block;
 
-                        if (prevBlock !== undefined && prevBlock !== this._miningWork.block )
+                        if (prevBlock && prevBlock !== this._miningWork.block )
                             prevBlock.destroyBlock();
                     }
 
@@ -198,20 +198,16 @@ class MinerPoolMining extends InheritedPoolMining {
 
                             let answer = await this._run();
 
-                            if (!answer)
-                                answer = {
-
-                                };
+                            if (!answer)  answer = { };
 
                             answer.timeDiff = new Date().getTime() - timeInitial;
                             answer.id = workId;
                             answer.h = workHeight;
 
-                            if (!this._miningWork.resolved) {
+                            if (!this._miningWork.resolved)
                                 answer.hashes = workEnd - workStart;
-                            }
 
-                            this.minerPoolManagement.minerPoolProtocol.pushWork(answer, this._miningWork.poolSocket);
+                            this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
 
                             this.resetForced = false;
                             this._miningWork.resolved = true;
