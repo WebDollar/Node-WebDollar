@@ -263,6 +263,20 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
 
+        //browser avoid asking for password
+        if (process.env.BROWSER && await Blockchain.Wallet.isAddressEncrypted( whoIsMining) )
+            return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                nonce: 0,
+                pos: {
+                    timestamp: medianTimestamp,
+                    posSignature: undefined,
+                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                    posMinerPublicKey: undefined,
+                }
+            };
+
         if ( !balance || balance < consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT * WebDollarCoins.WEBD ){
 
             await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 10000 : 1000 );
