@@ -11,3 +11,14 @@
    - Transactions hash using only transaction hash instead whole transaction
    - Download transactions manager
    - Transactions pending queue fix
+
+# 1.200.1 (475a501183b0ec035306341941b8545da5f6130d)
+
+  COMPATIBILITY:
+
+  - Miners: 1.200.1
+  - Pool-Miners: 1.200.1
+
+  UPDATES:
+
+  - Allow pools to mine POW until POS HARDFORK
