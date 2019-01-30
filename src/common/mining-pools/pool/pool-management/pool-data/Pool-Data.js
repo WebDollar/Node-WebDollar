@@ -357,7 +357,7 @@ class PoolData {
         }
         catch (exception){
 
-            console.log('ERROR saving miners in DB: ',  exception);
+            console.log('ERROR saving block information in DB: ',  exception);
             return false;
         }
     }

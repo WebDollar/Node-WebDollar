@@ -155,6 +155,8 @@ class PoolDataBlockInformation {
 
             } catch (exception){
                 Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block !== null ? this.block.toJSON() : '');
+                console.log(exception);
+
             }
 
         }
