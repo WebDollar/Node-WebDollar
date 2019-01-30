@@ -321,7 +321,7 @@ class MinerProtocol extends PoolProtocolList{
 
             let answer = poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
-            }, "answer", null);
+            }, "answer", undefined);
 
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") + " id: " + miningAnswer.id, Log.LOG_TYPE.POOLS);
             if (miningAnswer.pos)
@@ -341,7 +341,7 @@ class MinerProtocol extends PoolProtocolList{
 
             answer = await answer;
 
-            if (!answer ) throw {message: "WorkDone: Answer is null"};
+            if ( !answer ) throw {message: "WorkDone: Answer is null"};
             if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);

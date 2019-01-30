@@ -291,7 +291,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         }
 
-        this._checkForWorkInterval = setTimeout( this._checkForWorkIntervalCallback.bind(this), 10000);
+        this._checkForWorkInterval = setTimeout( this._checkForWorkIntervalCallback.bind(this), 5000 );
 
     }
 
