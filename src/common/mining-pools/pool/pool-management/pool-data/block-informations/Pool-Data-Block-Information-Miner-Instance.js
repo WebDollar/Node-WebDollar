@@ -73,6 +73,22 @@ class PoolDataBlockInformationMinerInstance {
         //POS difficulty
         if (BlockchainGenesis.isPoSActivated(prevBlock.height)){
 
+            //check if I already paid this address
+            let found = true;
+
+            this.blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
+                if (this.address.equals( blockInformationMinersInstance.address ) )
+                    if (blockInformationMinersInstance === this)
+                        found = true;
+                    else
+                        found = false;
+            });
+
+
+            //it is already another instance
+            if (!found)
+                workDone = 0;
+
             workDone = workDone.toString();
 
             return new BigNumber( workDone );
@@ -308,7 +324,7 @@ class PoolDataBlockInformationMinerInstance {
 
         this._workHash = newValue;
 
-        if (this.blockInformation.bestHash === undefined || newValue.compare(this.blockInformation.bestHash) <= 0)
+        if ( !this.blockInformation.bestHash || newValue.compare(this.blockInformation.bestHash) <= 0)
             this.blockInformation.bestHash = newValue;
 
     }
