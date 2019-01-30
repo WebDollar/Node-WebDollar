@@ -273,7 +273,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         try {
 
-            if ( this._miningWork.poolSocket && this._hashesPerSecond === 0 && !BlockchainGenesis.isPoSActivated(this._miningWork.height) )
+            if ( this._miningWork.poolSocket && this._hashesPerSecond === 0 )
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
             if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 180000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
