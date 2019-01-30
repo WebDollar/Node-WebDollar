@@ -1,5 +1,6 @@
 import Log from 'common/utils/logging/Log';
 const PROCESS_COUNT = 30;
+import consts from 'consts/const_global';
 
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
