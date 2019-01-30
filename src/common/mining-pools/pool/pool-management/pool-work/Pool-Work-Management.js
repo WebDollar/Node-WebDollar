@@ -38,10 +38,10 @@ class PoolWorkManagement{
 
     async getWork(minerInstance,  blockInformationMinerInstance){
 
-        if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
+        if ( !minerInstance ) throw {message: "minerInstance is undefined"};
 
         let hashes = minerInstance.hashesPerSecond;
-        if (hashes === undefined ) hashes = 500;
+        if ( !hashes ) hashes = 500;
 
         if ( !blockInformationMinerInstance )
             blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
@@ -112,8 +112,8 @@ class PoolWorkManagement{
 
         try{
 
-            if (minerInstance === undefined) throw {message: "minerInstance is undefined"};
-            if (work === null || typeof work !== "object") throw {message: "work is undefined"};
+            if ( !minerInstance ) throw {message: "minerInstance is undefined"};
+            if ( !work || typeof work !== "object") throw {message: "work is undefined"};
 
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
             if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
@@ -174,22 +174,22 @@ class PoolWorkManagement{
                     if ( isPos&& this.blockchain.blocks.length-3 > prevBlock.height )
                         throw {message: "pool: block is already too old"};
 
+                    prevBlock.hash = work.hash;
+                    prevBlock.nonce = work.nonce;
+
+                    if (isPos) {
+                        prevBlock.nonce = 0;
+                        prevBlock.posSignature = work.pos.posSignature;
+                        prevBlock.posMinerAddress = work.pos.posMinerAddress;
+                        prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
+                        prevBlock.timeStamp = work.pos.timestamp;
+                    }
+
                     let revertActions = new RevertActions(this.blockchain);
 
                     let block;
 
                     try {
-
-                        prevBlock.hash = work.hash;
-                        prevBlock.nonce = work.nonce;
-
-                        if (isPos) {
-                            prevBlock.nonce = 0;
-                            prevBlock.posSignature = work.pos.posSignature;
-                            prevBlock.posMinerAddress = work.pos.posMinerAddress;
-                            prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
-                            prevBlock.timeStamp = work.pos.timestamp;
-                        }
 
                         let serialization = prevBlock.serializeBlock();
                         block = this.blockchain.blockCreator.createEmptyBlock(prevBlock.height, undefined );
@@ -234,6 +234,12 @@ class PoolWorkManagement{
 
                         if (block)
                             block.destroyBlock();
+
+                        //it is an invalid block, let's generate a new one
+                        if (this.blockchain.blocks.length-1 === prevBlock.height)
+                            await this.poolWork.getNextBlockForWork();
+
+
 
                     }
 

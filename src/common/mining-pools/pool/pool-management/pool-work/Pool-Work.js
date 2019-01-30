@@ -36,7 +36,7 @@ class PoolWork {
     findBlockById(blockId, blockHeight){
 
         for (let i=0; i<this._blocksList.length; i++)
-            if ( (blockId !== undefined && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
+            if ( (blockId && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
                 return this._blocksList[i].block;
             }
 
