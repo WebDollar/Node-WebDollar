@@ -283,7 +283,7 @@ class PoolWorkManagement{
 
             if (exception.message === "block was incorrectly mined" && Math.random() < 0.3 )
                 console.error("Pool Work Management raised an error", exception);
-            else if (consts.DEBUG)
+            else if (Math.random() < 0.05 )
                 console.error("error pool mining", exception)
 
         }
