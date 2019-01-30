@@ -113,19 +113,21 @@ class PoolDataBlockInformationMinerInstance {
             }
 
             //it is already another instance
-            if (!found)
-                difficulty = BigNumber(0);
+            if (!found){
 
-            let prevDifficulty = this._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
+                let prevDifficulty = this._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
 
-            if ( prevDifficulty.isLessThan( difficulty ) ){
+                if ( prevDifficulty.isLessThan( difficulty ) ){
 
-                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
+                    this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
 
-                this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
-                this._minerInstanceTotalDifficultiesPOS[height] = difficulty;
+                    this.minerInstanceTotalDifficultyPOS = this.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
+                    this._minerInstanceTotalDifficultiesPOS[height] = difficulty;
+
+                }
 
             }
+
 
         } else { //POW difficulty
 
@@ -133,7 +135,7 @@ class PoolDataBlockInformationMinerInstance {
 
             if ( prevDifficulty.isLessThan(difficulty)) {
 
-                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height );
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
 
                 this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
                 this._minerInstanceTotalDifficultiesPOW[height] = difficulty;
@@ -157,13 +159,13 @@ class PoolDataBlockInformationMinerInstance {
     cancelDifficulties(){
 
         for (let height in this._minerInstanceTotalDifficultiesPOW)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height );
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height, false );
         this._minerInstanceTotalDifficultiesPOW = {};
         this.minerInstanceTotalDifficultyPOW = BigNumber(0);
 
 
         for (let height in this._minerInstanceTotalDifficultiesPOS)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOS[height], height );
+            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOS[height], height , false);
         this._minerInstanceTotalDifficultiesPOS = {};
         this.minerInstanceTotalDifficultyPOS = BigNumber(0);
 
@@ -222,7 +224,7 @@ class PoolDataBlockInformationMinerInstance {
         this.minerInstance.miner.rewardTotal -= this.reward;
         this.reward = 0;
 
-        if ( this.miner.referrals.referralLinkMiner !== undefined && this.poolManagement.poolSettings.poolReferralFee > 0)
+        if ( this.miner.referrals.referralLinkMiner && this.poolManagement.poolSettings.poolReferralFee > 0)
             this.miner.referrals.referralLinkMiner.rewardReferralTotal -= this._prevRewardInitial * ( this.poolManagement.poolSettings.poolReferralFee) ;
 
         this._prevRewardInitial = 0;

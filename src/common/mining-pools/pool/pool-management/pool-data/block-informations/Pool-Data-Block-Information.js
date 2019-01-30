@@ -11,14 +11,11 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
 class PoolDataBlockInformation {
 
-    constructor(poolManagement, index, totalDifficultyPOW, totalDifficultyPOS, block, height){
+    constructor(poolManagement, index, totalDifficultyPOW =  new BigNumber(0), totalDifficultyPOS =  new BigNumber(0), block, height){
 
         this.poolManagement = poolManagement;
 
         this.index = index;
-
-        if ( !totalDifficultyPOW ) totalDifficultyPOW = new BigNumber(0);
-        if ( !totalDifficultyPOS) totalDifficultyPOS = new BigNumber(0);
 
         this.totalDifficultyPOW = totalDifficultyPOW;
         this.totalDifficultyPOS = totalDifficultyPOS;
@@ -65,33 +62,50 @@ class PoolDataBlockInformation {
 
     }
 
-    adjustBlockInformationDifficultyBestTarget (difficulty, prevDifficulty, height){
+    adjustBlockInformationDifficultyBestTarget (difficulty, prevDifficulty, height, add ){
 
         if (typeof height === "string") height = Number.parseInt(height);
 
         let pos = BlockchainGenesis.isPoSActivated(height);
 
-        if (!this.miningHeights[height]) {
-
-            this.miningHeights[height] = true;
-            this.miningHeights.length++;
-
-            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
-            else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
-        }
-
-        this._totalDifficultyMinus( prevDifficulty, false, pos );
-        this._totalDifficultyPlus( difficulty, true, pos);
+        let difference = difficulty.minus(prevDifficulty);
 
         let totalDifficulty = this.totalDifficultyPOW;
         if (pos) totalDifficulty = this.totalDifficultyPOS;
 
-        if (totalDifficulty.isLessThanOrEqualTo(0)){
+        totalDifficulty.plus(difference);
 
-            this.miningHeights[height] = undefined;
+        this._calculateTimeRemaining();
 
-            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
-            else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
+
+        let miningHeightDifficulty = this.miningHeights[height] || BigNumber(0);
+
+        if (add && miningHeightDifficulty.plus(difference).isGreaterThan(0 ) ){
+
+            if (!this.miningHeights[height]) { //didn't exist
+                this.miningHeights.length++;
+                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
+                else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
+            }
+
+            this.miningHeights[height] = miningHeightDifficulty.plus(difference);
+
+        }
+
+        if (!add && miningHeightDifficulty.minus(difference).isLessThanOrEqualTo(0) ){
+
+            this.miningHeights[height] = miningHeightDifficulty.minus( difference );
+
+            if (this.miningHeights[height].isEqualTo(0)){
+
+                delete this.miningHeights[height];
+                this.miningHeights.length--;
+
+                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
+                else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
+
+            }
+
 
         }
 
@@ -318,23 +332,6 @@ class PoolDataBlockInformation {
 
     }
 
-    _totalDifficultyPlus(value, calculateRemaining = true, pos){
-
-        if (pos) this.totalDifficultyPOS = this.totalDifficultyPOS.plus(value);
-        else this.totalDifficultyPOW = this.totalDifficultyPOW.plus(value);
-
-        if (calculateRemaining)
-            this._calculateTimeRemaining();
-    }
-
-    _totalDifficultyMinus(value, calculateRemaining = true, pos){
-
-        if (pos) this.totalDifficultyPOS = this.totalDifficultyPOS.minus(value);
-        else this.totalDifficultyPOW = this.totalDifficultyPOW.minus(value);
-
-        if (calculateRemaining)
-            this._calculateTimeRemaining();
-    }
 
     set timeRemaining(newValue){
 
