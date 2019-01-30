@@ -78,7 +78,7 @@ class SocketProtocol {
 
             this.once(requestAnswer, requestFunction );
 
-            if (timeOutInterval !== undefined)
+            if ( timeOutInterval )
                 timeoutId = setTimeout( clearReturnFunction, timeOutInterval);
 
             let answer = this.node.sendRequest(request, requestData);
