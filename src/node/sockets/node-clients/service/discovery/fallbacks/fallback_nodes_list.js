@@ -48,8 +48,8 @@ export default {
         {"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd
         
-        {"addr": ["https://cryptocoingb.ddns.net:80"]}, // Thanks to CryptoCoinGB
         {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
+        {"addr": ["https://cryptocoingb.ddns.net:8081"]}, // Thanks to CryptoCoinGB
 
         {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
