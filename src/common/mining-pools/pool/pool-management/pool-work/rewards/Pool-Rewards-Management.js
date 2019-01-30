@@ -66,51 +66,60 @@ class PoolRewardsManagement{
             length: 0,
         };
 
-        this.poolData.blocksInfo.forEach( (blockInfo)=>{
+        try{
 
-            let block = this.blockchain.blocks[blockInfo.height];
-            if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 10 )
-                if (BlockchainGenesis.isPoSActivated(blockInfo.height))
+            this.poolData.blocksInfo.forEach( (blockInfo)=>{
 
-                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
+                let block = this.blockchain.blocks[blockInfo.height];
+                if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 10 )
+                    if (BlockchainGenesis.isPoSActivated(blockInfo.height))
 
-                        let penalty;
-                        if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
-                            penalty = true;
+                        blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
 
-                        if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
-                            penalty = true;
+                            let penalty;
+                            if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
+                                penalty = true;
 
-                        if (penalty) {
-                            penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
-                            penaltiesMinerInstances.length++;
-                        }
+                            if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
+                                penalty = true;
+
+                            if (penalty) {
+                                penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
+                                penaltiesMinerInstances.length++;
+                            }
+
+                        });
+
+            });
+
+            //redistribute all pool POS
+            if (penaltiesMinerInstances.length > 0)
+                for (let minerAddress in penaltiesMinerInstances) {
+
+                    this.poolData.blocksInfo.forEach( (blockInfo)=> {
+
+                        blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
+
+                            if (blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
+
+                                //redistribute all pool POS
+                                blockInformationMinerInstance.cancelDifficulties();
+                                blockInformationMinerInstance.cancelReward();
+
+                            }
+
+                        });
 
                     });
 
-        });
+                }
 
-        //redistribute all pool POS
-        if (penaltiesMinerInstances.length > 0)
-            for (let minerAddress in penaltiesMinerInstances) {
 
-                this.poolData.blocksInfo.forEach( (blockInfo)=> {
+        } catch (exception){
 
-                    blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
+            console.error("Pool Rewards Redistribution error")
 
-                        if (blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
-
-                            //redistribute all pool POS
-                            blockInformationMinerInstance.cancelDifficulties();
-                            blockInformationMinerInstance.cancelReward();
-
-                        }
-
-                    });
-
-                });
-
-            }
+        }
 
 
         let confirmationsPool = 0;
