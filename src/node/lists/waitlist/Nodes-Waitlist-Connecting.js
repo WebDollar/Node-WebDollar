@@ -189,6 +189,9 @@ class NodesWaitlistConnecting {
 
     _calculateNumberOfConnections() {
 
+        this.connectingMaximum.maximum_fallbacks = 10;
+        this.connectingMaximum.maximum_waitlist = 10;
+
         this.connectingMaximum.minimum_fallbacks = 1;
         this.connectingMaximum.minimum_waitlist = 0;
 
