@@ -214,7 +214,7 @@ class PoolWorkManagement{
 
 
                         try {
-                            blockInformation.block = prevBlock;
+                            blockInformation.block = block;
                         } catch (exception){
                             console.error("blockInformation block", exception);
                         }
