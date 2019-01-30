@@ -183,6 +183,9 @@ class PoolWorkManagement{
                         prevBlock.posMinerAddress = work.pos.posMinerAddress;
                         prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
                         prevBlock.timeStamp = work.pos.timestamp;
+
+                        prevBlock._validateBlockTimeStamp();
+
                     }
 
                     let revertActions = new RevertActions(this.blockchain);
