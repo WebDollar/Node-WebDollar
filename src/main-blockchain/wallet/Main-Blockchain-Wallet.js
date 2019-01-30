@@ -238,7 +238,7 @@ class MainBlockchainWallet {
         if (address === null)
             throw {message: "address not found", address:address};
 
-        return (await address.isPrivateKeyEncrypted());
+        return address.isPrivateKeyEncrypted();
     }
 
     /**
