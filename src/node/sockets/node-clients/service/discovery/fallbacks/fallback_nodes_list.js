@@ -32,8 +32,8 @@ export default {
         {"addr": ["https://losangeles.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         {"addr": ["https://singapore.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
-        {"addr": ["https://romeonet.ddns.net:65101/"]}, // Thanks to @romeonet
-        {"addr": ["https://romeonet.ddns.net:65001/"]}, // Thanks to @romeonet        
+        {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
+        {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
 
         {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000        
 
