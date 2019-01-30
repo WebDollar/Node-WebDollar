@@ -246,14 +246,15 @@ class PoolDataBlockInformationMinerInstance {
         }
 
         let miner = this.poolManagement.poolData.findMiner( address );
-        if ( !miner) {
+        if ( miner)
             this.minerInstance = miner.addInstance({
                 _diff: Math.random(),
                 node: {
-                    protocol: {}
+                    protocol: {
+
+                    }
                 }
             });
-        }
 
         if (version === 0x02){
 
