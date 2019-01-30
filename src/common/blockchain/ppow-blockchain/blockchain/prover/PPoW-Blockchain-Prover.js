@@ -161,10 +161,12 @@ class PPoWBlockchainProver{
 
     async createProofs() {
 
+        return;
+
         if ( !this.proofActivated )
             return false;
 
-        if (this.proofPi !== undefined)
+        if ( this.proofPi )
             this.proofPi.destroyProof();
 
         this.proofPi = await this._createProofPi(this.blockchain);

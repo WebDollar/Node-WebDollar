@@ -174,7 +174,7 @@ class MinerProtocol {
 
                     NodeDiscoveryService.startDiscovery();
 
-                    if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
+                    if (this.blockchain && this.blockchain.prover )
                         this.blockchain.prover.proofActivated = true;
 
                     consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;

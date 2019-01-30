@@ -143,7 +143,7 @@ class PoolManagement{
                 this.poolStatistics.startInterval();
                 await this.poolProtocol._startPoolProtocol();
 
-                if (this.blockchain!== undefined && this.blockchain.prover !== undefined)
+                if (this.blockchain && this.blockchain.prover )
                     this.blockchain.prover.proofActivated = false;
 
                 await this.poolProtocol.poolConnectedServersProtocol.insertServersListWaitlist( this.poolSettings._poolServers );
@@ -160,7 +160,7 @@ class PoolManagement{
                 await this.poolProtocol._stopPoolProtocol();
                 this.poolStatistics.clearInterval();
 
-                if (this.blockchain !== undefined && this.blockchain.prover !== undefined)
+                if (this.blockchain && this.blockchain.prover )
                     this.blockchain.prover.proofActivated = true;
 
                 consts.MINING_POOL.MINING_POOL_STATUS = consts.MINING_POOL_TYPE.MINING_POOL_DISABLED;
