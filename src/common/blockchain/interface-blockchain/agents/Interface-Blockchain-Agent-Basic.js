@@ -84,22 +84,22 @@ class InterfaceBlockchainAgentBasic {
 
                 this._prevBlocks = 0;
                 this._prevDate = 0;
-                //
-                // this._intervalVerifyConsensus = setInterval( () => {
-                //
-                //     if (this._prevDate !== undefined && this._prevBlocks === this.blockchain.blocks.length ) {
-                //
-                //         if (this.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) {
-                //             console.warn("agent basic synchronization");
-                //             Blockchain.synchronizeBlockchain(); //let's synchronize again
-                //         }
-                //
-                //     }
-                //
-                //     this._prevDate = new Date();
-                //     this._prevBlocks = this.blockchain.blocks.length;
-                //
-                // }, process.env.BROWSER ? TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_BROWSER : TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_TERMINAL );
+
+                this._intervalVerifyConsensus = setInterval( () => {
+
+                    if (this._prevDate !== undefined && this._prevBlocks === this.blockchain.blocks.length ) {
+
+                        if (this.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) {
+                            console.warn("agent basic synchronization");
+                            Blockchain.synchronizeBlockchain(); //let's synchronize again
+                        }
+
+                    }
+
+                    this._prevDate = new Date();
+                    this._prevBlocks = this.blockchain.blocks.length;
+
+                }, process.env.BROWSER ? TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_BROWSER : TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_TERMINAL );
 
             }
 
