@@ -51,11 +51,8 @@ export default {
         {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
         {"addr": ["https://cryptocoingb.ddns.net:8081"]}, // Thanks to CryptoCoinGB
 
-        {"addr": ["https://bacm.ro:80"]}, //Thanks to @jigodia
         {"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8080"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8081"]}, //Thanks to @jigodia
-        {"addr": ["https://bacm.ro:8082"]}, //Thanks to @jigodia
+
 
         //---------------------------------------------------------
         //--------------WebDollar FallBack Nodes-------------------
