@@ -148,14 +148,8 @@ class PoolDataBlockInformation {
 
             try {
 
-                array.push(Serialization.serializeNumber4Bytes(this.block.height));
-                array.push(this.block.difficultyTargetPrev);
-
-                if (BlockchainGenesis.isPoSActivated(this.block.height)) {
-                    this.block.posMinerAddress = undefined;
-                    this.block.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
-                    this.block.posMinerPublicKey = new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH);
-                }
+                array.push(Serialization.serializeNumber4Bytes( this.block.height ));
+                array.push( this.block.difficultyTargetPrev );
 
                 array.push(this.block.serializeBlock());
 
@@ -228,7 +222,7 @@ class PoolDataBlockInformation {
 
             try {
 
-                offset = this.block.deserializeBlock( buffer, height, undefined, undefined, offset, false, false);
+                offset = this.block.deserializeBlock( buffer, height, undefined, difficultyTargetPrev, offset, false, false);
                 this.block._difficultyTargetPrev = difficultyTargetPrev;
 
             } catch (exception){
