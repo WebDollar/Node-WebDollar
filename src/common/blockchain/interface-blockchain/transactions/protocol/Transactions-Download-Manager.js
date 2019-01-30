@@ -203,11 +203,9 @@ class TransactionsDownloadManager{
         return false;
     }
 
-    async _processSocket(socketID=undefined){
+    async _processSocket(socketID){
 
         if( NodesList.isConsensus(this.blockchain.blocks.length) ){
-
-            console.warn("Process Socket");
 
             try{
 
