@@ -32,6 +32,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
         let blockBuffer;
 
         //serialize the block
+        if (Buffer.isBuffer( block ))
+            blockBuffer = block;
+        else
         if ( !Buffer.isBuffer( block ) && typeof block === 'object' ) {
             blockBuffer = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
