@@ -19,7 +19,7 @@
     "coverage": "npm run build_terminal  && istanbul cover _mocha dist/tests/main.test.js -x *.test.js && npm run show_coverage",
     "show_coverage": "node src/tests/browser/show-coverage.test.js",
     "build_terminal_worker": "webpack --config build_webpack/webpack.terminal-worker.config.js",
-    "commands": "npm run build_terminal_menu && npm run build_terminal_worker && node --max_old_space_size=6144 dist_bundle/terminal-menu-bundle.js",
+    "commands": "npm run build_terminal_menu && npm run build_terminal_worker && node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js",
     "test": "mocha-webpack"
   },
   "repository": {
