@@ -177,6 +177,8 @@ class PoolDataBlockInformation {
         let version = Serialization.deserializeNumber1Bytes( buffer, offset, );
         offset += 1;
 
+        if (version === 0x00) return buffer.length;
+
         if (version >= 0x01){
 
             let height = Serialization.deserializeNumber4Bytes( buffer, offset, );

@@ -247,7 +247,7 @@ class PoolDataBlockInformationMinerInstance {
 
         }
 
-        console.log( "version", address );
+        console.log( "address", address );
 
         let miner = this.poolManagement.poolData.findMiner( address );
         if ( miner)
