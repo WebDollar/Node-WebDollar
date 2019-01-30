@@ -15,7 +15,7 @@ import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper"
 
 import AGENT_STATUS from "common/blockchain/interface-blockchain/agents/Agent-Status";
 
-class MinerProtocol {
+class MinerPoolManagement {
 
     constructor (blockchain){
 
@@ -212,7 +212,7 @@ class MinerProtocol {
             // if (!VersionCheckerHelper.detectMobile())
             //     throw "no mobile";
 
-            if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED)
+            if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && this.minerPoolStarted)
                 throw "it is sync";
 
             let pools = 0;
@@ -242,4 +242,4 @@ class MinerProtocol {
 
 }
 
-export default MinerProtocol;
+export default MinerPoolManagement;

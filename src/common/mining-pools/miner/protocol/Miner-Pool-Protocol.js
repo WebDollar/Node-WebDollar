@@ -16,7 +16,7 @@ import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-
 import WebDollarCoins from "../../../utils/coins/WebDollar-Coins";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
-class MinerProtocol extends PoolProtocolList{
+class MinerPoolProtocol extends PoolProtocolList{
 
     /**
      *
@@ -491,4 +491,4 @@ class MinerProtocol extends PoolProtocolList{
 
 }
 
-export default MinerProtocol;
+export default MinerPoolProtocol;
