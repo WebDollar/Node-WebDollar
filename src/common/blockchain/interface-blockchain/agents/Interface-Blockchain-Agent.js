@@ -122,44 +122,44 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
 
             //let's check if we downloaded blocks in the last 2 minutes
 
-            // let set = true;
-            //
-            // if (this.lastTimeChecked !== undefined ){
-            //
-            //     let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
-            //     let shouldItStart = false;
-            //     if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
-            //         NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
-            //         shouldItStart = true;
-            //     }
-            //
-            //     let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
-            //
-            //     if (Math.random() < 0.1){
-            //
-            //         Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
-            //         Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
-            //         Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
-            //
-            //     }
-            //
-            //     if ( difference <= 0) {
-            //
-            //         if (shouldItStart)
-            //             this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
-            //
-            //     } else set = false;
-            //
-            // }
-            //
-            //
-            // if (set)
-            //     this.lastTimeChecked = {
-            //
-            //         date: new Date().getTime(),
-            //         blocks: this.blockchain.blocks.length,
-            //
-            //     }
+            let set = true;
+
+            if (this.lastTimeChecked !== undefined ){
+
+                let diffBlocks = this.blockchain.blocks.length - this.lastTimeChecked.blocks;
+                let shouldItStart = false;
+                if (  NodesList.nodes.length > 0 && diffBlocks >= 0 && diffBlocks < consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD &&
+                    NodesList.nodes.length >= NodesWaitlistConnecting.connectingMaximum.minimum_fallbacks + NodesWaitlistConnecting.connectingMaximum.minimum_waitlist) {
+                    shouldItStart = true;
+                }
+
+                let difference = Math.max(0, Math.floor( ( 1*60*1000 - (new Date().getTime() -  this.lastTimeChecked.date ))/1000 ));
+
+                if (Math.random() < 0.1){
+
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn(shouldItStart ? ("Synchronization probably starts in: " + difference + ' seconds ') : 'Synchronizing', Log.LOG_TYPE.BLOCKCHAIN);
+                    Log.warn("", Log.LOG_TYPE.BLOCKCHAIN);
+
+                }
+
+                if ( difference <= 0) {
+
+                    if (shouldItStart)
+                        this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+
+                } else set = false;
+
+            }
+
+
+            if (set)
+                this.lastTimeChecked = {
+
+                    date: new Date().getTime(),
+                    blocks: this.blockchain.blocks.length,
+
+                };
 
             if (NodesList.nodes.length > 0)
                 this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
