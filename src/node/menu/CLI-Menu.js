@@ -671,7 +671,7 @@ class CLI {
 
     disconnectFromAllConnectedNodes(){
 
-        let NodesList = require('node/lists/Nodes-List');
+        let NodesList = require('node/lists/Nodes-List').default;
         NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
 
     }
