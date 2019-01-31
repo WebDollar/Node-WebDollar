@@ -202,7 +202,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "forkChainStartingPoint", forkChainStartingPoint, "forkChainLength", forkChainLength);
 
-            if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header !== undefined && binarySearchResult.header !== null) ){
+            if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header  )) {
 
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
@@ -332,14 +332,18 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     this.curentIterationsDownloaded++;
 
-                    if ( (trialsList[index] > 5 || global.TERMINATED) && !resolved ) {
-                        resolved = true;
-                        resolve(false);
+                    if ( trialsList[index] > 5 || global.TERMINATED) {
+
+                        if (!resolved) {
+                            resolved = true;
+                            resolve(false);
+                        }
+
                         return;
                     }
 
                     socketIndex++;
-                    if (! trialsList[index] ) trialsList[index] = 0
+                    if ( trialsList[index] === undefined ) trialsList[index] = 0;
                     trialsList[index] ++ ;
 
                     let socket = fork.getForkSocket(socketIndex);
@@ -361,7 +365,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     answer.then( (result)=>{
 
-                        if (result === undefined || result === null) {
+                        if ( !result ) {
 
                             downloadingList[index] = undefined;
                             socket.latency += Math.random()*1500;
@@ -424,10 +428,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
             for(let i=0; i<downloadingList.length; i++){
 
-                if (downloadingList[i] === null || downloadingList[i] === undefined)
+                if ( !downloadingList[i])
                     throw {message: "block never received "+ nextBlockHeight};
 
-                if ( !downloadingList[i].result || downloadingList[i].block === undefined  || !Buffer.isBuffer(downloadingList[i].block) ) {
+                if ( !downloadingList[i].result || !downloadingList[i].block || !Buffer.isBuffer(downloadingList[i].block) ) {
                     console.error("Fork Answer received ", downloadingList[i]);
                     throw {message: "Fork Answer is not Buffer"};
                 }
