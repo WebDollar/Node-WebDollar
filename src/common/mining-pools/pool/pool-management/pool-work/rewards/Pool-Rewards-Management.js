@@ -440,7 +440,8 @@ class PoolRewardsManagement{
 
     redistributePoolDataBlockInformation(blockInformation, index, workType){
 
-        blockInformation.block = undefined; //cancel the block
+        if (!workType)
+            blockInformation.block = undefined; //cancel the block
 
         //move the blockInformationMinerInstances to the latest non solved blockInformation
         let newBlockInformation = this.poolData.lastBlockInformation;
