@@ -88,7 +88,7 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    adjustDifficulty(prevBlock, difficulty, useDeltaTime = false, calculateReward = true ){
+    adjustDifficulty( prevBlock, difficulty, useDeltaTime = false, calculateReward = true ){
 
         let height = prevBlock.height;
 
@@ -143,9 +143,10 @@ class PoolDataBlockInformationMinerInstance {
                 for (let i=0; i < this.blockInformation.blockInformationMinersInstances.length; i++){
 
                     let blockInformationMinersInstance = this.blockInformation.blockInformationMinersInstances[i];
-                    for (let height in blockInformationMinersInstance.minerInstanceTotalDifficultyPOW ){
-                        blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW );
-                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] );
+
+                    blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW  || BigNumber(0) );
+                    for (let height in this.minerInstanceTotalDifficultyPOW){
+                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || BigNumber(0) );
                     }
 
                 }
