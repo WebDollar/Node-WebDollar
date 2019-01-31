@@ -450,8 +450,12 @@ class PoolRewardsManagement{
 
         blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
 
-            if ( (!workType || workType === "pow") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.isLessThanOrEqualTo(0)  ) return;
-            if ( (!workType || workType === "pow") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.isLessThanOrEqualTo(0)  ) return;
+            let nothing = true;
+
+            if ( (!workType || workType === "pow") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.isGreaterThan(0)  ) nothing = false;
+            if ( (!workType || workType === "pos") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.isGreaterThan(0)  ) nothing = false;
+
+            if (nothing) return;
 
             let newBlockInformationMinerInstance = newBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 

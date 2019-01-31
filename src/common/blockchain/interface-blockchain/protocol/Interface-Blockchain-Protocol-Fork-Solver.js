@@ -123,7 +123,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
-                    if (i === forkChainLength-1 && forkLastChainHash !== undefined && forkLastChainHash !== undefined) {
+                    if (i === forkChainLength-1 && forkLastChainHash && forkLastChainHash ) {
                         answer = { hash: forkLastChainHash };
                     } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
@@ -287,7 +287,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         StatusEvents.emit( "agent/status", {message: "Collecting Blockchain", blockHeight: fork.forkStartingHeight } );
 
-        if (fork === null || fork === undefined || typeof fork !== "object" )
+        if ( !fork || typeof fork !== "object" )
             throw {message: 'fork is null'};
 
         let nextBlockHeight = fork.forkStartingHeightDownloading;
