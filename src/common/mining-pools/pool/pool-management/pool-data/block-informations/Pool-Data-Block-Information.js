@@ -70,13 +70,10 @@ class PoolDataBlockInformation {
 
         let difference = difficulty.minus(prevDifficulty);
 
-        let totalDifficulty = this.totalDifficultyPOW;
-        if (pos) totalDifficulty = this.totalDifficultyPOS;
-
-        totalDifficulty.plus(difference);
+        if (!pos) this.totalDifficultyPOW = this.totalDifficultyPOW.plus(difference);
+        else if (pos) this.totalDifficultyPOS = this.totalDifficultyPOS.plus(difference);
 
         this._calculateTimeRemaining();
-
 
         let miningHeightDifficulty = this.miningHeights[height] || BigNumber(0);
 
@@ -92,7 +89,7 @@ class PoolDataBlockInformation {
 
         }
 
-        if (!add && miningHeightDifficulty.minus(difference).isLessThanOrEqualTo(0) ){
+        if (!add && miningHeightDifficulty.minus(difference).isLessThanOrEqualTo(0)  && this.miningHeights[height] ){
 
             this.miningHeights[height] = miningHeightDifficulty.minus( difference );
 

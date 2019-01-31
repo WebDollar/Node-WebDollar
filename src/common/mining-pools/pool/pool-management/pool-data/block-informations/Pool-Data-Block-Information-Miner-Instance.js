@@ -96,7 +96,7 @@ class PoolDataBlockInformationMinerInstance {
         if (BlockchainGenesis.isPoSActivated( height )){
 
             //check if I already paid this address
-            let found = true;
+            let found = undefined;
 
             for (let i=0; i < this.blockInformation.blockInformationMinersInstances.length; i++){
 
@@ -113,7 +113,7 @@ class PoolDataBlockInformationMinerInstance {
             }
 
             //it is already another instance
-            if (!found){
+            if (found){
 
                 let prevDifficulty = this._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
 
