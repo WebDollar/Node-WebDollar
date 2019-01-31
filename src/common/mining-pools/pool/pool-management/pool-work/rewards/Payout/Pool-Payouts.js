@@ -143,7 +143,12 @@ class PoolPayouts{
                     if ( consts.MINING_POOL.SKIP_POS_REWARDS || consts.MINING_POOL.SKIP_POW_REWARDS)
                         return;
 
-                    throw { message: "Total PS and POW are both zero", totalDifficultyPOS: totalDifficultyPOS,  totalDifficultyPOW: totalDifficultyPOW };
+                    console.info("--------------------------");
+                    console.info("TOTAL POS AND POW ARE BOTH ZERO", {totalDifficultyPOS: totalDifficultyPOS,  totalDifficultyPOW: totalDifficultyPOW});
+                    console.info("--------------------------");
+
+                    blockConfirmed.payout = true;
+                    return;
 
                 }
 
