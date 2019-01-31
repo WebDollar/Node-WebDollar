@@ -144,10 +144,10 @@ class PoolDataBlockInformationMinerInstance {
 
                     let blockInformationMinersInstance = this.blockInformation.blockInformationMinersInstances[i];
 
-                    blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW  || BigNumber(0) );
-                    for (let height in this.minerInstanceTotalDifficultyPOW){
-                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || BigNumber(0) );
-                    }
+                    blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW  || 0 );
+                    for (let height in this._minerInstanceTotalDifficultiesPOW)
+                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || 0 );
+
 
                 }
 
