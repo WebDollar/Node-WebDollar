@@ -55,7 +55,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevTimeStamp === null || this.forkPrevTimeStamp === undefined)
+            if ( !this.forkPrevTimeStamp )
                 throw {message: "forkPrevTimeStamp was not specified"};
             return this.forkPrevTimeStamp;
         }
