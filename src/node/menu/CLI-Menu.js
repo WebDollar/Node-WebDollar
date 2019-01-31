@@ -1,6 +1,5 @@
 /* eslint-disable */
 import CONNECTION_TYPE from "../lists/types/Connection-Type";
-import NodesList from 'node/lists/Nodes-List'
 
 const FileSystem = require('fs');
 import {JsonRpcServer} from './../jsonRpc';
@@ -672,6 +671,7 @@ class CLI {
 
     disconnectFromAllConnectedNodes(){
 
+        let NodesList = require('node/lists/Nodes-List');
         NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
 
     }
