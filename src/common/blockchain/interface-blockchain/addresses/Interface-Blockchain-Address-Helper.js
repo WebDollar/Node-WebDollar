@@ -158,6 +158,9 @@ class InterfaceBlockchainAddressHelper{
         if (!Buffer.isBuffer(address) && typeof address === "string")
             address = BufferExtended.fromBase(address);
 
+        if ( !Buffer.isBuffer(address) )
+            throw {message: "invalid address"};
+
         let prefix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.PREFIX_BASE58);
         let suffix = ( consts.ADDRESSES.ADDRESS.USE_BASE64 ? consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE64 : consts.ADDRESSES.ADDRESS.WIF.SUFFIX_BASE58);
 
