@@ -88,7 +88,7 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    adjustDifficulty(prevBlock, difficulty, useDeltaTime = false, calculateReward = true ){
+    adjustDifficulty( prevBlock, difficulty, useDeltaTime = false, calculateReward = true ){
 
         let height = prevBlock.height;
 
@@ -136,10 +136,20 @@ class PoolDataBlockInformationMinerInstance {
             if ( prevDifficulty.isLessThan(difficulty)) {
 
                 this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
-
                 this.minerInstanceTotalDifficultyPOW = this.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
                 this._minerInstanceTotalDifficultiesPOW[height] = difficulty;
 
+                //the best pow is used on all machines
+                for (let i=0; i < this.blockInformation.blockInformationMinersInstances.length; i++){
+
+                    let blockInformationMinersInstance = this.blockInformation.blockInformationMinersInstances[i];
+
+                    blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW  || 0 );
+                    for (let height in this._minerInstanceTotalDifficultiesPOW)
+                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || 0 );
+
+
+                }
 
             }
 
@@ -152,22 +162,21 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    cancelDifficulty(){
+    cancelDifficulties( workType ){
 
-    }
+        if ( !workType || workType === "pow") {
+            for (let height in this._minerInstanceTotalDifficultiesPOW)
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget(BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height, false);
+            this._minerInstanceTotalDifficultiesPOW = {};
+            this.minerInstanceTotalDifficultyPOW = BigNumber(0);
+        }
 
-    cancelDifficulties(){
-
-        for (let height in this._minerInstanceTotalDifficultiesPOW)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height, false );
-        this._minerInstanceTotalDifficultiesPOW = {};
-        this.minerInstanceTotalDifficultyPOW = BigNumber(0);
-
-
-        for (let height in this._minerInstanceTotalDifficultiesPOS)
-            this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOS[height], height , false);
-        this._minerInstanceTotalDifficultiesPOS = {};
-        this.minerInstanceTotalDifficultyPOS = BigNumber(0);
+        if ( !workType || workType === "pos"){
+            for (let height in this._minerInstanceTotalDifficultiesPOS)
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOS[height], height , false);
+            this._minerInstanceTotalDifficultiesPOS = {};
+            this.minerInstanceTotalDifficultyPOS = BigNumber(0);
+        }
 
     }
 
@@ -259,8 +268,6 @@ class PoolDataBlockInformationMinerInstance {
 
     deserializeBlockInformationMinerInstance(buffer, offset=0, version){
 
-        console.log( "version", version );
-
         let address;
 
         if (version >= 0x02) {
@@ -269,8 +276,6 @@ class PoolDataBlockInformationMinerInstance {
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         }
-
-        console.log( "address", address );
 
         let miner = this.poolManagement.poolData.findMiner( address );
         if ( miner)

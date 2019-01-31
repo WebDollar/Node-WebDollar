@@ -11,7 +11,7 @@ import StatusEvents from "common/events/Status-Events";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist';
 import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
 import NODE_TYPE from "../node/lists/types/Node-Type";
-import BlockchainGenesis from "../common/blockchain/global/Blockchain-Genesis"
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 import PoolManagement from "common/mining-pools/pool/pool-management/Pool-Management"
 import MinerPoolManagement from "common/mining-pools/miner/Miner-Pool-Management"
