@@ -1,6 +1,9 @@
 /* eslint-disable */
+import CONNECTION_TYPE from "../lists/types/Connection-Type";
+
 const FileSystem = require('fs');
 import {JsonRpcServer} from './../jsonRpc';
+
 let NodeExpress, NodeServer;
 
 if (!process.env.BROWSER) {
@@ -89,11 +92,14 @@ class CLI {
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
                 NodeExpress.startExpress();
                 break;
-            case '30':  // Set Password
-                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
-                break;
             case '21': // Disable Forks Immutability
                 await this.disableForksImmutability();
+                break;
+            case '22': // Disable Forks Immutability
+                await this.disconnectFromAllConnectedNodes();
+                break;
+            case '30':  // Set Password
+                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -562,11 +568,11 @@ class CLI {
                     }
 
 
-                    if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
-                    if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
-                    if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
-                    if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
-                    if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
+                    if (poolFee ) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+                    if (poolName ) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+                    if (poolWebsite ) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+                    if (poolServers ) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                    if (poolReferralFee ) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
 
                 }
 
@@ -663,6 +669,13 @@ class CLI {
 
     }
 
+    disconnectFromAllConnectedNodes(){
+
+        let NodesList = require('node/lists/Nodes-List').default;
+        NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+
+    }
+
 }
 
 const commands = [
@@ -682,6 +695,7 @@ const commands = [
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
         '21. Disable Node Immutability',
+        '22. Disconnect from all nodes',
         '30. Set Password for Mining Address',
     ];
 
