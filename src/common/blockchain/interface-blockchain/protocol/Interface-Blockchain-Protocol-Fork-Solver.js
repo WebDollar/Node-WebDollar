@@ -202,7 +202,7 @@ class InterfaceBlockchainProtocolForkSolver{
             //its a fork... starting from position
             console.log("fork position", binarySearchResult.position, "forkChainStartingPoint", forkChainStartingPoint, "forkChainLength", forkChainLength);
 
-            if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header  ){
+            if (binarySearchResult.position === -1 || (binarySearchResult.position > 0 && binarySearchResult.header  )) {
 
                 if (binarySearchResult.position === -1)
                     binarySearchResult.position = 0;
