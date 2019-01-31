@@ -16,6 +16,8 @@ class InterfaceBlockchainProtocolForkSolver{
         this.blockchain = blockchain;
         this.protocol = protocol;
 
+        this.curentIterationsDownloaded = 0;
+
     }
 
     async _discoverForkBinarySearch(socket, initialLeft, left, right){
@@ -292,7 +294,16 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
+        let totalIterations = 0;
+
         while (( fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED  ) {
+
+            totalIterations++;
+
+            if(totalIterations >= 1000){
+                console.error("MAX iterations on downloading block")
+                break;
+            }
 
             //let socketListOptimized = fork.sockets.sort((a,b) => {return (a.latency > b.latency) ? 1 : ((b.latency > a.latency ) ? -1 : 0);} );
 
@@ -318,6 +329,8 @@ class InterfaceBlockchainProtocolForkSolver{
             let finished = new Promise((resolve)=>{
 
                 let downloadingBlock = async (index)=>{
+
+                    this.curentIterationsDownloaded++;
 
                     if ( (trialsList[index] > 5 || global.TERMINATED) && !resolved ) {
                         resolved = true;
@@ -388,6 +401,13 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
             });
+
+            if(this.curentIterationsDownloaded >= 1000){
+
+                console.error("MAX iterations on downloading block")
+                this.curentIterationsDownloaded = 0;
+
+            }
 
             try {
                 await finished;
