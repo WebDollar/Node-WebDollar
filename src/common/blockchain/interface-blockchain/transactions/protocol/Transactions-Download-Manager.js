@@ -292,7 +292,7 @@ class TransactionsDownloadManager{
                                     //If tx was not added into pending queue increase socket invalidTransactions
                                     if (!wasAdded) {
 
-                                        console.info("Not Added", this._transactionsQueue[txId].buffer.toString('hex'));
+                                        console.info("Not Added", txId.toString('hex'));
                                         this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions++;
 
                                         //TODO Change limits after multithread
