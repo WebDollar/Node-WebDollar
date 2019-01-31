@@ -32,7 +32,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
 
-            if (left < 0 || answer === null  || !Buffer.isBuffer(answer.hash) ) // timeout
+            if (left < 0 || !answer || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
 
             //i have finished the binary search
@@ -226,8 +226,10 @@ class InterfaceBlockchainProtocolForkSolver{
                 if ( fork.forkStartingHeight > fork.forkChainLength-1 )
                     throw {message: "FORK is empty"};
 
+                console.info("immutability ");
                 fork.validateForkImmutability();
 
+                console.info("initialize fork");
                 await fork.initializeFork(); //download the requirements and make it ready
 
                 if (!fork.forkReady)
