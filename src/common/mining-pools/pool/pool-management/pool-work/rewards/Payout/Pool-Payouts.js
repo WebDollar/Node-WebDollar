@@ -8,6 +8,7 @@ import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-R
 
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
+import Blockchain from "main-blockchain/Blockchain";
 
 const PAYOUT_INTERVAL = consts.DEBUG ? 6 : 30; //in blocks;
 const PAYOUT_FEE = WebDollarCoins.WEBD * 0;
