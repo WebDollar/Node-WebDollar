@@ -30,13 +30,15 @@ class InterfaceBlockchainProtocolForkSolver{
 
             answer = await socket.node.sendRequestWaitOnce("head/chainHash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right);
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer && answer.hash) ? answer.hash.toString("hex") : 'no hash' );
 
             if (left < 0 || !answer || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
 
             //i have finished the binary search
             if (left >= right) {
+
+                console.log("answer.hash", answer.hash.toString("hex"), this.blockchain.getChainHash( mid + 1 ).toString("hex" ) );
 
                 //it the block actually is the same
                 if (answer.hash.equals( this.blockchain.getChainHash( mid + 1 ) ) )
@@ -48,7 +50,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                         answer = await socket.node.sendRequestWaitOnce("head/chainHash", mid-1, mid-1, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                        if (answer === null || !Buffer.isBuffer(answer.hash))
+                        if ( !answer || !Buffer.isBuffer(answer.hash))
                             return {position: null, header: answer }; // timeout
 
                         if (answer.hash.equals( this.blockchain.getChainHash(mid -1 + 1 ) ) ) // it is a match
@@ -125,7 +127,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         answer = { hash: forkLastChainHash };
                     } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-                        if (answer === null || answer === undefined || answer.hash === undefined)
+                        if (!answer || !answer.hash )
                             continue;
                     }
 
