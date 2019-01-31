@@ -296,9 +296,8 @@ class TransactionsDownloadManager{
                                         // If socket sent over 100 consecutive invalid tx
                                         if (this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions > 20) {
                                             this._socketsQueue[this._transactionsQueue[txId].socket[totalSocketsProcessed].node.sckAddress.uuid].invalidTransactions = 0;
-                                            let suspiciousSocket = this._transactionsQueue[txId].socket[totalSocketsProcessed];
-                                            this._unsubscribeSocket(suspiciousSocket);
-                                            this._increaseSocketPenalty(tx.socket);
+                                            this._unsubscribeSocket(this._transactionsQueue[txId].socket[totalSocketsProcessed]);
+                                            this._increaseSocketPenalty(this._transactionsQueue[txId].socket[totalSocketsProcessed].socket);
                                             continue;
                                         }
 
@@ -371,7 +370,7 @@ class TransactionsDownloadManager{
 
         socket.node.protocol.transactionsDownloadingManager.penaltyPoints += 2;
 
-        if ( socket.node.protocol.transactionsDownloadingManager.penaltyPoints >= 10 )
+        if ( socket.node.protocol.transactionsDownloadingManager.penaltyPoints >= 20 )
             socket.node.protocol.transactionsDownloadingManager.penaltyDate = new Date().getTime();
 
     }
