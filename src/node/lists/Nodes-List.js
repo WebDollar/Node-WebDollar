@@ -292,7 +292,7 @@ class NodesList {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if (this.nodes[i].isFallback)
-                this.nodes.splice(i,1);
+                this.nodes.disconnect();
 
     }
 
