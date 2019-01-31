@@ -268,8 +268,6 @@ class PoolDataBlockInformationMinerInstance {
 
     deserializeBlockInformationMinerInstance(buffer, offset=0, version){
 
-        console.log( "version", version );
-
         let address;
 
         if (version >= 0x02) {
@@ -278,8 +276,6 @@ class PoolDataBlockInformationMinerInstance {
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         }
-
-        console.log( "address", address );
 
         let miner = this.poolManagement.poolData.findMiner( address );
         if ( miner)
