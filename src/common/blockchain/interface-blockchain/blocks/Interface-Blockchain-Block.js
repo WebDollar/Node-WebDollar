@@ -578,12 +578,10 @@ class InterfaceBlockchainBlock {
 
     calculateNewChainHash(){
 
-        if (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+        if (this.height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return this.hash;
-        }
-        else {
+        else
             return this.hash;
-        }
 
     }
 

@@ -18,7 +18,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
         let hash = await socket.node.sendRequestWaitOnce("head/chainHash", heightRequired, heightRequired , consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-        if (hash === null)
+        if (!hash )
             throw { message: "LightProtocolForkSolver _calculateForkBinarySearch headers-info dropped ", heightRequired };
 
         return {position: heightRequired, header: hash.hash};
@@ -243,11 +243,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             let hash = await socket.node.sendRequestWaitOnce("head/chainHash", forkChainStartingPoint, forkChainStartingPoint,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info optionalProcess"};
+            if (!hash ) throw {message: "connection dropped headers-info optionalProcess"};
 
             hash = hash.hash;
 
-            if (hash === null || hash === undefined) throw {message: "connection dropped headers-info optionalProcess"};
+            if (!hash ) throw {message: "connection dropped headers-info optionalProcess"};
 
             binarySearchResult.position = {position: forkChainStartingPoint, header: hash.hash};
 
