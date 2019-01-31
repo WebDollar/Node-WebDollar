@@ -61,6 +61,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
+            console.log("it is comparing", answer.hash.toString("hex"), this.blockchain.getChainHash(mid + 1).toString("hex"));
+
             //was not not found, search left because it must be there
             if (! answer.hash.equals( this.blockchain.getChainHash(mid + 1)  ) )
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
