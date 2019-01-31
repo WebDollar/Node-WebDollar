@@ -51,26 +51,14 @@ class MiningTransactionsSelector{
         if(!this.validateTransactionId(transaction.txId))
             throw {message: "This transaction was already inserted by txId"};
 
-        if ( !this.blockchain.agent.light ){
+        if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
+            throw {message: "This transaction was already inserted"};
 
-            if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
-                throw {message: "This transaction was already inserted"};
+        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+            throw {message: "transaction is too old"};
 
-            if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-                throw {message: "transaction is too old"};
-
-            if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
-                throw {message: "transaction is in future"};
-
-        }else{
-
-            if( transaction.timeLock + 1 < this.blockchain.blocks.length )
-                throw {message: "transaction is too old"};
-
-            if( transaction.timeLock - 1 > this.blockchain.blocks.length )
-                throw {message: "transaction is in future"};
-
-        }
+        if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
+            throw {message: "transaction is in future"};
 
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
