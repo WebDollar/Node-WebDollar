@@ -30,7 +30,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             answer = await socket.node.sendRequestWaitOnce("head/chainHash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer && answer.hash) ? answer.hash.toString("hex") : 'no hash' );
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer && answer.hash) ? answer.hash.toString("hex") : 'no remote hash', "my chain hash", this.blockchain.getChainHash( mid + 1 ).toString("hex" ) );
 
             if (left < 0 || !answer || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
@@ -38,10 +38,8 @@ class InterfaceBlockchainProtocolForkSolver{
             //i have finished the binary search
             if (left >= right) {
 
-                console.log("answer.hash", answer.hash.toString("hex"), this.blockchain.getChainHash( mid + 1 ).toString("hex" ) );
-
                 //it the block actually is the same
-                if (answer.hash.equals( this.blockchain.getChainHash( mid + 1 ) ) )
+                if (answer.hash.equals( this.blockchain.getChainHash( mid + 2 ) ) )
                     return {position: mid, header: answer.hash };
                 else {
 
@@ -53,7 +51,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         if ( !answer || !Buffer.isBuffer(answer.hash))
                             return {position: null, header: answer }; // timeout
 
-                        if (answer.hash.equals( this.blockchain.getChainHash(mid -1 + 1 ) ) ) // it is a match
+                        if (answer.hash.equals( this.blockchain.getChainHash(mid -1 + 2 ) ) ) // it is a match
                             return {position: mid-1, header: answer.hash };
 
                     }
@@ -63,8 +61,10 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
+            console.log("it is comparing", answer.hash.toString("hex"), this.blockchain.getChainHash(mid + 1).toString("hex"));
+
             //was not not found, search left because it must be there
-            if (! answer.hash.equals( this.blockchain.getChainHash(mid + 1)  ) )
+            if (! answer.hash.equals( this.blockchain.getChainHash(mid + 2)  ) )
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there
