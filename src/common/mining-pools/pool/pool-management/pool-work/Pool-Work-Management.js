@@ -284,9 +284,12 @@ class PoolWorkManagement{
                 let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
 
                 //be sure that none of the POS blocks were skipped
-                if (isPos) {
+                if ( isPos ) {
+
                     for (let i = prevBlock.height; i > this.blockchain.blocks.blocksStartingPoint && i > prevBlock.height - 10; i--)
-                        blockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true);
+                        if ( BlockchainGenesis.isPoSActivated(i) )
+                            blockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true);
+
                 } else
                     blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
 
