@@ -446,7 +446,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
                     await this.blockchain.sleep(15);
 
-                if (this.blockchain.blocks[block.height] !== undefined && block.calculateNewChainHash().equals(this.blockchain.blocks[block.height].calculateNewChainHash() ) )
+                if (this.blockchain.blocks[block.height] && block.calculateNewChainHash().equals(this.blockchain.blocks[block.height].calculateNewChainHash() ) )
                     throw {message: "You gave me a block which I already have have the same block"};
 
                 let result;
