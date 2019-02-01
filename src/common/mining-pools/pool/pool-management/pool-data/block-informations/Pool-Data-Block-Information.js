@@ -202,6 +202,7 @@ class PoolDataBlockInformation {
         this.totalDifficultyPOW = new BigNumber(0);
         this.totalDifficultyPOS = new BigNumber(0);
 
+        console.info("Blocks Miner Instances", length);
         for (let i=0; i<length; i++){
 
             let blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, undefined);

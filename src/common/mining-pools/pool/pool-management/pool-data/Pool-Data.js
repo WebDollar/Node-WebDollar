@@ -220,7 +220,12 @@ class PoolData {
             offset += 4;
 
             this.blocksInfo = [];
+
+            console.info("Pool Blocks Data Length", numBlocksInformation);
+
             for (let i = 0; i < numBlocksInformation && offset < buffer.length; i++) {
+
+                console.info("Pool Blocks Data", i ) ;
 
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, undefined, Blockchain.blockchain.blocks.length );
                 offset = await blockInformation.deserializeBlockInformation(buffer, offset );

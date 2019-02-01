@@ -446,8 +446,6 @@ class PoolRewardsManagement{
         //move the blockInformationMinerInstances to the latest non solved blockInformation
         let newBlockInformation = this.poolData.lastBlockInformation;
 
-        console.log("redistributePoolDataBlockInformation")
-
         if ( newBlockInformation.block || newBlockInformation === blockInformation )
             newBlockInformation = this.poolData.addBlockInformation();
 
