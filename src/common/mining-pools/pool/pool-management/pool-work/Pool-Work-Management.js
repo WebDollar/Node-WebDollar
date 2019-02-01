@@ -159,7 +159,19 @@ class PoolWorkManagement{
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
-                if ( await blockInformationMinerInstance.wasBlockMined.apply( blockInformationMinerInstance, [prevBlock].concat( args )  ) ){
+                let wasBlockMined;
+
+                try {
+                    wasBlockMined = await blockInformationMinerInstance.wasBlockMined.apply(blockInformationMinerInstance, [prevBlock].concat(args));
+                } catch (exception){
+                    wasBlockMined = false;
+
+                    //TODO remove !isPOS to throw the error message always
+                    if (!isPos)
+                        throw exception;
+                }
+
+                if ( wasBlockMined ){
 
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
@@ -270,7 +282,13 @@ class PoolWorkManagement{
             if (storeDifficulty) {
 
                 let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
-                blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true );
+
+                //be sure that none of the POS blocks were skipped
+                if (isPos) {
+                    for (let i = prevBlock.height; i > this.blockchain.blocks.blocksStartingPoint && i > prevBlock.height - 10; i--)
+                        blockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true);
+                } else
+                    blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance );
