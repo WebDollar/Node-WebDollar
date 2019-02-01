@@ -9,7 +9,7 @@ export default {
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
+        // {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
 
         {"addr": ["https://ez.cnbacolt.com:443"]},
         {"addr": ["https://server.cnbacolt.com:443"]},
@@ -32,10 +32,10 @@ export default {
         {"addr": ["https://losangeles.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         {"addr": ["https://singapore.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
 
-        {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
-        {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
+        // {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
+        // {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
 
-        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000        
+        {"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
 
         {"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
@@ -59,7 +59,7 @@ export default {
         //---------------------------------------------------------
 
         {"addr": ["https://webdchucknorris.vpnromania.ro:80"]}, // Thanks to @cbusuioceanu
-        {"addr": ["https://webdchucknorris.vpnromania.ro:8080"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://webdchucknorris.vpnromania.ro:8080"]}, // Thanks to @cbusuioceanu
 
         {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
         {"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor
