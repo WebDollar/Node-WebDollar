@@ -84,7 +84,7 @@ class InterfaceBlockchainBlockData {
 
     _computeBlockDataHeaderPrefix(onlyHeader = false){
 
-        if (this.transactions.hashTransactions === undefined || this.transactions.hashTransactions === null)
+        if ( !this.transactions.hashTransactions )
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
         return Buffer.concat ([
