@@ -298,7 +298,7 @@ class PoolWorkManagement{
         prevBlock = prevBlock || this.poolWork.lastBlock;
 
         let balance = this.blockchain.accountantTree.getBalance( address );
-        if (balance === null) balance = 0;
+        if ( !balance ) balance = 0;
 
         //must be reverted
         //console.log("2 Before Balance ", balance); let s = "";
