@@ -138,7 +138,7 @@ class PoolPayouts{
                 if ( !totalDifficultyPOS.isEqualTo(blockConfirmed.totalDifficultyPOS) )
                     throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOS };
 
-                if ( totalDifficultyPOS.isLessThanOrEqualTo(0) && totalDifficultyPOW.isLessThanOrEqualTo(0) ) {
+                if ( totalDifficultyPOS.isLessThanOrEqualTo(0) && totalDifficultyPOW.isLessThanOrEqualTo(0  ) ) {
 
                     if ( consts.MINING_POOL.SKIP_POS_REWARDS || consts.MINING_POOL.SKIP_POW_REWARDS)
                         return;

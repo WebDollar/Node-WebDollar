@@ -40,8 +40,8 @@ class NodesList {
 
         if( this.nodes.length > 0 ) {
             for (let i = 0; i < this.nodes.length; i++)
-                if (typeof this.nodes[i].socket.node.protocol.blocks !== "undefined" && this.nodes[i].socket.node.protocol.blocks !== 0)
-                    if (typeof blocksList[this.nodes[i].socket.node.protocol.blocks] === "undefined")
+                if (this.nodes[i].socket.node.protocol.blocks && this.nodes[i].socket.node.protocol.blocks > 0)
+                    if ( !blocksList[this.nodes[i].socket.node.protocol.blocks] )
                         blocksList[this.nodes[i].socket.node.protocol.blocks] = 1;
                     else
                         blocksList[this.nodes[i].socket.node.protocol.blocks]++;
