@@ -225,8 +225,6 @@ class PoolData {
 
             for (let i = 0; i < numBlocksInformation && offset < buffer.length; i++) {
 
-                if (i === 51) throw "temp pool error";
-
                 console.info("Pool Blocks Data", i ) ;
 
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, undefined, Blockchain.blockchain.blocks.length );
