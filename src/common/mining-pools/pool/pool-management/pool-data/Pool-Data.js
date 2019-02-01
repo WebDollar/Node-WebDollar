@@ -240,7 +240,7 @@ class PoolData {
             }
 
 
-            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo].blockInformationMinersInstances.length > 0){
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo.length-1].blockInformationMinersInstances.length > 0){
                 this.addBlockInformation();
             }
 
