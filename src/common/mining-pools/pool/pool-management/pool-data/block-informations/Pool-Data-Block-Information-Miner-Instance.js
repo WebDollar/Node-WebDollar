@@ -276,6 +276,7 @@ class PoolDataBlockInformationMinerInstance {
             offset += consts.ADDRESSES.ADDRESS.LENGTH;
 
         }
+        console.log(version, "address", address.toString("hex"));
 
         let miner = this.poolManagement.poolData.findMiner( address );
         if ( miner)
