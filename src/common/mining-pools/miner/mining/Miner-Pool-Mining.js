@@ -198,7 +198,10 @@ class MinerPoolMining extends InheritedPoolMining {
 
                             let answer = await this._run();
 
-                            if (!answer)  answer = { };
+                            if (!answer)  answer = {
+                                hash: consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER,
+                                nonce: 0,
+                            };
 
                             answer.timeDiff = new Date().getTime() - timeInitial;
                             answer.id = workId;

@@ -266,7 +266,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.200.1",
+        VERSION: "1.201.0",
 
         VERSION_COMPATIBILITY: "1.200.1",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
@@ -454,7 +454,10 @@ consts.TERMINAL_WORKERS = {
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
 
+    //  -100 no CPU mining
+
     CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
+
 };
 
 consts.JSON_RPC = {
