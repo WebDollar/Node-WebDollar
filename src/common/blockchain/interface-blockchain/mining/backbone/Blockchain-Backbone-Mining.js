@@ -83,6 +83,9 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         if ( BlockchainGenesis.isPoSActivated( height ) )
             return this._minePOS(block, difficulty)  ;
 
+        if (consts.TERMINAL_WORKERS.CPU_MAX === -100) // NO POW MINING
+            return undefined;
+
         // multi threading
         if (this._workers.haveSupport())
             return this._mineNoncesWithWorkers(start, end);

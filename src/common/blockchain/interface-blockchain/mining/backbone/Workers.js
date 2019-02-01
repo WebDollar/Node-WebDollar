@@ -32,7 +32,10 @@ class Workers {
         this.workers_list = [];
 
         // workers setup
-        if (consts.TERMINAL_WORKERS.TYPE === "cpu") {
+        if (consts.TERMINAL_WORKERS.CPU_MAX === -100) { // NO POW MINING
+
+        } else
+        if (consts.TERMINAL_WORKERS.TYPE === "cpu") { // MULTI THREADING MINING
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH;
             this._worker_path_file_name = '';
@@ -43,7 +46,7 @@ class Workers {
 
             this.ibb._intervalPerMinute = false;
 
-        } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") {
+        } else if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp") { //CPP MINER
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH_CPP;
             this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_CPP_FILENAME;
@@ -58,7 +61,7 @@ class Workers {
 
             this.ibb._intervalPerMinute = true;
         }
-        else if (consts.TERMINAL_WORKERS.TYPE === "gpu") {
+        else if (consts.TERMINAL_WORKERS.TYPE === "gpu") { //GPU MINING
 
             this._worker_path = consts.TERMINAL_WORKERS.PATH_GPU;
             this._worker_path_file_name = consts.TERMINAL_WORKERS.PATH_GPU_FILENAME;

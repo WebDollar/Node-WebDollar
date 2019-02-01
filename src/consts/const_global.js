@@ -454,7 +454,10 @@ consts.TERMINAL_WORKERS = {
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
 
+    //  -100 no CPU mining
+
     CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
+
 };
 
 consts.JSON_RPC = {
