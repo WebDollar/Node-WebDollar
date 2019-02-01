@@ -193,7 +193,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 for (let i=0; i<response.ids.length; i++ ){
 
-                    if(response.ids[i] !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
+                    if(response.ids[i].length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
                         continue;
 
                     transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
