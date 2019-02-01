@@ -79,6 +79,7 @@ class NodeDiscoveryService {
                     "Access-Control-Allow-Origin": "*",
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
+                    'User-Agent': 'Request-Promise'
                 },
                 json: true, // Automatically parses the JSON string in the response
             });

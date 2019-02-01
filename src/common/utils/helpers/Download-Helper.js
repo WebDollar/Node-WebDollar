@@ -13,7 +13,7 @@ class DownloadHelper{
             // Socket IO reports local Ip`s prefixed with ::ffff:
             address = address.replace('::ffff:', '');
 
-            rp = await({
+            let data = await rp({
                 uri: address,
                 headers: {
                     'User-Agent': 'Request-Promise'
