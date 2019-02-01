@@ -24,7 +24,7 @@ export default {
         {"addr": ["https://node6.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node7.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node8.petreus.ro:443"]}, // Thanks to Dani Petreus
-        {"addr": ["https://node9.petreus.ro:443"]}, // Thanks to Dani Petreus
+        // {"addr": ["https://node9.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node10.petreus.ro:443"]}, // Thanks to Dani Petreus
 
         {"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
@@ -58,7 +58,7 @@ export default {
         //--------------WebDollar FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        {"addr": ["https://webdchucknorris.vpnromania.ro:80"]}, // Thanks to @cbusuioceanu
+        // {"addr": ["https://webdchucknorris.vpnromania.ro:80"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://webdchucknorris.vpnromania.ro:8080"]}, // Thanks to @cbusuioceanu
 
         {"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
