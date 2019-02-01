@@ -210,7 +210,8 @@ class PoolDataBlockInformation {
 
             if ( !blockInformationMinerInstance.minerInstance ) continue;
 
-            this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+            if (blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.isGreaterThan(0) || blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.isGreaterThan(0))
+                this.blockInformationMinersInstances.push(blockInformationMinerInstance);
 
         }
         this._calculateTimeRemaining();
