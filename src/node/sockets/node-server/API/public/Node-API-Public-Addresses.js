@@ -23,12 +23,12 @@ class NodeAPIPublicAddresses{
 
         let answer = [];
         let minedBlocks = [];
-        let balance = 0;
+        let balance;
         let last_block = Blockchain.blockchain.blocks.length;
 
         // Get balance
         balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
-        balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+        balance = !balance ? 0 : (balance / WebDollarCoins.WEBD);
 
         // Get mined blocks and transactions
         for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
@@ -50,23 +50,21 @@ class NodeAPIPublicAddresses{
                         break;
                     }
 
-                if (found) {
+                if (found)
                     answer.push({
                         blockId: Blockchain.blockchain.blocks[i].height,
                         timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
                         transaction: transaction.toJSON()
                     });
-                }
 
             }
-            if (Blockchain.blockchain.blocks[i].data.minerAddress.equals(address)) {
-                minedBlocks.push(
-                    {
-                        blockId: Blockchain.blockchain.blocks[i].height,
-                        timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
-                        transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
-                    });
-            }
+
+            if (Blockchain.blockchain.blocks[i].data.minerAddress.equals(address))
+                minedBlocks.push({
+                    blockId: Blockchain.blockchain.blocks[i].height,
+                    timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
+                    transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
+                });
         }
 
 
@@ -87,11 +85,30 @@ class NodeAPIPublicAddresses{
             return {result: false, message: "Invalid Address"};
         }
 
+        try {
+
+        } catch (exception){
+
+        }
         let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
 
-        balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
+        return {result: true, balance: !balance ? 0 : (balance / WebDollarCoins.WEBD) };
 
-        return {result: true, balance: balance};
+    }
+
+    addressNonce(req, res){
+
+        let address = req.address;
+
+        try {
+            address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
+        } catch (exception){
+            return {result: false, message: "Invalid Address"};
+        }
+
+        let nonce = Blockchain.blockchain.accountantTree.getAccountNonce(address, undefined);
+
+        return {result: true, nonce: !nonce ? 0 : (nonce / WebDollarCoins.WEBD) };
 
     }
 

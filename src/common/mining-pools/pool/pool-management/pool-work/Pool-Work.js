@@ -49,7 +49,7 @@ class PoolWork {
             throw {message: "Blockchain is not yet synchronized"};
 
         //still pending
-        if (this.lastBlockPromise !== undefined && this.lastBlockPromise.isPending() )
+        if (this.lastBlockPromise && this.lastBlockPromise.isPending() )
             return this.lastBlockPromise;
 
         //new work

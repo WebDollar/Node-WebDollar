@@ -51,6 +51,8 @@ class NodeAPIRouter{
 
         this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 , app, prefix, middleWare ) ;
 
+        this._addRoute('address/nonce/:address', NodeAPIPublicAddresses.addressNonce, nodeApiType,  200 , app, prefix, middleWare ) ;
+
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
