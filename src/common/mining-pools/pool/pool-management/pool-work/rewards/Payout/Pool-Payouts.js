@@ -133,10 +133,10 @@ class PoolPayouts{
                 });
 
                 if ( !totalDifficultyPOW.isEqualTo(blockConfirmed.totalDifficultyPOW)  )
-                    throw { message: "Total POW Difficulty doesn't match", totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOW };
+                    console.error( "Total POW Difficulty doesn't match", {totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOW });
 
                 if ( !totalDifficultyPOS.isEqualTo(blockConfirmed.totalDifficultyPOS) )
-                    throw { message: "Total POS Difficulty doesn't match", totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOS };
+                    console.error(  "Total POS Difficulty doesn't match", { totalDifficultyPOS: totalDifficultyPOS, blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOS });
 
                 if ( totalDifficultyPOS.isLessThanOrEqualTo(0) && totalDifficultyPOW.isLessThanOrEqualTo(0  ) ) {
 

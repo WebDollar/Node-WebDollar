@@ -145,8 +145,7 @@ class PoolDataBlockInformationMinerInstance {
                     let blockInformationMinersInstance = this.blockInformation.blockInformationMinersInstances[i];
 
                     blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = BigNumber( this.minerInstanceTotalDifficultyPOW  || 0 );
-                    for (let height in this._minerInstanceTotalDifficultiesPOW)
-                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || 0 );
+                    blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = BigNumber( this._minerInstanceTotalDifficultiesPOW[height] || 0 );
 
 
                 }
@@ -279,7 +278,7 @@ class PoolDataBlockInformationMinerInstance {
         //console.log(version, "address", address.toString("hex"));
 
         let miner = this.poolManagement.poolData.findMiner( address );
-        if ( miner)
+        if ( miner !== null)
             this.minerInstance = miner.addInstance({
                 _diff: Math.random(),
                 node: {
