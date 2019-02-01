@@ -305,6 +305,7 @@ class PoolWorkManagement{
         for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--  ) {
 
             let block = this.blockchain.blocks[ i ];
+            if (!block) continue;
 
             //s += block.height + " ";
 
