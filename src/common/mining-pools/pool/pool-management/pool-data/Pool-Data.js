@@ -230,6 +230,8 @@ class PoolData {
                 let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, undefined, Blockchain.blockchain.blocks.length );
                 offset = await blockInformation.deserializeBlockInformation(buffer, offset );
 
+                if (i === 52) throw "temp pool error";
+
                 if (blockInformation.blockInformationMinersInstances.length > 0) {
                     this.blocksInfo.push(blockInformation);
 
@@ -240,7 +242,7 @@ class PoolData {
             }
 
 
-            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block !== undefined ){
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo].blockInformationMinersInstances.length > 0){
                 this.addBlockInformation();
             }
 
