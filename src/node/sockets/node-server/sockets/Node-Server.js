@@ -68,7 +68,8 @@ class NodeServer {
 
         this.nodeServer = null;
 
-        await NodeExpress.startExpress();
+        let expressOpened = await NodeExpress.startExpress();
+        if (!expressOpened) return false;
 
         if (!consts.OPEN_SERVER) return false;
 
@@ -334,7 +335,7 @@ class NodeServer {
 
                         setTimeout(() => {
 
-                            if (NodesList.nodes[i] !== undefined)
+                            if ( NodesList.nodes[i] )
                                 NodesList.nodes[i].socket.disconnect();
 
                         }, 3000);

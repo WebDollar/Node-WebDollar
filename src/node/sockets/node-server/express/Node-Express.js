@@ -42,12 +42,12 @@ class NodeExpress{
         return domain;
     }
 
-    startExpress(){
+    async startExpress(){
 
         if (this.loaded) //already open
-            return;
+            return true;
 
-        return new Promise((resolve)=>{
+        let loading = new Promise((resolve)=>{
 
             this.app = express();
             this.app.use(cors({ credentials: true }));
@@ -64,8 +64,6 @@ class NodeExpress{
             let options = {};
 
             this.port = process.env.PORT || process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
-
-            this.loaded = true;
 
             try {
 
@@ -170,7 +168,15 @@ class NodeExpress{
 
             }
 
-        })
+        });
+
+        if (await loading)
+            this.loaded = true;
+        else
+            this.loaded = false;
+
+        return loading;
+
     }
 
     _initializeRouter(app){

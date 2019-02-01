@@ -90,7 +90,7 @@ class CLI {
                 await this.signTransaction();
                 break;
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
-                NodeExpress.startExpress();
+                await NodeServer.startServer();
                 break;
             case '21': // Disable Forks Immutability
                 await this.disableForksImmutability();
