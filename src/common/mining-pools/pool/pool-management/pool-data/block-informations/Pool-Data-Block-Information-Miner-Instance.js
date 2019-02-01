@@ -165,7 +165,7 @@ class PoolDataBlockInformationMinerInstance {
 
         if ( !workType || workType === "pow") {
             for (let height in this._minerInstanceTotalDifficultiesPOW)
-                this.blockInformation.adjustBlockInformationDifficultyBestTarget(BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height, false);
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( BigNumber(0), this._minerInstanceTotalDifficultiesPOW[height], height, false);
             this._minerInstanceTotalDifficultiesPOW = {};
             this.minerInstanceTotalDifficultyPOW = BigNumber(0);
         }

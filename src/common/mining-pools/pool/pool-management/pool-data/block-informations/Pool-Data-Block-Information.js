@@ -89,9 +89,9 @@ class PoolDataBlockInformation {
 
         }
 
-        if (!add && miningHeightDifficulty.minus(difference).isLessThanOrEqualTo(0)  && this.miningHeights[height] ){
+        if (!add && miningHeightDifficulty.plus(difference).isLessThanOrEqualTo(0)  && this.miningHeights[height] ){
 
-            this.miningHeights[height] = miningHeightDifficulty.minus( difference );
+            this.miningHeights[height] = miningHeightDifficulty.plus( difference );
 
             if (this.miningHeights[height].isEqualTo(0)){
 
