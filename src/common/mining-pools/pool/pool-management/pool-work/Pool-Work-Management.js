@@ -270,10 +270,7 @@ class PoolWorkManagement{
 
             }
 
-            let workDone, storeDifficulty;
-
-            if (isPos) workDone = work.pos.balance;
-            else workDone = work.hash;
+            let storeDifficulty;
 
             //for testing only
             if (!consts.MINING_POOL.SKIP_POS_REWARDS && isPos) storeDifficulty = true;
@@ -281,14 +278,19 @@ class PoolWorkManagement{
 
             if (storeDifficulty) {
 
-                let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
+                let workDone;
+                if (isPos) workDone = work.pos.balance;
+                else workDone = work.hash;
 
+                let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
                 blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
 
                 //be sure that none of the POS blocks were skipped
-                for (let i = Math.max( prevBlock.height - 10,  this.blockchain.blocks.blocksStartingPoint ); i <= prevBlock.height; i++)
-                    if ( BlockchainGenesis.isPoSActivated(i) )
-                        blockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true);
+                for (let i = Math.max( prevBlock.height - 10,  this.blockchain.blocks.blocksStartingPoint ); i < prevBlock.height; i++)
+                    if ( BlockchainGenesis.isPoSActivated(i) ) {
+                        let prevDifficulty = blockInformationMinerInstance.calculateDifficulty( {height: i}, work.pos.balance );
+                        blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
+                    }
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance );

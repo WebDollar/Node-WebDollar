@@ -80,7 +80,7 @@ class PoolNewWorkManagement{
             if (workInProgressIndex !== this._workInProgressIndex) return false;
 
             // i have sent it already in the last - no new work
-            if (minerInstance.lastWork !== undefined && newWork.s.equals(minerInstance.lastWork.s) ) return false; //already sent
+            if (minerInstance.lastWork && newWork.s.equals(minerInstance.lastWork.s) ) return false; //already sent
 
             minerInstance.socket.node.sendRequest("mining-pool/new-work", {
                 work: newWork,
