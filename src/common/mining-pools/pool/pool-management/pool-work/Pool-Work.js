@@ -23,12 +23,12 @@ class PoolWork {
     }
 
     startGarbageCollector(){
-        this._garbageCollectorInterval = setInterval( this._garbageCollector.bind(this), 5000);
+        this._garbageCollectorInterval = setInterval( this._garbageCollector.bind(this), 30000);
     }
 
     stopGarbageCollector(){
 
-        if (this._garbageCollectorInterval !== undefined)
+        if ( this._garbageCollectorInterval )
             clearInterval(this._garbageCollectorInterval);
 
     }
