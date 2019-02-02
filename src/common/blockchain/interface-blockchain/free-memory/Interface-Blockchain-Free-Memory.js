@@ -11,15 +11,15 @@ class InterfaceFreeMemory{
 
         for (let i=this.blockchain.blocks.blocksStartingPoint; i < this.blockchain.blocks.length-50; i++){
 
-            if (this.blockchain.blocks[i] === undefined ) continue;
+            if ( !this.blockchain.blocks[i] ) continue;
 
             this.blockchain.blocks[i].computedBlockPrefix = undefined;
 
             for (let j=0; j<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                this.blockchain.blocks[i].data.transactions.transactions[j]._serializated = undefined;
+                delete this.blockchain.blocks[i].data.transactions.transactions[j]._serializated ;
 
 
-            if (i % 10000 === 0) await this.blockchain.sleep(50);
+            if (i % 10000 === 0) await this.blockchain.sleep(100);
 
         }
 
@@ -27,7 +27,11 @@ class InterfaceFreeMemory{
 
     async _freeMemoryTimeout(){
 
-        await this.freeMemory();
+        try {
+            await this.freeMemory();
+        } catch (exception){
+
+        }
 
         setTimeout( this._freeMemoryTimeout.bind(this), 2*60*1000 );
 

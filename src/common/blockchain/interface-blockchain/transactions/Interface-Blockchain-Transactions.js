@@ -22,13 +22,13 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
     }
 
 
-    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo, validateNonce){
-        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo, validateNonce);
+    _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo, validateNonce, validateTimeLock, validateVersion, validateTxId ){
+        return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo, validateNonce, validateTimeLock, validateVersion, validateTxId);
     }
 
     _createTransactionFromBuffer(buffer, offset = 0){
 
-        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false );
+        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false, false, false, false, false );
         offset = transaction.deserializeTransaction(buffer, offset);
         return {transaction: transaction, offset: offset};
     }

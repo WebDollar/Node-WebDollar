@@ -48,8 +48,7 @@ class MiniBlockchain extends  inheritBlockchain{
                 let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
 
                 //reward
-                if (result === null || result === undefined)
-                    throw {message: "reward couldn't be set to the minerAddress"};
+                if ( !result ) throw {message: "reward couldn't be set to the minerAddress"};
 
                 if (await block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType) === false)
                     throw {message: "Validate Transactions is wrong"};

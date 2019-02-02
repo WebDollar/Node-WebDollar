@@ -31,7 +31,7 @@ class InterfaceBlockchainTransaction{
         this._confirmed = false;
 
         if(validateTimeLock)
-            if (timeLock === undefined)
+            if ( !timeLock )
                 this.timeLock = blockchain.blocks.length-1;
             else
                 this.timeLock = timeLock;
@@ -110,12 +110,9 @@ class InterfaceBlockchainTransaction{
         }
 
         if (validateTxId)
-            if (txId === undefined || txId === null)
-                txId = this._computeTxId();
+            if ( !txId.equals( this.txId) )
+                throw {message: "TxId is invalid"};
 
-        this.txId = txId;
-
-        this._serializated = undefined;
     }
 
     destroyTransaction(pendingTransactionsWereIncluded){
@@ -156,8 +153,8 @@ class InterfaceBlockchainTransaction{
         return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
     }
 
-    recalculateTxId(){
-        this.txId = this._computeTxId();
+    get txId(){
+        return this._computeTxId();
     }
 
     /**
@@ -183,7 +180,7 @@ class InterfaceBlockchainTransaction{
      */
     validateTransactionOnce( blockHeight, blockValidationType = {} ){
 
-        if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
+        if ( !blockHeight ) blockHeight = this.blockchain.blocks.length-1;
 
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
@@ -352,8 +349,6 @@ class InterfaceBlockchainTransaction{
             throw exception;
 
         }
-
-        this.recalculateTxId();
 
         return offset;
 

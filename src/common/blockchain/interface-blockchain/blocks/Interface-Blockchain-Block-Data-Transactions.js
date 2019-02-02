@@ -60,7 +60,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    destroyBlockDataTransactions(){
+    destroyBlockDataTransactions(freeOldMemory){
 
         for (let i=0; i<this.transactions.length; i++) {
 
@@ -69,8 +69,9 @@ class InterfaceBlockchainBlockDataTransactions {
 
             if (this.pendingTransactionsWereIncluded <= 0) this.pendingTransactionsWereIncluded = undefined;
 
-            if ( !this.pendingTransactionsWereIncluded && !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i].txId)  )
-                this.transactions[i].destroyTransaction();
+            if (!freeOldMemory)
+                if ( !this.pendingTransactionsWereIncluded && !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i].txId)  )
+                    this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;
 
@@ -240,7 +241,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return;
 
-        this.destroyBlockDataTransactions(true);
+        this.destroyBlockDataTransactions(true );
         delete this.transactionsLoaded;
 
     }
