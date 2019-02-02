@@ -46,8 +46,14 @@ class PoolWorkValidation{
                 minerInstance: minerInstance
             };
 
-            if (BlockchainGenesis.isPoSActivated(work.h))
+            if (BlockchainGenesis.isPoSActivated(work.h)) {
+
+                //avoid validating not signed POS
+                if (!work.pos || !work.pos.posSignature)
+                    return;
+
                 forced = true;
+            }
 
             if (work.result || forced  ){
 
