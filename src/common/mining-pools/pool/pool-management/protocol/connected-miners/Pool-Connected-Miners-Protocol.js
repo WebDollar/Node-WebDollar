@@ -193,7 +193,8 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 if (Math.random () < 0.1)
                     console.log("mining-pool/hello-pool"+"/answer", exception);
 
-                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
+                if (!socket.disconnected)
+                    socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message, } );
             }
 
         });

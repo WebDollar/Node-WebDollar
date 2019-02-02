@@ -88,11 +88,12 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
-    adjustDifficulty( prevBlock, difficulty, useDeltaTime = false, calculateReward = true ){
+    adjustDifficulty( prevBlock, difficulty, useDeltaTime = false, calculateReward = true, blockInformationMinerInstance ){
 
         let height = prevBlock.height;
 
-        let blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
+        if (!blockInformationMinerInstance)
+            blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
 
         //POS difficulty
         if (BlockchainGenesis.isPoSActivated( height )){
@@ -274,7 +275,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficulty = difficultyBigNumber.number;
 
                 if (difficulty.isGreaterThan(0))
-                    this.adjustDifficulty({height: height}, difficulty, false, false);
+                    this.adjustDifficulty({height: height}, difficulty, false, false, this );
 
             }
 
@@ -285,7 +286,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficulty = difficultyBigNumber.number;
 
                 if (difficulty.isGreaterThan(0))
-                    this.adjustDifficulty({height: height}, difficulty, false, false);
+                    this.adjustDifficulty({height: height}, difficulty, false, false, this);
             }
 
         }
