@@ -131,6 +131,13 @@ class CLI {
             let nonce = await AdvancedMessages.input('Enter the address current nonce: ');
             let timelock = await AdvancedMessages.input('Enter the current block: ');
             let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
+            let wantToPropagate = await AdvancedMessages.input('Do you want to propagate now y/n?:');
+
+            if ( wantToPropagate.toUpperCase().trim() === 'Y' ? true : false)
+                wantToPropagate = true;
+            else
+                wantToPropagate = false;
+
             let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
@@ -149,6 +156,9 @@ class CLI {
 
                 data.transaction = answer.transaction.serializeTransaction();
                 data.signature = answer.signature;
+
+                if(wantToPropagate)
+                    Blockchain.blockchain.transactions.transactionsProtocol.propagateNewPendingTransaction(data.transaction);
 
             }else{
 
