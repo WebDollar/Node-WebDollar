@@ -37,14 +37,13 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         }
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
-        if (address === null)
+        if ( !address )
             throw {message: "Your address is invalid", address: address};
 
         let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
-        if (node === undefined || node === null)
-            node = this.add(address, {balances: []});
+        if ( !node ) node = this.add(address, {balances: []});
 
         //it is not a leaf, hardly to believe
         if (!node.isLeaf()) {
@@ -72,7 +71,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         //WEBD
         if (showUpdate)
             //optimization, but it doesn't work in browser
-            this.emitBalanceChangeEvent(address, (resultUpdate !== null ? node.getBalances.bind(node) : null), (resultUpdate !== null ? node.nonce : null) );
+            this.emitBalanceChangeEvent(address, ( resultUpdate ? node.getBalances.bind(node) : null), (resultUpdate ? node.nonce : null) );
 
         //purging empty addresses
         if (!node.hasBalances()) {
@@ -94,14 +93,12 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     updateAccountNonce(address, nonceChange, revertActions, showUpdate) {
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
-        if (address === null)
-            throw {message: "Your address is invalid", address: address};
+        if ( !address ) throw {message: "Your address is invalid", address: address};
 
         let node = this.search(address).node;
 
         // in case it doesn't exist, let's create it
-        if (node === undefined || node === null)
-            throw {message: "Address was not found", address: address};
+        if ( !node ) throw {message: "Address was not found", address: address};
 
         if (!node.isLeaf())
             throw {message: "couldn't updateAccountNonce because node is not leaf", address: address};
@@ -139,16 +136,14 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     listBalances(address) {
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
-        if (address === null)
+        if (!address)
             throw {message: "Your address is invalid", address: address};
 
         let node = this.search(address).node;
 
-        if (node === undefined || node === null)
-            throw {message: "address not found", address: address};
+        if ( !node ) throw {message: "address not found", address: address};
 
-        if (!node.isLeaf())
-            throw {message: "couldn't list because input is not a leaf node"};
+        if (!node.isLeaf()) throw {message: "couldn't list because input is not a leaf node"};
 
         return node.getBalances();
     }
@@ -161,13 +156,12 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     getBalance(address, tokenId) {
 
         address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address);
-        if (address === null)
-            throw {message: "Your address is invalid", address: address};
+
+        if ( !address ) throw {message: "Your address is invalid", address: address};
 
         let node = this.search(address).node;
 
-        if (node === undefined || node === null)
-            return null; //throw {message: "address not found", address: address, tokenId: tokenId };
+        if ( !node ) return null; //throw {message: "address not found", address: address, tokenId: tokenId };
 
         if (!node.isLeaf())
             return null; //throw {message: "couldn't get the value because input is not a leaf node", address: address, tokenId: tokenId };
@@ -182,7 +176,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         let node = this.search(address).node;
 
-        if (node === undefined || node === null)
+        if ( !node )
             return null; //throw {message: "getAccounantNonce address not found", address: address, tokenId: tokenId };
 
         return node.nonce;
@@ -227,12 +221,12 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     calculateNodeCoins(tokenId, node) {
 
-        if (tokenId === undefined || tokenId === '' || tokenId === null) {
+        if (!tokenId ) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
-        if (node === undefined) node = this.root;
+        if (!node ) node = this.root;
 
         if (node === this.root && !Blockchain.blockchain.agent.consensus){
             return BlockchainMiningReward.getSumReward(Blockchain.blockchain.blocks.length-1);
@@ -241,7 +235,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         let sum = node.getBalance(tokenId);
 
         for (let i = 0; i < node.edges.length; i++)
-            if (node.edges[i].targetNode !== undefined && node.edges[i].targetNode !== null)
+            if (node.edges[i].targetNode )
                 sum += this.calculateNodeCoins(tokenId, node.edges[i].targetNode);
 
         return sum;

@@ -93,7 +93,8 @@ class NodesList {
 
     async registerUniqueSocket(socket, connectionType, nodeType, nodeConsensusType, validationDoubleConnectionsTypes){
 
-        if ( !nodeType ) throw {message: "type is necessary"};
+        //nodeType can be a value 0
+        if ( typeof nodeType === "undefined" ) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
             socket.disconnect();

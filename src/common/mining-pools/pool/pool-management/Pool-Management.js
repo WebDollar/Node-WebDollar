@@ -65,7 +65,7 @@ class PoolManagement{
 
     async startPool( forceStartPool = false ){
 
-        if (this.poolSettings.poolURL !== '' && this.poolSettings.poolURL !== undefined)
+        if (this.poolSettings.poolURL && this.poolSettings.poolURL !== '' )
             return await this.setPoolStarted(true, forceStartPool);
         else
             console.error("Couldn't start the Pool because the poolURL is empty");

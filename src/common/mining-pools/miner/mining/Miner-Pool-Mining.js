@@ -236,7 +236,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
     }
 
-    async _run() {
+    _run() {
 
         this._runningPromise = new Promise( async (resolve)=>{
 
