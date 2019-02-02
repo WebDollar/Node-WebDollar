@@ -108,7 +108,7 @@ class NodeAPIPublicAddresses{
 
         let nonce = Blockchain.blockchain.accountantTree.getAccountNonce(address, undefined);
 
-        return {result: true, nonce: !nonce ? 0 : (nonce / WebDollarCoins.WEBD) };
+        return {result: true, nonce: !nonce ? 0 : nonce  };
 
     }
 
