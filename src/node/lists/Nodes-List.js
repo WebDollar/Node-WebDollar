@@ -167,7 +167,8 @@ class NodesList {
             if ((this.nodes[i].connectionType === connectionType || connectionType  === "all") &&
                 (this.nodes[i].socket === socket  || this.nodes[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid   )) {
 
-                console.error('deleting client socket '+ i +" "+ socket.node.sckAddress.toString());
+                if ( Math.random() < 0.3)
+                    console.error('deleting client socket '+ i +" "+ socket.node.sckAddress.toString());
 
                 let nodeToBeDeleted = this.nodes[i];
                 this.nodes.splice(i, 1);
