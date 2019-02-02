@@ -92,46 +92,35 @@ class PoolDataBlockInformationMinerInstance {
 
         let height = prevBlock.height;
 
-        for (let i=0; i < this.blockInformation.blockInformationMinersInstances.length; i++){
+        let blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
 
-            let blockInformationMinersInstance = this.blockInformation.blockInformationMinersInstances[i];
+        //POS difficulty
+        if (BlockchainGenesis.isPoSActivated( height )){
 
-            //getting first address
-            if ( this.address.equals( blockInformationMinersInstance.address ) ){
+            //it is already another instance
+            let prevDifficulty = blockInformationMinerInstance._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
 
-                //POS difficulty
-                if (BlockchainGenesis.isPoSActivated( height )){
+            if ( prevDifficulty.isLessThan( difficulty ) ){
 
-                    //it is already another instance
-                    let prevDifficulty = blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS[height]||BigNumber(0);
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
 
-                    if ( prevDifficulty.isLessThan( difficulty ) ){
+                blockInformationMinerInstance.minerInstanceTotalDifficultyPOS = blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
+                blockInformationMinerInstance._minerInstanceTotalDifficultiesPOS[height] = difficulty;
 
-                        this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
-
-                        blockInformationMinersInstance.minerInstanceTotalDifficultyPOS = blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.plus( difficulty.minus(prevDifficulty) );
-                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOS[height] = difficulty;
-
-                    }
+            }
 
 
-                } else { //POW difficulty
+        } else { //POW difficulty
 
-                    //it is already another instance
-                    let prevDifficulty = blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height]||BigNumber(0);
+            //it is already another instance
+            let prevDifficulty = blockInformationMinerInstance._minerInstanceTotalDifficultiesPOW[height]||BigNumber(0);
 
-                    if ( prevDifficulty.isLessThan(difficulty)) {
+            if ( prevDifficulty.isLessThan(difficulty)) {
 
-                        this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
-                        blockInformationMinersInstance.minerInstanceTotalDifficultyPOW = blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
-                        blockInformationMinersInstance._minerInstanceTotalDifficultiesPOW[height] = difficulty;
+                this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
+                blockInformationMinerInstance.minerInstanceTotalDifficultyPOW = blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
+                blockInformationMinerInstance._minerInstanceTotalDifficultiesPOW[height] = difficulty;
 
-                    }
-
-                }
-
-
-                break;
             }
 
         }

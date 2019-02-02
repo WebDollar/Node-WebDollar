@@ -26,7 +26,11 @@ class PoolDataBlockInformation {
             blocksPos: 0,
         };
 
+        //stores the work of each miner instance
         this.blockInformationMinersInstances = [];
+
+        //store the position of each miner instance
+        this.blockInformationMinersInstancesPositionsFirst = {};
 
         this.confirmations = 0;
         this.confirmationsFailsTrials = 0;
@@ -293,6 +297,8 @@ class PoolDataBlockInformation {
         this.blockInformationMinersInstances[pos].cancelReward();
         this.blockInformationMinersInstances[pos].cancelDifficulties();
 
+        this.blockInformationMinersInstancesPositionsFirst [minerInstance.address.toString("hex")] = undefined;
+
         this.blockInformationMinersInstances.splice(pos,1);
 
     }
@@ -338,6 +344,30 @@ class PoolDataBlockInformation {
 
         if (this.poolManagement.poolData.blocksInfo.length === 0 || this.poolManagement.poolData.lastBlockInformation === this)
             this.poolManagement.poolStatistics.poolTimeRemaining = newValue;
+
+    }
+
+    findFirstMinerInstance(minerAddress){
+
+        if ( !Buffer.isBuffer(minerAddress) ) minerAddress = minerAddress.address;
+
+        let minerAddressString = minerAddress.toString("hex");
+
+        if (this.blockInformationMinersInstancesPositionsFirst[minerAddressString] === undefined)
+            //address is not set
+            for (let i=0; i < this.blockInformationMinersInstances.length; i++) {
+
+                let blockInformationMinersInstance = this.blockInformationMinersInstances[i];
+
+                //getting first address
+                if (minerAddress.equals(blockInformationMinersInstance.address)) {
+
+                    this.blockInformationMinersInstancesPositionsFirst[minerAddressString] = i;
+                    break;
+                }
+            }
+
+        return this.blockInformationMinersInstances[ this.blockInformationMinersInstancesPositionsFirst[minerAddressString] ];
 
     }
 
