@@ -113,7 +113,7 @@ class InterfaceBlockchainProtocolForkSolver{
         try {
 
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastChainHash, forkProof);
-            if (answer !== null) return answer;
+            if ( answer ) return answer;
 
             fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, undefined, [ forkLastChainHash ], false );
 
