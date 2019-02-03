@@ -304,6 +304,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-mini-blockchain-simulation"] = true;
                 validationType["skip-validation-transactions-from-values"] = true;
                 validationType["skip-validation-timestamp"] = true;
+                validationType["skip-validation-timestamp-network-adjusted-time"] = true;
                 validationType["skip-block-data-validation"] = true;
                 validationType["skip-block-data-transactions-validation"] = true;
                 validationType["skip-validation-interlinks"] = true;
