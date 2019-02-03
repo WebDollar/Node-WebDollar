@@ -117,7 +117,7 @@ class PoolWorkValidation{
                 }
 
                 this._works[key] = undefined;
-                delete (this._works[key]);
+                delete this._works[key];
 
                 index++;
                 if (index > n)
