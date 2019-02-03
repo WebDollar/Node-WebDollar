@@ -64,7 +64,7 @@ class SavingManager{
 
             let blocks = this._pendingBlocksList[key];
 
-            if (blocks === undefined){
+            if ( !blocks ){
                 this._pendingBlocksList[key] = undefined;
                 delete this._pendingBlocksList[key];
                 continue;

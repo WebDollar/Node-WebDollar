@@ -48,7 +48,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock , revertActions, showUpdate){
 
         if (  !block.blockValidation.blockValidationType['skip-validation'] ) {
 
