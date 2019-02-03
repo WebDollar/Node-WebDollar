@@ -197,7 +197,6 @@ class PoolRewardsManagement{
                     Log.warn("BLOCK TRANSACTION PAYOUT CONFIRMED "+i, Log.LOG_TYPE.POOLS);
                 }
 
-                continue;
             }
 
             //already confirmed
