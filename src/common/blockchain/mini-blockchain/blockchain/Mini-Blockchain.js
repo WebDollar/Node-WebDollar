@@ -116,15 +116,17 @@ class MiniBlockchain extends  inheritBlockchain{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<*>}
      */
-    async includeBlockchainBlock( block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate ){
+    async includeBlockchainBlock( ...args ){
 
-        if (await this.simulateNewBlock(block, false, revertActions,
+        let myArgs = args;
+
+        if (await this.simulateNewBlock( args[0], false, args[4],
 
                 async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, arguments );
+                    return await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs );
                 }
 
-            , showUpdate )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+            , args[5] )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         return true;
     }
