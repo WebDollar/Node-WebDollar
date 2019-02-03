@@ -23,12 +23,12 @@ class SavingManager{
 
         if (process.env.BROWSER) return;
 
-        if (block === undefined || block === null) return false;
+        if ( !block ) return false;
 
-        if (height === undefined)
+        if ( !height )
             height = block.height;
 
-        if (this._pendingBlocksList[height] === undefined) {
+        if ( !this._pendingBlocksList[height] ) {
 
             this._pendingBlocksList[height] = [{
                 saving: false,

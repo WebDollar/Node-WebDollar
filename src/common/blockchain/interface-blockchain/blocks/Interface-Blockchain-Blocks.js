@@ -38,6 +38,7 @@ class InterfaceBlockchainBlocks{
         this[this.length] =  block;
 
         this.length += 1;
+
         if (showUpdate)
             this.emitBlockCountChanged();
 
@@ -45,24 +46,23 @@ class InterfaceBlockchainBlocks{
             this.emitBlockInserted(block);
 
         //delete old blocks when I am in light node
-        if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
+        if (this.blockchain.agent && this.blockchain.agent.light){
 
             let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
 
-            while (this[index] !== undefined){
+            while (this[index] ){
                 this[index].destroyBlock();
                 delete this[index];
 
                 index--;
             }
 
-            while (this.length > 0 && this[this.blocksStartingPoint] === undefined && this.blocksStartingPoint < this.length){
+            while (this.length > 0 && !this[this.blocksStartingPoint] && this.blocksStartingPoint < this.length)
                 this.blocksStartingPoint++;
-            }
 
         }
 
-        if ( revertActions !== undefined )
+        if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
         this.chainWork = this.chainWork.plus( block.workDone );
