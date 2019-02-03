@@ -144,7 +144,7 @@ class SavingManager{
 
         let answer = 1;
 
-        while (answer !== null){
+        while (answer ){
 
             clearTimeout( this._timeoutSaveManager );
 
