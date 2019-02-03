@@ -34,9 +34,8 @@ class NodePropagationList{
         }
 
         //first number
-        for (let i=0; i<number && answer.length < list.length; i++){
+        for (let i=0; i<number && answer.length < list.length; i++)
             answer.push(list[i]);
-        }
 
         let index = 0 ;
         while (index < number && answer.length < list.length){
@@ -87,9 +86,9 @@ class NodePropagationList{
 
     async propagateWaitlistSimple(socket, nodeType, disconnectSocket = true){
 
-        if ( socket === undefined ) return;
+        if ( !socket ) return;
 
-        if (socket.emit === undefined) console.warn("socket.emit is not supported");
+        if ( !socket.emit ) console.warn("socket.emit is not supported");
 
         let list;
 

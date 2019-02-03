@@ -237,6 +237,18 @@ class InterfaceBlockchainBlockDataTransactions {
         return fee;
     }
 
+    findTransactionInBlockData(transaction){
+
+        if (typeof transaction === "string") transaction = Buffer.from(transaction, "hex");
+
+        if (!Buffer.isBuffer(transaction) && typeof transaction === "object") transaction = transaction.txId;
+
+        for (let i=0; i <this.transactions.length; i++)
+            if (this.transactions[i].txId.equals(transaction))
+                return i;
+
+    }
+
     freeTransactionsFromMemory(){
 
         if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return;
