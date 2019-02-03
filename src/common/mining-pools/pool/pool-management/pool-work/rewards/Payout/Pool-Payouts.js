@@ -311,8 +311,9 @@ class PoolPayouts{
 
             Log.info("Payout Total Paid "+ (total / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
 
-            for (let i=0; i < blocksConfirmed.length; i++)
-                blocksConfirmed[i].payoutTx = transactions[0].txId;
+            if (transactions.length > 0)
+                for (let i=0; i < blocksConfirmed.length; i++)
+                    blocksConfirmed[i].payoutTx = transactions[0].txId;
 
 
         } catch (exception){
