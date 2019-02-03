@@ -83,7 +83,7 @@ class SavingManager{
                 let block = blocks[i];
 
                 //already deleted
-                if (block.block === undefined || block.block.blockchain === undefined){
+                if (block.block || block.block.blockchain ){
                     blocks.splice(i,1);
                     i--;
                     continue;
