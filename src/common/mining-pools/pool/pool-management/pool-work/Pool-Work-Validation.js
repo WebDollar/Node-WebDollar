@@ -124,6 +124,8 @@ class PoolWorkValidation{
                     break;
             }
 
+            this._worksLength -= n;
+
         }
 
         this._timeoutPoolWorkValidation = setTimeout( this._processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, 50000/this._worksLength)) );
