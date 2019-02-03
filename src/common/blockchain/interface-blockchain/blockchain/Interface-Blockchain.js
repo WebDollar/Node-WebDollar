@@ -65,10 +65,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.reward === undefined)
             block.reward = BlockchainMiningReward.getReward(block.height);
 
-        if (saveBlock === undefined)
+        if (!saveBlock )
             saveBlock = true;
 
-        if (block.blockValidation === undefined)
+        if (!block.blockValidation )
             block.blockValidation = this.createBlockValidation();
         else {
 
@@ -311,7 +311,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-interlinks-update"] = true;
                 validationType["skip-target-difficulty-validation"] = true;
                 validationType["skip-calculating-proofs"] = true;
-                //validationType["skip-calculating-block-nipopow-level"] = true;
+                validationType["skip-calculating-block-nipopow-level"] = true;
                 validationType["skip-saving-light-accountant-tree-serializations"] = true;
                 validationType["skip-recalculating-hash-rate"] = true;
 

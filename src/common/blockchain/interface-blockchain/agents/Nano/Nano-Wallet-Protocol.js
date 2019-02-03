@@ -223,7 +223,7 @@ class NanoWalletProtocol{
                         //TODO use SPV
 
                         let tx = null;
-                        if (transaction !== undefined) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined);
+                        if (transaction ) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined);
 
                         let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
 

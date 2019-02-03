@@ -130,7 +130,7 @@ class InterfaceBlockchainTransactionsWizard{
                 timeLock, //timeLock
                 undefined, //version @FIXME This is not calculated if validateVersion === false,
                 undefined, //txId
-                false, false, false
+                false, false, false, false, false, false,
             );
 
         } catch (exception) {

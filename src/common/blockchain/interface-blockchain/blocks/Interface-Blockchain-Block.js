@@ -388,11 +388,11 @@ class InterfaceBlockchainBlock {
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
 
-        if (height !== undefined)  this.height = height;
-        if (reward !== undefined) this.reward = reward;
-        else if (this.reward === undefined) this.reward = BlockchainMiningReward.getReward(height||this.height);
+        if ( height !== undefined )  this.height = height||0;
+        if (reward ) this.reward = reward;
+        else this.reward = BlockchainMiningReward.getReward(this.height);
 
-        if (difficultyTargetPrev !== undefined) this._difficultyTargetPrev = difficultyTargetPrev;
+        if (difficultyTargetPrev ) this._difficultyTargetPrev = difficultyTargetPrev;
 
         if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };

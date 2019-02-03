@@ -34,7 +34,7 @@ class BlockchainGenesis{
             throw {message: "Timestamp is invalid", timeStamp: block.timeStamp}
     }
 
-    getLevel(){
+    get level(){
         return 0;
     }
 

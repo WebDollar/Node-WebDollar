@@ -24,8 +24,8 @@ class PPoWBlockchainProvesCalculated{
             return;
 
         try {
-            if (level === undefined)
-                level = block.getLevel();
+            if ( !level )
+                level = block.level;
         } catch (exception){
             console.error("couldn't get level", exception);
             return;
@@ -59,7 +59,7 @@ class PPoWBlockchainProvesCalculated{
             if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
                 return;
 
-            level = block.getLevel();
+            level = block.level;
             pos = this._binarySearch(this.levels[level], block);
 
 

@@ -22,7 +22,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
 
         if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {
-            block.level = block.getLevel(); //computing the level
             this.prover.provesCalculated.updateBlock(block);
             block._provesClculatedInserted = true;
         }

@@ -23,7 +23,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     destroyBlock(){
 
         //in case it was already included
-        if (this.blockchain === undefined) return;
+        if (!this.blockchain ) return;
 
         if (this._provesClculatedInserted)
             this.blockchain.prover.provesCalculated.deleteBlock(this);
@@ -35,7 +35,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this.interlink = this.calculateInterlink();
     }
 
-    getLevel(){
+    get level(){
 
         if (this._level !== undefined) return this._level;
 
@@ -49,7 +49,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             T = BlockchainGenesis.difficultyTargetPOS;
 
 
-        if (T === undefined || T === null) throw {message: "Target is not defined"};
+        if (!T) throw {message: "Target is not defined"};
 
         if (Buffer.isBuffer(T))
             T = Convert.bufferToBigIntegerHex(T);
@@ -94,7 +94,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if ( prevBlock ) {
             for (let i = 0; i < prevBlock.interlink.length; ++i)
                 interlink[i] = prevBlock.interlink[i];
-            blockLevel = prevBlock.getLevel();
+            blockLevel = prevBlock.level;
         }
 
         //add new interlinks for current block
@@ -126,7 +126,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
                     throw {message: "Interlink to Genesis is wrong! "};
 
-                let linkedBlockLevel = linkedBlock.getLevel();
+                let linkedBlockLevel = linkedBlock.level;
 
                 if (linkedBlockLevel < level )
                     throw {message: "Interlink level error", level: level}

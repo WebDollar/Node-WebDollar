@@ -84,7 +84,7 @@ class PPoWBlockchainProver{
                     // //slow version
                     for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
                         if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                            chain.blocks[i].getLevel() >= miu) {
+                            chain.blocks[i].level >= miu) {
 
                             superChain.push(chain.blocks[i]);
 
