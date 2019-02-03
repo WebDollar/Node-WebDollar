@@ -433,8 +433,13 @@ class Workers {
                 if (worker._is_batching)
                     return false;
 
-                if (this._final_batch)
+                if (this._final_batch) {
+
+                    if (Blockchain.MinerPoolManagement && Blockchain.MinerPoolManagement.minerPoolStarted)
+                        this.ibb.resetForced = true;
+
                     return false;
+                }
 
 
 

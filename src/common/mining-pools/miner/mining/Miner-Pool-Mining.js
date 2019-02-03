@@ -210,10 +210,11 @@ class MinerPoolMining extends InheritedPoolMining {
                             if (!this._miningWork.resolved)
                                 answer.hashes = workEnd - workStart;
 
-                            this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
-
                             this.resetForced = false;
                             this._miningWork.resolved = true;
+
+                            this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
+
 
                         } catch (exception){
                             console.log("Pool Mining Exception", exception);
