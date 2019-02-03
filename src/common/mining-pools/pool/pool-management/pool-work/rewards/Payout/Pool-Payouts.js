@@ -297,7 +297,7 @@ class PoolPayouts{
             for (let i=0; i<this._toAddresses.length; i++){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
-                if (miner ) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
+                if ( !miner ) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
                 miner.rewardConfirmed = 0; //paid this
