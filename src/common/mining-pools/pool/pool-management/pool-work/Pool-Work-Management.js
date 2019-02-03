@@ -250,9 +250,7 @@ class PoolWorkManagement{
                         if (block)
                             block.destroyBlock();
 
-                        //it is an invalid block, let's generate a new one
-                        if (this.blockchain.blocks.length-1 === prevBlock.height)
-                            await this.poolWork.getNextBlockForWork();
+
 
 
 
