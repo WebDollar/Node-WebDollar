@@ -62,8 +62,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
 
-        if (block.reward === undefined)
-            block.reward = BlockchainMiningReward.getReward(block.height);
+        if (!block.reward ) block.reward = BlockchainMiningReward.getReward(block.height);
 
         if (!saveBlock )
             saveBlock = true;
@@ -116,7 +115,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
-        if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
+        if (resetMining && this.mining ) //reset mining
             this.mining.resetMining();
 
         return true;
