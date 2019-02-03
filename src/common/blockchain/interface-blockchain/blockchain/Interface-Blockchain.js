@@ -248,7 +248,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (process.env.BROWSER)
             return true;
 
-
         if (saveLength)
             if (await this.db.save(this._blockchainFileName, this.blocks.length, 20000, saveInfinitum ? 1000000 : 10) !== true){
                 Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);

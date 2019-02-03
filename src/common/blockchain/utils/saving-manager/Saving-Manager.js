@@ -128,7 +128,11 @@ class SavingManager{
 
     async _saveManager(){
 
-        await this._saveNextBlock();
+        try{
+            await this._saveNextBlock();
+        } catch (exception){
+
+        }
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
@@ -150,7 +154,7 @@ class SavingManager{
 
             answer = await this._saveNextBlock();
 
-            if (answer !== null && answer % 100 === 0) {
+            if (answer && answer % 100 === 0) {
 
                 Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer);
                 await this.blockchain.sleep(10);

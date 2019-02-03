@@ -435,7 +435,6 @@ class InterfaceBlockchainBlock {
         let key = "block" + this.height;
 
         let bufferValue;
-
         try {
             bufferValue = await this.serializeBlock(false);
         } catch (exception){
@@ -443,13 +442,22 @@ class InterfaceBlockchainBlock {
             throw exception;
         }
 
-        try{
-            return (await this.db.save(key, bufferValue));
+        let trials = 0, answer;
+        while (trials < 20){
+
+            try{
+                answer = await this.db.save(key, bufferValue);
+            }
+            catch (exception){
+                console.error('ERROR on SAVE block: ',  exception);
+                trials++;
+            }
+
+            if (answer)
+                break;
         }
-        catch (exception){
-            console.error('ERROR on SAVE block: ',  exception);
-            throw exception;
-        }
+
+        return answer;
     }
 
     async loadBlock(){
