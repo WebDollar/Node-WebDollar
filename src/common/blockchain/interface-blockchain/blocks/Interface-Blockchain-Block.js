@@ -184,7 +184,7 @@ class InterfaceBlockchainBlock {
             if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
                 let prevBlockChainNew = this.blockValidation.getBlockCallBack(this.height).calculateNewChainHash();
-                if ( prevBlockChainNew === null || !Buffer.isBuffer(prevBlockChainNew))
+                if ( !prevBlockChainNew || !Buffer.isBuffer(prevBlockChainNew))
                     throw {message: 'previous chain hash is not given'};
 
                 if (! BufferExtended.safeCompare(prevBlockChainNew, this.hashChain))
@@ -461,10 +461,10 @@ class InterfaceBlockchainBlock {
             let buffer;
 
             let trials = 0;
-            while (trials < 20){
+            while (trials < 50){
 
                 trials ++;
-                buffer = await this.db.get(key, 12000);
+                buffer = await this.db.get(key, 7000);
 
                 if ( buffer )
                     break;
