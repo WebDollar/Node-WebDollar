@@ -184,7 +184,7 @@ class PoolRewardsManagement{
                 //verify if the transaction was included
                 //at least 2 confirmations
                 for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- )
-                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( this.poolData.blocksInfo[i].payoutTransaction ) ){
+                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( this.poolData.blocksInfo[i].payoutTx ) ){
                         found = true;
                         break;
                     }
