@@ -128,11 +128,11 @@ class PoolWorkManagement{
             let isPos = BlockchainGenesis.isPoSActivated(prevBlock.height);
 
             let args = [];
+
             if ( isPos ) {
 
                 work.nonce = 0;
                 work.pos.balance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
-
                 args = [  work.pos.timestamp, work.pos.posMinerAddress, work.pos.balance ];
 
             } else {
@@ -286,11 +286,13 @@ class PoolWorkManagement{
                 blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
 
                 //be sure that none of the POS blocks were skipped
-                for (let i = Math.max( prevBlock.height - 10,  this.blockchain.blocks.blocksStartingPoint ); i < prevBlock.height; i++)
-                    if ( BlockchainGenesis.isPoSActivated(i) ) {
-                        let prevDifficulty = blockInformationMinerInstance.calculateDifficulty( {height: i}, work.pos.balance );
-                        blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
-                    }
+                //for debug it won't work
+                if (isPos && !consts.DEBUG)
+                    for (let i = Math.max( prevBlock.height - 31,  this.blockchain.blocks.blocksStartingPoint ); i < prevBlock.height; i++)
+                        if ( BlockchainGenesis.isPoSActivated(i) ) {
+                            let prevDifficulty = blockInformationMinerInstance.calculateDifficulty( {height: i}, work.pos.balance );
+                            blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
+                        }
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance );
