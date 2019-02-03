@@ -243,8 +243,8 @@ class MinerPoolMining extends InheritedPoolMining {
             try {
 
                 if ( !this._miningWork.block ) throw {message: "block is undefined"};
-                if ( !this._miningWork.start ) throw {message: "start is undefined"};
-                if ( !this._miningWork.end ) throw {message: "end is undefined"};
+                if ( typeof this._miningWork.end  !== "number" ) throw {message: "start is undefined"};
+                if ( typeof this._miningWork.end  !== "number" ) throw {message: "end is undefined"};
                 if ( !this._miningWork.difficultyTarget ) throw {message: "difficultyTarget is undefined"};
 
                 let answer = await this.mine (this._miningWork.block, this._miningWork.difficultyTarget, this._miningWork.start, this._miningWork.end, this._miningWork.height,  );

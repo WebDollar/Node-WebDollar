@@ -214,9 +214,8 @@ class PoolRewardsManagement{
             }
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmed){
+            if (this.poolData.blocksInfo[i].confirmed)
                 continue;
-            }
 
             let blockInfo = this.poolData.blocksInfo[i].block;
 
