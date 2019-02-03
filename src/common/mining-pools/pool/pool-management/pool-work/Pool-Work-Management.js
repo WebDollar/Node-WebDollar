@@ -281,12 +281,26 @@ class PoolWorkManagement{
 
                 //be sure that none of the POS blocks were skipped
                 //for debug it won't work
-                if (isPos && !consts.DEBUG)
-                    for (let i = Math.max( prevBlock.height - 31,  this.blockchain.blocks.blocksStartingPoint ); i < prevBlock.height; i++)
-                        if ( BlockchainGenesis.isPoSActivated(i) ) {
-                            let prevDifficulty = blockInformationMinerInstance.calculateDifficulty( {height: i}, work.pos.balance );
-                            blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
-                        }
+                if (isPos && !consts.DEBUG) {
+
+                    for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
+
+                        let blockInfo = this.poolManagement.poolData.blocksInfo[i];
+                        if (blockInfo.payoutTransaction || blockInfo.payout || !blockInfo.block) continue;
+
+                        for (let height in blockInfo.totalDifficultyPOS)
+                            if (blockInfo.totalDifficultyPOS[height] && blockInfo.totalDifficultyPOS[height].isGreaterThan(0))
+                                if (height > prevBlock.height - 31 && BlockchainGenesis.isPoSActivated(height)){
+
+                                    //let prevDifficulty = blockInformationMinerInstance.calculateDifficulty({height: i}, work.pos.balance);
+                                    let prevDifficulty = difficulty;
+                                    blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
+
+                                }
+
+                    }
+
+                }
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance );
