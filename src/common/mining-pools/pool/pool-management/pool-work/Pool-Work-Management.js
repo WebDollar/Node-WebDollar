@@ -289,7 +289,7 @@ class PoolWorkManagement{
                         if (blockInfo.payoutTransaction || blockInfo.payout || !blockInfo.block) continue;
 
                         for (let height in blockInfo.miningHeights)
-                            if (height !== "length" && blockInfo.miningHeights[height] && blockInfo.miningHeights[height].isGreaterThan(0))
+                            if (height !== "length" && height !== "blocksPos" && height !== "blocksPow" && blockInfo.miningHeights[height] && blockInfo.miningHeights[height].isGreaterThan(0))
                                 if (height > prevBlock.height - 31 && BlockchainGenesis.isPoSActivated(height)){
 
                                     //let prevDifficulty = blockInformationMinerInstance.calculateDifficulty({height: i}, work.pos.balance);
