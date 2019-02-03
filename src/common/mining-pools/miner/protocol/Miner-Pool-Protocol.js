@@ -317,7 +317,7 @@ class MinerPoolProtocol extends PoolProtocolList{
 
             let answer = poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
-            }, "answer", null);
+            }, "answer", 5000);
 
             Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") + " id: " + miningAnswer.id, Log.LOG_TYPE.POOLS);
             if (miningAnswer.pos)
