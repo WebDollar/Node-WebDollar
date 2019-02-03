@@ -36,7 +36,7 @@ class PoolWorkValidation{
 
         try{
 
-            if (work.hash)
+            if (!work.hash)
                 return;
 
             work.hashHex = work.hash.toString("hex");
@@ -83,7 +83,7 @@ class PoolWorkValidation{
             }
 
         }catch (exception){
-
+            console.log(exception);
         }
 
 
@@ -128,7 +128,7 @@ class PoolWorkValidation{
 
         }
 
-        this._timeoutPoolWorkValidation = setTimeout( this._processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, 50000/this._worksLength)) );
+        this._timeoutPoolWorkValidation = setTimeout( this._processPoolWorkValidation.bind(this), Math.max( 100, Math.min(10000, this._worksLength ? 50000/this._worksLength : 0)) );
 
     }
 
