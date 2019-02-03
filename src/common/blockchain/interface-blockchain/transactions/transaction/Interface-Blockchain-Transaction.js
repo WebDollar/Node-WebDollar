@@ -37,7 +37,7 @@ class InterfaceBlockchainTransaction{
                 this.timeLock = timeLock;
 
         if(validateVersion)
-            if (version === undefined){
+            if ( !version ){
 
                 if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
                 else
@@ -77,7 +77,7 @@ class InterfaceBlockchainTransaction{
 
 
         if(validateNonce)
-            if (nonce === undefined || nonce === null)
+            if ( !nonce )
                 nonce = this._computeNonce();
 
         if(validateVersion)

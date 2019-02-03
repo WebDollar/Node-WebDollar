@@ -36,6 +36,9 @@ class PoolWorkValidation{
 
         try{
 
+            if (work.hash)
+                return;
+
             work.hashHex = work.hash.toString("hex");
             if ( this._worksDuplicate[work.hashHex] )
                 return;

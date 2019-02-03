@@ -284,17 +284,21 @@ class TransactionsPendingQueue {
 
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
+            let tx = this.listArray[i];
+
             let removeThis = false;
 
             try{
 
+                if (!tx.blockchain) removeThis = true;
+                else
+                if (!tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
+                else
                 //This is just for pool
                 //TODO remove on light consensus
-                if( this.blockchain.agent.light && this.listArray[i].timeLock < this.blockchain.blocks.length-1 )
-                    removeThis=true;
-
-                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( this.listArray[i] ))
-                    removeThis=true;
+                if( this.blockchain.agent.light && tx.timeLock < this.blockchain.blocks.length-1 ) removeThis=true;
+                else
+                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) removeThis=true;
 
             } catch (exception){
 
@@ -308,7 +312,7 @@ class TransactionsPendingQueue {
             }
 
             if(removeThis)
-                this.removePendingTransaction(this.listArray[i], i);
+                this.removePendingTransaction(tx, i);
 
         }
 
