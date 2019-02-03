@@ -64,13 +64,7 @@ class SavingManager{
 
             let blocks = this._pendingBlocksList[key];
 
-            if ( !blocks ){
-                this._pendingBlocksList[key] = undefined;
-                delete this._pendingBlocksList[key];
-                continue;
-            }
-
-            if (blocks.length === 0){
+            if ( !blocks || blocks.length === 0 ){
                 this._pendingBlocksList[key] = undefined;
                 delete this._pendingBlocksList[key];
                 continue;
@@ -83,7 +77,7 @@ class SavingManager{
                 let block = blocks[i];
 
                 //already deleted
-                if (block.block || block.block.blockchain ){
+                if (!block.block || !block.block.blockchain ){
                     blocks.splice(i,1);
                     i--;
                     continue;

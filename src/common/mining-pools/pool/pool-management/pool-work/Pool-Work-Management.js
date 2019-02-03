@@ -250,10 +250,6 @@ class PoolWorkManagement{
                         if (block)
                             block.destroyBlock();
 
-
-
-
-
                     }
 
                     revertActions.destroyRevertActions();
