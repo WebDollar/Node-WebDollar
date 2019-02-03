@@ -275,7 +275,7 @@ class MinerPoolMining extends InheritedPoolMining {
             if ( this._miningWork.poolSocket && this._hashesPerSecond === 0 )
                 await this.minerPoolManagement.minerPoolProtocol.requestWork();
 
-            if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 180000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
+            if (this.started && this.minerPoolManagement.started && ( (new Date().getTime() - this._miningWork.date ) > 300000 || this.minerPoolManagement.minerPoolProtocol.connectedPools.length === 0 ) ){
 
                 //in case I can not mine from this pool, show an error and disconnect
                 Log.error("Mining Pool is not working. Trying to reconnect", Log.LOG_TYPE.POOLS);
