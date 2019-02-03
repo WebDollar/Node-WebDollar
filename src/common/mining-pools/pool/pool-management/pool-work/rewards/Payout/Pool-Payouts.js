@@ -147,7 +147,7 @@ class PoolPayouts{
                     console.info("TOTAL POS AND POW ARE BOTH ZERO", {totalDifficultyPOS: totalDifficultyPOS,  totalDifficultyPOW: totalDifficultyPOW});
                     console.info("--------------------------");
 
-                    blockConfirmed.payoutTransaction = true;
+                    blockConfirmed.payout = true;
                     return;
 
                 }

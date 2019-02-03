@@ -202,13 +202,11 @@ class PoolRewardsManagement{
             if ( this.poolData.blocksInfo[i].payout){
 
                 //let's delete old payouts
-                if (found){
-                    this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
-                    this.poolManagement.poolStatistics.poolBlocksConfirmed--;
-                    Log.warn("BLOCK ALREADY PAID "+i, Log.LOG_TYPE.POOLS);
-                    this.poolData.deleteBlockInformation(i);
-                    needSave = true;
-                }
+                this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
+                this.poolManagement.poolStatistics.poolBlocksConfirmed--;
+                Log.warn("BLOCK ALREADY PAID "+i, Log.LOG_TYPE.POOLS);
+                this.poolData.deleteBlockInformation(i);
+                needSave = true;
 
                 continue;
             }
