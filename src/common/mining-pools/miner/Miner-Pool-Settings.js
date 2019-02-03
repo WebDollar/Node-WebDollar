@@ -156,13 +156,13 @@ class MinerPoolSettings {
 
     async addPoolList(url, data, save = true){
 
-        if (data === undefined)
+        if ( !data )
             data = PoolsUtils.extractPoolURL(url);
 
-        if (data === null) return;
+        if (!data ) return;
 
         let foundPool = this.poolsList[ data.poolPublicKey.toString("hex") ];
-        if (foundPool === undefined)
+        if (!foundPool)
             foundPool = {};
 
         if (JSON.stringify(this.poolsList[data.poolPublicKey.toString("hex")]) !== JSON.stringify(data)){

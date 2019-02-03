@@ -148,7 +148,7 @@ class PoolRewardsManagement{
                         confirmationsPool++;
                     else {
 
-                        if (uniques[ block.data.minerAddress.toString("hex")] === undefined) {
+                        if ( !uniques[ block.data.minerAddress.toString("hex")] ) {
                             uniques[ block.data.minerAddress.toString("hex")] = true;
                             confirmationsOthersUnique++;
                         } else

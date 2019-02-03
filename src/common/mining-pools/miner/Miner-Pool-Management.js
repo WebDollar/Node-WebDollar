@@ -105,7 +105,7 @@ class MinerPoolManagement {
                 if (value && forceStartMinerPool) {
                     await Blockchain.PoolManagement.setPoolStarted(false);
 
-                    if (Blockchain.ServerPoolManagement !== undefined)
+                    if (Blockchain.ServerPoolManagement )
                         await Blockchain.ServerPoolManagement.setServerPoolStarted(false);
                 }
 
@@ -199,7 +199,7 @@ class MinerPoolManagement {
             await this.setMinerPoolStarted(true, true);
         }
 
-        if (this._setRandomPoolTimeout === undefined)
+        if ( !this._setRandomPoolTimeout )
             this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 10);
 
         return true;

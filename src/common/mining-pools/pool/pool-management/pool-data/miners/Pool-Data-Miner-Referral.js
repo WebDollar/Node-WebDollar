@@ -14,7 +14,7 @@ class PoolDataMinerReferral {
         this.refereeAddress = refereeAddress; //the referee
         this.refereeMiner = refereeMiner; //the referee
 
-        if (this.refereeAddress !== undefined)
+        if (this.refereeAddress )
             this.findRefereeAddress();
 
         this._rewardReferralTotal = 0; // total - no confirmed
@@ -57,13 +57,13 @@ class PoolDataMinerReferral {
 
     findRefereeAddress(){
 
-        if (this.refereeMiner !== null && this.refereeMiner !== undefined)
+        if (this.refereeMiner)
             return this.refereeMiner;
 
-        if (this.refereeAddress === undefined) return null;
+        if ( !this.refereeAddress ) return null;
 
         let refereeMiner = this.poolData.findMiner( this.refereeAddress );
-        if (refereeMiner === null || refereeMiner === undefined) throw {message: "couldn't find refereeAddress", refereeAddress: this.refereeAddress}
+        if (!refereeMiner ) throw {message: "couldn't find refereeAddress", refereeAddress: this.refereeAddress}
         else this.refereeMiner = refereeMiner;
 
         return this.refereeMiner;
@@ -114,8 +114,8 @@ class PoolDataMinerReferral {
             confirmed: Math.floor( this._rewardReferralConfirmed ),
             sent: Math.floor( this._rewardReferralSent  ),
 
-            address: this.refereeAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.refereeAddress, false, true) : '',
-            online: this.refereeMiner !== undefined  ? this.refereeMiner.isOnline : undefined,
+            address: this.refereeAddress ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.refereeAddress, false, true) : '',
+            online: this.refereeMiner ? this.refereeMiner.isOnline : undefined,
         }
 
     }
