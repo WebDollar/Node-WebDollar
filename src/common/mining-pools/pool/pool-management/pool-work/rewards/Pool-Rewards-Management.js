@@ -10,7 +10,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START = 40; //blocks
 
-const MAXIMUM_FAIL_CONFIRMATIONS = 20; //blocks
+const MAXIMUM_FAIL_CONFIRMATIONS = 80; //blocks
 
 const CONFIRMATIONS_REQUIRE_OTHER_MINERS = consts.DEBUG ? false : true;
 
