@@ -63,9 +63,10 @@ class PoolDataMiner{
 
         let pos = this.findInstance(socket, true);
 
-        if (pos !== -1)
-            this.instances.splice( pos ,1);
+        if (pos !== -1) {
+            this.instances.splice(pos, 1);
             return true;
+        }
 
         return false;
     }

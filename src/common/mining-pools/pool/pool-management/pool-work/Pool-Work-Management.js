@@ -157,6 +157,10 @@ class PoolWorkManagement{
                 prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
                 prevBlock.timeStamp = work.pos.timestamp;
                 prevBlock.verifyPOSSignature();
+
+                if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
+                    throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
+                
             }
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
@@ -199,9 +203,6 @@ class PoolWorkManagement{
                         prevBlock.timeStamp = work.pos.timestamp;
 
                         prevBlock._validateBlockTimeStamp();
-
-                        if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
-                            throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
 
 
                     }

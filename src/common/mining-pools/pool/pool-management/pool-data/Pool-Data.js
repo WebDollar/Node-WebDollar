@@ -184,7 +184,8 @@ class PoolData {
                 let miner = new PoolDataMiner(this, i );
                 offset = miner.deserializeMiner(buffer, offset );
 
-                this.miners.push(miner);
+                if (!this.findMiner(miner.address))
+                    this.miners.push(miner);
 
             }
 

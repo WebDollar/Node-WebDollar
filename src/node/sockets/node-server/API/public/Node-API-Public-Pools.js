@@ -41,7 +41,7 @@ class NodeAPIPublicPools {
   miners(req, res) {
     let miners = [];
 
-    if (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement.poolStarted) {
+    if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
       let minersOnline = Blockchain.PoolManagement.poolData.connectedMinerInstances.list;
 
       for (let i = 0; i < minersOnline.length; i++) {
