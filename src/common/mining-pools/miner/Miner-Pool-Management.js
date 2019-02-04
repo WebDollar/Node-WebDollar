@@ -200,7 +200,7 @@ class MinerPoolManagement {
         }
 
         if ( !this._setRandomPoolTimeout )
-            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 10);
+            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 1000 * 40);
 
         return true;
     }
@@ -212,7 +212,7 @@ class MinerPoolManagement {
             // if (!VersionCheckerHelper.detectMobile())
             //     throw "no mobile";
 
-            if (Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED && this.minerPoolStarted)
+            if ( Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED )
                 throw "it is sync";
 
             let pools = 0;
@@ -236,7 +236,7 @@ class MinerPoolManagement {
 
         }
 
-        setTimeout( this._setRandomPool.bind(this), 5000);
+        setTimeout( this._setRandomPool.bind(this), 1000 * 40);
 
     }
 
