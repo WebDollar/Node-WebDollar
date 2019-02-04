@@ -296,6 +296,10 @@ class PoolWorkManagement{
                                     let prevDifficulty = difficulty;
 
                                     let oldBlockInformationMinerInstance = oldBlockInfo.findFirstMinerInstance( blockInformationMinerInstance.address );
+
+                                    if (!oldBlockInformationMinerInstance)
+                                        oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance(  blockInformationMinerInstance )  ;
+
                                     oldBlockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
 
                                 }
