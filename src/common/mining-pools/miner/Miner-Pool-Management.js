@@ -35,6 +35,8 @@ class MinerPoolManagement {
         this._minerPoolOpened = false;
         this._minerPoolStarted = false;
 
+        this._lastyPoolTryed = undefined;
+
     }
 
     async initializeMinerPoolManagement(poolURL){
@@ -194,49 +196,77 @@ class MinerPoolManagement {
     //be sure the URL of the webpage was read
     async setMinerInitialPoolURL(newURL){
 
-        if (newURL !== '' && newURL !== undefined) {
+        let timeoutInterval = 1000*10;
+
+        if (newURL !== '' && newURL !== undefined)
+            timeoutInterval = 10;
+
+        if( !this.minerPoolSettings.poolURL )
+            timeoutInterval = 10;
+
+        if (newURL !== '' && newURL !== undefined){
+
+            if ( !this._setRandomPoolTimeout )
+                this._setRandomPoolTimeout = setTimeout( () => this._setRandomPool(newURL), timeoutInterval);
+
+            this._lastyPoolTryed = newURL;
+
             await this.minerPoolSettings.setPoolURL(newURL);
             await this.setMinerPoolStarted(true, true);
+
+            return true;
         }
 
         if ( !this._setRandomPoolTimeout )
-            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 1000 * 10);
+            this._setRandomPoolTimeout = setTimeout( () => this._setRandomPool(), timeoutInterval);
 
         return true;
     }
 
-    async _setRandomPool(){
+    async _setRandomPool(newUrl=undefined){
 
         try {
 
             // if (!VersionCheckerHelper.detectMobile())
             //     throw "no mobile";
 
-            if ( Blockchain.blockchain.agent.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED )
+            if ( Blockchain.MinerPoolManagement.minerPoolStarted && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED )
                 throw "it is sync";
 
-            let pools = 0;
-            for (let key in this.minerPoolSettings.poolsList)
-                pools++;
+            if( this.minerPoolSettings.poolURL && this._lastyPoolTryed !== this.minerPoolSettings.poolURL ){
+                this._lastyPoolTryed = this.minerPoolSettings.poolURL;
+                await this.setMinerPoolStarted(true, true);
+            }else{
 
-            let random = Math.floor(Math.random() * pools);
+                let pools = 0;
+                for (let key in this.minerPoolSettings.poolsList)
+                    pools++;
 
-            let c = 0;
-            for (let key in this.minerPoolSettings.poolsList) {
+                let random = Math.floor(Math.random() * pools);
 
-                if (c === random) {
-                    await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL, true, true);
-                    break;
+                let c = 0;
+                for (let key in this.minerPoolSettings.poolsList) {
+
+                    if (c === random) {
+
+                        if( !this.minerPoolSettings.poolURL )
+                            await this.minerPoolSettings.setPoolURL(this.minerPoolSettings.poolsList[key].poolURL);
+
+                        await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL,true, true);
+                        this._lastyPoolTryed = this.minerPoolSettings.poolsList[key].poolURL;
+                        break;
+                    }
+
+                    c++;
                 }
 
-                c++;
             }
 
         } catch (exception){
 
         }
 
-        setTimeout( this._setRandomPool.bind(this), 1000 * 40);
+        setTimeout( () => this._setRandomPool(), 1000 * 10);
 
     }
 
