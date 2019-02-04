@@ -285,16 +285,18 @@ class PoolWorkManagement{
 
                     for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
 
-                        let blockInfo = this.poolManagement.poolData.blocksInfo[i];
-                        if (blockInfo.payoutTransaction || blockInfo.payout || !blockInfo.block) continue;
+                        let oldBlockInfo = this.poolManagement.poolData.blocksInfo[i];
+                        if (oldBlockInfo.payoutTransaction || oldBlockInfo.payout || !oldBlockInfo.block) continue;
 
-                        for (let height in blockInfo.miningHeights)
-                            if (typeof blockInfo.miningHeights[height] === "object" && blockInfo.miningHeights[height].isGreaterThan(0))
+                        for (let height in oldBlockInfo.miningHeights)
+                            if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
                                 if (height > prevBlock.height - 31 && BlockchainGenesis.isPoSActivated(height)){
 
                                     //let prevDifficulty = blockInformationMinerInstance.calculateDifficulty({height: i}, work.pos.balance);
                                     let prevDifficulty = difficulty;
-                                    blockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
+
+                                    let oldBlockInformationMinerInstance = oldBlockInfo.findFirstMinerInstance( blockInformationMinerInstance.address );
+                                    oldBlockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
 
                                 }
 

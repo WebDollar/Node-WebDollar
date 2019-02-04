@@ -349,7 +349,8 @@ class PoolDataBlockInformation {
 
     findFirstMinerInstance(minerAddress){
 
-        if ( !Buffer.isBuffer(minerAddress) ) minerAddress = minerAddress.address;
+        if ( typeof minerAddress === "string" ) minerAddress = Buffer.from(minerAddress, "hex");
+        if ( !Buffer.isBuffer(minerAddress) && typeof minerAddress === "object" ) minerAddress = minerAddress.address;
 
         let minerAddressString = minerAddress.toString("hex");
 
