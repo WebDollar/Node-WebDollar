@@ -200,7 +200,7 @@ class MinerPoolManagement {
         }
 
         if ( !this._setRandomPoolTimeout )
-            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 1000 * 40);
+            this._setRandomPoolTimeout = setTimeout( this._setRandomPool.bind(this), 1000 * 10);
 
         return true;
     }
