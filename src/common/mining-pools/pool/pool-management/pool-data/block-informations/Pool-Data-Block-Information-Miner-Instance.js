@@ -275,7 +275,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficulty = difficultyBigNumber.number;
 
                 if (difficulty.isGreaterThan(0))
-                    this.adjustDifficulty({height: height}, difficulty, false, false, this );
+                    this.adjustDifficulty({height: height}, difficulty, false, false );
 
             }
 
@@ -286,7 +286,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficulty = difficultyBigNumber.number;
 
                 if (difficulty.isGreaterThan(0))
-                    this.adjustDifficulty({height: height}, difficulty, false, false, this);
+                    this.adjustDifficulty({height: height}, difficulty, false, false );
             }
 
         }

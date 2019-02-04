@@ -206,7 +206,7 @@ class PoolData {
 
         let list = [Serialization.serializeNumber4Bytes(this.blocksInfo.length)];
 
-        for (let i = 0; i < this.blocksInfo.length; ++i)
+        for (let i = 0; i < this.blocksInfo.length; ++i){}
             list.push(this.blocksInfo[i].serializeBlockInformation());
 
         return Buffer.concat(list);

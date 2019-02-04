@@ -283,7 +283,7 @@ class PoolWorkManagement{
                 //for debug it won't work
                 if (isPos && !consts.DEBUG) {
 
-                    for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
+                    for (let i=0; i < this.poolManagement.poolData.blocksInfo.length - 1; i++){
 
                         let oldBlockInfo = this.poolManagement.poolData.blocksInfo[i];
                         if (oldBlockInfo.payoutTransaction || oldBlockInfo.payout || !oldBlockInfo.block) continue;
@@ -298,7 +298,7 @@ class PoolWorkManagement{
                                     let oldBlockInformationMinerInstance = oldBlockInfo.findFirstMinerInstance( blockInformationMinerInstance.address );
 
                                     if (!oldBlockInformationMinerInstance)
-                                        oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance(  blockInformationMinerInstance )  ;
+                                        oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
                                     oldBlockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
 
