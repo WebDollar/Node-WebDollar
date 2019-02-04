@@ -280,11 +280,11 @@ class PoolDataBlockInformation {
         if (!minerInstance ) throw {message: "minerInstance is undefined"};
 
         let blockInformationMinerInstance = this._findBlockInformationMinerInstance(minerInstance);
-        if (blockInformationMinerInstance ) return blockInformationMinerInstance;
 
-
-        blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance, undefined, );
-        this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+        if ( !blockInformationMinerInstance ) {
+            blockInformationMinerInstance = new PoolDataBlockInformationMinerInstance(this.poolManagement, this, minerInstance, undefined,);
+            this.blockInformationMinersInstances.push(blockInformationMinerInstance);
+        }
 
         return blockInformationMinerInstance;
 
