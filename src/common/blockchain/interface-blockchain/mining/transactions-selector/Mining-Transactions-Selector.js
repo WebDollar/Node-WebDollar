@@ -79,21 +79,19 @@ class MiningTransactionsSelector{
         let size = 200 * 1024 - 800;
         let i = 0;
 
+        let infoTx ;
         while (size > 0 && i < this.blockchain.transactions.pendingQueue.listArray.length ){
 
             let transaction = this.blockchain.transactions.pendingQueue.listArray[i];
 
             try {
 
-                if (this._transactions.length.length <= 20)
-                    console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true) );
+                infoTx = transaction.txId.toString("hex") + " " + InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true);
 
                 if ( !transaction.blockchain ) {
                     i++;
                     continue;
                 }
-
-                console.log( transaction.txId.toString("hex"), InterfaceBlockchainAddressHelper.generateAddressWIF(transaction.from.addresses[0].unencodedAddress, false, true), "size", size );
 
                 this.validateTransaction( transaction, miningFeePerByte );
 
@@ -118,8 +116,10 @@ class MiningTransactionsSelector{
 
                         size -= transaction.serializeTransaction().length;
 
-                        if (size >= 0)
+                        if (size >= 0) {
                             this._transactions.push(transaction);
+                            infoTx += " added";
+                        }
 
                     } else
                         bRemoveTransaction = true;
@@ -129,11 +129,13 @@ class MiningTransactionsSelector{
 
                     if(!missingFirstNonce)
                         if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' ){
+
                             missingFirstNonce = true;
                             let alreadyInserted = 0;
-                            for(let i=this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress)+1;i<transaction.nonce;i++)
-                                if(alreadyInserted<=consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_MISSING_NONCE_SEARCH){
-                                    this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress,i);
+
+                            for(let j=this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress)+1; j<transaction.nonce; j++)
+                                if (alreadyInserted<=consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_MISSING_NONCE_SEARCH){
+                                    this.blockchain.transactions.pendingQueue.propagateMissingNonce(transaction.from.addresses[0].unencodedAddress, j);
                                     alreadyInserted++;
                                 }
                         }
@@ -147,6 +149,8 @@ class MiningTransactionsSelector{
             } catch (exception){
 
             }
+
+            console.log(infoTx);
 
             i++;
         }
