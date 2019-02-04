@@ -199,7 +199,7 @@ class InterfaceBlockchainTransaction{
 
         if ( blockHeight !== -1){
             if (this.timeLock !== 0 && blockHeight < this.timeLock ) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
-            if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timeLock : this.timeLock };
+            if (this.timeLock !== 0 && this.timeLock - blockHeight > 100) throw { message: "timeLock - blockHeight < 100", timeLock : this.timeLock };
         }
 
         let txId = this._computeTxId();

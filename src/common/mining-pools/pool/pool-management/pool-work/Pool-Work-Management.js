@@ -180,10 +180,10 @@ class PoolWorkManagement{
                     console.warn("----------------------------------------------------------------------------");
 
                     //returning false, because a new fork was changed in the mean while
-                    if ( !isPos && this.blockchain.blocks.length-1 > prevBlock.height )
+                    if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
                         throw {message: "pool: block is already too old"};
 
-                    if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height )
+                    if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
                         throw {message: "pool: block is already too old"};
 
                     prevBlock.hash = work.hash;
@@ -289,7 +289,7 @@ class PoolWorkManagement{
                         if (blockInfo.payoutTransaction || blockInfo.payout || !blockInfo.block) continue;
 
                         for (let height in blockInfo.miningHeights)
-                            if (height !== "length" && height !== "blocksPos" && height !== "blocksPow" && blockInfo.miningHeights[height] && blockInfo.miningHeights[height].isGreaterThan(0))
+                            if (typeof blockInfo.miningHeights[height] === "object" && blockInfo.miningHeights[height].isGreaterThan(0))
                                 if (height > prevBlock.height - 31 && BlockchainGenesis.isPoSActivated(height)){
 
                                     //let prevDifficulty = blockInformationMinerInstance.calculateDifficulty({height: i}, work.pos.balance);

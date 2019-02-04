@@ -14,12 +14,12 @@ class MiningTransactionsSelector{
 
     validateTransactionId(txId){
 
+        if (typeof txId === "string") txId = Buffer.from(txId, "hex");
+
         //Verify if was included in last blocks
-        for(let i=this.blockchain.blocks.length-consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH; i<this.blockchain.blocks.length; i++)
-            if( this.blockchain.blocks[i] )
-                for(let j=0; j<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                    if(txId.toString('hex') === this.blockchain.blocks[i].data.transactions.transactions[j].txId.toString('hex'))
-                        return false;
+        for(let i=Math.max(this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint ); i<this.blockchain.blocks.length; i++)
+            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.findTransactionInBlockData( txId) )
+                return false;
 
         return true;
 
@@ -48,17 +48,15 @@ class MiningTransactionsSelector{
 
         }
 
-        if(!this.validateTransactionId(transaction.txId))
+        if (!this.validateTransactionId(transaction.txId))
             throw {message: "This transaction was already inserted by txId"};
 
         if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
 
-        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
-            throw {message: "transaction is too old"};
 
-        if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
-            throw {message: "transaction is in future"};
+        if (transaction.timeLock !== 0 && this.blockchain.blocks.length-1 < transaction.timeLock ) throw { message: "blockHeight < timeLock", timeLock: transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
+        if (transaction.timeLock !== 0 && transaction.timeLock - this.blockchain.blocks.length-1 > 100) throw { message: "timelock - blockHeight < 100", timeLock : transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
 
         //validating its own transaction
         if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
