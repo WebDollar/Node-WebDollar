@@ -292,7 +292,7 @@ class TransactionsPendingQueue {
 
                 if (!tx.blockchain) removeThis = true;
                 else
-                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
+                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress) && this.blockchain.mining.miningTransactionSelector.validateTransactionId( tx )) continue;
                 else
                 //This is just for pool
                 //TODO remove on light consensus
