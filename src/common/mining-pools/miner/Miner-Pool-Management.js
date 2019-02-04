@@ -36,6 +36,7 @@ class MinerPoolManagement {
         this._minerPoolStarted = false;
 
         this._lastyPoolTryed = undefined;
+        this.isNewUser = false;
 
     }
 
@@ -201,8 +202,10 @@ class MinerPoolManagement {
         if (newURL !== '' && newURL !== undefined)
             timeoutInterval = 10;
 
-        if( !this.minerPoolSettings.poolURL )
+        if( !this.minerPoolSettings.poolURL ){
+            this.isNewUser = true;
             timeoutInterval = 10;
+        }
 
         if (newURL !== '' && newURL !== undefined){
 
@@ -249,7 +252,7 @@ class MinerPoolManagement {
 
                     if (c === random) {
 
-                        if( !this.minerPoolSettings.poolURL )
+                        if(this.isNewUser)
                             await this.minerPoolSettings.setPoolURL(this.minerPoolSettings.poolsList[key].poolURL);
 
                         await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL,true, true);
