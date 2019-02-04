@@ -41,7 +41,7 @@ class PoolDataMiner{
 
         let instance = this.findInstance(socket);
 
-        if ( instance === null) {
+        if ( !instance ) {
             instance = new PoolDataMinerInstance(this, socket);
             this.instances.push(instance);
         }
@@ -62,10 +62,10 @@ class PoolDataMiner{
     removeInstance(socket){
 
         let pos = this.findInstance(socket, true);
-        if (pos !== -1) {
+
+        if (pos !== -1)
             this.instances.splice( pos ,1);
             return true;
-        }
 
         return false;
     }

@@ -338,7 +338,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
-                if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
+                if ( !unencodedAddress ) throw { message: "minerAddress is not correct" };
 
                 if (!Buffer.isBuffer( data.minerAddressPublicKey)  || data.minerAddressPublicKey.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
                 let minerAddressPublicKey = data.minerAddressPublicKey;
@@ -347,10 +347,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( typeof data.newMinerAddress !== "string" ) throw { message: "newMinerAddress is not correct" };
                 let newUnencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.newMinerAddress );
-                if (newUnencodedAddress === null) throw { message: "newMinerAddress is not correct" };
+                if ( !newUnencodedAddress ) throw { message: "newMinerAddress is not correct" };
+
+                if (newUnencodedAddress.equals(unencodedAddress))
+                    throw {message: "addresses are the same"};
 
                 let miner = this.poolManagement.poolData.findMiner(unencodedAddress);
-                if (miner === null) throw {message: "miner was not found"};
+                if ( !miner ) throw {message: "miner was not found"};
 
                 let message = Buffer.concat([
 
@@ -361,7 +364,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
-                if (minerInstance === null) throw {message: "minerInstance was not found"};
+                if ( !minerInstance ) throw {message: "minerInstance was not found"};
 
 
                 if ( !Buffer.isBuffer(data.signature) || data.signature.length < 10 ) throw {message: "pool: signature is invalid"};
@@ -371,11 +374,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( data.type === "only instance" ){
 
-                    miner.removeInstance(minerInstance);
+                    let newMiner = this.poolManagement.poolData.addMiner( newUnencodedAddress );
 
-                    let newMiner = this.poolManagement.poolData.addMiner(newUnencodedAddress );
-                    minerInstance.miner = newMiner;
-                    newMiner.addInstance(minerInstance);
+                    minerInstance = newMiner.addInstance(socket);
+                    socket.node.protocol.minerPool = newMiner;
 
                     miner = newMiner;
 

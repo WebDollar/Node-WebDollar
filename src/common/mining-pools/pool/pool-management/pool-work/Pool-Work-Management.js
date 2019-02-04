@@ -23,6 +23,8 @@ class PoolWorkManagement{
         this.poolWorkValidation = new PoolWorkValidation(poolManagement, this);
 
         this.poolWork = new PoolWork(poolManagement, blockchain);
+
+        this._rewardedAddresses = {};
     }
 
     startPoolWorkManagement(){
@@ -197,6 +199,10 @@ class PoolWorkManagement{
                         prevBlock.timeStamp = work.pos.timestamp;
 
                         prevBlock._validateBlockTimeStamp();
+
+                        if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
+                            throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
+
 
                     }
 
