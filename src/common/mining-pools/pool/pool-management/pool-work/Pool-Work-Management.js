@@ -283,10 +283,12 @@ class PoolWorkManagement{
                 //for debug it won't work
                 if (isPos && !consts.DEBUG) {
 
-                    for (let i=0; i < this.poolManagement.poolData.blocksInfo.length - 1; i++){
+                    for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
 
                         let oldBlockInfo = this.poolManagement.poolData.blocksInfo[i];
-                        if (oldBlockInfo.payoutTransaction || oldBlockInfo.payout || !oldBlockInfo.block) continue;
+                        if (oldBlockInfo.payoutTransaction || oldBlockInfo.payout ) continue;
+
+                        if ( !oldBlockInfo.block && i !== this.poolManagement.poolData.blocksInfo.length ) continue;
 
                         for (let height in oldBlockInfo.miningHeights)
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
