@@ -158,7 +158,7 @@ class CLI {
                 data.signature = answer.signature;
 
                 if (wantToPropagate)
-                    Blockchain.blockchain.transactions.pendingQueue.transactionsProtocol.propagateNewPendingTransaction( answer.transaction );
+                    Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction( answer.transaction, undefined, true);
 
             }else{
 

@@ -26,14 +26,14 @@ class TransactionsPendingQueue {
 
     }
 
-    addNewTransaction(index,transaction){
+    _addNewTransaction(index, transaction){
 
         let foundMissingNonce = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
         if(foundMissingNonce)
             this.transactionsProtocol.transactionsDownloadingManager.removeMissingNonceList(transaction.from.addresses[0].unencodedAddress.toString('hex')+transaction.nonce);
 
-        if(!index)
+        if (index === undefined)
             this.listArray.push(transaction);
         else
             this.listArray.splice(index, 0, transaction);
@@ -111,7 +111,7 @@ class TransactionsPendingQueue {
 
                 }else if (transaction.nonce < this.listArray[i].nonce){ // will add a smaller nonce
 
-                    this.addNewTransaction(i,transaction);
+                    this._addNewTransaction(i,transaction);
                     inserted = true;
                     i++;
 
@@ -119,7 +119,7 @@ class TransactionsPendingQueue {
 
             } else if (compare > 0) { // i will add a higher nonce
 
-                this.addNewTransaction(i,transaction);
+                this._addNewTransaction(i,transaction);
                 inserted = true;
                 i++;
 
@@ -152,7 +152,7 @@ class TransactionsPendingQueue {
         }
 
         if ( inserted === false){
-            this.addNewTransaction(undefined,transaction);
+            this._addNewTransaction(undefined,transaction);
             this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
         }
 

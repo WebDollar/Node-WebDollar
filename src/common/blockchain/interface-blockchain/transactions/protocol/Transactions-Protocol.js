@@ -296,7 +296,6 @@ class InterfaceBlockchainTransactionsProtocol {
             });
 
 
-        // NodeProtocol.broadcastRequest( "transactions/new-pending-transaction", { format: "buffer", buffer: transaction.serializeTransaction() }, undefined, exceptSockets );
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
 
     }
