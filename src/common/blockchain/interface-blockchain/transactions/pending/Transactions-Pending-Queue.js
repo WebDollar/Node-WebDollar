@@ -38,8 +38,10 @@ class TransactionsPendingQueue {
         else
             this.listArray.splice(index, 0, transaction);
 
-        this.listObject[transaction.txId.toString('hex')] = transaction;
-        this.listObject[transaction.txId.toString('hex')].alreadyBroadcasted = false;
+        let txId = transaction.txId.toString('hex');
+
+        this.listObject[txId] = transaction;
+        this.listObject[txId].alreadyBroadcasted = false;
 
     }
 
