@@ -160,8 +160,15 @@ class PoolWorkManagement{
 
                 if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
                     throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
-                
+
             }
+
+            //returning false, because a new fork was changed in the mean while
+            if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
+                throw {message: "pool: block is already too old"};
+
+            if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
+                throw {message: "pool: block is already too old"};
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
@@ -184,13 +191,6 @@ class PoolWorkManagement{
                     console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex"));
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
-
-                    //returning false, because a new fork was changed in the mean while
-                    if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
-                        throw {message: "pool: block is already too old"};
-
-                    if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
-                        throw {message: "pool: block is already too old"};
 
                     prevBlock.hash = work.hash;
                     prevBlock.nonce = work.nonce;
