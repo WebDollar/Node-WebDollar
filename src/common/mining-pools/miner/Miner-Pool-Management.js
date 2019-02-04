@@ -27,7 +27,7 @@ class MinerPoolManagement {
         this.minerPoolProtocol = new MinerPoolProtocol(this);
         this.minerPoolStatistics = new MinerPoolStatistics(this);
         this.minerPoolReferrals = new MinerPoolReferrals(this);
-        
+
         this.minerPoolMining = new MinerPoolMining(this);
         this.minerPoolReward = new MinerPoolReward(this);
 
