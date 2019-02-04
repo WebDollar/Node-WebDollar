@@ -71,7 +71,7 @@ class PoolRewardsManagement{
         //     this.poolData.blocksInfo.forEach( (blockInfo)=>{
         //
         //         let block = this.blockchain.blocks[blockInfo.height];
-        //         if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 10 )
+        //         if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 50 )
         //             if (BlockchainGenesis.isPoSActivated(blockInfo.height))
         //
         //                 blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {

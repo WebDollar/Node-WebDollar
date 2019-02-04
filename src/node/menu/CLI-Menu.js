@@ -179,12 +179,10 @@ class CLI {
                 console.log("Transaction successfully exported to ," + addressPath+"transaction.tx");
 
                 resolve(true);
-                return;
 
             });
 
             resolve(true);
-            return;
 
         });
 
