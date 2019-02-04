@@ -35,7 +35,7 @@ class MinerPoolManagement {
         this._minerPoolOpened = false;
         this._minerPoolStarted = false;
 
-        this._lastyPoolTryed = undefined;
+        this._lastPoolTried = undefined;
         this.isNewUser = false;
 
     }
@@ -212,7 +212,7 @@ class MinerPoolManagement {
             if ( !this._setRandomPoolTimeout )
                 this._setRandomPoolTimeout = setTimeout( () => this._setRandomPool(newURL), timeoutInterval);
 
-            this._lastyPoolTryed = newURL;
+            this._lastPoolTried = newURL;
 
             await this.minerPoolSettings.setPoolURL(newURL);
             await this.setMinerPoolStarted(true, true);
@@ -226,7 +226,7 @@ class MinerPoolManagement {
         return true;
     }
 
-    async _setRandomPool(newUrl=undefined){
+    async _setRandomPool(  ){
 
         try {
 
@@ -236,8 +236,8 @@ class MinerPoolManagement {
             if ( Blockchain.MinerPoolManagement.minerPoolStarted && Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED )
                 throw "it is sync";
 
-            if( this.minerPoolSettings.poolURL && this._lastyPoolTryed !== this.minerPoolSettings.poolURL ){
-                this._lastyPoolTryed = this.minerPoolSettings.poolURL;
+            if( this.minerPoolSettings.poolURL && this._lastPoolTried !== this.minerPoolSettings.poolURL ){
+                this._lastPoolTried = this.minerPoolSettings.poolURL;
                 await this.setMinerPoolStarted(true, true);
             }else{
 
@@ -256,7 +256,7 @@ class MinerPoolManagement {
                             await this.minerPoolSettings.setPoolURL(this.minerPoolSettings.poolsList[key].poolURL);
 
                         await this.startMinerPool(this.minerPoolSettings.poolsList[key].poolURL,true, true);
-                        this._lastyPoolTryed = this.minerPoolSettings.poolsList[key].poolURL;
+                        this._lastPoolTried = this.minerPoolSettings.poolsList[key].poolURL;
                         break;
                     }
 
