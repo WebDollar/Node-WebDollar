@@ -18,7 +18,7 @@ class MiningTransactionsSelector{
 
         //Verify if was included in last blocks
         for(let i=Math.max(this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint ); i<this.blockchain.blocks.length; i++)
-            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.findTransactionInBlockData( txId) )
+            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( txId) )
                 return false;
 
         return true;
