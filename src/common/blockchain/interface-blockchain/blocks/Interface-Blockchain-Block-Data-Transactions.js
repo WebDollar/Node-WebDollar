@@ -247,6 +247,8 @@ class InterfaceBlockchainBlockDataTransactions {
             if (this.transactions[i].txId.equals(transaction))
                 return i;
 
+        return -1;
+
     }
 
     freeTransactionsFromMemory(){

@@ -186,7 +186,7 @@ class PoolRewardsManagement{
                 if (!this.poolData.blocksInfo[i].payoutTx) found = true;
                 else
                 for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- )
-                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( this.poolData.blocksInfo[i].payoutTx ) ){
+                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( this.poolData.blocksInfo[i].payoutTx ) >= 0 ){
                         found = true;
                         break;
                     }
