@@ -1,7 +1,6 @@
 import consts from 'consts/const_global'
 import TransactionsProtocol from "../protocol/Transactions-Protocol"
 import TransactionsPendingQueueSavingManager from "./Transactions-Pending-Queue-Saving-Manager";
-import Blockchain from "../../../../../main-blockchain/Blockchain";
 import StatusEvents from "common/events/Status-Events";
 import NodesList from 'node/lists/Nodes-List'
 
