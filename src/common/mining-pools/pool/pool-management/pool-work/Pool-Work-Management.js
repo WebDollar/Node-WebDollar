@@ -277,12 +277,11 @@ class PoolWorkManagement{
                 else workDone = work.hash;
 
                 let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
-                blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true);
+                blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true, true);
 
                 //be sure that none of the POS blocks were skipped
                 //for debug it won't work
-                if (isPos && !consts.DEBUG) {
-
+                if (isPos && !consts.DEBUG)
                     for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
 
                         let oldBlockInfo = this.poolManagement.poolData.blocksInfo[i];
@@ -292,23 +291,21 @@ class PoolWorkManagement{
 
                         for (let height in oldBlockInfo.miningHeights)
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
-                                if (height > prevBlock.height - 31 && BlockchainGenesis.isPoSActivated(height)){
+                                if ( BlockchainGenesis.isPoSActivated(height) ){
 
                                     //let prevDifficulty = blockInformationMinerInstance.calculateDifficulty({height: i}, work.pos.balance);
-                                    let prevDifficulty = difficulty;
+                                    let prevDifficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
 
                                     let oldBlockInformationMinerInstance = oldBlockInfo.findFirstMinerInstance( blockInformationMinerInstance.address );
 
                                     if (!oldBlockInformationMinerInstance)
                                         oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
-                                    oldBlockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true);
+                                    oldBlockInformationMinerInstance.adjustDifficulty({height: i}, prevDifficulty, true, true,  oldBlockInformationMinerInstance );
 
                                 }
 
                     }
-
-                }
 
                 //statistics
                 this.poolManagement.poolStatistics.addStatistics( difficulty, minerInstance );

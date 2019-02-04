@@ -231,6 +231,7 @@ class PoolData {
                 offset = await blockInformation.deserializeBlockInformation(buffer, offset );
 
                 if (blockInformation.blockInformationMinersInstances.length > 0) {
+
                     this.blocksInfo.push(blockInformation);
 
                     for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
