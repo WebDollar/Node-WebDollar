@@ -381,11 +381,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                     miner = newMiner;
 
-                } else if (data.type === "all instances"){
-
-                    miner.address = newUnencodedAddress;
-
-                } else throw {message: "data.type is invalid"};
+                }
+                // not supported anymore
+                // else if (data.type === "all instances"){
+                //
+                //     miner.address = newUnencodedAddress;
+                //
+                // } else throw {message: "data.type is invalid"};
 
 
                 socket.node.sendRequest("mining-pool/change-wallet-mining/answer", {result: true, address: InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address), reward: minerInstance.miner.rewardTotal,  confirmed: minerInstance.miner.rewardConfirmedTotal, refReward: minerInstance.miner.referrals.rewardReferralsTotal, refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed } )

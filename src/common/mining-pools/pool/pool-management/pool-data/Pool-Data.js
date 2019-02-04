@@ -86,7 +86,7 @@ class PoolData {
     addMiner(minerAddress, minerReward = 0){
 
         let miner = this.findMiner(minerAddress);
-        if ( miner === null) {
+        if ( !miner ) {
 
             if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
                 throw {message: "miner address is invalid" };
