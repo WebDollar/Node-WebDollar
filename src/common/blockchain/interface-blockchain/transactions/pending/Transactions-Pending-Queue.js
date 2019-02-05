@@ -291,17 +291,31 @@ class TransactionsPendingQueue {
 
             try{
 
-                if (!tx.blockchain) removeThis = true;
+                if (!tx.blockchain) {
+                    console.log(tx.txId.toString('hex'),"don't has blockchain");
+                    removeThis = true;
+                }
                 else
-                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress) && this.blockchain.mining.miningTransactionSelector.validateTransactionId( tx.txId )) continue;
+                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress) && this.blockchain.mining.miningTransactionSelector.validateTransactionId( tx.txId )){
+                    console.log(tx.txId.toString('hex'),"is mine");
+                    continue;
+                }
                 else
                 //This is just for pool
                 //TODO remove on light consensus
-                if( this.blockchain.agent.light && tx.timeLock < this.blockchain.blocks.length-1 ) removeThis=true;
+                if( this.blockchain.agent.light && tx.timeLock < this.blockchain.blocks.length-1 ) {
+                    console.log(tx.txId.toString('hex'),"browser remove");
+                    removeThis=true;
+                }
                 else
-                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) removeThis=true;
+                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) {
+                    console.log(tx.txId.toString('hex'),"not valid anymore");
+                    removeThis=true;
+                }
 
             } catch (exception){
+
+                console.log(tx.txId.toString('hex'),"exception remove",exception);
 
                 if(exception.myNonce)
                     if ( Math.abs( exception.myNonce - exception.nonce) < consts.SPAM_GUARDIAN.MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE )
