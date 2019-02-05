@@ -27,7 +27,7 @@ class PoolDataMiner{
 
     }
 
-    get adressWIF(){
+    get addressWIF(){
         return BufferExtended.toBase( InterfaceBlockchainAddressHelper.generateAddressWIF(this.address) );
     }
 
