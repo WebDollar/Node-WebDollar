@@ -66,6 +66,7 @@ class NodeAPIPublicPools {
   }
 
   minersAll(req, res) {
+
     let miners = [];
 
     if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
@@ -73,11 +74,12 @@ class NodeAPIPublicPools {
       let minersAll = Blockchain.PoolManagement.poolData.miners;
 
       for (let i = 0; i < miners.length; i++) {
+
         var miner = minersAll[i];
 
         miners.push({
           address: miner.adressWIF,
-          index: miner.index,
+          miner_index: miner.index,
           reward_total: miner._rewardTotal,
           reward_confirmed: miner._rewardConfirmed,
           reward_sent: miner._rewardSent,
