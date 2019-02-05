@@ -78,8 +78,9 @@ class NodeAPIRouter{
 
         this._addRoute( 'pools/stats', NodeAPIPublicPools.stats, nodeApiType, 200 , app, prefix, middleWare );
 
+        this._addRoute( 'pools/all-miners', NodeAPIPublicPools.minersAll, nodeApiType, 5 , app, prefix, middleWare );
+
         this._addRoute( 'pools/miners', NodeAPIPublicPools.minersInstances, nodeApiType, 5, app, prefix, middleWare );
-        this._addRoute( 'pools/miners-all', NodeAPIPublicPools.minersAll, nodeApiType, 5 , app, prefix, middleWare );
 
         this._addRoute( 'transactions/pending', NodeAPIPublicTransactions.pending, nodeApiType, 200 , app, prefix, middleWare );
         
