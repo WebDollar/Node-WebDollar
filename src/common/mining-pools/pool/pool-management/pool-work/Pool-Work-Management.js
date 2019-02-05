@@ -158,9 +158,8 @@ class PoolWorkManagement{
                 prevBlock.timeStamp = work.pos.timestamp;
                 prevBlock.verifyPOSSignature();
 
-                if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
-                    throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
-
+                if (!work.pos.posMinerAddress.equals( minerInstance.address ))
+                    throw {message: "work.pos.posMinerAddress doesn't match", posMinerAddress: work.pos.posMinerAddress, minerInstance: minerInstance.address, }
             }
 
             //returning false, because a new fork was changed in the mean while
@@ -203,7 +202,6 @@ class PoolWorkManagement{
                         prevBlock.timeStamp = work.pos.timestamp;
 
                         prevBlock._validateBlockTimeStamp();
-
 
                     }
 

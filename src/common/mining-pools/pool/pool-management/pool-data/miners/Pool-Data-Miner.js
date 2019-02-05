@@ -3,8 +3,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 import consts from 'consts/const_global';
 import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
 import PoolDataMinerReferrals from "./Pool-Data-Miner-Referrals";
-import InterfaceBlockchainAddressHelper
-    from "../../../../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class PoolDataMiner{
 
