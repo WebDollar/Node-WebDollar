@@ -55,7 +55,7 @@ npm run commands
 #### -> Start mining again with ```npm run commands``` and ```8```
 ----
 ### Blockchain Loading and Saving example ###
-<img src="https://webdollarvpn.io/img/webdollar-saving-blockchain-img1.jpg" alt="Blockchain Loading Example" /></img>
+<img src="https://www.vpnromania.ro/webd/webdollar-saving-blockchain-img1.jpg" alt="Blockchain Loading Example" /></img>
 ----
 ### WebDollar Mining Example
-<img src="https://webdollarvpn.io/img/webdollar-mining-terminal-img1.jpg" alt="WebDollar Mining Example" /></img>
+<img src="https://www.vpnromania.ro/webd/webdollar-mining-img1.jpg" alt="WebDollar Mining Example" /></img>
