@@ -117,17 +117,18 @@ class MiningTransactionsSelector{
                         "validate-fast-transactions": true,
                     };
 
-                    if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
+                    if(this.blockchain.blocks.length-1 < transaction.timeLock)
+                        if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
 
-                        size -= transaction.serializeTransaction().length;
+                            size -= transaction.serializeTransaction().length;
 
-                        if (size >= 0) {
-                            this._transactions.push(transaction);
-                            infoTx += " added";
-                        }
+                            if (size >= 0) {
+                                this._transactions.push(transaction);
+                                infoTx += " added";
+                            }
 
-                    } else
-                        bRemoveTransaction = true;
+                        } else
+                            bRemoveTransaction = true;
 
                 } catch (exception){
                     //console.warn('Error Including Transaction', exception);
