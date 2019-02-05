@@ -35,8 +35,8 @@ npm run commands
 #### press ```10``` then hit Enter; paste POOL LINK then hit ENTER.
 
 ### 6. SOLO-MINING
-#### Before starting SOLO-Mining, there is a blockchainDB3 backup you can download and use to instantly mine!
-#### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a> or <a href="https://webdftp.webdollarvpn.io/ftp/blockchainDB3.tar.gz">https://webdftp.webdollarvpn.io/ftp/blockchainDB3.tar.gz</a>
+#### Before starting SOLO-Mining, there is a blockchainDB3 backup you can download and use to mine instantly!
+#### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a>
 #### ^ These backups are made at every 6 hours.
 #### Create a folder named ```blockchainDB3``` inside Node-WebDollar1 and unpack the downloaded arhive to that folder. If the folder is already created, delete the contents inside it and download the backup inside.
 #### To unzip it, run: ```tar -zxvf blockchainDB3.tar.gz -C .``` -> always run this inside blockchainDB3 folder!
