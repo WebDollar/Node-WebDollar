@@ -65,7 +65,7 @@ class NodeAPIPublicPools {
     return minerInstances;
   }
 
-  minersInstances(req, res) {
+  minersAll(req, res) {
     let miners = [];
 
     if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
