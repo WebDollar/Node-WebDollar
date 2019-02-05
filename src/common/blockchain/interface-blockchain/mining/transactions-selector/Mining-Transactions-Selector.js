@@ -117,7 +117,7 @@ class MiningTransactionsSelector{
                         "validate-fast-transactions": true,
                     };
 
-                    if(this.blockchain.blocks.length-1 < transaction.timeLock)
+                    if(this.blockchain.blocks.length-1 > transaction.timeLock)
                         if ( transaction.validateTransactionEveryTime( this.blockchain.blocks.length,  blockValidationType )) {
 
                             size -= transaction.serializeTransaction().length;
