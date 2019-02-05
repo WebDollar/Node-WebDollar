@@ -92,9 +92,9 @@ class PoolData {
                 throw {message: "miner address is invalid" };
 
 
-            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] ) );
+            miner = new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] );
+            this.miners.push( miner );
 
-            miner = this.miners[this.miners.length-1]
 
         }
 
@@ -181,7 +181,7 @@ class PoolData {
             this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let miner = new PoolDataMiner(this, i );
+                let miner = new PoolDataMiner( this, i );
                 offset = miner.deserializeMiner(buffer, offset );
 
                 if (!this.findMiner(miner.address))

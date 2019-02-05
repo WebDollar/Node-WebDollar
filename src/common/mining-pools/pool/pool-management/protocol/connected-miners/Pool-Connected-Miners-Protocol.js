@@ -83,10 +83,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
                 // save minerPublicKey
-                let miner = this.poolManagement.poolData.findMiner(unencodedAddress);
-
-                if ( !miner )
-                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress );
+                let miner = await this.poolManagement.poolData.addMiner(unencodedAddress );
 
                 let minerInstance = miner.addInstance(socket);
 
