@@ -328,6 +328,8 @@ class TransactionsPendingQueue {
 
             if(removeThis)
                 this.removePendingTransaction(tx, i);
+            else
+                console.log(tx.txId.toString('hex'),"------- GOOD tx");
 
         }
 
