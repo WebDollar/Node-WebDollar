@@ -73,7 +73,7 @@ class NodeAPIPublicPools {
 
       let minersAll = Blockchain.PoolManagement.poolData.miners;
 
-      for (let i = 0; i < miners.length; i++) {
+      for (let i = 0; i < minersAll.length; i++) {
 
         var miner = minersAll[i];
 
