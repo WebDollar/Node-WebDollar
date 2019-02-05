@@ -5,7 +5,7 @@ class NodeAPIPublicTransactions {
 
 
   pending(req, res) {
-    return Blockchain.Transactions.pendingQueue.list;
+    return Blockchain.Transactions.pendingQueue.listArray;
   }
 
 }
