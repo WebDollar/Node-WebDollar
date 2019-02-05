@@ -22,7 +22,7 @@ class NodeAPIPublicPools {
       time_remaining: 0,
     };
 
-    if (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement.poolStarted) {
+    if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
       var statistics = Blockchain.PoolManagement.poolStatistics;
       stats.hashes = statistics.poolHashes;
       stats.hashes_now = statistics.poolHashesNow;
@@ -38,26 +38,55 @@ class NodeAPIPublicPools {
 
   }
 
-  miners(req, res) {
-    let miners = [];
+  minersInstances(req, res) {
+    let minerInstances = [];
 
-    if (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement.poolStarted) {
+    if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
       let minersOnline = Blockchain.PoolManagement.poolData.connectedMinerInstances.list;
 
       for (let i = 0; i < minersOnline.length; i++) {
-        var miner = minersOnline[i];
+        var minerInstance = minersOnline[i];
 
-        var address =  BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(miner.address));
+        minerInstances.push({
+          hashes: minerInstance.hashesPerSecond,
+          hashes_alt: minerInstance.realHashesPerSecond,
+          address: minerInstance.addressWIF,
+          reward_total: minerInstance.miner._rewardTotal,
+          reward_confirmed: minerInstance.miner._rewardConfirmed,
+          reward_sent: minerInstance.miner._rewardSent,
+          date_activity: minerInstance.dateActivity,
+          miner_index: minerInstance.miner.index,
+          ip: minerInstance.socket ? minerInstance.socket.node.sckAddress.getAddress(true, true) : "offline",
+        });
+
+      }
+    }
+
+    return minerInstances;
+  }
+
+  minersAll(req, res) {
+
+    let miners = [];
+
+    if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
+
+      let minersAll = Blockchain.PoolManagement.poolData.miners;
+
+      for (let i = 0; i < miners.length; i++) {
+
+        var miner = minersAll[i];
 
         miners.push({
-          hashes: miner.hashesPerSecond,
-          hashes_alt: miner.realHashesPerSecond,
-          address: address,
-          reward_total: miner.miner._rewardTotal,
-          reward_confirmed: miner.miner._rewardConfirmed,
-          reward_sent: miner.miner._rewardSent,
+          address: miner.adressWIF,
+          miner_index: miner.index,
+          reward_total: miner._rewardTotal,
+          reward_confirmed: miner._rewardConfirmed,
+          reward_sent: miner._rewardSent,
           date_activity: miner.dateActivity,
+          instances: miner.instances.length,
         });
+
       }
     }
 

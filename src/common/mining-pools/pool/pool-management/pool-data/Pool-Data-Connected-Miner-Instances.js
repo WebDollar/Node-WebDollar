@@ -15,7 +15,8 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
 
     startPoolDataConnectedMinerInstances(){
-        if (this._deleteUnresponsiveMinersInterval === undefined)
+
+        if (!this._deleteUnresponsiveMinersInterval )
             this._deleteUnresponsiveMinersInterval = setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
     }
 

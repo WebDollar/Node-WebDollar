@@ -150,7 +150,7 @@ class PoolWorkValidation{
             let time = new Date().getTime();
 
             for (let key in this._worksDuplicate)
-                if ( time - this._worksDuplicate[key] > 180000 ){
+                if ( time - this._worksDuplicate[key] > 600000 ){
                     delete this._worksDuplicate[key];
                 }
 

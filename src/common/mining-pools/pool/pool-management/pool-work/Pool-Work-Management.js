@@ -157,7 +157,17 @@ class PoolWorkManagement{
                 prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
                 prevBlock.timeStamp = work.pos.timestamp;
                 prevBlock.verifyPOSSignature();
+
+                if (!work.pos.posMinerAddress.equals( minerInstance.address ))
+                    throw {message: "work.pos.posMinerAddress doesn't match", posMinerAddress: work.pos.posMinerAddress, minerInstance: minerInstance.address, }
             }
+
+            //returning false, because a new fork was changed in the mean while
+            if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
+                throw {message: "pool: block is already too old"};
+
+            if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
+                throw {message: "pool: block is already too old"};
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
@@ -181,13 +191,6 @@ class PoolWorkManagement{
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
 
-                    //returning false, because a new fork was changed in the mean while
-                    if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
-                        throw {message: "pool: block is already too old"};
-
-                    if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
-                        throw {message: "pool: block is already too old"};
-
                     prevBlock.hash = work.hash;
                     prevBlock.nonce = work.nonce;
 
@@ -199,10 +202,6 @@ class PoolWorkManagement{
                         prevBlock.timeStamp = work.pos.timestamp;
 
                         prevBlock._validateBlockTimeStamp();
-
-                        if (!prevBlock.posMinerAddress.equals( minerInstance.address ))
-                            throw {message: "posMinerAddress must be the same with the minerInstance.miner", posMinerAddress: prevBlock.posMinerAddress, minerInstance: minerInstance.address, }
-
 
                     }
 

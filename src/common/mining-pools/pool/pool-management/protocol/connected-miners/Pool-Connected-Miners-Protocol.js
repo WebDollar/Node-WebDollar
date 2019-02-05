@@ -74,7 +74,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
                 if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
                 let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
-                if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
+                if ( !unencodedAddress ) throw { message: "minerAddress is not correct" };
 
                 let addresses = [];
                 if (data.addresses)
@@ -83,10 +83,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
 
                 // save minerPublicKey
-                let miner = this.poolManagement.poolData.findMiner(unencodedAddress);
-
-                if ( !miner )
-                    miner = await this.poolManagement.poolData.addMiner(unencodedAddress );
+                let miner = await this.poolManagement.poolData.addMiner( unencodedAddress );
 
                 let minerInstance = miner.addInstance(socket);
 
@@ -112,8 +109,6 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let suffix = "";
                 if ( typeof data.suffix === "string")
                     suffix = '/'+data.suffix;
-
-                this.poolManagement.poolData.lastBlockInformation._findBlockInformationMinerInstance(minerInstance);
 
                 //generate a message for confirming pool Owner
                 let messageAddressConfirmation = undefined;

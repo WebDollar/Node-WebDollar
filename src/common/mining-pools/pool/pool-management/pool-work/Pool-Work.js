@@ -70,6 +70,7 @@ class PoolWork {
             }
 
             let error = false;
+
             try{
 
                 this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
