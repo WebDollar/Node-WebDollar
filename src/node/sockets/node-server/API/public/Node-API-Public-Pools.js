@@ -78,7 +78,7 @@ class NodeAPIPublicPools {
         var miner = minersAll[i];
 
         miners.push({
-          address: miner.adressWIF,
+          address: miner.addressWIF,
           miner_index: miner.index,
           reward_total: miner._rewardTotal,
           reward_confirmed: miner._rewardConfirmed,
