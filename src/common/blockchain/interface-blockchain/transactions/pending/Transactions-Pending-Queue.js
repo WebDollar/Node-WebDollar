@@ -260,7 +260,7 @@ class TransactionsPendingQueue {
 
     removePendingTransaction (transaction, index, callDestroy = true){
 
-        if ( !index && typeof index !== "number")
+        if ( typeof index !== "number")
             for (let i=0; i < this.listArray.length; i++)
                 if ( this.listArray[i].txId.equals( transaction.txId )){
                     index = i;
