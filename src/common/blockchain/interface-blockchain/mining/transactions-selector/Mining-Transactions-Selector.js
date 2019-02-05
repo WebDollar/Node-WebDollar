@@ -18,7 +18,7 @@ class MiningTransactionsSelector{
 
         //Verify if was included in last blocks
         for(let i=Math.max(this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint ); i<this.blockchain.blocks.length; i++)
-            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( txId) >= 0 )
+            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( txId ) >= 0 )
                 return false;
 
         return true;
@@ -53,7 +53,6 @@ class MiningTransactionsSelector{
 
         if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
             throw {message: "This transaction was already inserted"};
-
 
         if (transaction.timeLock !== 0 && this.blockchain.blocks.length-1 < transaction.timeLock ) throw { message: "blockHeight < timeLock", timeLock: transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
         if (transaction.timeLock !== 0 && transaction.timeLock - this.blockchain.blocks.length-1 > 100) throw { message: "timelock - blockHeight < 100", timeLock : transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
