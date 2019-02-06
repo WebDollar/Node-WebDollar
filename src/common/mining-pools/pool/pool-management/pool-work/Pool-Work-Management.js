@@ -296,10 +296,7 @@ class PoolWorkManagement{
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
                                 if ( BlockchainGenesis.isPoSActivated(height) ){
 
-                                    let oldBlockInformationMinerInstance = oldBlockInfo.findFirstMinerInstance( blockInformationMinerInstance.address );
-
-                                    if (!oldBlockInformationMinerInstance)
-                                        oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
+                                    let oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
                                     oldBlockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true, true,  oldBlockInformationMinerInstance );
 

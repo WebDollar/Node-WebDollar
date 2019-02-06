@@ -1,8 +1,6 @@
 import Serialization from 'common/utils/Serialization';
 import consts from 'consts/const_global';
 import BufferExtended from "common/utils/BufferExtended";
-import InterfaceBlockchainAddressHelper
-    from "../../../../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 
 class PoolDataMinerInstance {
