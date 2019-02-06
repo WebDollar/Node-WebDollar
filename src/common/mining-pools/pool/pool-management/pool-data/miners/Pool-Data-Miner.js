@@ -44,6 +44,9 @@ class PoolDataMiner{
 
     addInstance(socket, miner){
 
+        if (socket.node.protocol.minerPool && socket.node.protocol.minerPool.minerInstance && socket.node.protocol.minerPool.miner === miner)
+            return socket.node.protocol.minerPool.minerInstance;
+
         let instance = this.findInstance(socket);
         if (instance) return instance;
 
