@@ -186,7 +186,7 @@ class PoolPayouts{
 
                     blockInformationMinerInstance.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.reward;
 
-                    if (blockInformationMinerInstance.miner.referrals.referralLinkMiner )
+                    if ( blockInformationMinerInstance.miner.referrals.referralLinkMiner )
                         blockInformationMinerInstance.miner.referrals.referralLinkMiner.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.rewardForReferral;
 
                 });
@@ -199,9 +199,10 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                if ( (miner.rewardConfirmed) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
+                if ( (miner.rewardConfirmed + miner.__tempRewardConfirmedOther ) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
 
-                    this._addAddressTo(miner.address).amount += miner.rewardConfirmed;
+                    this._addAddressTo(miner.address).amount += miner.rewardConfirmed + miner.__tempRewardConfirmedOther;
+
                     miner.__tempRewardConfirmedOther = 0;
                     miner.rewardConfirmedOther = 0;
 
@@ -262,7 +263,7 @@ class PoolPayouts{
 
             for (let i=0; i<blocksConfirmed.length; i++) {
 
-                blocksConfirmed[i].blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
+                blocksConfirmed[i].blockInformationMinersInstances.forEach(blockInformationMinerInstance=>{
 
                     let miner = blockInformationMinerInstance.miner;
                     let paid = this._findAddressTo(miner.address);
@@ -273,6 +274,8 @@ class PoolPayouts{
                         //move funds to confirmedOther
                         if ( !paid )
                             miner.rewardConfirmedOther += miner.__tempRewardConfirmedOther;
+
+                        miner.__tempRewardConfirmedOther = 0;
 
                         blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
                         blockInformationMinerInstance.reward = 0; //i already paid
