@@ -57,10 +57,10 @@ class MiningTransactionsSelector{
         // if (transaction.timeLock !== 0 && this.blockchain.blocks.length-1 < transaction.timeLock )
         //     throw { message: "blockHeight < timeLock", timeLock: transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
 
-        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH < this.blockchain.blocks.length )
+        if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH/2 < this.blockchain.blocks.length )
             throw {message: "transaction is too old"};
 
-        if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH > this.blockchain.blocks.length )
+        if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH/2 > this.blockchain.blocks.length )
             throw {message: "transaction is in future"};
 
         //validating its own transaction
