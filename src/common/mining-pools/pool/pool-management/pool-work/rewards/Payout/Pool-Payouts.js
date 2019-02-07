@@ -199,9 +199,9 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                if ( (miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
+                if ( (miner.rewardConfirmed) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
 
-                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther;
+                    this._addAddressTo(miner.address).amount += miner.rewardConfirmed;
                     miner.__tempRewardConfirmedOther = 0;
                     miner.rewardConfirmedOther = 0;
 
