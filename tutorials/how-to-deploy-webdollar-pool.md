@@ -29,7 +29,6 @@ npm run build_browser && npm run build_browser_user_interface
 ```shell
 git clone https://github.com/WebDollar/vue-Frontend.git
 cd vue-Frontend
-git checkout MiningPools
 npm install
 cd .. # to go back to MiningPool1 folder for step 3
 ```
