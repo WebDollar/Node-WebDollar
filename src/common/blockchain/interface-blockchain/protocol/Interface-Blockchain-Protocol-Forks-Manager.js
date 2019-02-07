@@ -44,7 +44,6 @@ class InterfaceBlockchainProtocolForksManager {
                  && (!this.blockchain.agent.light || (this.blockchain.agent.light && ( !forkProof || !this.blockchain.proofPi.validatesLastBlock() ))) )) {
 
                 socket.node.protocol.blocks = forkChainLength;
-                console.log("Error ForkTip 1");
                 return false;
             }
 
