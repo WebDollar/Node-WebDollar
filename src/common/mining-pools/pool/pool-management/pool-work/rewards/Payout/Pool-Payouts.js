@@ -199,8 +199,13 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                if ( (miner.rewardConfirmed) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT )
-                    this._addAddressTo(miner.address).amount += miner.rewardConfirmed ;
+                if ( (miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
+
+                    this._addAddressTo(miner.address).amount += miner.__tempRewardConfirmedOther + miner.rewardConfirmedOther;
+                    miner.__tempRewardConfirmedOther = 0;
+                    miner.rewardConfirmedOther = 0;
+
+                }
 
             });
 
@@ -266,14 +271,11 @@ class PoolPayouts{
 
                         //not paid
                         //move funds to confirmedOther
-                        if (paid )
+                        if ( !paid )
                             miner.rewardConfirmedOther += miner.__tempRewardConfirmedOther;
-
-                        miner.__tempRewardConfirmedOther = 0;
 
                         blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
                         blockInformationMinerInstance.reward = 0; //i already paid
-
 
                         if ( miner.referrals.referralLinkMiner  ) {
 
@@ -297,7 +299,12 @@ class PoolPayouts{
             for (let i=0; i<this._toAddresses.length; i++){
 
                 let miner = this.poolData.findMiner( this._toAddresses[i].address );
-                if ( !miner ) Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
+
+                if ( !miner ) {
+                    Log.error("ERROR! Miner was not found at the payout", Log.LOG_TYPE.POOLS);
+                    continue;
+                }
+
 
                 miner.rewardSent += this._toAddresses[i].amount; //i paid totally
                 miner.rewardConfirmed = 0; //paid this
