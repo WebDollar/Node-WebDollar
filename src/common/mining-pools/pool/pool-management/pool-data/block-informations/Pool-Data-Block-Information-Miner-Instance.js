@@ -92,6 +92,9 @@ class PoolDataBlockInformationMinerInstance {
 
         let height = prevBlock.height;
 
+        //too old
+        if (this.poolManagement.blockchain.blocks.length !== 0 && height < this.poolManagement.blockchain.blocks.length - 200) return;
+
         if (!blockInformationMinerInstance)
             blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
 
