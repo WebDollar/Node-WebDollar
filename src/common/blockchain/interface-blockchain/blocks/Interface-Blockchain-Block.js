@@ -82,12 +82,12 @@ class InterfaceBlockchainBlock {
 
     }
 
-    destroyBlock(){
+    async destroyBlock(){
 
         if (this.blockchain === undefined) return;
 
         //it is included in the blockchain
-        if ( this.blockchain.blocks[ this.height ] === this)
+        if ( (await this.blockchain.getBlock(this.height)) === this)
             return;
 
         this.blockchain = undefined;
@@ -318,7 +318,6 @@ class InterfaceBlockchainBlock {
         ] );
 
         return await WebDollarCrypto.hashPOW( buffer );
-
     }
 
     serializeBlock(requestHeader){

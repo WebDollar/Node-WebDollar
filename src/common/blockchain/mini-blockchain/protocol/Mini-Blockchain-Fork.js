@@ -52,12 +52,12 @@ class MiniBlockchainFork extends inheritFork{
 
     }
 
-    preFork(revertActions, showUpdate=true){
+    async preFork(revertActions, showUpdate=true){
 
         //remove transactions and rewards from each blocks
         for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
 
-            let block = this.blockchain.blocks[i];
+            let block = await this.blockchain.getBlock( i );
 
             // remove transactions
             for (let j=block.data.transactions.transactions.length-1; j>=0; j--)

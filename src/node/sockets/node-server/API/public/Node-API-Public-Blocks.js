@@ -5,7 +5,7 @@ class NodeAPIPublicBlocks{
 
 
 
-    blocks(req, res){
+    async blocks(req, res){
 
         let block_start = req.block_start;
 
@@ -15,7 +15,7 @@ class NodeAPIPublicBlocks{
 
             let blocks_to_send = [];
             for (let i=block_start; i<Blockchain.blockchain.blocks.length; i++)
-                blocks_to_send.push(Blockchain.blockchain.blocks[i].toJSON())
+                blocks_to_send.push( (await Blockchain.blockchain.getBlock(i)).toJSON() )
 
             return {result: true, blocks: blocks_to_send};
 
@@ -25,7 +25,7 @@ class NodeAPIPublicBlocks{
 
     }
 
-    block(req, res){
+    async block(req, res){
 
         let index = req.block;
 
@@ -34,7 +34,7 @@ class NodeAPIPublicBlocks{
             if (index < Blockchain.blockchain.blocksStartingPoint) throw {message: "Invalid index."};
             if (index > Blockchain.blockchain.blocks.length)       throw {message: "Block not found."};
 
-            return {result: true, block: Blockchain.blockchain.blocks[index].toJSON()}
+            return {result: true, block: (await Blockchain.blockchain.getBlock(index)).toJSON()}
 
         } catch (exception) {
             return {result: false, message: "Invalid Block"};

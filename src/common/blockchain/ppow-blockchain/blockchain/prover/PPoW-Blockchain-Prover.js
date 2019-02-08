@@ -28,7 +28,7 @@ class PPoWBlockchainProver{
     async _createProofPi(chain){
 
         //B ← C[0]
-        let B = await chain.loadingManager.getBlock(0);
+        let B = await chain.getBlock(0);
 
         // π
         // π is underlyingChain
@@ -45,7 +45,7 @@ class PPoWBlockchainProver{
 
             //for µ = |C[−k].interlink| down to 0 do
 
-            let C = chain.blocks[chainLength - consts.POPOW_PARAMS.k];
+            let C = chain.getBlock(chainLength - consts.POPOW_PARAMS.k);
 
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
                 for (let miu = C.interlink.length; miu >= 0; --miu) {
@@ -110,7 +110,7 @@ class PPoWBlockchainProver{
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
-                        B = await chain.loadingManager.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m].height );
+                        B = await chain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m].height );
 
 
                     count ++;

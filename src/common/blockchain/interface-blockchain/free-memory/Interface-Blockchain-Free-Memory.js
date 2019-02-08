@@ -11,13 +11,15 @@ class InterfaceFreeMemory{
 
         for (let i=this.blockchain.blocks.blocksStartingPoint; i < this.blockchain.blocks.length-50; i++){
 
-            if (this.blockchain.blocks[i] === undefined ) continue;
+            let block = await this.blockchain.getBlock(i);
 
-            this.blockchain.blocks[i].computedBlockPrefix = undefined;
-            this.blockchain.blocks[i].computedSerialization = undefined;
+            if (block === undefined ) continue;
 
-            for (let j=0; j<this.blockchain.blocks[i].data.transactions.transactions.length; j++)
-                this.blockchain.blocks[i].data.transactions.transactions[j]._serializated = undefined;
+            block.computedBlockPrefix = undefined;
+            block.computedSerialization = undefined;
+
+            for (let j=0; j<block.data.transactions.transactions.length; j++)
+                block.data.transactions.transactions[j]._serializated = undefined;
 
 
             if (i % 10000 === 0) await this.blockchain.sleep(50);

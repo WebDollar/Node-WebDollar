@@ -11,7 +11,7 @@ class NodeAPIPublicAddresses{
     //Get Address
     //TODO: optimize or limit the number of requests
 
-    addressInfo(req, res){
+    async addressInfo(req, res){
 
         let address = req.address;
 
@@ -33,9 +33,10 @@ class NodeAPIPublicAddresses{
         // Get mined blocks and transactions
         for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
 
-            for (let j = 0; j < Blockchain.blockchain.blocks[i].data.transactions.transactions.length; j++) {
+            let block = await Blockchain.blockchain.getBlock(i);
+            for (let j = 0; j < block.data.transactions.transactions.length; j++) {
 
-                let transaction = Blockchain.blockchain.blocks[i].data.transactions.transactions[j];
+                let transaction = block.data.transactions.transactions[j];
 
                 let found = false;
                 for (let q = 0; q < transaction.from.addresses.length; q++)
@@ -52,19 +53,19 @@ class NodeAPIPublicAddresses{
 
                 if (found) {
                     answer.push({
-                        blockId: Blockchain.blockchain.blocks[i].height,
-                        timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
+                        blockId: await block.height,
+                        timestamp: await block.timeStamp + BlockchainGenesis.timeStamp,
                         transaction: transaction.toJSON()
                     });
                 }
 
             }
-            if (Blockchain.blockchain.blocks[i].data.minerAddress.equals(address)) {
+            if (await block.data.minerAddress.equals(address)) {
                 minedBlocks.push(
                     {
-                        blockId: Blockchain.blockchain.blocks[i].height,
-                        timestamp: Blockchain.blockchain.blocks[i].timeStamp + BlockchainGenesis.timeStamp,
-                        transactions: Blockchain.blockchain.blocks[i].data.transactions.transactions.length
+                        blockId: await block.height,
+                        timestamp: await block.timeStamp + BlockchainGenesis.timeStamp,
+                        transactions: await block.data.transactions.transactions.length
                     });
             }
         }

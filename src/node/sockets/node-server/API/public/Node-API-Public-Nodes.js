@@ -44,7 +44,7 @@ class NodeAPIPublicNodes{
             let list = [];
             for (let i = Blockchain.blockchain.blocks.length-1; i>Math.max(Blockchain.blockchain.blocks.blocksStartingPoint, Blockchain.blockchain.blocks.length-500); i--){
 
-                let block = Blockchain.blockchain.blocks[i];
+                let block = await Blockchain.blockchain.getBlock(i);
 
                 list.push({
                     height: block.height,
