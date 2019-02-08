@@ -88,7 +88,8 @@ class PoolWorkManagement{
 
         };
 
-        this.poolWork.lastBlockNonce += hashes;
+        if (!isPOS)
+            this.poolWork.lastBlockNonce += hashes;
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
