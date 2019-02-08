@@ -126,11 +126,18 @@ class NodeAPIPublicPools {
         };
       }
 
-      poolData.push({
-        block: blockInfo.block ? blockInfo.block.toJSON() : undefined,
+      let element = {
         miningHeights: miningHeights,
         instances: instances,
-      })
+      };
+
+      try{
+        element.block =  blockInfo.block ? blockInfo.block.toJSON() : undefined;
+      } catch (exception){
+
+      }
+      
+      poolData.push( element );
 
     });
 
