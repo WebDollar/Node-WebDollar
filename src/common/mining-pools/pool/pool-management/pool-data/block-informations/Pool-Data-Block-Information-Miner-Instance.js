@@ -295,6 +295,10 @@ class PoolDataBlockInformationMinerInstance {
 
     }
 
+    get addressWIF(){
+        return this.minerInstance.miner.addressWIF;
+    }
+
     get address(){
         return this.minerInstance.miner.address;
     }
