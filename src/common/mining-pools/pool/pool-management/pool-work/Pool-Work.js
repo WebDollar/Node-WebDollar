@@ -121,7 +121,7 @@ class PoolWork {
     }
 
 
-    _garbageCollector(){
+    async _garbageCollector(){
 
         try{
 
