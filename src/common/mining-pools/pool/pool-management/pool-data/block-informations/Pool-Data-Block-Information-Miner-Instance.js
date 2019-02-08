@@ -95,6 +95,9 @@ class PoolDataBlockInformationMinerInstance {
         //too old
         if (this.poolManagement.blockchain.blocks.length !== 0 && height < this.poolManagement.blockchain.blocks.length - 200) return;
 
+        //TODO REMOVE THIS
+        if (height < 200 && !consts.DEBUG) return; //bug pools main net
+
         if (!blockInformationMinerInstance)
             blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
 
