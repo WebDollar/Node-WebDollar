@@ -86,7 +86,7 @@ class NodeAPIPublicPools {
           date_activity: miner.dateActivity,
           instances: miner.instances.length,
           // instances_JSON: JSON.stringify(miner.instances),
-          referral: JSON.stringify(miner.referrals)
+          // referral: JSON.stringify(miner.referrals)
         });
 
       }
