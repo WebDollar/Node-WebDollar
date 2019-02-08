@@ -275,7 +275,7 @@ class PoolDataBlockInformation {
         return null;
     }
 
-    _addBlockInformationMinerInstance(minerInstance){
+    addBlockInformationMinerInstance(minerInstance){
 
         if (!minerInstance ) throw {message: "minerInstance is undefined"};
 

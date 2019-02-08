@@ -482,7 +482,7 @@ class PoolRewardsManagement{
 
             if (nothing) return;
 
-            let newBlockInformationMinerInstance = newBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
+            let newBlockInformationMinerInstance = newBlockInformation.addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
             blockInformationMinersInstance.cancelReward();
 

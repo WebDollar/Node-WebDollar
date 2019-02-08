@@ -46,7 +46,7 @@ class PoolWorkManagement{
         if ( !hashes ) hashes = 500;
 
         if ( !blockInformationMinerInstance )
-            blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+            blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation.addBlockInformationMinerInstance(minerInstance);
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
@@ -121,12 +121,10 @@ class PoolWorkManagement{
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
             if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
 
-            let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+            let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation.addBlockInformationMinerInstance(minerInstance);
 
-            prevBlock = prevBlock  || blockInformationMinerInstance.workBlock;
-
-            if ( !prevBlock )
-                throw {message: "miner instance - no block"};
+            if (!prevBlock) prevBlock = blockInformationMinerInstance.workBlock;
+            if ( !prevBlock ) throw {message: "miner instance - no block"};
 
             let isPos = BlockchainGenesis.isPoSActivated(prevBlock.height);
 
@@ -180,6 +178,7 @@ class PoolWorkManagement{
                     wasBlockMined = false;
 
                     //TODO remove !isPOS to throw the error message always
+                    //TODO After the timestamp is used sent via the pool miners, this should be removed
                     if (!isPos)
                         throw exception;
                 }
@@ -297,7 +296,7 @@ class PoolWorkManagement{
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
                                 if ( BlockchainGenesis.isPoSActivated(height) ){
 
-                                    let oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
+                                    let oldBlockInformationMinerInstance = oldBlockInfo.addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
                                     oldBlockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true, true,  oldBlockInformationMinerInstance );
 
