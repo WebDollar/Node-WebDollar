@@ -67,15 +67,11 @@ class NodeAPIPublicPools {
 
   minersAll(req, res) {
 
+    if (!Blockchain.PoolManagement || !Blockchain.PoolManagement.poolStarted)  return [];
+
     let miners = [];
 
-    if (Blockchain.PoolManagement && Blockchain.PoolManagement.poolStarted) {
-
-      let minersAll = Blockchain.PoolManagement.poolData.miners;
-
-      for (let i = 0; i < minersAll.length; i++) {
-
-        var miner = minersAll[i];
+    Blockchain.PoolManagement.poolData.miners.forEach((miner)=>{
 
         miners.push({
           address: miner.addressWIF,
@@ -85,14 +81,60 @@ class NodeAPIPublicPools {
           reward_sent: miner._rewardSent,
           date_activity: miner.dateActivity,
           instances: miner.instances.length,
-          // instances_JSON: JSON.stringify(miner.instances),
-          // referral: JSON.stringify(miner.referrals)
         });
 
-      }
-    }
+    });
 
     return miners;
+
+  }
+
+  poolData(req, res) {
+
+    if (!Blockchain.PoolManagement || !Blockchain.PoolManagement.poolStarted) return [];
+
+    let poolData = [];
+
+    Blockchain.PoolManagement.poolData.blocksInfo.forEach( (blockInfo)=>{
+
+      let miningHeights = {};
+
+      for (let key in blockInfo.miningHeights)
+        miningHeights[key ] =  blockInfo.miningHeights[key].toString()
+
+      let instances = {};
+      for (let key in blockInfo.blockInformationMinersInstances) {
+
+        let blockMinerInstance = blockInfo.blockInformationMinersInstances[key];
+
+        let minerInstanceTotalDifficultiesPOW = {}, minerInstanceTotalDifficultiesPOS = {};
+
+        for  (let height in blockMinerInstance._minerInstanceTotalDifficultiesPOW)
+          minerInstanceTotalDifficultiesPOW[height] = blockInfo.blockInformationMinersInstances[key]._minerInstanceTotalDifficultiesPOW[height].toString();
+
+        for  (let height in blockMinerInstance._minerInstanceTotalDifficultiesPOS)
+          minerInstanceTotalDifficultiesPOS[height] = blockInfo.blockInformationMinersInstances[key]._minerInstanceTotalDifficultiesPOS[height].toString();
+
+
+        instances[key] = {
+          address: blockMinerInstance.addressWIF,
+          minerInstanceTotalDifficultyPOW: blockMinerInstance.minerInstanceTotalDifficultyPOW.toString(),
+          minerInstanceTotalDifficultyPOS: blockMinerInstance.minerInstanceTotalDifficultyPOS.toString(),
+          minerInstanceTotalDifficultiesPOW: minerInstanceTotalDifficultiesPOW,
+          minerInstanceTotalDifficultiesPOS: minerInstanceTotalDifficultiesPOW,
+          first: blockInfo.findFirstMinerInstance(blockMinerInstance.address) === blockMinerInstance,
+        };
+      }
+
+      poolData.push({
+        block: blockInfo.block ? blockInfo.block.toJSON() : undefined,
+        miningHeights: miningHeights,
+        instances: instances,
+      })
+
+    });
+
+    return poolData;
   }
 
 }
