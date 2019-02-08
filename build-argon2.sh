@@ -407,7 +407,7 @@ function set_cpucpp() {
 			set_cputhreads
 
 		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: process.env.TERMINAL_WORKERS_TYPE || cpu-cpp$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: process.env.TERMINAL_WORKERS_TYPE || cpu-cpp$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 			set_cputhreads
 		fi
 
@@ -423,21 +423,21 @@ function set_gpu_cuda() {
 
 	if [[ $yn_gpu_cuda == [nN] ]]; then
 
-		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 		else
 			echo "$showinfo Ok..."
 		fi
 
         elif [[ $yn_gpu_cuda == [yY] ]]; then
 
-		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 			echo "$showok ${yellow}TYPE; gpu$stand miner is already set."
 
-		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: process.env.TERMINAL_WORKERS_TYPE || gpu$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1)"
 
 			if [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
 
@@ -448,9 +448,9 @@ function set_gpu_cuda() {
 				echo "$showok ${yellow}GPU_MODE: cuda$stand is already set."
 			fi
 
-		elif [[ $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
+		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu-cpp"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1)"
 
 			if [[ $(grep "GPU_MODE: \"opencl\"" $get_const_global | cut -d ',' -f1) ]]; then
 
@@ -474,16 +474,16 @@ function set_gpu_opencl() {
 
 	if [[ $yn_gpu_opencl == [nN] ]]; then
 
-		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: "gpu"/TYPE: "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
+			echo -e "$showinfo Reverting ${yellow}TYPE: gpu$stand to CPU-CPP..." && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "gpu"/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu-cpp"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu-cpp\"" $get_const_global | cut -d ',' -f1)"
 		else
 			echo "$showinfo Ok..."
 		fi
 
         elif [[ $yn_gpu_opencl == [yY] ]]; then
 
-		if [[ $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		if [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 			echo "$showok ${yellow}TYPE: gpu$stand miner is already set."
 
 			if [[ $(grep "GPU_MODE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
@@ -495,9 +495,9 @@ function set_gpu_opencl() {
 				echo "$showok ${yellow}GPU_MODE: opencl$stand is already set."
 			fi
 
-		elif [[ $(grep "TYPE: \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
+		elif [[ $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"cpu\"" $get_const_global | cut -d ',' -f1) ]]; then
 
-			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: \"gpu\"" $get_const_global | cut -d ',' -f1)"
+			echo "$showexecute Setting terminal worker to ${yellow}TYPE: gpu$stand" && sed -i -- 's/TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu"/TYPE: "gpu"/g' $get_const_global && echo "$showinfo Result: $(grep "TYPE: process.env.TERMINAL_WORKERS_TYPE || \"gpu\"" $get_const_global | cut -d ',' -f1)"
 
 			if [[ $(grep "GPU_MODE: \"cuda\"" $get_const_global | cut -d ',' -f1) ]]; then
 
