@@ -4,7 +4,7 @@ import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import Blockchain from "main-blockchain/Blockchain";
 import BufferExtended from "common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-
+const JSON = require('circular-json');
 
 class NodeAPIPublicPools {
 
@@ -85,6 +85,8 @@ class NodeAPIPublicPools {
           reward_sent: miner._rewardSent,
           date_activity: miner.dateActivity,
           instances: miner.instances.length,
+          // instances_JSON: JSON.stringify(miner.instances),
+          referral: JSON.stringify(miner.referrals)
         });
 
       }
