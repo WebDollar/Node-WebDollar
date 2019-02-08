@@ -125,7 +125,7 @@ class PoolPayouts{
 
                 let totalDifficultyPOW = new BigNumber(0), totalDifficultyPOS = new BigNumber(0);
 
-                this.poolManagement.poolRewardsManagement.redistributePoolDataBlockInformation( blockConfirmed, blockConfirmed, paymentType === "pow" ? "pos" : "pow");
+                this.poolManagement.poolRewardsManagement.redistributePoolDataBlockInformation( blockConfirmed, blockConfirmed, (paymentType === "pow") ? "pos" : "pow");
 
                 blockConfirmed.blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
                     totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);

@@ -79,34 +79,25 @@ class PoolDataBlockInformation {
 
         this._calculateTimeRemaining();
 
+        let prevMiningHeight = this.miningHeights[height];
         let miningHeightDifficulty = this.miningHeights[height] || BigNumber(0);
 
-        if (add && miningHeightDifficulty.plus(difference).isGreaterThan(0 ) ){
-
-            if (!this.miningHeights[height]) { //didn't exist
-                this.miningHeights.length++;
-                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
-                else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
-            }
-
+        if (!difference.isEqualTo(0) )
             this.miningHeights[height] = miningHeightDifficulty.plus(difference);
 
+        if (!prevMiningHeight &&  this.miningHeights[height].isGreaterThan(0 ) ) { //didn't exist
+            this.miningHeights.length++;
+            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
+            else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
         }
 
-        if (!add && miningHeightDifficulty.plus(difference).isLessThanOrEqualTo(0)  && this.miningHeights[height] ){
+        if (prevMiningHeight && prevMiningHeight.isGreaterThan(0) && this.miningHeights[height].isEqualTo(0)){
 
-            this.miningHeights[height] = miningHeightDifficulty.plus( difference );
+            delete this.miningHeights[height];
+            this.miningHeights.length--;
 
-            if (this.miningHeights[height].isEqualTo(0)){
-
-                delete this.miningHeights[height];
-                this.miningHeights.length--;
-
-                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
-                else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
-
-            }
-
+            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
+            else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
 
         }
 
