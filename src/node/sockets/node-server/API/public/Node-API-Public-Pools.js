@@ -118,10 +118,10 @@ class NodeAPIPublicPools {
 
         instances[key] = {
           address: blockMinerInstance.addressWIF,
-          minerInstanceTotalDifficultyPOW: blockMinerInstance.minerInstanceTotalDifficultyPOW.toString(),
-          minerInstanceTotalDifficultyPOS: blockMinerInstance.minerInstanceTotalDifficultyPOS.toString(),
-          minerInstanceTotalDifficultiesPOW: minerInstanceTotalDifficultiesPOW,
-          minerInstanceTotalDifficultiesPOS: minerInstanceTotalDifficultiesPOW,
+          totalDifficultyPOW: blockMinerInstance.minerInstanceTotalDifficultyPOW.toString(),
+          totalDifficultyPOS: blockMinerInstance.minerInstanceTotalDifficultyPOS.toString(),
+          totalDifficultiesPOW: minerInstanceTotalDifficultiesPOW,
+          totalDifficultiesPOS: minerInstanceTotalDifficultiesPOS,
           first: blockInfo.findFirstMinerInstance(blockMinerInstance.address) === blockMinerInstance,
         };
       }
