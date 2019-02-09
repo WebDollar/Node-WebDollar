@@ -164,7 +164,7 @@ class PoolWorkManagement{
             }
 
             //returning false, because a new fork was changed in the mean while
-            if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
+            if ( !isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
                 throw {message: "pool: block is already too old"};
 
             if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
