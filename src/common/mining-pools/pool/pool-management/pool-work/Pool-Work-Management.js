@@ -278,7 +278,7 @@ class PoolWorkManagement{
                 else {
 
                     if ( work.hash.compare( prevBlock.difficultyTargetPrev ) < 0){
-                        work.hash = new Buffer.from("00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+                        work.hash =  Buffer.from("00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
                         work.nonce = -1;
                     }
 
