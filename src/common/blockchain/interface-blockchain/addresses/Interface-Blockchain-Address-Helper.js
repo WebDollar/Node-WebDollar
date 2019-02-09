@@ -1,3 +1,4 @@
+/* eslint-disable */
 import ed25519 from "common/crypto/ed25519";
 
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
@@ -72,7 +73,7 @@ class InterfaceBlockchainAddressHelper{
     }
 
     static _generatePrivateKey(salt, showDebug){
-        
+
         return InterfaceBlockchainAddressHelper._generatePrivateKeyAdvanced(salt, showDebug).privateKeyWIF.string;
     }
 
@@ -319,7 +320,7 @@ class InterfaceBlockchainAddressHelper{
 
             if (!versionDetected) throw {message: "PRIVATE KEY  VERSION PREFIX is not recognized"};
         }
-        
+
         return {result: true, privateKey: privateKeyWIF};
     }
 
@@ -399,7 +400,7 @@ class InterfaceBlockchainAddressHelper{
 
         if (addressWIF.length !== consts.ADDRESSES.ADDRESS.LENGTH){
 
-            if (!prefixDetected) 
+            if (!prefixDetected)
                 throw {message: "ADDRESS KEY  PREFIX  is not right", addressWIF: addressWIF};
 
             if (!suffixDetected)
@@ -415,34 +416,33 @@ class InterfaceBlockchainAddressHelper{
         return {result: true, unencodedAddress: addressWIF};
     }
 
-    static askForPassword(message){
+    static askForPassword(message) {
+
+        message = message || 'Please enter your last password (12 words separated by space):';
 
         return new Promise( async (resolve) => {
 
-            let answer = await AdvancedMessages.input("Please enter your last password (12 words separated by space):");
-
+            let answer   = await AdvancedMessages.input(message);
             let password = answer.trim().split(' ');
 
-            for ( let i=password.length-1; i >= 0; i-- )
-                if ( password[i].length === 0 )
+            for (let i = password.length - 1; i >= 0; i--)
+            {
+                if (password[i].length === 0)
+                {
                     password.splice( i , 1);
+                }
+            }
 
-            if (password.length !== 12) {
-                AdvancedMessages.alert('You entered a password that has ' + password.length + ' words. It must have 12!', "Password Error", "error", 5000);
+            if (password.length !== 12)
+            {
+                AdvancedMessages.alert(`You entered a password that has ${password.length} words. It must have 12!`, 'Password Error', 'error', 5000);
                 resolve(null);
                 return;
             }
 
             resolve(password);
-
-
         });
-
     }
-
-
-
-
 }
 
 export default InterfaceBlockchainAddressHelper;
