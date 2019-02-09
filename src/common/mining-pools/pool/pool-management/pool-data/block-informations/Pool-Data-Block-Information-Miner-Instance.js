@@ -160,7 +160,7 @@ class PoolDataBlockInformationMinerInstance {
             let diff = Math.floor( (new Date().getTime() - this.blockInformation.date)/1000);
 
             if (diff > 0 && this.blockInformation._timeRemaining > 0)
-                ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining );
+                ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining*2 );
         }
 
         let rewardPOW = BigNumber(0);
@@ -190,7 +190,6 @@ class PoolDataBlockInformationMinerInstance {
             prevReward = Math.max( 0 , Math.floor ( this._prevRewardInitial ) );
 
         }
-
 
         this.minerInstance.miner.rewardTotal += this._reward - prevReward;
 
