@@ -279,7 +279,8 @@ class PoolPayouts{
 
                         miner.__tempRewardConfirmedOther = 0;
 
-                        blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
+                        blockInformationMinerInstance.reset();
+                        
                         blockInformationMinerInstance.reward = 0; //i already paid
 
                         if ( miner.referrals.referralLinkMiner  ) {

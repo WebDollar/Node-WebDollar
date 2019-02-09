@@ -24,6 +24,15 @@ class PoolDataBlockInformationMinerInstance {
 
         //current block
 
+        this.reset();
+
+        this._lastHeight = 60; //avoid genesis wallets
+
+        this.socket = undefined;
+
+    }
+
+    reset(){
         this.minerInstanceTotalDifficultyPOW = BigNumber(0);
         this.minerInstanceTotalDifficultyPOS = BigNumber(0);
 
@@ -31,11 +40,6 @@ class PoolDataBlockInformationMinerInstance {
         };
         this._minerInstanceTotalDifficultiesPOS = {
         };
-
-        this._lastHeight = 60; //avoid genesis wallets
-
-        this.socket = undefined;
-
     }
 
     destroyBlockInformationMinerInstance(){
