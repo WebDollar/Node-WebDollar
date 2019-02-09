@@ -1,5 +1,5 @@
-import {authenticatedMethod, RpcMethod} from './../../../jsonRpc';
-import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
+import {authenticatedMethod, RpcMethod} from './../../../../jsonRpc';
+import WebDollarCoins                   from './../../../../common/utils/coins/WebDollar-Coins';
 
 /**
  * The list of addresses in the wallet.

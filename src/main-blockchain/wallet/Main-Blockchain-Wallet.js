@@ -1,3 +1,4 @@
+/* eslint-disable */
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 import MiniBlockchainAddress from 'common/blockchain/mini-blockchain/Mini-Blockchain-Address';
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
@@ -404,26 +405,25 @@ class MainBlockchainWallet {
      */
     async exportAddressToJSON(address){
 
-        for (let i = 0; i < this.addresses.length; i++)
-            if (address === this.addresses[i].address || address === this.addresses[i].unencodedAddress){
-                return {
-                    result: true,
+        const nAddressIndex = this.getAddress(address, true);
 
-                    data: {
-                        version: consts.SETTINGS.PARAMS.WALLET.VERSION,
-                        address: this.addresses[i].address,
-                        publicKey: this.addresses[i].publicKey.toString("hex"),
-                        privateKey: (await this.addresses[i].exportAddressPrivateKeyToHex())
-                    }
-
-                }
-            }
-
-        return {
-            result: false,
-            message: "Address was not found"
+        if (nAddressIndex === -1)
+        {
+            return  {
+                result : false,
+                message: 'Address was not found'
+            };
         }
 
+        return {
+            result: true,
+            data  : {
+                version   : consts.SETTINGS.PARAMS.WALLET.VERSION,
+                address   : this.addresses[nAddressIndex].address,
+                publicKey : this.addresses[nAddressIndex].publicKey.toString("hex"),
+                privateKey: (await this.addresses[nAddressIndex].exportAddressPrivateKeyToHex())
+            }
+        };
     }
 
     /**
@@ -504,53 +504,106 @@ class MainBlockchainWallet {
 
     }
 
-    async deleteAddress(address){
+    async deleteAddress(address, bIsInteractive = true, password = null){
 
-        if (typeof address === "object" && address.hasOwnProperty("address"))
+        if (typeof address === 'object' && address.hasOwnProperty('address'))
+        {
             address = address.address;
+        }
 
-        let index = this.getAddress(address, true);
-        if ( index === -1 )
-            return {result: false, message: "Address was not found ", address: address};
+        const index = this.getAddress(address, true);
 
-        if (await this.isAddressEncrypted(address)) {
+        if (index === -1)
+        {
+            return {
+                result : false,
+                message: 'Address was not found',
+                address: address
+            };
+        }
 
-            for (let tries = 3; tries >= 1; --tries) {
-
-                await Blockchain.blockchain.sleep(100);
-
-                let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword("Please enter your last password (12 words separated by space).  " +  tries + " tries left:");
-
-                if (oldPassword === null){
-
-                    if (tries === 1)
-                        return {result: false, message: "Your old password is incorrect!"};
-
-                    continue;
+        if (await this.isAddressEncrypted(address))
+        {
+            if (bIsInteractive === false)
+            {
+                if (password === null)
+                {
+                    return {
+                        result : false,
+                        message: 'Non-Interactive mode detected and a password was not provided'
+                    };
                 }
 
                 address = this.getAddress(address);
-                let privateKey = await address._getPrivateKey(oldPassword);
 
-                try {
-                    if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
-                        break;
-                } catch (exception) {
-
-                    AdvancedMessages.alert('Your old password is incorrect!', "Password Error", "error", 5000);
-
-                    if (tries === 1)
-                        return {result: false, message: "Your old password is incorrect!"};
+                try
+                {
+                    InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(await address._getPrivateKey(password));
                 }
+                catch (exception)
+                {
+                    return {
+                        result : false,
+                        message: 'Password is incorrect'
+                    };
+                }
+            }
+            else
+            {
+                for (let tries = 3; tries >= 1; --tries)
+                {
+                    await Blockchain.blockchain.sleep(100);
 
+                    let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword(`Please enter your last password (12 words separated by space). ${tries} tries left:`);
 
+                    if (oldPassword === null)
+                    {
+                        if (tries === 1)
+                        {
+                            return {
+                                result : false,
+                                message: 'Password is incorrect!'
+                            };
+                        }
+
+                        continue;
+                    }
+
+                    address        = this.getAddress(address);
+                    let privateKey = await address._getPrivateKey(oldPassword);
+
+                    try
+                    {
+                        if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
+                        {
+                            break;
+                        }
+                    }
+                    catch (exception)
+                    {
+                        AdvancedMessages.alert('Your password is incorrect!', 'Password Error', 'error', 5000);
+
+                        if (tries === 1)
+                        {
+                            return {
+                                result: false,
+                                message: 'Password is incorrect!'
+                            };
+                        }
+                    }
+                }
             }
         }
 
-        let ask = await AdvancedMessages.confirm("Are you sure you want to delete " + address);
+        let ask = true;
 
-        if ( ask ){
+        if (bIsInteractive)
+        {
+            ask = await AdvancedMessages.confirm(`Are you sure you want to delete ${address}`);
+        }
 
+        if (ask)
+        {
             let addressToDelete = this.addresses[index];
 
             this.addresses.splice(index, 1);
@@ -558,23 +611,29 @@ class MainBlockchainWallet {
             AdvancedMessages.log("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
 
             //setting the next minerAddress
-            if (!this.blockchain.mining.minerAddress || BufferExtended.safeCompare(this.blockchain.mining.unencodedMinerAddress, addressToDelete.unencodedAddress) ) {
+            if (!this.blockchain.mining.minerAddress || BufferExtended.safeCompare(this.blockchain.mining.unencodedMinerAddress, addressToDelete.unencodedAddress))
+            {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
             }
 
             await this.saveWallet();
 
-            this.emitter.emit('wallet/changes', this.addresses );
+            this.emitter.emit('wallet/changes', this.addresses);
 
-            return {result: true, length: this.addresses.length }
-
-        } else {
-
-            return {result: false, message: "Action canceled by user" };
+            return {
+                result: true,
+                length: this.addresses.length
+            };
 
         }
-
+        else
+        {
+            return {
+                result: false,
+                message: 'Action canceled by user'
+            };
+        }
     }
 
 
@@ -604,6 +663,10 @@ class MainBlockchainWallet {
             StatusEvents.emit('validation/status', {message: "IndexedDB - Wallet couldn't be imported"});
 
         }
+    }
+
+    hasAddress(address) {
+        return this.getAddress(address, true) !== -1;
     }
 
 }

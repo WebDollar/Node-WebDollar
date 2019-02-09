@@ -1,5 +1,5 @@
-import {RpcMethod} from './../../../jsonRpc';
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import {RpcMethod}       from './../../../jsonRpc';
+import BlockchainGenesis from '../../../common/blockchain/global/Blockchain-Genesis';
 
 /**
  * Returns an object with data about the sync status.
@@ -32,7 +32,7 @@ class Syncing extends RpcMethod
         }
 
         return {
-            currentBlock  : this._oBlockchain.blocks.length,
+            currentBlock  : this._oBlockchain.last.height,
             isSynchronized: isSynchronized,
             secondsBehind : nSecondsBehind < 0 ? 0 : nSecondsBehind / 1000,
         };

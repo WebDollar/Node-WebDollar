@@ -1,4 +1,4 @@
-import RpcMethod from '../../../jsonRpc/RpcMethod';
+import RpcMethod from './../../../jsonRpc/RpcMethod';
 
 /**
  * The number of blocks mined by an address.
