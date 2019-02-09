@@ -39,8 +39,7 @@ class PoolWorkValidation{
 
         try{
 
-            if (!work.hash)
-                return;
+            if (!work.hash) return;
 
             work.hashHex = work.hash.toString("hex");
 
@@ -62,6 +61,7 @@ class PoolWorkValidation{
             minerInstance.dateActivity = new Date().getTime() / 1000;
 
             let workData = {
+                hashHex: work.hashHex,
                 work: work,
                 minerInstance: minerInstance
             };
