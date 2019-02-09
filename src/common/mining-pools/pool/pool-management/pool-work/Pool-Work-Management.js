@@ -276,12 +276,13 @@ class PoolWorkManagement{
                 let workDone;
                 if (isPos) workDone = work.pos.balance;
                 else {
-                    workDone = work.hash;
 
                     if ( work.hash.compare( prevBlock.difficultyTargetPrev ) < 0){
                         work.hash = new Buffer.from("00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
                         work.nonce = -1;
                     }
+
+                    workDone = work.hash;
 
                 }
 
