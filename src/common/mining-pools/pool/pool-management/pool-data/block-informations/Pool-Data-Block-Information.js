@@ -82,23 +82,25 @@ class PoolDataBlockInformation {
         let prevMiningHeight = this.miningHeights[height];
         let miningHeightDifficulty = this.miningHeights[height] || BigNumber(0);
 
-        if (!difference.isEqualTo(0) )
+        if (!difference.isEqualTo(0) ) {
+
             this.miningHeights[height] = miningHeightDifficulty.plus(difference);
 
-        if (!prevMiningHeight &&  this.miningHeights[height].isGreaterThan(0 ) ) { //didn't exist
-            this.miningHeights.length++;
-            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
-            else if ( !pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
-        }
+            if (!prevMiningHeight && this.miningHeights[height].isGreaterThan(0)) { //didn't exist
+                this.miningHeights.length++;
+                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos++;
+                else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow++;
+            }
 
-        if (prevMiningHeight && prevMiningHeight.isGreaterThan(0) && this.miningHeights[height].isEqualTo(0)){
+            if (prevMiningHeight && prevMiningHeight.isGreaterThan(0) && this.miningHeights[height].isEqualTo(0)) {
 
-            delete this.miningHeights[height];
-            this.miningHeights.length--;
+                delete this.miningHeights[height];
+                this.miningHeights.length--;
 
-            if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
-            else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
+                if (pos && !consts.MINING_POOL.SKIP_POS_REWARDS) this.miningHeights.blocksPos--;
+                else if (!pos && !consts.MINING_POOL.SKIP_POW_REWARDS) this.miningHeights.blocksPow--;
 
+            }
         }
 
     }
