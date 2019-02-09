@@ -117,7 +117,7 @@ class PoolWorkValidation{
             for (let key in this._works){
 
                 try {
-                    await this._validateWork(this._works[i]);
+                    await this._validateWork(this._works[key]);
                 } catch (exception){
 
                 }
