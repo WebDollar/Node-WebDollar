@@ -298,7 +298,7 @@ class PoolWorkManagement{
 
                                     let oldBlockInformationMinerInstance = oldBlockInfo.addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
-                                    oldBlockInformationMinerInstance.adjustDifficulty({height: height}, difficulty, true, true,  oldBlockInformationMinerInstance );
+                                    oldBlockInformationMinerInstance.adjustDifficulty({height: height }, difficulty, true, true,  oldBlockInformationMinerInstance );
 
                                 }
 

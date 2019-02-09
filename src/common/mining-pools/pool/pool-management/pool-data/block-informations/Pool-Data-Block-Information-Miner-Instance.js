@@ -90,13 +90,7 @@ class PoolDataBlockInformationMinerInstance {
 
     adjustDifficulty( prevBlock, difficulty, useDeltaTime = false, calculateReward = true, blockInformationMinerInstance ){
 
-        let height = prevBlock.height;
-
-        //too old
-        if (this.poolManagement.blockchain.blocks.length !== 0 && height < this.poolManagement.blockchain.blocks.length - 200) return;
-
-        //TODO REMOVE THIS
-        if (height < 200 && !consts.DEBUG) return; //bug pools main net
+        let height = Number.parseInt( prevBlock.height );
 
         if (!blockInformationMinerInstance)
             blockInformationMinerInstance = this.blockInformation.findFirstMinerInstance( this.address );
