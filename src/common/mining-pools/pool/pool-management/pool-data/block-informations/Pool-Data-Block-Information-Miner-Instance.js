@@ -119,6 +119,7 @@ class PoolDataBlockInformationMinerInstance {
             if ( prevDifficulty.isLessThan(difficulty)) {
 
                 this.blockInformation.adjustBlockInformationDifficultyBestTarget( difficulty, prevDifficulty, height, true );
+
                 blockInformationMinerInstance.minerInstanceTotalDifficultyPOW = blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.plus( difficulty.minus(prevDifficulty) );
                 blockInformationMinerInstance._minerInstanceTotalDifficultiesPOW[height] = difficulty;
 

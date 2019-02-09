@@ -82,8 +82,10 @@ class PoolPayouts{
         Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
         Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
 
+        //last block should not be processed at the moment to avoid problems with redistribution
+
         let blocksConfirmed = [];
-        for (let i=0; i<this.poolData.blocksInfo.length-1; i++)
+        for (let i=0; i<this.poolData.blocksInfo.length-2; i++)
             if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout &&  !this.poolData.blocksInfo[i].payoutTransaction )
                 if(this.poolData.blocksInfo[i].block)
                     if ( (BlockchainGenesis.isPoSActivated( this.poolData.blocksInfo[i].block.height ) && paymentType === "pos") ||  ( !BlockchainGenesis.isPoSActivated( this.poolData.blocksInfo[i].block.height ) && paymentType === "pow" ) )

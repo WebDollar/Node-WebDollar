@@ -115,6 +115,8 @@ class PoolWorkManagement{
 
         try{
 
+            let wasBlockMined;
+
             if ( !minerInstance ) throw {message: "minerInstance is undefined"};
             if ( !work || typeof work !== "object") throw {message: "work is undefined"};
 
@@ -169,8 +171,6 @@ class PoolWorkManagement{
                 throw {message: "pool: block is already too old"};
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
-
-                let wasBlockMined;
 
                 try {
                     wasBlockMined = await blockInformationMinerInstance.wasBlockMined.apply(blockInformationMinerInstance, [prevBlock].concat(args));
@@ -241,10 +241,6 @@ class PoolWorkManagement{
 
                         this.poolManagement.poolData.addBlockInformation();
 
-
-                        blockInformationMinerInstance.poolWork = Buffer.from("00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF","hex");
-                        blockInformationMinerInstance.poolWorkNonce = -1;
-
                         StatusEvents.emit("blockchain/new-blocks", { });
 
                     } catch (exception){
@@ -279,7 +275,16 @@ class PoolWorkManagement{
 
                 let workDone;
                 if (isPos) workDone = work.pos.balance;
-                else workDone = work.hash;
+                else {
+
+                    if ( work.hash.compare( prevBlock.difficultyTargetPrev ) < 0){
+                        work.hash =  Buffer.from("00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+                        work.nonce = -1;
+                    }
+
+                    workDone = work.hash;
+
+                }
 
                 let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
                 blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true, true);
