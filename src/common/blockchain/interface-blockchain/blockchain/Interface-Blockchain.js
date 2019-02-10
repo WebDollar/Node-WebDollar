@@ -35,9 +35,12 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     async validateBlockchain(){
 
-        for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++)
-            if (! (await this.validateBlockchainBlock(this.blocks[i])) )
+        for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++) {
+
+            let block = await this.blocks.getBlock( i );
+            if (!(await this.validateBlockchainBlock( block ))
                 return false;
+        }
 
         return true;
     }
@@ -241,12 +244,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height <= 0) return BlockchainGenesis.hash;
 
         if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
-        if ( !this.blocks[height-1] ) throw {message: "getChainHash invalid height", height: height};
 
         let block = await this.blocks.loadingManager.getBlock(height-1);
         if ( !block ) throw {message: "getChainHash invalid height ", height: height};
 
-        return this.blocks[height-1].hashChain;
+        return block.hashChain;
 
     }
 
@@ -421,9 +423,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             try {
 
-                //for POS it is required to have the transactions for the last 30 blocks
-                let prevBlockFreedAlready = 0;
-
                 for (index = indexStart; index < numBlocks; ++index ) {
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
@@ -433,16 +432,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     let block = await this._loadBlock(indexStart, index, blockValidation);
 
                     block.blockValidation.blockValidationType = {};
-
-
-                    if ( index < consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER  ){
-
-                        for (let j = prevBlockFreedAlready; j < index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 ; j++)
-                            this.blocks[j].data.transactions.freeTransactionsFromMemory();
-
-                        prevBlockFreedAlready = Math.max( prevBlockFreedAlready, index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 );
-
-                    }
 
                     if (index > 0 && index % 10000 === 0) {
                         await this.db.restart();

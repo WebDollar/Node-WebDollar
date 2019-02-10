@@ -26,13 +26,13 @@ class PPoWBlockchainProofBasic{
         else
         for (let i=0; i<this.blocks.length; i++) {
 
-            if (this.blocks[i] === undefined || this.blocks[i] === null) continue;
+            if (!this.blocks[i] ) continue;
 
             let found = false;
 
             //TODO optimization instead of using for j
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined)
+            if (this.blockchain.proofPi )
                 for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
                     if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
                         found = true;
@@ -42,7 +42,7 @@ class PPoWBlockchainProofBasic{
             if (!found) {
 
                 // avoid destroying real blocks
-                if (this.blocks[i] !== undefined && typeof this.blocks[i].destroyBlock === "function")
+                if (this.blocks[i] && typeof this.blocks[i].destroyBlock === "function")
                     this.blocks[i].destroyBlock();
 
             }
@@ -69,7 +69,7 @@ class PPoWBlockchainProofBasic{
 
                 console.error("Failed to retrieve block " , i, exception );
                 try {
-                    console.error("Failed to retrieve block ", this.blocks[i] !== null ? this.blocks[i].toJSON() : 'block is null');
+                    console.error("Failed to retrieve block ", this.blocks[i] ? this.blocks[i].toJSON() : 'block is null');
                 } catch (exception){
 
                 }

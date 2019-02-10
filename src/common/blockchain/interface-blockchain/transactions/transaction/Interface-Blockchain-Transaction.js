@@ -115,25 +115,6 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    destroyTransaction(pendingTransactionsWereIncluded){
-        //avoid to delete
-        if (pendingTransactionsWereIncluded)
-            this.pendingTransactionsIncluded--;
-
-        if ( this.pendingTransactionsIncluded && this.pendingTransactionsIncluded > 0)
-            return;
-
-        this.blockchain.transactions.pendingQueue.removePendingTransaction(this, undefined, false);
-        this.blockchain = undefined;
-
-        delete this._serializated;
-        delete this.from.addresses;
-        delete this.from.currencyTokenId;
-        delete this.to.addresses;
-        delete this.txId;
-
-    }
-
     _createTransactionFrom(from){
         return new InterfaceBlockchainTransactionFrom(this, from);
     }

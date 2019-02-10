@@ -39,6 +39,7 @@ class InterfaceBlockchainFork {
 
                     this.forkBlocks[i] = undefined;
                 }
+
             this.forkBlocks = [];
 
             this.blockchain = undefined;

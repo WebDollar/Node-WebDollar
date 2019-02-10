@@ -257,7 +257,7 @@ class TransactionsPendingQueue {
 
     }
 
-    removePendingTransaction (transaction, index, callDestroy = true){
+    removePendingTransaction (transaction, index){
 
         if ( typeof index !== "number")
             for (let i=0; i < this.listArray.length; i++)
@@ -274,8 +274,6 @@ class TransactionsPendingQueue {
 
             this.transactions.emitTransactionChangeEvent(transaction, true);
 
-            if (callDestroy)
-                transaction.destroyTransaction();
 
         }
     }

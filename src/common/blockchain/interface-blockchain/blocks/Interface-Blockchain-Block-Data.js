@@ -35,17 +35,6 @@ class InterfaceBlockchainBlockData {
 
     }
 
-    destroyBlockData(){
-
-        this.transactions.destroyBlockDataTransactions();
-        this.transactions.blockData = undefined;
-        this.transactions = undefined;
-
-        this.blockchain = undefined;
-        this._minerAddress = undefined;
-
-    }
-
     async validateBlockData(blockHeight, blockValidation){
 
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )

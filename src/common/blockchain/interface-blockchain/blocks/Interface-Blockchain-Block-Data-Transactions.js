@@ -64,27 +64,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    destroyBlockDataTransactions(freeOldMemory){
 
-        for (let i=0; i<this.transactions.length; i++) {
-
-            if (this.pendingTransactionsWereIncluded)
-                this.transactions[i].pendingTransactionsIncluded--;
-
-            if (this.pendingTransactionsWereIncluded <= 0) this.pendingTransactionsWereIncluded = undefined;
-
-            if (!freeOldMemory)
-                if ( !this.pendingTransactionsWereIncluded && !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i].txId)  )
-                    this.transactions[i].destroyTransaction();
-
-            this.transactions[i] = undefined;
-
-        }
-        this.transactions = [];
-
-        delete this.pendingTransactionsWereIncluded;
-
-    }
 
     async validateTransactions(blockHeight, blockValidationType){
 

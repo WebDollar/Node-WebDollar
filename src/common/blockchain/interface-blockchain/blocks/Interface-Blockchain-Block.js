@@ -103,28 +103,6 @@ class InterfaceBlockchainBlock {
 
     }
 
-    destroyBlock(){
-
-        if (this.blockchain === undefined) return;
-
-        //it is included in the blockchain
-        if ( (await this.blockchain.getBlock(this.height)) === this)
-            return;
-
-        this.blockchain = undefined;
-
-        if (this.data !== undefined && this.data !== null)
-            this.data.destroyBlockData();
-
-        this.db = undefined;
-        delete this.data;
-
-        if (this.blockValidation !== undefined && this.blockValidation !== null)
-            this.blockValidation.destroyBlockValidation();
-
-        this.blockValidation = undefined;
-    }
-
     async _supplementaryValidation() {
         return true;
     }

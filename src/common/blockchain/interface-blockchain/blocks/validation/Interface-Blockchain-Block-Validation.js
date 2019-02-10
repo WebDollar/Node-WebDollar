@@ -16,18 +16,6 @@ class InterfaceBlockchainBlockValidation {
         this.blockValidationType = blockValidationType;
     }
 
-    destroyBlockValidation(){
-
-        this.getBlockCallBack = undefined;
-        this.getDifficultyCallback = undefined;
-        this.getTimeStampCallback = undefined;
-        this.getHashPrevCallback = undefined;
-        this.getChainHashCallback = undefined;
-
-        this.blockValidationType = undefined;
-
-    }
-
     getDifficulty(blockTimestamp, blockNumber){
 
         return BlockchainDifficulty.getDifficulty(this.getDifficultyCallback, this.getTimeStampCallback, blockTimestamp, blockNumber)
