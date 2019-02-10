@@ -8,7 +8,7 @@ const BigInteger = require('big-integer');
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 
 };
@@ -256,8 +256,7 @@ consts.MINING_POOL = {
 
     SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
 
-    SKIP_POW_REWARDS: false,
-    SKIP_POS_REWARDS: false
+
 
 };
 
@@ -267,7 +266,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.203.2",
+        VERSION: "1.203.0",
 
         VERSION_COMPATIBILITY: "1.200.1",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
@@ -501,6 +500,19 @@ consts.NETWORK_TYPE = {
     name: "Webdollar MainNet"
 };
 
+if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet') {
+
+    consts.DEBUG = true;
+
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
+
+    consts.NETWORK_TYPE = {
+        id: 2,
+        name: "Webdollar TestNet"
+    };
+
+}
+
 if ( consts.DEBUG === true ) {
 
     consts.MINING_POOL.SKIP_POW_REWARDS = true;
@@ -532,17 +544,6 @@ if ( consts.DEBUG === true ) {
     consts.SETTINGS.NODE.VERSION = "1.210.6" ;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.6";
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.6";
-
-}
-
-if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet') {
-
-    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
-
-    consts.NETWORK_TYPE = {
-        id: 2,
-        name: "Webdollar TestNet"
-    };
 
 }
 
