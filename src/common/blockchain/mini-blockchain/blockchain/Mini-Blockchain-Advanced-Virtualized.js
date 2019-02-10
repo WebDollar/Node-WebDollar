@@ -11,7 +11,7 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
             let answer = await this.prover.provesCalculated._loadProvesCalculated();
 
-            if (answer === false)
+            if ( !answer )
                 throw {message : "NiPoPoW Proves Calculated raised an error"};
 
         } catch (exception){
