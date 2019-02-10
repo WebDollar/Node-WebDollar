@@ -11,6 +11,7 @@ import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
 import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
+import Log from "../../../utils/logging/Log";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -18,9 +19,11 @@ import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manag
 
 class InterfaceBlockchainBlocks{
 
-    constructor(blockchain){
+    constructor(blockchain, db){
 
         this.blockchain = blockchain;
+
+        this.db = db;
 
         this.blocksStartingPoint = 0;
         this._length = 0;
@@ -31,13 +34,12 @@ class InterfaceBlockchainBlocks{
         this.chainWorkSerialized = new Buffer(0);
 
 
+        this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
+
         this.savingManager = new SavingManager(this);
         this.loadingManager = new LoadingManager(this);
+        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
 
-        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
-            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
-
-        this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
     }
 
     addBlock(block, revertActions, saveBlock, showUpdate = true){
@@ -87,28 +89,25 @@ class InterfaceBlockchainBlocks{
             this.emitBlockCountChanged();
     }
 
-    clear(){
-
-        this.spliceBlocks(0, true);
-
+    clearBlocks(){
+        return this.spliceBlocks(0, true);
     }
 
     get endingPosition(){
 
-        if (this.blockchain.agent.light)
-            return this.blockchain.blocks.length;
-        else //full node
-            return this.blockchain.blocks.length;
+        //full node
+        return this.length;
+
     }
 
     // aka head
     get last() {
-        return this[this.length - 1];
+        return this.getBlock(this.length - 1);
     }
 
     // aka tail
     get first() {
-        return this[ this.blocksStartingPoint ];
+        return this.getBLock( this.blocksStartingPoint );
     }
 
     async recalculateNetworkHashRate(){
@@ -176,24 +175,30 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
-    _freeAllBlocksTransactionsFromMemory(){
+    async readBLockchainLength(){
 
-        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
+        let numBlocks = await this.db.get(this._blockchainFileName, 200, 1000000);
 
-        try {
-
-            for (let i = 0; i < Math.max(0, Math.floor( this.length - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER ) ); i++)
-                if (this[i] !== undefined)
-                    this[i].data.transactions.freeTransactionsFromMemory();
-
-        } catch (exception){
-            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
+        if ( !numBlocks ) {
+            Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return undefined;
         }
 
-        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
-
+        return numBlocks;
     }
 
+    async saveBlockchainLength(){
+
+        let answer = await this.db.save(this._blockchainFileName, this.length, 20000, 1000000) ;
+
+        if (!answer) {
+            Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return false;
+        }
+
+        return true;
+
+    }
 
 }
 

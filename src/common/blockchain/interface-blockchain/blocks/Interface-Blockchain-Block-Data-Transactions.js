@@ -235,16 +235,6 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    freeTransactionsFromMemory(){
-
-        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return;
-
-        this.destroyBlockDataTransactions(true );
-        delete this.transactionsLoaded;
-
-    }
-
-
 }
 
 export default InterfaceBlockchainBlockDataTransactions;

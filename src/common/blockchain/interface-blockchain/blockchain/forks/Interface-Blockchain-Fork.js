@@ -421,7 +421,7 @@ class InterfaceBlockchainFork {
 
                 if (this.downloadBlocksSleep) await this.sleep(20);
 
-                this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false, false);
+                await this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false, false);
 
                 let forkedSuccessfully = true;
 

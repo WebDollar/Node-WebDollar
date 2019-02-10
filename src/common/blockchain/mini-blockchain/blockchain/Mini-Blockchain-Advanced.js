@@ -131,9 +131,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            if (length === undefined) length = this.blocks.length;
-
-            if (length === 0) throw {message: "length is 0"};
+            if ( !length ) length = this.blocks.length;
+            if ( !length ) throw {message: "length is 0"};
 
             //avoid resaving the same blockchain
             if (this._miniBlockchainSaveBlocks >= length) throw {message: "already saved"};
@@ -153,11 +152,14 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             console.info("accountant tree", this.accountantTree.root.hash.sha256.toString("hex"));
             console.info("accountant tree", this.accountantTree.root.edges.length);
 
-            if (serialization === undefined)
+            if ( !serialization )
                 serialization = this.lightAccountantTreeSerializations[length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES + 1];
 
             if (!(await this.accountantTree.saveMiniAccountant(true, "lightAccountantTreeFinalAdvanced", serialization)))
                 throw {message: "saveMiniAccountant couldn't be saved"};
+
+            if (!( await this.blockchain.blocks.saveBlockchainLength() ))
+                throw {message: "saveMiniAccountant Length couldn't be saved"};
 
             await this.sleep(70);
 

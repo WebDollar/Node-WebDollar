@@ -37,7 +37,7 @@ class RevertActions {
                 }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.blocks.spliceBlocks(action.height, true);
+                    await this.blockchain.blocks.spliceBlocks(action.height, true);
 
                     if (this.blockchain.agent.light) {
                         this.blockchain.lightPrevHashPrevs.splice(action.height);

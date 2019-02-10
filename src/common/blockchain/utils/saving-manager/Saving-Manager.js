@@ -90,7 +90,7 @@ class SavingManager{
                     if (block.block.height % 5000 === 0)
                         await this.blockchain.db.restart();
 
-                    await this.blockchain.saveNewBlock(block.block, false, true);
+                    await block.saveBlock();
 
                 } catch (exception){
 
@@ -100,7 +100,7 @@ class SavingManager{
 
                 //saving Accountant Tree
                 if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0)
-                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false, 5000), this.blockchain.blocks.length );
+                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false, 5000), this.blockchain.blocks.length);
 
 
                 block.saving = false;

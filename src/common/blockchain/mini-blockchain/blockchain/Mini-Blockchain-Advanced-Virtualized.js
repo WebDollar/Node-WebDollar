@@ -45,7 +45,7 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
         if (process.env.BROWSER) return;
 
-        MiniBlockchainAdvanced.prototype.saveAccountantTree.call(this, serialization.length);
+        MiniBlockchainAdvanced.prototype.saveAccountantTree.apply(this, arguments );
 
         console.log("intraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
 

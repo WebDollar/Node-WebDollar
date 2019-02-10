@@ -21,7 +21,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
     _initializeMiniBlockchainLight(){
 
         this.proofPi = undefined;
-        this.blocks.clear();
+        this.blocks.clearBlocks();
         this.blocks.blocksStartingPoint = 0;
 
         this.lightPrevDifficultyTargets = {};

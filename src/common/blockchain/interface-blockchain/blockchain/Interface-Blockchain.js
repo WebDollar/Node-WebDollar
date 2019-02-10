@@ -16,7 +16,6 @@ import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
 import InterfaceBlockchainHardForks from "./../blocks/hard-forks/Interface-Blockchain-Hard-Forks"
 import Log from 'common/utils/logging/Log';
-import InterfaceBlockchainFreeMemory from "./../free-memory/Interface-Blockchain-Free-Memory"
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -28,8 +27,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         super(agent);
 
         this.hardForks = new InterfaceBlockchainHardForks(this);
-
-        this.freeMemory = new InterfaceBlockchainFreeMemory(this);
 
     }
 
@@ -156,7 +153,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             BlockchainGenesis.validateGenesis(block);
         }
 
-        if (block.blockValidation === undefined)
+        if ( !block.blockValidation )
             block.blockValidation = this.createBlockValidation();
 
 
@@ -252,22 +249,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async saveNewBlock(block, saveLength = false, saveInfinitum=false){
-
-        if (process.env.BROWSER)
-            return true;
-
-        if (saveLength)
-            if (await this.db.save(this._blockchainFileName, this.blocks.length, 20000, saveInfinitum ? 1000000 : 10) !== true){
-                Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
-                return false;
-            }
-
-        await block.saveBlock();
-
-        return true;
-    }
-
     async saveBlockchain(startingHeight, endingHeight){
 
         if (process.env.BROWSER)
@@ -320,21 +301,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 validationType["skip-validation-PoW-hash"] = true;
 
         return validationType;
-
-    }
-
-    async readNumberSavedBlocks(){
-
-        let numBlocks = await this.db.get(this._blockchainFileName);
-
-        if ( !numBlocks ) {
-
-            console.error("NumBlocks was not found");
-            return false;
-
-        }
-
-        return numBlocks;
 
     }
 
@@ -393,7 +359,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             }
 
-        this.blocks.clear();
+        this.blocks.clearBlocks();
 
         global.INTERFACE_BLOCKCHAIN_LOADING = true;
 
@@ -509,20 +475,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return block;
     }
 
-    async removeBlockchain(index, removeFiles = true){
-
-        if (removeFiles === true) {
-            for (let i = index; i < this.blocks.length; ++i){
-
-                let block = await this.getBlock(i);
-                let response = block.removeBlock();
-
-                if (response !== true)
-                    return response;
-            }
-        }
+    async removeBlockchain( index ){
 
         this.blocks.spliceBlocks(index, true);
+        this.blocks.saveBlocks();
 
         return true;
     }
