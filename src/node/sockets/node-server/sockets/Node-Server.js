@@ -305,11 +305,8 @@ class NodeServer {
         if (NodeExpress.port === 0) return '';
         if (NodeExpress.domain  === '') return '';
 
-        if ( getIP ){
-
+        if ( getIP )
             return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port;
-
-        }
 
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
 
