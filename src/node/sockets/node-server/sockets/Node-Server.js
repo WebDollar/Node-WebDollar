@@ -324,20 +324,20 @@ class NodeServer {
 
         //disconnect unresponsive nodes
         for (let i = 0; i < NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL) {
 
                 if (isPoolActivated && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL)
                     continue;
 
                 if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
 
-                    if (NodesList.nodes[i].socket.node.protocol.blocks === NodesList.nodes[i].socket.node.protocol.blocksPrevious){
+                    if (NodesList.nodes[i].socket.node.protocol.blocks === NodesList.nodes[i].socket.node.protocol.blocksPrevious) {
 
                         NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
                         setTimeout(() => {
 
-                            if ( NodesList.nodes[i] )
+                            if (NodesList.nodes[i])
                                 NodesList.nodes[i].socket.disconnect();
 
                         }, 3000);
@@ -349,6 +349,7 @@ class NodeServer {
                     }
 
                 }
+            }
 
 
         if (!isPoolActivated ) {
