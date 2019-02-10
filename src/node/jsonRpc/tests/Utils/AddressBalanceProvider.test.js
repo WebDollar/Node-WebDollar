@@ -28,13 +28,11 @@ describe('AddressBalanceProviderTest', () => {
         }).to.throw('Address must be an object containing the "address" property');
     });
 
-    it ('should throw exception if address is invalid', () => {
-        sinon.stub(AccountantTree, 'getBalance').withArgs('WEBD$invalid').returns(null);
+    it ('should return 0 if address is invalid', () => {
+        sinon.stub(AccountantTree, 'getBalance').withArgs('WEBD$invalid').returns(0);
 
         const oAddressBalanceProvider = new AddressBalanceProvider(AccountantTree);
-        expect(() => {
-            oAddressBalanceProvider.getBalance({address: 'WEBD$invalid'});
-        }).to.throw('Address is invalid');
+        assert.strictEqual(oAddressBalanceProvider.getBalance({address: 'WEBD$invalid'}), 0);
     });
 
     it ('should return the current balance if address is valid', () => {

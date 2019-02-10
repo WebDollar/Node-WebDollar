@@ -13,8 +13,7 @@ class GetBalance extends RpcMethod {
     getHandler(args) {
         let sAddress = args[0] || null;
 
-        if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(sAddress) === null)
-        {
+        if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(sAddress) === null) {
             throw new Error('Address is invalid');
         }
 
