@@ -35,7 +35,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++) {
 
             let block = await this.blocks.getBlock( i );
-            if (!(await this.validateBlockchainBlock( block ))
+            if ( false === await this.validateBlockchainBlock( block ) )
                 return false;
         }
 
@@ -311,7 +311,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (indexStartProcessingOffset !== undefined ){
 
             //fast loading Blockchain
-            if ( i <= indexStartProcessingOffset ){
+            if ( i <= indexStartProcessingOffset )
 
                this.setFastLoadingValidationType(validationType);
 
