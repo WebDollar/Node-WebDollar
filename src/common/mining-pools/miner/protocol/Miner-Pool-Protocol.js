@@ -236,12 +236,13 @@ class MinerPoolProtocol extends PoolProtocolList{
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
                 //await this._validateRequestWork( data.work, socket );
-                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
 
                 this._validateRequestWork( data.work, socket);
+
+                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
             } catch (exception){
                 console.error("new work raised an exception", exception);
@@ -251,7 +252,7 @@ class MinerPoolProtocol extends PoolProtocolList{
 
     }
 
-    async _validateRequestWork(work, socket){
+    _validateRequestWork(work, socket){
 
         if (typeof work !== "object") throw {message: "get-work invalid work"};
 
@@ -274,7 +275,7 @@ class MinerPoolProtocol extends PoolProtocolList{
             if (!ed25519.verify(work.sig, message, this.minerPoolManagement.minerPoolSettings.poolPublicKey)) throw {message: "pool: signature doesn't validate message"};
         }
 
-        await this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
+        this.minerPoolManagement.minerPoolMining.updatePoolMiningWork( work, socket );
 
     }
 
