@@ -11,12 +11,16 @@ describe('RpcMethodManagerTest', () => {
 
     it('RpcMethodManager::addMethods should throw exception if argument is not an instance of Array', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.addMethods('invalid');}).to.throw(Error, 'Argument must be an instance of Array');
+        expect(() => {
+            return oRpcMethodManager.addMethods('invalid');
+        }).to.throw(Error, 'Argument must be an instance of Array');
     });
 
     it('RpcMethodManager::addMethods should throw exception if Array entries are not instances of RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.addMethods(['invalid']);}).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
+        expect(() => {
+            return oRpcMethodManager.addMethods(['invalid']);
+        }).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
     });
 
     it('RpcMethodManager::addMethods should add RpcMethods', () => {
@@ -30,7 +34,9 @@ describe('RpcMethodManagerTest', () => {
 
     it('RpcMethodManager::addMethod should throw exception if argument is not an instance of RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.addMethod('invalid');}).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
+        expect(() => {
+            return oRpcMethodManager.addMethod('invalid');
+        }).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
     });
 
     it('RpcMethodManager::addMethod should add exactly one RpcMethod', () => {
@@ -45,7 +51,9 @@ describe('RpcMethodManagerTest', () => {
 
     it('RpcMethodManager::removeMethod should throw exception if argument is not an instance of RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.removeMethod('invalid');}).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
+        expect(() => {
+            return oRpcMethodManager.removeMethod('invalid');
+        }).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
     });
 
     it('RpcMethodManager::removeMethod should remove exactly one RpcMethod', () => {
@@ -64,7 +72,9 @@ describe('RpcMethodManagerTest', () => {
 
     it('RpcMethodManager::hasMethod should throw exception if argument is not an instance of RpcMethod', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.hasMethod('invalid');}).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
+        expect(() => {
+            return oRpcMethodManager.hasMethod('invalid');
+        }).to.throw(Error, 'Method must be an instance of "JsonRpc\\RpcMethod"');
     });
 
     it('RpcMethodManager::hasMethod should return boolean', () => {
@@ -80,7 +90,9 @@ describe('RpcMethodManagerTest', () => {
 
     it('RpcMethodManager::getMethod should throw exception if argument is not a string', () => {
         const oRpcMethodManager = new RpcMethodManager();
-        expect(() => {return oRpcMethodManager.getMethod([]);}).to.throw(Error, 'Argument must be a string');
+        expect(() => {
+            return oRpcMethodManager.getMethod([]);
+        }).to.throw(Error, 'Argument must be a string');
     });
 
     it('RpcMethodManager::getMethod should return the RpcMethod or null', () => {

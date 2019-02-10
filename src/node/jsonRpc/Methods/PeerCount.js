@@ -1,18 +1,17 @@
-import {RpcMethod} from './../../../jsonRpc';
+import {RpcMethod}      from './../../../jsonRpc';
 import CONNECTIONS_TYPE from './../../../node/lists/types/Connection-Type';
 
 /**
  * The current number of peers connected to the client.
  */
-class PeerCount extends RpcMethod
-{
+class PeerCount extends RpcMethod {
     constructor(name, oNodesList) {
         super(name);
 
         this._oNodesList = oNodesList;
     }
 
-    getHandler(args) {
+    getHandler() {
         return {
             clients : this._oNodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET),
             servers : this._oNodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET),

@@ -1,11 +1,10 @@
+// import {isInteger} from 'lodash';
 import {RpcMethod} from './../../../jsonRpc';
-import {isInteger} from 'lodash';
 
 /**
  * The information about a transaction by block hash and transaction index position.
  */
-class GetTransactionByBlockHashAndIndex extends RpcMethod
-{
+class GetTransactionByBlockHashAndIndex extends RpcMethod {
     /**
      * @param {string} name
      * @param {BlockRepository}        oBlockRepository
@@ -20,7 +19,7 @@ class GetTransactionByBlockHashAndIndex extends RpcMethod
         this._oTransactionTransformer = oTransactionTransformer;
     }
 
-    getHandler(args) {
+    getHandler(/** args */) {
         throw new Error('GetTransactionByBlockHashAndIndex method is not supported');
         // if (args.length !== 2)
         // {

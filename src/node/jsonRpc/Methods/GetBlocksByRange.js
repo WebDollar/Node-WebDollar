@@ -1,11 +1,10 @@
-import {RpcMethod} from './../../../jsonRpc';
-import {defaults, isArray} from 'lodash';
+import {defaults, isArray, omitBy, isNull,} from 'lodash';
+import {RpcMethod}                          from './../../../jsonRpc';
 
 /**
  * Th information about blocks between two block numbers.
  */
-class GetBlocksByRange extends RpcMethod
-{
+class GetBlocksByRange extends RpcMethod {
     constructor(name, oBlockRepository, oBlockTransformer) {
         super(name);
         this._oBlockRepository  = oBlockRepository;
@@ -13,21 +12,19 @@ class GetBlocksByRange extends RpcMethod
     }
 
     getHandler(args) {
-        const oTransformOptions = {
-            includeTransactions: args[1] || undefined,
-            processHardForks   : args[2] || undefined
-        };
+        const oTransformOptions = omitBy({
+            includeTransactions: args[1] || null,
+            processHardForks   : args[2] || null
+        }, isNull);
 
-        if (isArray(args[0]) === false || args[0].length !== 2)
-        {
+        if (isArray(args[0]) === false || args[0].length !== 2) {
             throw new Error('First parameter must be an Array containing the starting and the ending block numbers');
         }
 
         const aBlocks          = this._oBlockRepository.findByRange(args[0][0], args[0][1]);
         let aTransformedBlocks = [];
 
-        for (const oBlock of aBlocks)
-        {
+        for (const oBlock of aBlocks) {
             aTransformedBlocks.push(this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true})));
         }
 

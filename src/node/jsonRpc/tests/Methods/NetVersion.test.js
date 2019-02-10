@@ -11,11 +11,11 @@ describe('NetVersionTest', () => {
 
     it ('should return the network version', () => {
         const oMethod = new NetVersion('name', {
-            id: 1,
+            id  : 1,
             name: 'Webdollar MainNet'
         });
         assert.deepEqual(oMethod.getHandler(), {
-            id: 1,
+            id  : 1,
             name: 'Webdollar MainNet'
         });
     });

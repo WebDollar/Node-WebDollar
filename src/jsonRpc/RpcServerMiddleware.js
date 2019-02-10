@@ -1,8 +1,7 @@
 import RpcMethodManager from './RpcMethodManager';
 const jayson = require('jayson/promise');
 
-class RpcServerMiddleware
-{
+class RpcServerMiddleware {
     /**
      * @param {RpcMethodManager} oMethodManager
      */
@@ -23,8 +22,7 @@ class RpcServerMiddleware
      * @throws Error
      */
     setMethodManager(oMethodManager) {
-        if (!(oMethodManager instanceof RpcMethodManager))
-        {
+        if (!(oMethodManager instanceof RpcMethodManager)) {
             throw new Error('MethodManager must be an instance of JsonRpc\\RpcMethodManager');
         }
 
@@ -36,42 +34,40 @@ class RpcServerMiddleware
      * @return {Middleware}
      */
     getMiddleware(bServerIsSecured) {
-        if (this._oMiddleware !== null)
-        {
+        if (this._oMiddleware !== null) {
             return this._oMiddleware;
         }
 
         const oServer = jayson.server();
 
-        for (let [methodName, oMethod] of this.getMethodManager().getMethods().entries())
-        {
+        for (let [methodName, oMethod] of this.getMethodManager().getMethods().entries()) {
             oServer.method(methodName, new jayson.Method({
                 handler: function(args) {
                     return new Promise((resolve, reject) => {
-                        if (bServerIsSecured === false && oMethod.isPrivate())
-                        {
+                        if (bServerIsSecured === false && oMethod.isPrivate()) {
                             return reject(oServer.error(401, 'You must be authenticated and the server to have the Authentication enabled in order to access the method "' + oMethod.getName() + '"'));
                         }
 
-                        try
-                        {
+                        try {
                             const mReturn = oMethod.getHandler(args);
 
-                            if (mReturn instanceof Promise)
-                            {
-                                return mReturn.then((response) => {resolve(response);}).catch((e) => {reject(oServer.error(null, null, {details: e.message || null}));});
+                            if (mReturn instanceof Promise) {
+                                return mReturn.then((response) => {
+                                    resolve(response);
+                                }).catch((e) => {
+                                    reject(oServer.error(null, null, {details: e.message || null}));
+                                });
                             }
 
                             return resolve(mReturn);
                         }
-                        catch (e)
-                        {
+                        catch (e) {
                             return reject(oServer.error(null, null, {details: e.message || null}));
                         }
                     });
                 },
                 collect: true,
-                params: oMethod.getParamType() || Array
+                params : oMethod.getParamType() || Array
             }));
         }
 

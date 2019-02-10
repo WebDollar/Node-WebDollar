@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import RpcMethod  from '../../../../jsonRpc/RpcMethod';
+import RpcMethod       from '../../../../jsonRpc/RpcMethod';
 import ProtocolVersion from '../../Methods/ProtocolVersion';
 
 describe('ProtocolVersionTest', () => {

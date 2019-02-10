@@ -3,8 +3,7 @@ import {RpcMethod} from './../../../jsonRpc';
 /**
  * The number of transactions in a block matching the given block number.
  */
-class GetBlockTransactionCountByNumber extends RpcMethod
-{
+class GetBlockTransactionCountByNumber extends RpcMethod {
     /**
      * @param {string} name
      * @param {TransactionRepository} oTransactionRepository
@@ -15,8 +14,7 @@ class GetBlockTransactionCountByNumber extends RpcMethod
     }
 
     getHandler(args) {
-        if (args.length !== 1)
-        {
+        if (args.length !== 1) {
             throw new Error('Params must contain exactly one entry, the block number/TAG');
         }
 

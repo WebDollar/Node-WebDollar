@@ -4,8 +4,7 @@ import InterfaceBlockchainAddressHelper from './../../../common/blockchain/inter
 import BufferExtended from './../../../common/utils/BufferExtended';
 import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
 
-class BlockTransformer
-{
+class BlockTransformer {
     constructor(oBlockDataHardForkProcessor, oTransactionTransformer) {
         this._oBlockDataHardForksProcessor = oBlockDataHardForkProcessor;
         this._oTransactionTransformer      = oTransactionTransformer;
@@ -34,14 +33,13 @@ class BlockTransformer
             trxs           : oOptions.includeTransactions
                 ? oBlock.data.transactions.transactions.map((tx, i) => this._oTransactionTransformer.transform(tx, oBlock, i))
                 : oBlock.data.transactions.transactions.map((tx) => tx.txId.toString('hex')),
-            reward         : oBlock.reward === null ? 0 : oBlock.reward / WebDollarCoins.WEBD,
-            reward_raw     : oBlock.reward === null ? 0 : oBlock.reward,
-            createdAtUTC   : oBlockTimestampUTC,
-            block_raw      : BufferExtended.toBase(oBlock.serializeBlock().toString('hex')),
+            reward      : oBlock.reward === null ? 0 : oBlock.reward / WebDollarCoins.WEBD,
+            reward_raw  : oBlock.reward === null ? 0 : oBlock.reward,
+            createdAtUTC: oBlockTimestampUTC,
+            block_raw   : BufferExtended.toBase(oBlock.serializeBlock().toString('hex')),
         };
 
-        if (oOptions.processHardForks)
-        {
+        if (oOptions.processHardForks) {
             this._oBlockDataHardForksProcessor.processBlockData(oBlockData, oOptions.includeTransactions);
         }
 

@@ -1,11 +1,10 @@
-import {RpcMethod} from './../../../jsonRpc';
-import {defaults, isArray} from 'lodash';
+import {defaults, isArray, omitBy, isNull,} from 'lodash';
+import {RpcMethod}                          from './../../../jsonRpc';
 
 /**
  * Th information about blocks by numbers.
  */
-class GetBlocksByNumbers extends RpcMethod
-{
+class GetBlocksByNumbers extends RpcMethod {
     constructor(name, oBlockRepository, oBlockTransformer) {
         super(name);
         this._oBlockRepository  = oBlockRepository;
@@ -13,21 +12,19 @@ class GetBlocksByNumbers extends RpcMethod
     }
 
     getHandler(args) {
-        const oTransformOptions = {
-            includeTransactions: args[1] || undefined,
-            processHardForks   : args[2] || undefined
-        };
+        const oTransformOptions = omitBy({
+            includeTransactions: args[1] || null,
+            processHardForks   : args[2] || null
+        }, isNull);
 
-        if (isArray(args[0]) === false)
-        {
+        if (isArray(args[0]) === false) {
             throw new Error('First parameter must be an Array containing the corresponding block numbers');
         }
 
         const aBlocks          = this._oBlockRepository.findByNumbers(args[0]);
         let aTransformedBlocks = [];
 
-        for (const oBlock of aBlocks)
-        {
+        for (const oBlock of aBlocks) {
             aTransformedBlocks.push(this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true})));
         }
 

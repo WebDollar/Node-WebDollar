@@ -3,12 +3,10 @@ import {isString, isBoolean} from 'lodash';
 /**
  * Base class for all the JSON RPC API Methods
  */
-class RpcMethod
-{
+class RpcMethod {
     constructor(name) {
 
-        if (isString(name) === false || name === '')
-        {
+        if (isString(name) === false || name === '') {
             throw new Error('Name must be defined as a non empty string');
         }
 
@@ -35,8 +33,7 @@ class RpcMethod
      * @return {string|int|bool|Object|Array}
      */
     getOption(name) {
-        if (this.hasOption(name) === false)
-        {
+        if (this.hasOption(name) === false) {
             return null;
         }
 
@@ -59,10 +56,16 @@ class RpcMethod
         this._options.set(name, value);
     }
 
+    /**
+     * @param args
+     */
     getHandler(args) {
-        throw new Error('Handler is not defined');
+        throw new Error('Handler is not defined. Arguments: ' + JSON.stringify(args));
     }
 
+    /**
+     * @returns {string|int|bool|Object|Array}
+     */
     getParamType() {
         return this.getOption('paramType') || Array;
     }
@@ -73,8 +76,7 @@ class RpcMethod
     isPrivate() {
         const bIsPrivate = this.getOption('isPrivate');
 
-        if (bIsPrivate !== null && isBoolean(bIsPrivate))
-        {
+        if (bIsPrivate !== null && isBoolean(bIsPrivate)) {
             return bIsPrivate;
         }
 

@@ -8,14 +8,12 @@ import {isArray, isString} from 'lodash';
  * @param {RpcMethod} oMethod
  */
 const _ensureMethod = (oMethod) => {
-    if ((oMethod instanceof Method) === false)
-    {
+    if ((oMethod instanceof Method) === false) {
         throw new Error('Method must be an instance of "JsonRpc\\RpcMethod"');
     }
 };
 
-class RpcMethodManager
-{
+class RpcMethodManager {
     constructor() {
         this._methods = new Map();
     }
@@ -24,14 +22,12 @@ class RpcMethodManager
      * @param {RpcMethod[]} aMethods
      */
     addMethods(aMethods = []) {
-        if (isArray(aMethods) === false)
-        {
+        if (isArray(aMethods) === false) {
             throw new Error('Argument must be an instance of Array');
         }
 
-        for (let i in aMethods)
-        {
-            this.addMethod(aMethods[i]);
+        for (const oMethod of aMethods) {
+            this.addMethod(oMethod);
         }
     }
 
@@ -50,8 +46,7 @@ class RpcMethodManager
     removeMethod(oMethod) {
         _ensureMethod(oMethod);
 
-        if (this.hasMethod(oMethod))
-        {
+        if (this.hasMethod(oMethod)) {
             this._methods.delete(oMethod.getName());
         }
     }
@@ -70,13 +65,11 @@ class RpcMethodManager
      * @return RpcMethod|null
      */
     getMethod(sName) {
-        if (isString(sName) === false)
-        {
+        if (isString(sName) === false) {
             throw new Error('Argument must be a string');
         }
 
-        if (this._methods.has(sName) === false)
-        {
+        if (this._methods.has(sName) === false) {
             return null;
         }
 

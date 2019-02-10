@@ -1,11 +1,11 @@
-import { expect, assert } from 'chai';
+import {assert } from 'chai';
 
 import BlockRepository from '../../Utils/BlockRepository';
 
 describe('BlockRepositoryTest', () => {
     const Blockchain = {
         blocksStartingPoint: 0,
-        blocks: {
+        blocks             : {
             0: {
                 id: 'block_0'
             },

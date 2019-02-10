@@ -3,14 +3,13 @@ import {RpcMethod} from './../../../jsonRpc';
 /**
  * The number of the most recent block.
  */
-class BlockNumber extends RpcMethod
-{
+class BlockNumber extends RpcMethod {
     constructor(name, oBlockchain) {
         super(name);
         this._oBlockchain = oBlockchain;
     }
 
-    getHandler(args) {
+    getHandler() {
         return this._oBlockchain.blocks.last.height;
     }
 }

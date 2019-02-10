@@ -31,8 +31,57 @@
             "error",
             "always"
         ],
+        "curly": [
+            "error"
+        ],
+        "eqeqeq": [
+            "error"
+        ],
+        "no-eq-null": [
+            "error"
+        ],
+        "brace-style": [
+            "error",
+            "stroustrup"
+        ],
+        "require-await": [
+            "error"
+        ],
+        "no-undefined": [
+            "warn"
+        ],
+        "no-multi-spaces": [
+            "error",
+            {
+                "exceptions": {
+                    "Property"            : true,
+                    "VariableDeclarator"  : true,
+                    "ImportDeclaration"   : true,
+                    "AssignmentExpression": true
+                }
+            }
+        ],
         "no-unused-vars": [
             "warn"
-        ]
+        ],
+        "space-before-function-paren": [
+            "error",
+            "never"
+        ],
+        "space-in-parens": [
+            "error",
+            "never"
+        ],
+        "key-spacing": ["error", {
+            "singleLine": {
+                "beforeColon": false,
+                "afterColon" : true
+            },
+            "align": {
+                "beforeColon": false,
+                "afterColon" : true,
+                "on"         : "colon"
+            }
+        }]
     }
 }

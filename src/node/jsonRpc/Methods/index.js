@@ -1,7 +1,13 @@
-import {oAddressBalanceProvider, oBlockRepository, oTransactionRepository, oBlockTransformer, oTransactionTransformer} from './../Utils';
+import {
+    oAddressBalanceProvider,
+    oBlockRepository,
+    oTransactionRepository,
+    oBlockTransformer,
+    oTransactionTransformer
+}                   from './../Utils';
 import Blockchain   from './../../../main-blockchain/Blockchain';
 import NodesList    from './../../../node/lists/Nodes-List';
-import const_global from '../../../consts/const_global';
+import const_global from './../../../consts/const_global';
 
 /**
  * METHODS Account

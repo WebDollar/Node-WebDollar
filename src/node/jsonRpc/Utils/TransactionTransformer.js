@@ -3,8 +3,7 @@ import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
 import BufferExtended from './../../../common/utils/BufferExtended';
 import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
-class TransactionTransformer
-{
+class TransactionTransformer {
     /**
      * @param {InterfaceBlockchainTransaction} oTransaction
      * @param {InterfaceBlockchainBlock|null} oBlock
@@ -31,13 +30,12 @@ class TransactionTransformer
             timestamp_raw  : null,
             createdAtUTC   : null,
             block_id       : null,
-            from           : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
+            from           : {trxs: [], addresses: [], amount: nInputSum / WebDollarCoins.WEBD, amount_raw: nInputSum},
             to             : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
             isConfirmed    : oTransaction.confirmed
         };
 
-        if (oBlock !== null)
-        {
+        if (oBlock !== null) {
             const nBlockTimestampRaw = oBlock.timeStamp;
             const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
             const oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);

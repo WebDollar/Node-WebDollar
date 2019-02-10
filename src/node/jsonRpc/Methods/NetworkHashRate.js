@@ -3,15 +3,14 @@ import {RpcMethod} from './../../../jsonRpc';
 /**
  * The current webdollar network hash rate.
  */
-class NetworkHashRate extends RpcMethod
-{
+class NetworkHashRate extends RpcMethod {
     constructor(name, oBlockchain) {
         super(name);
 
         this._oBlockchain = oBlockchain;
     }
 
-    getHandler(args) {
+    getHandler() {
         return this._oBlockchain.blocks.networkHashRate;
     }
 }

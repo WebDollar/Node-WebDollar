@@ -1,8 +1,7 @@
-import sinon from 'sinon';
-import { expect, assert } from 'chai';
-
-import RpcMethod from '../../../../jsonRpc/RpcMethod';
-import Accounts from '../../Methods/Account/Accounts';
+import sinon      from 'sinon';
+import { assert } from 'chai';
+import Accounts   from './../../Methods/Account/Accounts';
+import RpcMethod  from './../../../../jsonRpc/RpcMethod';
 
 describe('AccountsTest', () => {
     it ('should inherit from JsonRpc\\RpcMethod', () => {

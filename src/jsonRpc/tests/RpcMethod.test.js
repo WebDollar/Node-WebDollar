@@ -9,8 +9,12 @@ describe('RpcMethodTest', () => {
     });
 
     it('RpcMethod::constructor should throw exception on invalid name', () => {
-        expect(() => {return new RpcMethod();}).to.throw(Error, 'Name must be defined as a non empty string');
-        expect(() => {return new RpcMethod(null);}).to.throw(Error, 'Name must be defined as a non empty string');
+        expect(() => {
+            return new RpcMethod();
+        }).to.throw(Error, 'Name must be defined as a non empty string');
+        expect(() => {
+            return new RpcMethod(null);
+        }).to.throw(Error, 'Name must be defined as a non empty string');
     });
 
     it('RpcMethod::getOptions should return a Map instance', () => {
@@ -39,7 +43,9 @@ describe('RpcMethodTest', () => {
     });
 
     it('RpcMethod::getHandler should throw exception by default', () => {
-        expect(() => {(new RpcMethod('name')).getHandler();}).to.throw(Error, 'Handler is not defined');
+        expect(() => {
+            (new RpcMethod('name')).getHandler();
+        }).to.throw(Error, 'Handler is not defined');
     });
 
     it('RpcMethod::getParamType should return "Array" by default', () => {

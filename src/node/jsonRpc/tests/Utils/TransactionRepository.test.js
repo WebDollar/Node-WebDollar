@@ -7,12 +7,12 @@ import BlockRepository from '../../Utils/BlockRepository';
 describe('TransactionRepositoryTest', () => {
     const Blockchain = {
         blocksStartingPoint: 0,
-        blocks: {
+        blocks             : {
             0: {
                 id: 'block_0'
             },
             10: {
-                id: 'block_10',
+                id  : 'block_10',
                 data: {
                     transactions: {
                         transactions: [
@@ -24,7 +24,7 @@ describe('TransactionRepositoryTest', () => {
                 }
             },
             11: {
-                id: 'block_11',
+                id  : 'block_11',
                 data: {
                     transactions: {
                         transactions: []
@@ -85,7 +85,9 @@ describe('TransactionRepositoryTest', () => {
     });
 
     it ('TransactionRepository::findByBlockHashAndIndex should throw exception', () => {
-        expect(() => {oTransactionRepository.findByBlockHashAndIndex('hash', 1);}).to.throw('Find By Hash is not supported. Block hash: hash');
+        expect(() => {
+            oTransactionRepository.findByBlockHashAndIndex('hash', 1);
+        }).to.throw('Find By Hash is not supported. Block hash: hash');
     });
 
     it ('TransactionRepository::countByBlockNumber should return 0 on invalid block', () => {
@@ -110,7 +112,9 @@ describe('TransactionRepositoryTest', () => {
     });
 
     it ('TransactionRepository::countByBlockHash should throw exception', () => {
-        expect(() => {oTransactionRepository.countByBlockHash('hash');}).to.throw('Find By Hash is not supported. Block hash: hash');
+        expect(() => {
+            oTransactionRepository.countByBlockHash('hash');
+        }).to.throw('Find By Hash is not supported. Block hash: hash');
     });
 
     // !!!Important Keep this
