@@ -248,8 +248,6 @@ class PoolWorkManagement{
                         console.error("PoolWork include raised an exception", exception);
                         revertActions.revertOperations();
 
-                        if (block)
-                            block.destroyBlock();
 
                     }
 

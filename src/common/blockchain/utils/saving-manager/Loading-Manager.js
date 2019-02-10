@@ -75,8 +75,8 @@ class LoadingManager{
 
                 //check if it is not being saved by the Save Manager
 
-                this.loadedBlocks[key].destroyBlock();
                 delete this.loadedBlocks[key];
+
             }
 
         }

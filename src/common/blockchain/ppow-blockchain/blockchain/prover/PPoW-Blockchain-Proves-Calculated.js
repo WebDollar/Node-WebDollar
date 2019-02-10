@@ -25,7 +25,7 @@ class PPoWBlockchainProvesCalculated{
 
     deleteBlock(block, level){
 
-        if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
+        if ( level === undefined && !block.difficultyTarget )
             return;
 
         try {
@@ -36,10 +36,8 @@ class PPoWBlockchainProvesCalculated{
             return;
         }
 
-
-
         //deleting old ones if they have a different level
-        if (this.allBlocks[block.height] !== undefined && this.allBlocks[block.height] === block && this.allBlocks[block.height] !== level) {
+        if (this.allBlocks[block.height] && this.allBlocks[block.height] === block && this.allBlocks[block.height] !== level) {
 
             let oldlevel = this.allBlocks[block.height];
             this.levelsLengths[oldlevel]--;
@@ -56,13 +54,13 @@ class PPoWBlockchainProvesCalculated{
 
     updateBlock(block){
 
-        if (block === undefined || block === null) return false;
+        if ( !block ) return false;
 
         let level, pos;
 
         try {
 
-            if (level === undefined && (block.difficultyTarget === undefined || block.difficultyTarget === null))
+            if (level === undefined && !block.difficultyTarget )
                 return;
 
             level = block.level;
@@ -70,7 +68,7 @@ class PPoWBlockchainProvesCalculated{
 
             this.deleteBlock(block);
 
-            if (this.levels[level][pos] !== undefined && this.levels[level][pos].height === block.height) {
+            if (this.levels[level][pos] && this.levels[level][pos].height === block.height) {
                 this.levels[level][pos] = block;
                 return;
             }

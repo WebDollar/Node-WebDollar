@@ -21,36 +21,7 @@ class PPoWBlockchainProofBasic{
 
     destroyProof(){
 
-        if (!this.blockchain.agent.light)
-            this.blocks = [];
-        else
-        for (let i=0; i<this.blocks.length; i++) {
-
-            if (!this.blocks[i] ) continue;
-
-            let found = false;
-
-            //TODO optimization instead of using for j
-
-            if (this.blockchain.proofPi )
-                for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
-                    if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
-                        found = true;
-                        break;
-                    }
-
-            if (!found) {
-
-                // avoid destroying real blocks
-                if (this.blocks[i] && typeof this.blocks[i].destroyBlock === "function")
-                    this.blocks[i].destroyBlock();
-
-            }
-
-            this.blocks[i] = undefined;
-
-        }
-
+        this.blocks = [];
         this.blockchain = undefined;
 
     }

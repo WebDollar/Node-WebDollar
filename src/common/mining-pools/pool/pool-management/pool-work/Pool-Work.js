@@ -150,8 +150,6 @@ class PoolWork {
                         for (let key in this._blocksList[i].instances)
                             this._blocksList[i].instances[key].workBlock = undefined;
 
-                        if (this._blocksList[i].block )
-                            this._blocksList[i].block.destroyBlock();
 
                         this._blocksList[i].block = undefined;
                         this._blocksList[i].instances = undefined;

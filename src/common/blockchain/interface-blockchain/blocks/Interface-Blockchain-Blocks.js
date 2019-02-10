@@ -52,23 +52,6 @@ class InterfaceBlockchainBlocks{
         if (saveBlock)
             this.emitBlockInserted(block);
 
-        //delete old blocks when I am in light node
-        if (this.blockchain.agent && this.blockchain.agent.light){
-
-            let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
-
-            while (this[index] ){
-                this[index].destroyBlock();
-                delete this[index];
-
-                index--;
-            }
-
-            while (this.length > 0 && !this[this.blocksStartingPoint] && this.blocksStartingPoint < this.length)
-                this.blocksStartingPoint++;
-
-        }
-
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
@@ -85,21 +68,15 @@ class InterfaceBlockchainBlocks{
         StatusEvents.emit("blockchain/blocks-count-changed", this._length);
     }
 
-    spliceBlocks(after, freeMemory = false, showUpdate = true){
+    async spliceBlocks(after, showUpdate = true){
 
-        for (let i = this.length - 1; i >= after; i--)
-            if (this[i] !== undefined){
+        for (let i = this.length - 1; i >= after; i--) {
 
-                this.chainWork = this.chainWork.minus( this[i].workDone );
+            //optimize save workDone for each block
+            let block = await this.getBlock(i);
 
-                if (freeMemory) {
-                    this[i].destroyBlock();
-                    delete this[i];
-                }
-                else
-                    this[i] = undefined;
-
-            }
+            this.chainWork = this.chainWork.minus( block.workDone);
+        }
 
         if (this.length === 0)
             this._chainWork =  new BigInteger(0);

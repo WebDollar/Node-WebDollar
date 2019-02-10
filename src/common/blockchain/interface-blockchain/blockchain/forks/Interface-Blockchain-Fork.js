@@ -35,8 +35,6 @@ class InterfaceBlockchainFork {
             for (let i = 0; i < this.forkBlocks.length; i++)
                 if (this.forkBlocks[i] && (await this.blockchain.getBlock(this.forkBlocks[i].height)) !== this.forkBlocks[i]) {
 
-                    this.forkBlocks[i].destroyBlock();
-
                     this.forkBlocks[i] = undefined;
                 }
 
@@ -335,10 +333,7 @@ class InterfaceBlockchainFork {
             this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
 
             for (let j=0; j<=pos; j++)
-                if ( (await this.blockchain.getBlock( this.forkBlocks[j].height )) !== this.forkBlocks[j])
-                    this.forkBlocks[j].destroyBlock();
-                else
-                    this.forkBlocks[j] = undefined;
+                this.forkBlocks[j] = undefined;
 
 
             this.forkBlocks.splice(0, pos);
@@ -693,11 +688,11 @@ class InterfaceBlockchainFork {
 
 
         for (let i = 0; i < this._blocksCopy.length; i++) {
+
             let block = await this.blockchain.getBlock(this._blocksCopy[i].height);
-            if (this._blocksCopy[i] && block !== this._blocksCopy[i]) {
-                this._blocksCopy[i].destroyBlock();
+            if (this._blocksCopy[i] && block !== this._blocksCopy[i])
                 this._blocksCopy[i] = undefined;
-            }
+
         }
 
         this._blocksCopy = [];

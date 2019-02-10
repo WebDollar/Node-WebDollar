@@ -20,17 +20,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this._provesClculatedInserted = undefined;
     }
 
-    destroyBlock(){
-
-        //in case it was already included
-        if (!this.blockchain ) return;
-
-        if (this._provesClculatedInserted)
-            this.blockchain.prover.provesCalculated.deleteBlock(this);
-
-        InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
-    }
-
     updateInterlink(){
         this.interlink = this.calculateInterlink();
     }
