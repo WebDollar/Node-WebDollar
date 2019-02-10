@@ -80,7 +80,6 @@ class MinerPoolProtocol extends PoolProtocolList{
 
                 let answer = await this._sendPoolHello(socket);
 
-
                 if (!answer)
                     throw {message: "send hello is not working"};
 
@@ -133,8 +132,8 @@ class MinerPoolProtocol extends PoolProtocolList{
             }, "answer", 30000  );
 
 
-            if (answer === null ) throw {message: "pool : didn't respond"}; //in case there was an error message
-            if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
+            if ( !answer ) throw {message: "pool : didn't respond"}; //in case there was an error message
+            if ( !answer.result ) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
 
             try{
 
