@@ -18,14 +18,19 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
         if (!this._deleteUnresponsiveMinersInterval )
             this._deleteUnresponsiveMinersInterval = setTimeout( this._deleteUnresponsiveMiners.bind(this), 20000 );
+
     }
 
     stopPoolDataConnectedMinerInstances(){
+
         clearTimeout(this._deleteUnresponsiveMinersInterval);
         this._deleteUnresponsiveMinersInterval = undefined;
+
     }
 
-    _deleteUnresponsiveMiners(){
+    async _deleteUnresponsiveMiners(){
+
+        let count = 0;
 
         try{
 
@@ -33,10 +38,10 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
             for (let i = this.connectedMinerInstances.length - 1; i >= 0; i--) {
 
-                if ( !this.connectedMinerInstances[i] || !this.connectedMinerInstances[i].socket )
+                if ( !this.connectedMinerInstances[i] || !this.connectedMinerInstances[i].socket || this.connectedMinerInstances[i].socket.disconnected )
                     this.connectedMinerInstances.splice(i, 1);
                 else
-                if ((time - this.connectedMinerInstances[i].dateActivity > 480) || this.connectedMinerInstances[i].socket.disconnected) { //8 minutes
+                if ( time - this.connectedMinerInstances[i].dateActivity > 480 ) { //8 minutes
 
                     try {
 
@@ -49,6 +54,13 @@ class PoolDataConnectedMinerInstances extends PoolProtocolList{
 
                         if (this.connectedMinerInstances[i] && socket === this.connectedMinerInstances[i].socket)
                             this.connectedMinerInstances.splice(i, 1);
+
+                        count ++;
+
+                        if (count % 20 === 0) {
+                            await this.poolManagement.blockchain.sleep(500);
+                            Log.info("_deleteUnresponsiveMiners batch disconnected", Log.LOG_TYPE.POOLS, count );
+                        }
 
                     } catch (exception) {
                         Log.error("_deleteUnresponsiveMiners raised an error", Log.LOG_TYPE.POOLS, exception);

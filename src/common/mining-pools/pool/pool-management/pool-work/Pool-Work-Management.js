@@ -299,11 +299,11 @@ class PoolWorkManagement{
                     for (let i=0; i < this.poolManagement.poolData.blocksInfo.length; i++){
 
                         let oldBlockInfo = this.poolManagement.poolData.blocksInfo[i];
-                        if (oldBlockInfo.payoutTransaction || oldBlockInfo.payout ) continue;
+                        if ( oldBlockInfo.payoutTransaction || oldBlockInfo.payout ) continue;
 
                         for (let height in oldBlockInfo.miningHeights)
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
-                                if ( BlockchainGenesis.isPoSActivated(height) ){
+                                if ( BlockchainGenesis.isPoSActivated( height) ){
 
                                     let oldBlockInformationMinerInstance = oldBlockInfo.addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 

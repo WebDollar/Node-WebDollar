@@ -122,7 +122,7 @@ class PoolDataBlockInformation {
 
         let blockInformationMinerInstance = this._findBlockInformationMinerInstance(minerInstance);
 
-        if (blockInformationMinerInstance === null) throw {message: "blockInformation - miner instance was not found "};
+        if ( !blockInformationMinerInstance ) throw {message: "blockInformation - miner instance was not found "};
 
         return blockInformationMinerInstance.reward;
 
@@ -259,13 +259,13 @@ class PoolDataBlockInformation {
 
 
 
-    _findBlockInformationMinerInstance(minerInstance){
+    _findBlockInformationMinerInstance(minerInstance, pos = false){
 
         for (let i=0; i<this.blockInformationMinersInstances.length; i++)
             if (this.blockInformationMinersInstances[i].minerInstance === minerInstance )
-                return this.blockInformationMinersInstances[i];
+                return pos ? i : this.blockInformationMinersInstances[i];
 
-        return null;
+        return pos  ? -1 : null;
     }
 
     addBlockInformationMinerInstance(minerInstance){
@@ -287,11 +287,10 @@ class PoolDataBlockInformation {
 
         let pos = minerInstance;
         if (typeof pos !== "number")
-            for (let i=this.blockInformationMinersInstances.length-1; i>=0; i--)
-                if (this.blockInformationMinersInstances[i].minerInstance === minerInstance ) {
-                    pos = i;
-                    break;
-                }
+            pos = this._findBlockInformationMinerInstance( minerInstance );
+
+        if (typeof pos !== "number")
+            return;
 
         this.blockInformationMinersInstances[pos].cancelReward();
         this.blockInformationMinersInstances[pos].cancelDifficulties();

@@ -30,7 +30,7 @@ class NodeBlockchainPropagation{
         setTimeout( this.processPropagation.bind(this), INTERVAL_PROPAGATION);
 
         //remove disconnected sockets
-        setInterval( this._deleteDisconenctedSockets.bind(this), 20000)
+        setInterval( this._deleteDisconnectedSockets.bind(this), 20000)
     }
 
     propagateBlock(block, socketsAvoidBroadcast){
@@ -144,7 +144,7 @@ class NodeBlockchainPropagation{
         return false;
     }
 
-    _deleteDisconenctedSockets(){
+    _deleteDisconnectedSockets(){
 
         for (let i=this._socketsAlreadyBroadcast.length-1; i>=0; i--)
             if (this._socketsAlreadyBroadcast[i].disconnected)
