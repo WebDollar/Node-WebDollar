@@ -162,7 +162,7 @@ class NodeServer {
                         //be sure it is not a fallback node
                         let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
 
-                        if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
+                        if ( !nodeDomain || !waitlist.waitlist || !waitlist.waitlist.isFallback) {
 
                             if (Math.random() < 0.05) console.warn("too many terminal connections");
                             return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
@@ -189,7 +189,7 @@ class NodeServer {
                     }else {
 
                         let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
-                        if ( waitlist === null || waitlist.waitlist === null) //it will also disconnect the socket
+                        if ( !waitlist || !waitlist.waitlist ) //it will also disconnect the socket
                             return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true);
 
                     }

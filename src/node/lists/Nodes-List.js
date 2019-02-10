@@ -94,7 +94,7 @@ class NodesList {
     async registerUniqueSocket(socket, connectionType, nodeType, nodeConsensusType, validationDoubleConnectionsTypes){
 
         //nodeType can be a value 0
-        if ( typeof nodeType === "undefined" ) throw {message: "type is necessary"};
+        if ( nodeType === undefined ) throw {message: "type is necessary"};
 
         if (!socket.node || !socket.node.protocol || !socket.node.protocol.helloValidated ) {
             socket.disconnect();
@@ -106,7 +106,7 @@ class NodesList {
         socket.node.protocol.nodeConsensusType = nodeConsensusType;
 
         // avoiding double connections                              unless it is allowed to double connections
-        if ( this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) === null ) {
+        if ( !this.searchNodeSocketByAddress(socket, undefined, validationDoubleConnectionsTypes ) ) {
 
             // it is a unique connection, I should register this connection
 
@@ -148,7 +148,7 @@ class NodesList {
     //Removing socket from the list (the connection was terminated)
     async disconnectSocket(socket, connectionType = 'all'){
 
-        if (socket !== null && !socket.hasOwnProperty("node") ) {
+        if (socket && !socket.hasOwnProperty("node") ) {
 
             //console.error("Error - disconnectSocket rejected by invalid helloValidated");
             //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);

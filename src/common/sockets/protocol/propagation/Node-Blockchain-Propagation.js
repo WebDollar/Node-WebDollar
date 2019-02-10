@@ -42,7 +42,7 @@ class NodeBlockchainPropagation{
 
         this._socketsAlreadyBroadcast = [];
 
-        if (socketsAvoidBroadcast !== undefined && socketsAvoidBroadcast !== "all") {
+        if (socketsAvoidBroadcast && socketsAvoidBroadcast !== "all") {
 
             if (! Array.isArray(socketsAvoidBroadcast) )
                 socketsAvoidBroadcast = [socketsAvoidBroadcast];
@@ -79,12 +79,7 @@ class NodeBlockchainPropagation{
 
         let block = this._blockPropagating;
 
-        if (block === undefined){
-            setTimeout( this.processPropagation.bind(this), INTERVAL_PROPAGATION );
-            return true;
-        }
-
-        if (this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
+        if (block && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
 
             let list = [];
             for (let i=0; i<NodesList.nodes.length; i++)
