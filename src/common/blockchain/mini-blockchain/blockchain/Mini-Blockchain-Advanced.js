@@ -158,7 +158,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if (!(await this.accountantTree.saveMiniAccountant(true, "lightAccountantTreeFinalAdvanced", serialization)))
                 throw {message: "saveMiniAccountant couldn't be saved"};
 
-            if (!( await this.blockchain.blocks.saveBlockchainLength() ))
+            if (!( await this.blockchain.blocks.saveBlockchainLength( length ) ))
                 throw {message: "saveMiniAccountant Length couldn't be saved"};
 
             await this.sleep(70);

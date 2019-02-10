@@ -187,9 +187,9 @@ class InterfaceBlockchainBlocks{
         return numBlocks;
     }
 
-    async saveBlockchainLength(){
+    async saveBlockchainLength(length = this.length){
 
-        let answer = await this.db.save(this._blockchainFileName, this.length, 20000, 1000000) ;
+        let answer = await this.db.save(this._blockchainFileName, length, 20000, 1000000) ;
 
         if (!answer) {
             Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
