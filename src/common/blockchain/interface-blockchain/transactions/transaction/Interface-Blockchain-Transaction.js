@@ -22,7 +22,7 @@ class InterfaceBlockchainTransaction{
      * @param txId - usually null
      */
 
-    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, calculateTxId = true ){
+    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, validateTxId = true ){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -31,13 +31,13 @@ class InterfaceBlockchainTransaction{
         this._confirmed = false;
 
         if (validateTimeLock)
-            if (timeLock === undefined)
+            if ( !timeLock )
                 this.timeLock = blockchain.blocks.length-1;
             else
                 this.timeLock = timeLock;
 
         if (validateVersion)
-            if (version === undefined){
+            if ( !version ){
 
                 if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
                 else
@@ -75,6 +75,18 @@ class InterfaceBlockchainTransaction{
             throw typeof exception === "string" ? "Transaction To Error " + exception : exception;
         }
 
+
+        if(validateNonce)
+            if ( !nonce )
+                nonce = this._computeNonce();
+
+        if(validateVersion)
+            if (version === 0x00) nonce = nonce % 0x100;
+            else if (version >= 0x01) nonce = nonce % 0X10000;
+
+        this.nonce = nonce; //1 bytes
+
+
         try {
 
             if (validateFrom)
@@ -97,35 +109,28 @@ class InterfaceBlockchainTransaction{
 
         }
 
-        if(validateNonce)
-            if (nonce === undefined || nonce === null)
-                nonce = this._computeNonce();
+        if (validateTxId)
+            if ( !txId.equals( this.txId) )
+                throw {message: "TxId is invalid"};
 
-        if(validateVersion)
-            if (version === 0x00) nonce = nonce % 0x100;
-            else if (version >= 0x01) nonce = nonce % 0X10000;
-
-        this.nonce = nonce; //1 bytes
-
-        if (calculateTxId)
-            if (txId === undefined || txId === null)
-                txId = this._computeTxId();
-
-        this._txId = txId;
-
-        //this._serializated;
     }
 
-    destroyTransaction(){
+    destroyTransaction(pendingTransactionsWereIncluded){
+        //avoid to delete
+        if (pendingTransactionsWereIncluded)
+            this.pendingTransactionsIncluded--;
 
+        if ( this.pendingTransactionsIncluded && this.pendingTransactionsIncluded > 0)
+            return;
+
+        this.blockchain.transactions.pendingQueue.removePendingTransaction(this, undefined, false);
         this.blockchain = undefined;
-        this.from.transaction = undefined;
-        this.to.transaction = undefined;
 
         delete this._serializated;
         delete this.from.addresses;
+        delete this.from.currencyTokenId;
         delete this.to.addresses;
-        delete this._txId;
+        delete this.txId;
 
     }
 
@@ -146,8 +151,8 @@ class InterfaceBlockchainTransaction{
         return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this.serializeTransaction() ));
     }
 
-    recalculateTxId(){
-        this._txId = this._computeTxId();
+    get txId(){
+        return this._computeTxId();
     }
 
     /**
@@ -173,7 +178,7 @@ class InterfaceBlockchainTransaction{
      */
     validateTransactionOnce( blockHeight, blockValidationType = {} ){
 
-        if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
+        if ( !blockHeight ) blockHeight = this.blockchain.blocks.length-1;
 
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
@@ -192,7 +197,7 @@ class InterfaceBlockchainTransaction{
 
         if ( blockHeight !== -1){
             if (this.timeLock !== 0 && blockHeight < this.timeLock ) throw {message: "blockHeight < timeLock", timeLock:this.timeLock, blockHeight: blockHeight };
-            if (this.timeLock - blockHeight > 100) throw { message: "timelock - blockHeight < 100", timeLock : this.timeLock };
+            if (this.timeLock !== 0 && this.timeLock - blockHeight > 100) throw { message: "timeLock - blockHeight < 100", timeLock : this.timeLock };
         }
 
         let txId = this._computeTxId();
@@ -231,13 +236,13 @@ class InterfaceBlockchainTransaction{
 
     validateTransactionEveryTime( blockHeight , blockValidationType = {}){
 
-        if (this.blockchain === undefined) throw {message: "blockchain is empty"};
+        if ( !this.blockchain ) throw {message: "blockchain is empty"};
 
-        if (blockHeight === undefined) blockHeight = this.blockchain.blocks.length-1;
+        if ( !blockValidationType || !blockValidationType['skip-validation-transactions-from-values']){
 
-        if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
+            if ( !blockHeight ) blockHeight = this.blockchain.blocks.length-1;
 
-        if (blockValidationType === undefined || !blockValidationType['skip-validation-transactions-from-values']){
+            if (this.timeLock !== 0 && blockHeight < this.timeLock) throw {message: "blockHeight < timeLock", timeLock: this.timeLock};
 
             if (! this._validateNonce(blockValidationType) ) throw {message: "Nonce is invalid" };
 
@@ -248,23 +253,23 @@ class InterfaceBlockchainTransaction{
     }
 
 
-    isTransactionOK(avoidValidatingSignature = false, showDebug=true){
+    isTransactionOK(avoidValidatingSignature = false, showDebug=true, blockValidationType = {}){
 
         if (!avoidValidatingSignature)
             this.validateTransactionOnce(undefined,  { 'skip-validation-transactions-from-values': true } );
 
         try {
-            let blockValidationType = {
-                "take-transactions-list-in-consideration": {
-                    validation: true
-                }
+
+            blockValidationType["take-transactions-list-in-consideration"] = {
+                validation: true
             };
+
             this.validateTransactionEveryTime(undefined, blockValidationType );
 
         } catch (exception){
 
-            if (showDebug)
-                console.warn ("Transaction Problem", exception);
+            //if (showDebug)
+                // console.warn ("Transaction Problem", exception);
 
             return false;
         }
@@ -278,7 +283,7 @@ class InterfaceBlockchainTransaction{
 
     serializeTransaction(rewrite = false){
 
-        return this._serializeTransaction();
+        // return this._serializeTransaction();
 
         if ( !this._serializated || rewrite )
             this._serializated = this._serializeTransaction();
@@ -305,12 +310,8 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    get txId(){
-
-        if (!this._txId)
-            this._txId = this._computeTxId();
-
-        return this._txId;
+    serializeTransactionId(){
+        return this.txId;
     }
 
     deserializeTransaction(buffer, offset, returnTransaction=false){

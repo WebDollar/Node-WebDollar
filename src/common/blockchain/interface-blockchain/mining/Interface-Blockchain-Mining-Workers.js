@@ -5,6 +5,7 @@ import Serialization from 'common/utils/Serialization';
 import SemaphoreProcessing from "common/utils/Semaphore-Processing";
 import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 
 class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
@@ -26,19 +27,27 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
     }
 
 
-    mine(block, difficultyTarget, start, end){
+    mine (block, difficultyTarget, start, end, height){
+
+        let blockBuffer;
 
         //serialize the block
-        if ( !Buffer.isBuffer( block ) && typeof block === 'object' && block.computedBlockPrefix !== undefined) {
-            block = Buffer.concat( [
+        if (Buffer.isBuffer( block ))
+            blockBuffer = block;
+        else
+        if ( !Buffer.isBuffer( block ) && typeof block === 'object' ) {
+            blockBuffer = Buffer.concat( [
                 Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(block.height) ),
                 Serialization.serializeBufferRemovingLeadingZeros( block.difficultyTargetPrev ),
-                block.computedBlockPrefix
+                block._computeBlockHeaderPrefix( true )
             ]);
         }
 
         this.bestHash =  consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER ;
         this.bestHashNonce = -1;
+
+        if ( BlockchainGenesis.isPoSActivated( height ) )
+            return this._minePOS(block, difficultyTarget);
 
         this.block = block;
         this.difficulty = difficultyTarget;
@@ -48,16 +57,16 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
         this._nonce = start;
 
-
         this._workerFinished = false;
 
         let promiseResolve = new Promise ((resolve)=>{ this._workerResolve = resolve });
 
         //initialize new workers
 
-        this.workers.initializeWorkers(block, difficultyTarget );
+        this.workers.initializeWorkers(blockBuffer, difficultyTarget );
 
         return promiseResolve;
+
     }
 
 
@@ -116,6 +125,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
     async startMining(){
 
+        if (this.started)
+            return;
+
         InterfaceBlockchainMining.prototype.startMining.call(this);
 
         if (this.workers.workers === 0)
@@ -140,7 +152,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             this.workers.suspendWorkers();
             this._suspendMiningWorking();
 
-            if (this._workerResolve !== null && this._workerResolve !== undefined)
+            if ( this._workerResolve )
                 this._workerResolve( { //we didn't find anything
                     result: false,
                     hash: this.bestHash,
@@ -180,9 +192,9 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
             if ( worker.suspended )
                 return; //I am no longer interested
 
-            if (event.data.hash === undefined){
+            if ( !event.data.hash )
                 console.log("Worker Error");
-            } else{
+            else{
 
                 let compare = 0;
 

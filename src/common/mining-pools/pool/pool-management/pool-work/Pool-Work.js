@@ -23,20 +23,21 @@ class PoolWork {
     }
 
     startGarbageCollector(){
-        this._garbageCollectorInterval = setInterval( this._garbageCollector.bind(this), 5000);
+        if (!this._garbageCollectorInterval)
+            this._garbageCollectorInterval = setTimeout( this._garbageCollector.bind(this), 30000);
     }
 
     stopGarbageCollector(){
 
-        if (this._garbageCollectorInterval !== undefined)
-            clearInterval(this._garbageCollectorInterval);
+        if ( this._garbageCollectorInterval ) clearTimeout(this._garbageCollectorInterval);
+        this._garbageCollectorInterval = undefined;
 
     }
 
     findBlockById(blockId, blockHeight){
 
         for (let i=0; i<this._blocksList.length; i++)
-            if ( (blockId !== undefined && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
+            if ( (blockId && this._blocksList[i].blockId === blockId ) || ( this._blocksList[i].block.height === blockHeight ) ){
                 return this._blocksList[i].block;
             }
 
@@ -49,7 +50,7 @@ class PoolWork {
             throw {message: "Blockchain is not yet synchronized"};
 
         //still pending
-        if (this.lastBlockPromise !== undefined && this.lastBlockPromise.isPending() )
+        if (this.lastBlockPromise && this.lastBlockPromise.isPending() )
             return this.lastBlockPromise;
 
         //new work
@@ -57,17 +58,30 @@ class PoolWork {
         this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
+            this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
+            this.lastBlock._hashPrev = this.lastBlock.hashPrev;
+
             this.lastBlockNonce = 0;
 
+            //fill with blank info
+            this.lastBlock.hash = new Buffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH );
+            if (BlockchainGenesis.isPoSActivated(this.lastBlock.height)) {
+                this.lastBlock.posMinerPublicKey = new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH );
+                this.lastBlock.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH );
+            }
 
-            if (this.lastBlock.computedBlockPrefix === undefined )
-                this.lastBlock._computeBlockHeaderPrefix();
+            let error = false;
 
-            this.lastBlockSerialization = Buffer.concat( [
-                Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(this.lastBlock.height) ),
-                Serialization.serializeBufferRemovingLeadingZeros( this.lastBlock.difficultyTargetPrev ),
-                this.lastBlock.computedBlockPrefix
-            ]);
+            try{
+
+                this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
+
+            } catch (exception){
+
+                error = true;
+
+            }
+
 
             this.lastBlockId ++ ;
 
@@ -83,8 +97,17 @@ class PoolWork {
 
             this._blocksList.push( this.lastBlockElement );
 
+            if (error) {
+                resolve(false);
+                console.error("Error creating Pool block");
+                return;
+            }
+
             if  (!this.blockchain.semaphoreProcessing.processing && ( this.lastBlock.height !==  this.blockchain.blocks.length || !this.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash ))) {
-                console.error("ERRRORR!!! HASHPREV DOESN'T MATCH blocks.last.hash");
+
+                if (consts.DEBUG)
+                    console.error("ERROR!!! POOL MINING LAST BLOCK WAS CHANGED. HASHPREV DOESN'T MATCH blocks.last.hash");
+
                 resolve(false);
                 return;
             }
@@ -98,46 +121,60 @@ class PoolWork {
     }
 
 
-    _garbageCollector(){
+    async _garbageCollector(){
 
-        let time = (new Date().getTime()/1000) - BlockchainGenesis.timeStampOffset;
+        try{
 
-        for (let i=0; i<this._blocksList.length; i++) {
+            let time = (new Date().getTime()/1000) - BlockchainGenesis.timeStampOffset;
+            let destroyed = 0;
 
-            //verify if the block was a solution to a block
-            let found = false;
-            for (let j =0 ; j < this.poolManagement.poolData.blocksInfo.length; j++)
-                if ( this.poolManagement.poolData.blocksInfo[j].block !== undefined && this._blocksList[i].block !== undefined &&
-                     (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block || ( this._blocksList[i].block.hash !== null && this.poolManagement.poolData.blocksInfo[j].block.hash.equals(this._blocksList[i].block.hash) )) ){
-                    found = true;
-                    break;
-                }
+            for (let i=0; i<this._blocksList.length; i++) {
 
-            if (!found)
+                //verify if the block was a solution to a block
+                let found = false;
+                for (let j =0 ; j < this.poolManagement.poolData.blocksInfo.length; j++)
+                    if ( this.poolManagement.poolData.blocksInfo[j].block && this._blocksList[i].block &&
+                        (this.poolManagement.poolData.blocksInfo[j].block === this._blocksList[i].block || ( this._blocksList[i].block.hash && this.poolManagement.poolData.blocksInfo[j].block.hash.equals(this._blocksList[i].block.hash) )) ){
+                        found = true;
+                        break;
+                    }
+
+                if (!found)
                 //delete block
-                if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 20*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) && this._blocksList[i].block.height < this.blockchain.blocks.length - 20 ) {
+                    if ( this._blocksList[i].block !== this.lastBlock && ( (time - this._blocksList[i].block.timeStamp ) > 200*consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK) && this._blocksList[i].block.height < this.blockchain.blocks.length - 100 ) {
 
-                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
-                    Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+ this._blocksList[i].blockId +" height "+this._blocksList[i].block.height, Log.LOG_TYPE.POOLS);
-                    Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                        Log.warn("==========================================", Log.LOG_TYPE.POOLS);
+                        Log.warn("GARBAGE COLLECTOR DELETE BLOCK "+ this._blocksList[i].blockId +" height "+this._blocksList[i].block.height, Log.LOG_TYPE.POOLS);
+                        Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
-                    for (let key in this._blocksList[i].instances)
-                        if (this._blocksList[i].instances.hasOwnProperty(key))
+                        for (let key in this._blocksList[i].instances)
                             this._blocksList[i].instances[key].workBlock = undefined;
 
+                        if (this._blocksList[i].block )
+                            this._blocksList[i].block.destroyBlock();
 
-                    if (this._blocksList[i].block !== undefined)
-                        this._blocksList[i].block.destroyBlock();
+                        this._blocksList[i].block = undefined;
+                        this._blocksList[i].instances = undefined;
 
-                    this._blocksList[i].block = undefined;
-                    this._blocksList[i].instances = undefined;
+                        this._blocksList.splice(i, 1);
+                        destroyed++;
 
-                    this._blocksList.splice(i, 1);
+                        if (destroyed % 10 === 0)
+                            await this.blockchain.sleep(100);
 
-                    i--;
-                }
+                        i--;
+                    }
+
+
+
+            }
+
+
+        } catch (exception){
 
         }
+
+        this._garbageCollectorInterval = setTimeout( this._garbageCollector.bind(this), 30000);
 
     }
 

@@ -156,13 +156,13 @@ class MinerPoolSettings {
 
     async addPoolList(url, data, save = true){
 
-        if (data === undefined)
+        if ( !data )
             data = PoolsUtils.extractPoolURL(url);
 
-        if (data === null) return;
+        if (!data ) return;
 
         let foundPool = this.poolsList[ data.poolPublicKey.toString("hex") ];
-        if (foundPool === undefined)
+        if (!foundPool)
             foundPool = {};
 
         if (JSON.stringify(this.poolsList[data.poolPublicKey.toString("hex")]) !== JSON.stringify(data)){
@@ -229,10 +229,9 @@ class MinerPoolSettings {
 
     async _addPoolsList(){
 
+        await this.addPoolList("/pool/1/WebDPoolUS/0.01/14f1f8d096f60216bc7bb84ed539ef98bb0384894322747d8fcd3dc324babd67/https:$$webdpool.us:80", undefined, true);
         await this.addPoolList("/pool/1/BACMpool/0.01/21dc1f57cb7338963ea159877b4ade97b71dd11ac17292e3852bdc33a26a17e4/https:$$pool.bacm.ro:443", undefined, true);
         await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
-        await this.addPoolList("/pool/0/WebDollarExperimentalPool/0.02/WEBD$gDU+tP3@42@L9$Is463vDJi4IKrabPNNn$$/93ba881950314cca579d4f8699a6bc67695ec7292bceadb6f6709b70beba774a/https:$$webdollar.ddns.net/https:$$webdollar.ddns.net:80", undefined, true);
-        await this.addPoolList("/pool/1/WEBDminers/0.01/9d1e36899b3a1164e1fc790cc38c73f81d6b48522cef0abbb559c823662f0c57/https:$$webdminers.ddns.net:80", undefined, true);
         await this.addPoolList("/pool/1/WMP/0.02/c01f57930c27e78e434de1243ae02b98e56d6cd3df42d136be1a1c0a0a9a8624/https:$$server.webdollarminingpool.com:443", undefined, true);
         await this.addPoolList("/pool/1/WebDollarPoolWin/0.01/60ba45707efcf2292e1c8d4c6a16b602a58aa8bee04d7d3645198afa4f8435e0/https:$$webdollarpool.win:80", undefined, true);
 

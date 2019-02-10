@@ -2,10 +2,11 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 
 const https = require('https');
 const http = require('http');
-const path = require('path')
-const express = require('express')
+const path = require('path');
+const express = require('express');
 const cors = require('cors');
-const fs = require('fs')
+const fs = require('fs');
+const bodyParser = require('body-parser');
 
 import consts from 'consts/const_global'
 
@@ -41,15 +42,16 @@ class NodeExpress{
         return domain;
     }
 
-    startExpress(){
+    async startExpress(){
 
         if (this.loaded) //already open
-            return;
+            return true;
 
-        return new Promise((resolve)=>{
+        let loading = new Promise((resolve)=>{
 
             this.app = express();
             this.app.use(cors({ credentials: true }));
+            this.app.use(bodyParser.json());
 
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
@@ -62,8 +64,6 @@ class NodeExpress{
             let options = {};
 
             this.port = process.env.PORT || process.env.SERVER_PORT || consts.SETTINGS.NODE.PORT;
-
-            this.loaded = true;
 
             try {
 
@@ -92,6 +92,7 @@ class NodeExpress{
                         break;
                     }
 
+                if (privateKey === '' && cert === '' && caBundle === '') throw {message: "HTTPS server couldn't be started. Starting HTTP"};
                 if (privateKey === '') throw {message: "HTTPS server couldn't be started because certificate private.key was not found"};
                 if (cert === '') throw {message: "HTTPS server couldn't be started because certificate certificate.crt was not found"};
                 if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};
@@ -167,15 +168,23 @@ class NodeExpress{
 
             }
 
-        })
+        });
+
+        if (await loading)
+            this.loaded = true;
+        else
+            this.loaded = false;
+
+        return loading;
+
     }
 
     _initializeRouter(app){
 
 
         NodeAPIRouter._routesEnabled = true;
-        NodeAPIRouter.initializeRouter( this.app.get.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
-        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', this.app, NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouter( this.app.all.bind(this.app), this._expressMiddleware, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
+        NodeAPIRouter.initializeRouterCallbacks( this.app.get.bind(this.app), this._expressMiddlewareCallback, '/', NODE_API_TYPE.NODE_API_TYPE_HTTP );
         NodeAPIRouter._routesEnabled = false;
 
     }
@@ -198,7 +207,9 @@ class NodeExpress{
             for (let k in req.params)
                 req.params[k] = decodeURIComponent(req.params[k]);
 
-            let answer = await callback(req.params, res);
+            let merged = req.body ? Object.assign(req.params, req.body) : req.params;
+
+            let answer = await callback(merged, res);
             res.json(answer);
 
         } catch (exception){
@@ -210,8 +221,8 @@ class NodeExpress{
     async _expressMiddlewareCallback(req, res, callback){
 
         try {
-            for (let k in req)
-                req[k] = decodeURIComponent(req[k]);
+            for (let k in req.params)
+                req.params[k] = decodeURIComponent(req.params[k]);
 
             let url = req.url;
 

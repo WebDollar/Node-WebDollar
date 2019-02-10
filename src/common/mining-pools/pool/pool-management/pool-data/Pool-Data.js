@@ -85,16 +85,15 @@ class PoolData {
      */
     addMiner(minerAddress, minerReward = 0){
 
+        if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
+            throw {message: "miner address is invalid" };
+
         let miner = this.findMiner(minerAddress);
-        if ( miner === null) {
 
-            if ( !Buffer.isBuffer(minerAddress) || minerAddress.length !== consts.ADDRESSES.ADDRESS.LENGTH )
-                throw {message: "miner address is invalid" };
+        if ( !miner ) {
 
-
-            this.miners.push( new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] ) );
-
-            miner = this.miners[this.miners.length-1]
+            miner = new PoolDataMiner( this, uuid.v4(), minerAddress, minerReward, [] );
+            this.miners.push( miner );
 
         }
 
@@ -103,7 +102,7 @@ class PoolData {
 
     addBlockInformation(){
 
-        let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
+        let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, undefined, Blockchain.blockchain.blocks.length );
         this.blocksInfo.push(blockInformation);
 
         return blockInformation;
@@ -181,10 +180,11 @@ class PoolData {
             this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
-                let miner = new PoolDataMiner(this, i );
+                let miner = new PoolDataMiner( this, i );
                 offset = miner.deserializeMiner(buffer, offset );
 
-                this.miners.push(miner);
+                if (!this.findMiner(miner.address))
+                    this.miners.push(miner);
 
             }
 
@@ -220,12 +220,18 @@ class PoolData {
             offset += 4;
 
             this.blocksInfo = [];
+
+            console.info("Pool Blocks Data Length", numBlocksInformation);
+
             for (let i = 0; i < numBlocksInformation && offset < buffer.length; i++) {
 
-                let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, Blockchain.blockchain.blocks.length );
+                console.info("Pool Blocks Data", i ) ;
+
+                let blockInformation = new PoolDataBlockInformation(this.poolManagement, this.blocksInfo.length, undefined, undefined, undefined, Blockchain.blockchain.blocks.length );
                 offset = await blockInformation.deserializeBlockInformation(buffer, offset );
 
                 if (blockInformation.blockInformationMinersInstances.length > 0) {
+
                     this.blocksInfo.push(blockInformation);
 
                     for (let j = 0; j < blockInformation.blockInformationMinersInstances.length; j++)
@@ -235,7 +241,7 @@ class PoolData {
             }
 
 
-            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block !== undefined ){
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo.length-1].blockInformationMinersInstances.length > 0){
                 this.addBlockInformation();
             }
 
@@ -285,6 +291,12 @@ class PoolData {
             let buffer = await this._db.get("blocksInformation", 60000, true);
 
             if (buffer !== null) {
+
+                if (consts.DEBUG) {
+                    console.log('Pool Data is not loaded in Debug');
+                    return true;
+                }
+
                 let response = await this._deserializeBlockInformation(buffer);
 
                 if (response !== true) {
@@ -351,7 +363,7 @@ class PoolData {
         }
         catch (exception){
 
-            console.log('ERROR saving miners in DB: ',  exception);
+            console.log('ERROR saving block information in DB: ',  exception);
             return false;
         }
     }

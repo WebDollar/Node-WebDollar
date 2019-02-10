@@ -10,21 +10,23 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db) {
+    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db) {
 
-        super(blockchain, blockValidation, version, hash, hashPrev, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
         this._level = undefined;
         this.interlink = undefined;
+        this._provesClculatedInserted = undefined;
     }
 
     destroyBlock(){
 
         //in case it was already included
-        if (this.blockchain === undefined) return;
-        
-        this.blockchain.prover.provesCalculated.deleteBlock(this);
+        if (!this.blockchain ) return;
+
+        if (this._provesClculatedInserted)
+            this.blockchain.prover.provesCalculated.deleteBlock(this);
 
         InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
     }
@@ -33,18 +35,22 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this.interlink = this.calculateInterlink();
     }
 
-    getLevel(){
+    get level(){
 
         if (this._level !== undefined) return this._level;
-        
+
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
 
-        if (this.height === 0)
+        if ( this.height === 0 )
             T = BlockchainGenesis.difficultyTarget;
-        
-        if (T === undefined || T === null) throw {message: "Target is not defined"};
-        
+        else
+        if ( this.height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
+            T = BlockchainGenesis.difficultyTargetPOS;
+
+
+        if (!T) throw {message: "Target is not defined"};
+
         if (Buffer.isBuffer(T))
             T = Convert.bufferToBigIntegerHex(T);
 
@@ -88,7 +94,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if ( prevBlock ) {
             for (let i = 0; i < prevBlock.interlink.length; ++i)
                 interlink[i] = prevBlock.interlink[i];
-            blockLevel = prevBlock.getLevel();
+            blockLevel = prevBlock.level;
         }
 
         //add new interlinks for current block
@@ -120,7 +126,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 if (! BufferExtended.safeCompare(linkedBlock.hash, link.blockId))
                     throw {message: "Interlink to Genesis is wrong! "};
 
-                let linkedBlockLevel = linkedBlock.getLevel();
+                let linkedBlockLevel = linkedBlock.level;
 
                 if (linkedBlockLevel < level )
                     throw {message: "Interlink level error", level: level}
@@ -146,17 +152,12 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return this.validateBlockInterlinks();
     }
 
-    _computeBlockHeaderPrefix(skipPrefix, requestHeader){
+    _computeBlockHeaderPrefix(requestHeader){
 
-        if (skipPrefix === true && Buffer.isBuffer(this.computedBlockPrefix) )
-            return this.computedBlockPrefix;
-
-        this.computedBlockPrefix = Buffer.concat ( [
-            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, false, requestHeader),
+        return Buffer.concat ( [
+            InterfaceBlockchainBlock.prototype._computeBlockHeaderPrefix.call(this, requestHeader),
             this._serializeInterlink(),
         ]);
-
-        return this.computedBlockPrefix;
 
     }
 
@@ -212,10 +213,10 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation = true){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation , onlyHeader , usePrevHash){
 
 
-        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.call(this, buffer, height, reward, difficultyTargetPrev,  offset, blockLengthValidation);
+        offset = InterfaceBlockchainBlock.prototype.deserializeBlock.apply(this, arguments);
 
         try {
 
@@ -243,7 +244,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             } else
                 data.push({
                     h: interlinks[i].height,
-                    bId: interlinks[i].blockId,
+                    bId: interlinks[i].blockId.toString("hex"),
                 });
 
             prevInterlink = this.interlink[i];

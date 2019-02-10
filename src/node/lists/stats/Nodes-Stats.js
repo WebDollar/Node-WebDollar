@@ -5,6 +5,9 @@ import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import CONNECTIONS_TYPE from "node/lists/types/Connection-Type"
 import Blockchain from "main-blockchain/Blockchain"
 import NODE_TYPE from "../types/Node-Type";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import BansList from "common/utils/bans/BansList";
+import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class NodesStats {
 
@@ -33,11 +36,21 @@ class NodesStats {
 
     _printStats(){
 
-        console.info(" blocks: ", Blockchain.blockchain.blocks.length);
+        console.info(" blocks: ", Blockchain.blockchain.blocks.length, BlockchainGenesis.isPoSActivated(Blockchain.blockchain.blocks.length) ? "POS" : "POW" );
+        console.info(" amount mining wallet: ", Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD, "  amount");
+
+        try {
+            if (Blockchain.blockchain.mining.minerAddress && Buffer.isBuffer(Blockchain.blockchain.mining.unencodedMinerAddress))
+                console.info("Exists: ", Blockchain.Wallet.getAddress({unencodedAddress: Blockchain.blockchain.mining.unencodedMinerAddress}) !== null ? "YES" : "NO");
+        } catch (err){
+            console.error(" Wallet was not found ", Blockchain.blockchain.mining.unencodedMinerAddress);
+        }
+
         console.info(" v: ", consts.SETTINGS.NODE.VERSION);
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
 
+        BansList._listBans();
 
         let string1 = "";
         let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
@@ -80,7 +93,7 @@ class NodesStats {
 
     _recalculateStats(nodesListObject, printStats = true){
 
-        this.statsClients = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
+        this.statsClients = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, true);
         this.statsServer = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_SERVER_SOCKET);
         this.statsWebPeers = NodesList.countNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_WEBRTC);
 

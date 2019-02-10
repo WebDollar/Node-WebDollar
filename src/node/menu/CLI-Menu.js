@@ -1,4 +1,8 @@
+/* eslint-disable */
+import CONNECTION_TYPE from "../lists/types/Connection-Type";
+
 const FileSystem = require('fs');
+import {JsonRpcServer} from './../jsonRpc';
 
 let NodeExpress, NodeServer;
 
@@ -86,10 +90,16 @@ class CLI {
                 await this.signTransaction();
                 break;
             case '20':  // Server Mining Pool: Create a new Server for Mining Pool
-                NodeExpress.startExpress();
+                await NodeServer.startServer();
                 break;
             case '21': // Disable Forks Immutability
                 await this.disableForksImmutability();
+                break;
+            case '22': // Disable Forks Immutability
+                await this.disconnectFromAllConnectedNodes();
+                break;
+            case '30':  // Set Password
+                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -121,6 +131,13 @@ class CLI {
             let nonce = await AdvancedMessages.input('Enter the address current nonce: ');
             let timelock = await AdvancedMessages.input('Enter the current block: ');
             let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
+            let wantToPropagate = await AdvancedMessages.input('Do you want to propagate now y/n?:');
+
+            if ( wantToPropagate.toUpperCase().trim() === 'Y' ? true : false)
+                wantToPropagate = true;
+            else
+                wantToPropagate = false;
+
             let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple ( amountToSend );
 
             let addressString = Blockchain.Wallet.addresses[addressId].address;
@@ -139,6 +156,9 @@ class CLI {
 
                 data.transaction = answer.transaction.serializeTransaction();
                 data.signature = answer.signature;
+
+                if (wantToPropagate)
+                    Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction( answer.transaction, undefined, true);
 
             }else{
 
@@ -159,12 +179,10 @@ class CLI {
                 console.log("Transaction successfully exported to ," + addressPath+"transaction.tx");
 
                 resolve(true);
-                return;
 
             });
 
             resolve(true);
-            return;
 
         });
 
@@ -179,6 +197,8 @@ class CLI {
 
         this._showCommands();
         AdvancedMessages.WEBD_CLI.prompt();
+
+        JsonRpcServer(consts.JSON_RPC);
 
         this._exitMenu = false;
         await this._runMenu();
@@ -235,11 +255,11 @@ class CLI {
 
             balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
-            if (address === miningAddress) {
+            if (address === miningAddress)
                 console.log(((i < 10) ? "|  *" : "| *") + i + "   |  " + address + "  | " + balance + lineSeparator);
-            } else {
+            else
                 console.log(((i < 10) ? "|   " : "|  ")+ i + "   |  " + address + "  | " + balance + lineSeparator);
-            }
+
         }
 
         let balance = 0;
@@ -313,6 +333,9 @@ class CLI {
                     if (answer.result === true) {
                         console.log("Address successfully imported", answer.address);
                         await Blockchain.Wallet.saveWallet();
+
+                        if(Blockchain.Wallet.addresses.length===1) Blockchain.blockchain.mining.minerAddress = Blockchain.Wallet.addresses[0].address;
+
                         resolve(true);
                     } else {
                         console.error(answer.message);
@@ -423,6 +446,8 @@ class CLI {
 
     async startMining(instantly){
 
+
+
         await this._callCallbackBlockchainSync( undefined, async ()=>{
 
             await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
@@ -439,7 +464,7 @@ class CLI {
     }
 
     async startMiningInsidePool(){
-        
+
         Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
 
         consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
@@ -551,11 +576,11 @@ class CLI {
                     }
 
 
-                    if (poolFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
-                    if (poolName !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
-                    if (poolWebsite !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
-                    if (poolServers !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
-                    if (poolReferralFee !== undefined) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
+                    if (poolFee ) await Blockchain.PoolManagement.poolSettings.setPoolFee(poolFee / 100);
+                    if (poolName ) await Blockchain.PoolManagement.poolSettings.setPoolName(poolName);
+                    if (poolWebsite ) await Blockchain.PoolManagement.poolSettings.setPoolWebsite(poolWebsite);
+                    if (poolServers ) await Blockchain.PoolManagement.poolSettings.setPoolServers(poolServers);
+                    if (poolReferralFee ) await Blockchain.PoolManagement.poolSettings.setPoolReferralFee(poolReferralFee / 100);
 
                 }
 
@@ -652,6 +677,13 @@ class CLI {
 
     }
 
+    disconnectFromAllConnectedNodes(){
+
+        let NodesList = require('node/lists/Nodes-List').default;
+        NodesList.disconnectAllNodes(CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET);
+
+    }
+
 }
 
 const commands = [
@@ -671,7 +703,10 @@ const commands = [
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
         '21. Disable Node Immutability',
+        '22. Disconnect from all nodes',
+        '30. Set Password for Mining Address',
     ];
+
 
 const lineSeparator =
     "\n|_______|____________________________________________|_________________|";

@@ -66,6 +66,8 @@ class SocketExtend{
 
         socket.node.protocol.sendLastBlock = NodeProtocol.prototype.sendLastBlock.bind(socket);
 
+        socket.node.protocol.penalty = {};
+
         socket.node.protocol.calculateLatency = NodeProtocol.prototype.calculateLatency.bind(socket) ;
         socket.node.on("ping", ()=>{
             socket.node.sendRequest("ping/pong", 'r' )

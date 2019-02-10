@@ -49,9 +49,9 @@ describe('WebDollar crypt', ()=>{
         let hash1_copy = await WebDollarCrypto.hashPOW(message1_copy)
         let hash2 = await WebDollarCrypto.hashPOW(message2)
 
-        console.log("POW buffer ",hash1, typeof hash1, Buffer.isBuffer(hash1));
-        console.log("POW buffer ",hash1_copy, typeof hash1_copy, Buffer.isBuffer(hash1_copy));
-        console.log("POW buffer ",hash2, typeof hash2, Buffer.isBuffer(hash2));
+        // console.log("POW buffer ",hash1, typeof hash1, Buffer.isBuffer(hash1));
+        // console.log("POW buffer ",hash1_copy, typeof hash1_copy, Buffer.isBuffer(hash1_copy));
+        // console.log("POW buffer ",hash2, typeof hash2, Buffer.isBuffer(hash2));
 
 
         assert(typeof hash1 === 'object' && Buffer.isBuffer(hash1), "Hash1 is not Buffer");
@@ -67,7 +67,7 @@ describe('WebDollar crypt', ()=>{
         assert(! (await WebDollarCrypto.verifyHashPOW(hash2, message1)), "Hash2 is not good because message1 "+message1);
 
 
-        console.log("WebDollarCrypto worked 3")
+        // console.log("WebDollarCrypto worked 3")
     })
 
     it('hash Proof Of Work function string TESTS ', async ()=>{
@@ -93,9 +93,9 @@ describe('WebDollar crypt', ()=>{
         let hash1_copy = await WebDollarCrypto.hashPOW_String(message1_copy)
         let hash2 = await WebDollarCrypto.hashPOW_String(message2)
 
-        console.log("hash1 string", hash1);
-        console.log("hash1_copy string", hash1_copy);
-        console.log("hash2 string", hash2);
+        // console.log("hash1 string", hash1);
+        // console.log("hash1_copy string", hash1_copy);
+        // console.log("hash2 string", hash2);
 
         assert(typeof hash1 === 'string', "Hash1 is not String");
         assert(typeof hash1_copy === 'string', "Hash1_copy is not String");

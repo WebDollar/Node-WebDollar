@@ -32,6 +32,10 @@ class PoolDataMinerInstance {
         return this.miner.address;
     }
 
+    get addressWIF(){
+        return this.miner.addressWIF;
+    }
+
     set hashesPerSecond(newValue){
         this._hashesPerSecond = newValue;
     }
@@ -42,6 +46,14 @@ class PoolDataMinerInstance {
 
     set dateActivity(newValue){
         this._dateActivity = newValue;
+    }
+    
+    set realHashesPerSecond(newValue){
+        this._realHashesPerSecond = newValue;
+    }
+    
+    get realHashesPerSecond(){
+        return this._realHashesPerSecond;
     }
 
     get dateActivity(){

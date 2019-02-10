@@ -13,8 +13,10 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import consts from "consts/const_global"
 import Log from 'common/utils/logging/Log';
 import AGENT_STATUS from "../../../blockchain/interface-blockchain/agents/Agent-Status";
+import WebDollarCoins from "../../../utils/coins/WebDollar-Coins";
+import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
-class MinerProtocol extends PoolProtocolList{
+class MinerPoolProtocol extends PoolProtocolList{
 
     /**
      *
@@ -78,7 +80,6 @@ class MinerProtocol extends PoolProtocolList{
 
                 let answer = await this._sendPoolHello(socket);
 
-
                 if (!answer)
                     throw {message: "send hello is not working"};
 
@@ -112,7 +113,10 @@ class MinerProtocol extends PoolProtocolList{
         try{
 
             let message = WebDollarCrypto.getBufferRandomValues(32);
-            //let message = new Buffer(32);
+
+            let addresses = [];
+            for (let i=0; i < Blockchain.Wallet.addresses.length; i++)
+                addresses.push( Blockchain.Wallet.addresses[i].unencodedAddress.toString("hex") )
 
             let answer = await socket.node.sendRequestWaitOnce( "mining-pool/hello-pool", {
 
@@ -123,11 +127,13 @@ class MinerProtocol extends PoolProtocolList{
 
                 ref: this.minerPoolManagement.minerPoolSettings.poolReferral !== '' ? this.minerPoolManagement.minerPoolSettings.poolReferral : undefined,
 
+                addresses: addresses,
+
             }, "answer", 30000  );
 
 
-            if (answer === null ) throw {message: "pool : didn't respond"}; //in case there was an error message
-            if (answer.result !== true) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
+            if ( !answer ) throw {message: "pool : didn't respond"}; //in case there was an error message
+            if ( !answer.result ) throw {message: "pool : result is not true" + answer.message} //in case there was an error message
 
             try{
 
@@ -164,9 +170,6 @@ class MinerProtocol extends PoolProtocolList{
 
                 socket.node.sendRequest("mining-pool/hello-pool/answer/confirmation", { result: true });
 
-                if (answer.work !== undefined)
-                    this._validateRequestWork(answer.work, socket);
-
                 this.minerPoolManagement.minerPoolSettings.poolName = poolName;
                 this.minerPoolManagement.minerPoolSettings.poolAddress = poolAddress;
                 this.minerPoolManagement.minerPoolSettings.poolFee = poolFee;
@@ -182,6 +185,9 @@ class MinerProtocol extends PoolProtocolList{
 
                 this._updateStatistics(answer);
                 this.minerPoolManagement.minerPoolReward.setReward(answer);
+
+                if (answer.work)
+                    await this._validateRequestWork(answer.work, socket);
 
                 return true;
 
@@ -201,6 +207,10 @@ class MinerProtocol extends PoolProtocolList{
 
 
     async _connectionEstablishedWithPool(socket ){
+
+        this.minerPoolManagement.minerPoolMining.resetForced = true;
+        if (this.minerPoolManagement.minerPoolMining._isBeingMining)
+            await this.minerPoolManagement.minerPoolMining._isBeingMining;
 
         socket.node.protocol.pool = {
         };
@@ -222,36 +232,22 @@ class MinerProtocol extends PoolProtocolList{
 
             try {
 
-                let suffix = '';
-
                 if (typeof data.work !== "object") throw {message: "new-work invalid work"};
 
-                Log.info("Sending Partial Work: ("+this.minerPoolManagement.minerPoolMining._miningWork.height+")"+ this.minerPoolManagement.minerPoolMining.bestHash.toString("hex") , Log.LOG_TYPE.POOLS);
-
-                if ( (this.minerPoolManagement.minerPoolMining.bestHashNonce !== 0 && this.minerPoolManagement.minerPoolMining.bestHashNonce !== -1) || this.minerPoolManagement.minerPoolMining.bestHash[0] !== 0xFF || this.minerPoolManagement.minerPoolMining.bestHash[1] !== 0xFF )
-                    socket.node.sendRequest("mining-pool/work-partially-done"+suffix, {
-                        work: {
-                            result: false,
-                            hash: new Buffer(this.minerPoolManagement.minerPoolMining.bestHash),
-                            nonce: this.minerPoolManagement.minerPoolMining.bestHashNonce,
-                            id: this.minerPoolManagement.minerPoolMining._miningWork.blockId,
-                        }
-                    });
-                else
-                    Log.warn("Sending Partial Work was skipped" , Log.LOG_TYPE.POOLS);
-
-                this._validateRequestWork(data.work, socket);
+                //await this._validateRequestWork( data.work, socket );
 
                 this._updateStatistics( data);
                 this.minerPoolManagement.minerPoolReward.setReward(data);
+
+                this._validateRequestWork( data.work, socket);
+
+                this.minerPoolManagement.minerPoolMining.resetForced = true;
 
             } catch (exception){
                 console.error("new work raised an exception", exception);
             }
 
         });
-
-
 
     }
 
@@ -266,11 +262,7 @@ class MinerProtocol extends PoolProtocolList{
         if (typeof work.start !== "number") throw {message: "get-work invalid noncesStart"};
         if (typeof work.end !== "number") throw {message: "get-work invalid noncesEnd"};
 
-        let serialization = Buffer.concat([
-            Serialization.serializeBufferRemovingLeadingZeros( Serialization.serializeNumber4Bytes(work.h) ),
-            Serialization.serializeBufferRemovingLeadingZeros( work.t ),
-            work.s,
-        ]);
+        let serialization = work.s;
 
         work.block = serialization;
 
@@ -308,7 +300,7 @@ class MinerProtocol extends PoolProtocolList{
 
         if (answer.result !== true) throw {message: "get-work answered false"};
 
-        this._validateRequestWork( answer.work, poolSocket);
+        await this._validateRequestWork( answer.work, poolSocket);
 
         this._updateStatistics(answer);
         this.minerPoolManagement.minerPoolReward.setReward(answer);
@@ -320,16 +312,18 @@ class MinerProtocol extends PoolProtocolList{
 
         try {
 
-            if (poolSocket === undefined)
+            if (!poolSocket )
                 poolSocket = this.connectedPools[0];
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
+            if (!poolSocket ) throw {message: "You are disconnected"};
 
             let answer = poolSocket.node.sendRequestWaitOnce("mining-pool/work-done", {
                 work: miningAnswer,
-            }, "answer", 6000);
+            }, "answer", 5000 );
 
-            Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") , Log.LOG_TYPE.POOLS);
+            Log.info("Push Work: ("+miningAnswer.nonce+")"+ miningAnswer.hash.toString("hex") + " id: " + miningAnswer.id, Log.LOG_TYPE.POOLS);
+            if (miningAnswer.pos)
+                Log.info( "timestamp " + miningAnswer.pos.timestamp + "   " + "balance " + (Blockchain.AccountantTree.getBalance( Blockchain.blockchain.mining.minerAddress  ) / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
 
             if (!miningAnswer.result){
 
@@ -345,12 +339,12 @@ class MinerProtocol extends PoolProtocolList{
 
             answer = await answer;
 
-            if (answer === null) throw {message: "WorkDone: Answer is null"};
+            if ( !answer ) throw {message: "WorkDone: Answer is null"};
             if (answer.result !== true) throw {message: "WorkDone: Result is not True", reason: answer.message};
 
             this.minerPoolManagement.minerPoolReward.setReward(answer);
 
-            this._validateRequestWork( answer.newWork||answer.work, poolSocket);
+            await this._validateRequestWork( answer.newWork||answer.work, poolSocket);
 
             this._updateStatistics(answer);
             this.minerPoolManagement.minerPoolReward.setReward(answer);
@@ -371,17 +365,17 @@ class MinerProtocol extends PoolProtocolList{
 
         try {
 
-            if (poolSocket === undefined)
+            if (!poolSocket )
                 poolSocket = this.connectedPools[0];
 
-            if (newAddress === undefined)
+            if (!newAddress )
                 newAddress = Blockchain.Wallet.addresses[0].address;
 
-            if (poolSocket === null || poolSocket === undefined) throw {message: "You are disconnected"};
+            if (!poolSocket ) throw {message: "You are disconnected"};
 
             oldAddress = Blockchain.Wallet.getAddress(oldAddress||this.minerPoolManagement.minerPoolMining.minerAddress);
 
-            if (oldAddress === null || oldAddress === undefined){
+            if ( !oldAddress ){
 
                 AdvancedMessages.alert("In order to change the wallet, you need to have access to the wallet of the address " + this.minerPoolManagement.minerPoolMining.minerAddress, "Wallet Error", "error", 5000 );
                 return;
@@ -428,7 +422,8 @@ class MinerProtocol extends PoolProtocolList{
 
             console.error("Couldn't change the wallet", exception.message);
 
-            await this.minerPoolManagement.minerPoolMining._setAddress(  oldAddress.address , false, true);
+            if (oldAddress)
+                await this.minerPoolManagement.minerPoolMining._setAddress(  oldAddress.address , false, true);
 
             return false;
 
@@ -494,4 +489,4 @@ class MinerProtocol extends PoolProtocolList{
 
 }
 
-export default MinerProtocol;
+export default MinerPoolProtocol;

@@ -6,8 +6,7 @@ import FallBackObject from './fallbacks/fallback-object';
 import FallBackNodesList from './fallbacks/fallback_nodes_list';
 import NODE_TYPE from "node/lists/types/Node-Type"
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
-
-const axios = require('axios');
+var rp = require('request-promise');
 
 class NodeDiscoveryService {
 
@@ -72,17 +71,17 @@ class NodeDiscoveryService {
 
         try{
 
-            let response = await axios({
+            let response = await rp( {
                 method:'get',
                 timeout: 10000,
-                withCredentials: true,
-                url: url,
+                uri: url,
                 headers: {
                     "Access-Control-Allow-Origin": "*",
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
+                    'User-Agent': 'Request-Promise'
                 },
-                responseType: 'json',
+                json: true, // Automatically parses the JSON string in the response
             });
 
             fallbackItem.checked = true;

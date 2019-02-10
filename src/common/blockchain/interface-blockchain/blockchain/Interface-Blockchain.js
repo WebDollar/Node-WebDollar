@@ -60,15 +60,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
      * @param socketsAvoidBroadcast
      * @returns {Promise.<boolean>}
      */
-    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock, revertActions, showUpdate){
+    async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock = true, revertActions, showUpdate){
 
-        if (block.reward === undefined)
-            block.reward = BlockchainMiningReward.getReward(block.height);
+        if (!block.reward ) block.reward = BlockchainMiningReward.getReward(block.height);
 
-        if (saveBlock === undefined)
-            saveBlock = true;
-
-        if (block.blockValidation === undefined)
+        if (!block.blockValidation )
             block.blockValidation = this.createBlockValidation();
         else {
 
@@ -116,7 +112,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
-        if (resetMining && this.mining !== undefined  && this.mining !== null) //reset mining
+        if (resetMining && this.mining ) //reset mining
             this.mining.resetMining();
 
         return true;
@@ -160,8 +156,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.blockValidation === undefined)
             block.blockValidation = this.createBlockValidation();
 
-        block.difficultyTargetPrev = await block.blockValidation.getDifficultyCallback(block.height);
-
 
         //validate difficulty & hash
         if (! (await block.validateBlock( block.height )))
@@ -176,91 +170,93 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
-        } else
-            if (block.blockValidation.blockValidationType["load-difficulty-calculated"]){
-                block.difficultyTarget = await block.blockValidation.getDifficultyCallback( block.height + 1, true);
-            }
+        }
 
         return true;
     }
 
-    async getBlock(height){
+    async getBlock(height = this.blocks.length){
 
-        if (height === undefined)
-            height = this.blocks.length;
+        if (height <= 0) return BlockchainGenesis;
 
-        if (height <= 0)
-            return BlockchainGenesis;
-        else{
-            if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length}; else
+        if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length};
 
-            let block = await this.blocks.loadingManager.getBlock(height-1);
-            if ( block === undefined) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+        let block = await this.blocks.loadingManager.getBlock(height-1);
 
-            return block ;
-        }
+        if ( !block ) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+
+        return block;
 
     }
 
-    async getDifficultyTarget(height, skipLengthValidation){
+    async getDifficultyTarget(height = this.blocks.length, POSRecalculation = true){
 
-        if (height === undefined)
-            height = this.blocks.length;
+        if (height <= 0) return BlockchainGenesis.difficultyTarget;
 
-        if (height <= 0)
-            return BlockchainGenesis.difficultyTarget;
-        else{
+        if (POSRecalculation && height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
-            if (height > this.blocks.length && !skipLengthValidation) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
+            if (height % 30 === 0 && height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
+            else if (height % 30 === 0 ) height = height - 10;  //first POS, get the last proof of Stake
+            else if (height % 30 === 20 ) height = height - 20; //first POW, get the last proof of Work
 
-            let difficultyTarget = await this.getDifficultyTarget(height-1);
-            if ( difficultyTarget === undefined) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length}; else
-
-            return difficultyTarget;
         }
+
+        if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
+
+        let block = await this.blocks.loadingManager.getBlock(height-1);
+        if ( !block ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+
+        return block.difficultyTarget;
 
     }
 
-    async getTimeStamp(height){
-        if (height === undefined) height = this.blocks.length;
+    async getTimeStamp(height = this.blocks.length){
 
-        if (height <= 0)
-            return BlockchainGenesis.timeStamp;
-        else{
-            if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height}; else
+        if (height <= 0) return BlockchainGenesis.timeStamp;
 
-            let block = await this.getBlock(height-1);
-            if ( block === undefined) throw {message: "getTimeStamp invalid height ", height: height}; else
+        if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
 
-            return block.timeStamp;
-        }
+        let block = await this.blocks.loadingManager.getBlock(height-1);
+        if ( !block ) throw {message: "getTimeStamp invalid height ", height: height};
+
+        return block.timeStamp;
+
     }
 
-    async getHashPrev(height){
+    async getHashPrev(height = this.blocks.length){
 
-        if (height === undefined) height = this.blocks.length;
+        if (height <= 0) return BlockchainGenesis.hashPrev;
 
-        if (height <= 0)
-            return BlockchainGenesis.hashPrev;
-        else {
+        if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height};
 
-            if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height}; else
+        let block = await this.blocks.loadingManager.getBlock(height-1);
+        if ( !block ) throw {message: "getHashPrev invalid height ", height: height};
 
-            let block = await this.getBlock(height-1);
-            if ( block === undefined) throw {message: "getHashPrev invalid height", height: height};
+        return block.hash;
 
-            return block.hash;
-        }
     }
 
-    async saveNewBlock(block, saveLength = false){
+    async getChainHash(height = this.blocks.length){
+
+        if (height <= 0) return BlockchainGenesis.hash;
+
+        if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
+        if ( !this.blocks[height-1] ) throw {message: "getChainHash invalid height", height: height};
+
+        let block = await this.blocks.loadingManager.getBlock(height-1);
+        if ( !block ) throw {message: "getChainHash invalid height ", height: height};
+
+        return this.blocks[height-1].hashChain;
+
+    }
+
+    async saveNewBlock(block, saveLength = false, saveInfinitum=false){
 
         if (process.env.BROWSER)
             return true;
 
-
         if (saveLength)
-            if (await this.db.save(this._blockchainFileName, this.blocks.length) !== true){
+            if (await this.db.save(this._blockchainFileName, this.blocks.length, 20000, saveInfinitum ? 1000000 : 10) !== true){
                 Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
                 return false;
             }
@@ -299,27 +295,27 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     setFastLoadingValidationType(validationType){
 
-        if(validationType===undefined) validationType = {"skip-sleep": true};
+        if(!validationType) validationType = {"skip-sleep": true};
 
-        validationType["skip-prev-hash-validation"] = true;
-        validationType["skip-accountant-tree-validation"] = true;
-        validationType["skip-mini-blockchain-simulation"] = true;
-        validationType["skip-validation-transactions-from-values"] = true;
-        validationType["skip-validation-timestamp"] = true;
-        validationType["validation-timestamp-adjusted-time"] = false;
-        validationType["skip-block-data-validation"] = true;
-        validationType["skip-block-data-transactions-validation"] = true;
-        validationType["skip-validation-interlinks"] = true;
-        validationType["skip-validation"] = true;
-        validationType["skip-interlinks-update"] = true;
-        validationType["skip-target-difficulty-validation"] = true;
-        validationType["skip-calculating-proofs"] = true;
-        //validationType["skip-calculating-block-nipopow-level"] = true;
-        validationType["skip-saving-light-accountant-tree-serializations"] = true;
-        validationType["skip-recalculating-hash-rate"] = true;
+            validationType["skip-prev-hash-validation"] = true;
+            validationType["skip-accountant-tree-validation"] = true;
+            validationType["skip-mini-blockchain-simulation"] = true;
+            validationType["skip-validation-transactions-from-values"] = true;
+            validationType["skip-validation-timestamp"] = true;
+            validationType["skip-validation-timestamp-network-adjusted-time"] = true;
+            validationType["skip-block-data-validation"] = true;
+            validationType["skip-block-data-transactions-validation"] = true;
+            validationType["skip-validation-interlinks"] = true;
+            validationType["skip-validation"] = true;
+            validationType["skip-interlinks-update"] = true;
+            validationType["skip-target-difficulty-validation"] = true;
+            validationType["skip-calculating-proofs"] = true;
+            validationType["skip-calculating-block-nipopow-level"] = true;
+            validationType["skip-saving-light-accountant-tree-serializations"] = true;
+            validationType["skip-recalculating-hash-rate"] = true;
 
-        if (Math.random() > 0.0001)
-            validationType["skip-validation-PoW-hash"] = true;
+            if (Math.random() > 0.0001 || BlockchainGenesis.isPoSActivated( i ))
+                validationType["skip-validation-PoW-hash"] = true;
 
         return validationType;
 
@@ -329,7 +325,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         let numBlocks = await this.db.get(this._blockchainFileName);
 
-        if (numBlocks === null ) {
+        if ( !numBlocks ) {
 
             console.error("NumBlocks was not found");
             return false;
@@ -351,7 +347,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                this.setFastLoadingValidationType(validationType);
 
-            }
 
         } else {
 
@@ -372,30 +367,29 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async _loadBlockchain( indexStartLoadingOffset = undefined, indexStartProcessingOffset = undefined ){
+    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset , numBlocks){
 
         if (process.env.BROWSER)
             return true;
 
-        let numBlocks = 0;
+        if ( numBlocks  === undefined)
+            try {
+                //load the number of blocks
+                numBlocks = await this.db.get(this._blockchainFileName);
+                if (numBlocks === null) {
+                    Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
+                    return false;
+                }
 
-        try {
-            //load the number of blocks
-            numBlocks = await this.db.get(this._blockchainFileName);
-            if (numBlocks === null) {
-                Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
-                return false;
+                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
+                Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
+                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
+
+            } catch (exception){
+
+                numBlocks = 0;
+
             }
-
-            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-            Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
-            Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-
-        } catch (exception){
-
-            numBlocks = 0;
-
-        }
 
         this.blocks.clear();
 
@@ -407,10 +401,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             let indexStart = 0;
 
-            if (indexStartLoadingOffset )
+            if (indexStartLoadingOffset !== undefined)
                 indexStart = numBlocks - indexStartLoadingOffset;
 
             if (indexStartProcessingOffset !== undefined) {
+
                 indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
 
                 console.warn("===========================================================");
@@ -426,29 +421,36 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             try {
 
+                //for POS it is required to have the transactions for the last 30 blocks
+                let prevBlockFreedAlready = 0;
+
                 for (index = indexStart; index < numBlocks; ++index ) {
 
                     let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
 
-                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), validationType );
-
-                    //vor virtualizing the first
-                    if (indexStartLoadingOffset !== undefined && index <= indexStartLoadingOffset + 20){
-                        validationType["skip-difficulty-recalculation"] = true;
-                        validationType["load-difficulty-calculated"] = true;
-                        validationType["skip-validation-timestamp"] = true;
-                        validationType["skip-recalculating-hash-rate"] = true;
-                    }
+                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), validationType );
 
                     let block = await this._loadBlock(indexStart, index, blockValidation);
 
                     block.blockValidation.blockValidationType = {};
 
-                    if (index < numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE)
-                        block.data.transactions.freeTransactionsFromMemory();
 
+                    if ( index < consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER  ){
+
+                        for (let j = prevBlockFreedAlready; j < index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 ; j++)
+                            this.blocks[j].data.transactions.freeTransactionsFromMemory();
+
+                        prevBlockFreedAlready = Math.max( prevBlockFreedAlready, index - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS - 1 );
+
+                    }
+
+                    if (index > 0 && index % 10000 === 0) {
+                        await this.db.restart();
+                    }
 
                 }
+
+                await this.db.restart();
 
             } catch (exception){
                 console.error("Error loading block", index, exception);
@@ -522,7 +524,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (removeFiles === true) {
             for (let i = index; i < this.blocks.length; ++i){
-                let response = await (await this.getBlock(i)).removeBlock();
+
+                let block = await this.getBlock(i);
+                let response = block.removeBlock();
 
                 if (response !== true)
                     return response;
@@ -536,7 +540,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     createBlockValidation(){
 
-        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), {} );
+        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), {} );
 
     }
 

@@ -1,4 +1,3 @@
-const axios = require('axios');
 import consts from 'consts/const_global'
 
 import DownloadHelper from "./Download-Helper";

@@ -159,9 +159,10 @@ class InterfaceBlockchainAgent extends InterfaceBlockchainAgentBasic{
                     date: new Date().getTime(),
                     blocks: this.blockchain.blocks.length,
 
-                }
+                };
 
-            this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
+            if (NodesList.nodes.length > 0)
+                this.status = AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED;
 
         }
 

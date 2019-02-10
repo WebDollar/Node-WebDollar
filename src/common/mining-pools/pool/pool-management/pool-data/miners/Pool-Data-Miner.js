@@ -3,6 +3,7 @@ import BufferExtended from 'common/utils/BufferExtended';
 import consts from 'consts/const_global';
 import PoolDataMinerInstance from "./Pool-Data-Miner-Instance";
 import PoolDataMinerReferrals from "./Pool-Data-Miner-Referrals";
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
 
 class PoolDataMiner{
 
@@ -26,6 +27,10 @@ class PoolDataMiner{
 
     }
 
+    get addressWIF(){
+        return BufferExtended.toBase( InterfaceBlockchainAddressHelper.generateAddressWIF(this.address) );
+    }
+
     destroyPoolDataMiner(){
 
         this.poolData = undefined;
@@ -37,14 +42,23 @@ class PoolDataMiner{
         this.referrals.destroyPoolDataMinerReferrals();
     }
 
-    addInstance(socket){
+    addInstance(socket, miner){
+
+        if (socket.node.protocol.minerPool && socket.node.protocol.minerPool.minerInstance && socket.node.protocol.minerPool.miner === miner)
+            return socket.node.protocol.minerPool.minerInstance;
 
         let instance = this.findInstance(socket);
+        if (instance) return instance;
 
-        if ( instance === null) {
-            instance = new PoolDataMinerInstance(this, socket);
-            this.instances.push(instance);
+        //find an empty instance
+        instance = this.findEmptyInstance(miner);
+        if (instance){
+            instance.socket = socket;
+            return instance;
         }
+
+        instance = new PoolDataMinerInstance(this, socket);
+        this.instances.push(instance);
 
         return instance;
 
@@ -59,11 +73,21 @@ class PoolDataMiner{
         return returnPos ? -1 : null;
     }
 
+    findEmptyInstance(miner){
+
+        for (let i=0; i < this.instances.length; i++)
+            if (this.instances[i].miner === miner && (!this.instances[i].socket || this.instances[i].socket.disconnected ))
+                return this.instances[i];
+
+        return;
+    }
+
     removeInstance(socket){
 
         let pos = this.findInstance(socket, true);
+
         if (pos !== -1) {
-            this.instances.splice( pos ,1);
+            this.instances.splice(pos, 1);
             return true;
         }
 

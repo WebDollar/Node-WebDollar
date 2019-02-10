@@ -25,7 +25,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
 
         //recalculate hashData
         if (hashData === undefined || hashData === null)
-            this.hashData = this.computeHashBlockData();
+            this.computeHashBlockData();
 
     }
 
@@ -51,7 +51,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             // if (this.blockchain.accountantTree.root.edges.length > 0)
             //     console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
-            if (! BufferExtended.safeCompare(hashAccountantTree, this.hashAccountantTree) )
+            if ( ! BufferExtended.safeCompare(hashAccountantTree, this.hashAccountantTree) )
                 throw {message: "block.data hashAccountantTree is not right  ", hashAccountantTree: hashAccountantTree.toString("hex"), myHashAccoutantTree:this.hashAccountantTree.toString("hex") };
 
         }
@@ -64,8 +64,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
         if (!Buffer.isBuffer(this.hashAccountantTree) || this.hashAccountantTree.length !== 32)
             this.computeAccountantTreeHashBlockData();
 
-        return Buffer.concat (
-            [
+        return Buffer.concat ([
                 inheritBlockData.prototype._computeBlockDataHeaderPrefix.call(this, onlyHeader),
                 this.hashAccountantTree,
             ]);

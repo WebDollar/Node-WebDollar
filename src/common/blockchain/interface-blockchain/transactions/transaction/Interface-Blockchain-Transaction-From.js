@@ -53,7 +53,6 @@ class InterfaceBlockchainTransactionFrom {
             currencyTokenId = addresses.currencyTokenId;
         }
 
-
         if (!Array.isArray(addresses))
             addresses = [addresses];
 
@@ -114,7 +113,7 @@ class InterfaceBlockchainTransactionFrom {
                 address: BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress)),
                 publicKey: address.publicKey.toString("hex"),
                 signature: address.signature.toString("hex"),
-                amount: address.amount.toString(),
+                amount: address.amount,
             })
         });
 

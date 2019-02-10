@@ -3,8 +3,11 @@ import StatusEvents from "common/events/Status-Events"
 
 const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
+import BlockchainGenesis from 'src/common/blockchain/global/Blockchain-Genesis'
 
 import Serialization from "common/utils/Serialization";
+import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
+import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
 import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
@@ -31,6 +34,10 @@ class InterfaceBlockchainBlocks{
         this.savingManager = new SavingManager(this);
         this.loadingManager = new LoadingManager(this);
 
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
+            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+
+        this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
     }
 
     addBlock(block, revertActions, saveBlock, showUpdate = true){
@@ -38,6 +45,7 @@ class InterfaceBlockchainBlocks{
         this[this.length] =  block;
 
         this.length += 1;
+
         if (showUpdate)
             this.emitBlockCountChanged();
 
@@ -45,24 +53,23 @@ class InterfaceBlockchainBlocks{
             this.emitBlockInserted(block);
 
         //delete old blocks when I am in light node
-        if (this.blockchain.agent !== undefined && this.blockchain.agent.light){
+        if (this.blockchain.agent && this.blockchain.agent.light){
 
             let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
 
-            while (this[index] !== undefined){
+            while (this[index] ){
                 this[index].destroyBlock();
                 delete this[index];
 
                 index--;
             }
 
-            while (this.length > 0 && this[this.blocksStartingPoint] === undefined && this.blocksStartingPoint < this.length){
+            while (this.length > 0 && !this[this.blocksStartingPoint] && this.blocksStartingPoint < this.length)
                 this.blocksStartingPoint++;
-            }
 
         }
 
-        if ( revertActions !== undefined )
+        if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
         this.chainWork = this.chainWork.plus( block.workDone );
@@ -91,7 +98,11 @@ class InterfaceBlockchainBlocks{
                 }
                 else
                     this[i] = undefined;
+
             }
+
+        if (this.length === 0)
+            this._chainWork =  new BigInteger(0);
 
         this.length = after;
 
@@ -125,28 +136,38 @@ class InterfaceBlockchainBlocks{
 
     async recalculateNetworkHashRate(){
 
-        let MaxTarget = new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
-        let SumDiff = new BigNumber( 0 );
+        let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
+        let diff;
 
-        let how_much_it_took_to_mine_X_Blocks = 0;
+        let SumDiffPoS = new BigNumber( 0 );
+        let SumDiffPoW = new BigNumber( 0 );
 
-        for (let i=this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; i<this.blockchain.blocks.endingPosition; i++) {
+        let last, first;
+        for (let i = Math.max( this.blockchain.blocks.blocksStartingPoint, Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS*3)); i<this.blockchain.blocks.endingPosition; i++) {
 
             if (i < 0) continue;
-            let block = await this.blockchain.getBlock(i);
-            if (block === undefined) continue;
+            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
 
-            let Diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ block.difficultyTarget.toString("hex") ) );
-            SumDiff = SumDiff.plus(Diff);
+            if( BlockchainGenesis.isPoSActivated( this.blockchain.blocks[i].height ) )
+                SumDiffPoS = SumDiffPoS.plus( diff );
+            else
+                SumDiffPoW = SumDiffPoW.plus( diff );
 
-            how_much_it_took_to_mine_X_Blocks += this.blockchain.getTimeStamp(i+1) - this.blockchain.getTimeStamp(i);
+            if (!first) first = i;
+            last = i;
+
         }
 
-        let answer = SumDiff.dividedToIntegerBy(how_much_it_took_to_mine_X_Blocks).toNumber();
+        let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
+        let answer;
 
-        this.networkHashRate = answer;
-        
-        return answer;
+        if( BlockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
+            answer = SumDiffPoS.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
+        else
+            answer = SumDiffPoW.dividedToIntegerBy(new BigNumber(how_much_it_took_to_mine_X_Blocks.toString() )).toFixed(13);
+
+        this.networkHashRate = parseFloat(answer);
+        return parseFloat(answer);
 
     }
 
@@ -177,6 +198,25 @@ class InterfaceBlockchainBlocks{
     get chainWork(){
         return this._chainWork;
     }
+
+    _freeAllBlocksTransactionsFromMemory(){
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
+
+        try {
+
+            for (let i = 0; i < Math.max(0, Math.floor( this.length - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER ) ); i++)
+                if (this[i] !== undefined)
+                    this[i].data.transactions.freeTransactionsFromMemory();
+
+        } catch (exception){
+            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
+        }
+
+        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+
+    }
+
 
 }
 

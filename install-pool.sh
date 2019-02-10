@@ -101,7 +101,6 @@ if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == 
 			echo "$showinfo Cloning vue-Frontend from WebDollar repository..."
 			git clone https://github.com/WebDollar/vue-Frontend.git
 			if cd vue-Frontend; then echo "$showexecute Changing dir to ${yellow}vue-Frontend$stand"; else echo "$showerror Couldn't cd to vue-Frontend folder!"; fi
-			git checkout MiningPools
 			npm install
 			if cd ..; then echo "$showexecute Changing dir to ${yellow}$(pwd)$stand"; else echo "$showerror Couldn't cd back!"; fi
 

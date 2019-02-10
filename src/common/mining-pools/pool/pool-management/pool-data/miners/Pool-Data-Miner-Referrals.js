@@ -40,7 +40,7 @@ class PoolDataMinerReferrals {
         if (typeof address === "string")
             address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( address );
 
-        if ( address === null || address === undefined || !Buffer.isBuffer(address) || address.length !== consts.ADDRESSES.ADDRESS.LENGTH )
+        if ( !address || !Buffer.isBuffer(address) || address.length !== consts.ADDRESSES.ADDRESS.LENGTH )
             return false;
 
         //avoid to be the same person
@@ -64,17 +64,17 @@ class PoolDataMinerReferrals {
 
     findReferralLinkAddress(){
 
-        if (this.referralLinkMiner !== null && this.referralLinkMiner !== undefined)
+        if (this.referralLinkMiner )
             return this.referralLinkMiner;
 
-        if (this.referralLinkAddress === undefined) return null;
+        if (!this.referralLinkAddress ) return null;
 
         let linkMiner = this.poolData.findMiner( this.referralLinkAddress );
-        if (linkMiner === undefined || linkMiner === null) return;
+        if (!linkMiner ) return;
 
         let referralLinkMiner = linkMiner.referrals.addReferral(this.miner.address, this.miner);
 
-        if (referralLinkMiner === undefined || referralLinkMiner === null) this.referralLinkMiner = undefined;
+        if ( !referralLinkMiner ) this.referralLinkMiner = undefined;
         else this.referralLinkMiner = referralLinkMiner;
 
         return this.referralLinkMiner;
@@ -86,9 +86,9 @@ class PoolDataMinerReferrals {
         let list = [];
 
         //referral Link Address
-        list.push( Serialization.serializeNumber1Byte( this.referralLinkAddress !== undefined ? 1 : 0 ) );
+        list.push( Serialization.serializeNumber1Byte( this.referralLinkAddress  ? 1 : 0 ) );
 
-        if ( this.referralLinkAddress !== undefined )
+        if ( this.referralLinkAddress)
             list.push ( this.referralLinkAddress );
 
         list.push( Serialization.serializeNumber1Byte(this.referees.length > 0 ? 1 : 0 ) );
@@ -223,8 +223,8 @@ class PoolDataMinerReferrals {
 
             referees: referees,
 
-            linkAddress: this.referralLinkAddress !== undefined ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true) : '',
-            linkAddressOnline: this.referralLinkAddress !== undefined  ? this.referralLinkMiner.isOnline : undefined,
+            linkAddress: this.referralLinkAddress  ? InterfaceBlockchainAddressHelper.generateAddressWIF(this.referralLinkAddress, false, true) : '',
+            linkAddressOnline: this.referralLinkAddress  ? this.referralLinkMiner.isOnline : undefined,
 
             total: Math.floor( this._rewardReferralsTotal),
             confirmed: Math.floor( this._rewardReferralsConfirmed),

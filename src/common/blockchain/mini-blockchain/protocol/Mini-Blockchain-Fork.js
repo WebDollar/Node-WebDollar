@@ -14,8 +14,6 @@ class MiniBlockchainFork extends inheritFork{
 
         super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
 
-        this._accountantTreeClone = null;
-
     }
 
     /**
@@ -28,27 +26,14 @@ class MiniBlockchainFork extends inheritFork{
             "skip-validation-transactions-from-values": true //can not validate the transactions
         };
 
-        if (height === this.forkChainLength-1)
-            validationType["validation-timestamp-adjusted-time"] = true;
-
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     preForkClone(cloneBlocks=true, cloneAccountantTree=true){
 
         InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
 
-        if (cloneAccountantTree) {
 
-            try {
-                //clone the Accountant Tree
-                this._accountantTreeClone = this.blockchain.accountantTree.serializeMiniAccountant();
-            } catch (exception){
-                console.error("Error cloding Accountant Tree", exception);
-                return false;
-            }
-        } else
-            this._accountantTreeClone = null;
 
     }
 
@@ -73,10 +58,6 @@ class MiniBlockchainFork extends inheritFork{
     }
 
     revertFork(){
-
-        //recover to the original Accountant Tree
-        if (this._accountantTreeClone !== null)
-            this.blockchain.accountantTree.deserializeMiniAccountant(this._accountantTreeClone);
 
         return inheritFork.prototype.revertFork.call(this);
 

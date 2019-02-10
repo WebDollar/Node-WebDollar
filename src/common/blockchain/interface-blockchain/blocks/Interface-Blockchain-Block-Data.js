@@ -15,11 +15,10 @@ class InterfaceBlockchainBlockData {
         miner address is unencodedAddress
      **/
 
-    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData){
+    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData ){
 
         this.blockchain = blockchain;
 
-        this._onlyHeader = false;
         this._minerAddress = undefined;
 
         if (minerAddress === undefined)
@@ -39,6 +38,7 @@ class InterfaceBlockchainBlockData {
     destroyBlockData(){
 
         this.transactions.destroyBlockDataTransactions();
+        this.transactions.blockData = undefined;
         this.transactions = undefined;
 
         this.blockchain = undefined;
@@ -84,12 +84,14 @@ class InterfaceBlockchainBlockData {
 
     _computeBlockDataHeaderPrefix(onlyHeader = false){
 
-        if (this.transactions.hashTransactions === undefined || this.transactions.hashTransactions === null)
+        if ( !this.transactions.hashTransactions )
             this.transactions.hashTransactions = this.transactions.calculateHashTransactions();
 
-        return Buffer.concat ( [
+        return Buffer.concat ([
+
             Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.minerAddress ),
             this.transactions.serializeTransactions(onlyHeader),
+
         ]);
 
     }
@@ -99,7 +101,7 @@ class InterfaceBlockchainBlockData {
      **/
     serializeData(onlyHeader = false){
 
-        if (!Buffer.isBuffer(this.hashData) || this.hashData.length !== 32)
+        if ( !Buffer.isBuffer(this.hashData) || this.hashData.length !== 32 )
             this.computeHashBlockData();
 
         return Buffer.concat( [

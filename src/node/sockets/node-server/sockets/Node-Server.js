@@ -23,12 +23,12 @@ const ROOMS = {
 
     TERMINALS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 30,
+        SERVER_FREE_ROOM : 20,
     },
 
     BROWSERS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 50,
+        SERVER_FREE_ROOM : 20,
     },
 
 };
@@ -68,7 +68,8 @@ class NodeServer {
 
         this.nodeServer = null;
 
-        await NodeExpress.startExpress();
+        let expressOpened = await NodeExpress.startExpress();
+        if (!expressOpened) return false;
 
         if (!consts.OPEN_SERVER) return false;
 
@@ -213,7 +214,8 @@ class NodeServer {
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
-                    console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
+                    if ( Math.random() < 0.3)
+                        console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
 
                     if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
@@ -290,7 +292,6 @@ class NodeServer {
 
         });
 
-
         socket.node.protocol.propagation.initializePropagation();
         socket.node.protocol.signaling.server.initializeSignalingServerService();
     }
@@ -334,7 +335,7 @@ class NodeServer {
 
                         setTimeout(() => {
 
-                            if (NodesList.nodes[i] !== undefined)
+                            if ( NodesList.nodes[i] )
                                 NodesList.nodes[i].socket.disconnect();
 
                         }, 3000);

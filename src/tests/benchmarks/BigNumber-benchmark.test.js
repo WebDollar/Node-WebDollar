@@ -19,7 +19,7 @@ describe('Decimal BenchMarks', () => {
         let end = new Date().getTime();
         let time = end - start;
 
-        console.log("Call to doSomething took " + time+ " milliseconds.")
+        // console.log("Call to doSomething took " + time+ " milliseconds.")
 
     });
 
@@ -44,7 +44,7 @@ describe('Decimal BenchMarks', () => {
         let end = new Date().getTime();
         let time = end - start;
 
-        console.log("Call to doSomething took " + time+ " milliseconds.")
+        // console.log("Call to doSomething took " + time+ " milliseconds.")
 
     });
 

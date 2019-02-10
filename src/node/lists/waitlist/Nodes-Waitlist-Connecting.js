@@ -189,7 +189,6 @@ class NodesWaitlistConnecting {
 
     _calculateNumberOfConnections() {
 
-
         if (process.env.BROWSER) { //browser
 
             this.connectingMaximum.maximum_fallbacks = consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.CLIENT.MAXIMUM_CONNECTIONS_IN_BROWSER_WAITLIST_FALLBACK;
@@ -237,6 +236,7 @@ class NodesWaitlistConnecting {
             this.connectingMaximum.minimum_waitlist += 5;
 
         }
+
 
         try {
             let date = new Date().getTime();

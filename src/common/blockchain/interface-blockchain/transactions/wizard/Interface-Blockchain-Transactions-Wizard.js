@@ -1,5 +1,7 @@
+/* eslint-disable */
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
+import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 
 class InterfaceBlockchainTransactionsWizard{
@@ -24,7 +26,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
 
-        let process = await this.validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, undefined);
+        let process = await this.validateTransaction( address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
 
         if(process.result)
             return await this.propagateTransaction( process.signature , process.transaction );
@@ -126,9 +128,9 @@ class InterfaceBlockchainTransactionsWizard{
                 to, //to
                 nonce, //nonce
                 timeLock, //timeLock
-                undefined, //version
+                undefined, //version @FIXME This is not calculated if validateVersion === false,
                 undefined, //txId
-                false, false, false
+                false, false, true, true, true, false,
             );
 
         } catch (exception) {
@@ -143,6 +145,9 @@ class InterfaceBlockchainTransactionsWizard{
         if (fee === undefined) {
             fee = this.calculateFeeWizzard( transaction.serializeTransaction(true)) ;
             transaction.from.addresses[0].amount += fee;
+
+            // This is needed because the fromAmount is changing
+            transaction.serializeTransaction(true);
         }
 
         let signature;
@@ -151,13 +156,13 @@ class InterfaceBlockchainTransactionsWizard{
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
 
-            if (typeof exception === "object" && exception.message !== undefined) exception = exception.message;
+            if (typeof exception === "object" && exception.message ) exception = exception.message;
             return { result:false,  message: "Wrong password", reason: exception }
         }
 
         try{
 
-            if(!skipValidationNonce){
+            if (!skipValidationNonce){
 
                 let blockValidationType = {
                     "take-transactions-list-in-consideration": {

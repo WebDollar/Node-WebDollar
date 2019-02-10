@@ -98,12 +98,12 @@ class NodesWaitlist {
                         if ( !forceInsertingWaitlist && nodeType === NODE_TYPE.NODE_TERMINAL)
                             response = await DownloadManager.downloadFile(sckAddress.getAddress(true, true), 5000);
 
-                        if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility)) {
+                        if ( forceInsertingWaitlist || nodeType === NODE_TYPE.NODE_WEB_PEER || ( response && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) ) {
 
                             //search again because i have waited for a promise
                             let answer = this._searchNodesWaitlist(sckAddress, port, nodeType);
 
-                            if (answer.waitlist === null)
+                            if ( !answer.waitlist )
                                 sckAddresses.push(sckAddress);
                             else
                                 waitListFound = answer.waitlist;
@@ -113,7 +113,7 @@ class NodesWaitlist {
                     }
                 }
 
-                if (answer.waitlist !== null) {
+                if (answer.waitlist ) {
 
                     //already found, let's add a new pushBackedBy
                     answer.waitlist.pushBackedBy(backedBy, connected);
@@ -125,7 +125,6 @@ class NodesWaitlist {
 
                 }
                 else{
-
 
 
                 }

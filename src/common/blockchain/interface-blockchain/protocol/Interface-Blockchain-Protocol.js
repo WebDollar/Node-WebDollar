@@ -147,14 +147,43 @@ class InterfaceBlockchainProtocol {
 
             });
 
-        if (this.acceptBlockHeaders)
+        if (this.acceptBlockHeaders) {
+
+            socket.node.on("head/chainHash", async (h) => {
+
+                try {
+
+                    // height
+                    await this.blockchain.sleep(15 + Math.random() * 20);
+
+                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
+                        socket.node.sendRequest("head/chainHash", null);
+                        return;
+                    }
+
+                    let block = this.blockchain.blocks[h+1];
+                    if ( block ) {
+                        socket.node.sendRequest("head/chainHash/" + h, {hash: block.hashChain });
+                    }
+
+                    block = this.blockchain.blocks[h];
+                    if ( !block ) socket.node.sendRequest("head/chainHash", null);
+
+                    socket.node.sendRequest("head/chainHash/" + h, { hash: block.calculateNewChainHash() });
+
+                } catch (exception) {
+
+                }
+
+            });
+
             socket.node.on("head/hash", async (h) => {
 
                 try {
 
                     // height
 
-                    await this.blockchain.sleep(15+Math.random()*20);
+                    await this.blockchain.sleep(15 + Math.random() * 20);
 
                     if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
                         socket.node.sendRequest("head/hash", null);
@@ -164,13 +193,14 @@ class InterfaceBlockchainProtocol {
                     let block = await this.blockchain.getBlock(h);
                     if (block === undefined) socket.node.sendRequest("head/hash", null);
 
-                    socket.node.sendRequest("head/hash/" + h, {hash: block.hash});
+                    socket.node.sendRequest("head/hash/" + h, { hash: block.hash });
 
-                } catch (exception){
+                } catch (exception) {
 
                 }
 
             });
+        }
 
 
         if (this.acceptBlocks)

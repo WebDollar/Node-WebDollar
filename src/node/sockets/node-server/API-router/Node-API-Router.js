@@ -1,6 +1,8 @@
 import NodeAPIPublicNodes from "../API/public/Node-API-Public-Nodes";
 import NodeAPIPublicBlocks from "../API/public/Node-API-Public-Blocks";
 import NodeAPIPublicAddresses from "../API/public/Node-API-Public-Addresses";
+import NodeAPIPublicPools from "../API/public/Node-API-Public-Pools";
+import NodeAPIPublicTransactions from "../API/public/Node-API-Public-Transactions";
 import NodeAPIPublic from "../API/Node-API-Public";
 
 import NodeAPIPrivate from "../API/Node-API-Private";
@@ -49,6 +51,8 @@ class NodeAPIRouter{
 
         this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 , app, prefix, middleWare ) ;
 
+        this._addRoute('address/nonce/:address', NodeAPIPublicAddresses.addressNonce, nodeApiType,  200 , app, prefix, middleWare ) ;
+
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
@@ -56,8 +60,10 @@ class NodeAPIRouter{
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import/:address/:publicKey/:privateKey', NodeAPIPrivate.walletImport, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction/:from/:to/:amount/:fee', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
-
+            
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare );
+
+            this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-wallet', NodeAPIPrivate.walletCreate, nodeApiType, 100, app, prefix, middleWare );
 
         }
 
@@ -70,6 +76,16 @@ class NodeAPIRouter{
         // Return blocks information
         this._addRoute( 'server/nodes/blocks-propagated', NodeAPIPublicNodes.lastBlocksMined.bind(NodeAPIPublicNodes), nodeApiType, 20, app, prefix, middleWare );
 
+        this._addRoute( 'pools/stats', NodeAPIPublicPools.stats, nodeApiType, 200 , app, prefix, middleWare );
+
+        this._addRoute( 'pools/all-miners', NodeAPIPublicPools.minersAll, nodeApiType, 5 , app, prefix, middleWare );
+
+        this._addRoute( 'pools/miners', NodeAPIPublicPools.minersInstances, nodeApiType, 5, app, prefix, middleWare );
+
+        this._addRoute( 'pools/pool-data', NodeAPIPublicPools.poolData, nodeApiType, 5, app, prefix, middleWare );
+
+        this._addRoute( 'transactions/pending', NodeAPIPublicTransactions.pending, nodeApiType, 200 , app, prefix, middleWare );
+        
         // respond with "hello"
         this._addRoute( 'hello', NodeAPIPublic.helloWorld, nodeApiType, 1000, app, prefix, middleWare );
 
@@ -78,7 +94,6 @@ class NodeAPIRouter{
 
         this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
 
-        
     }
 
     initializeRouterCallbacks(app, middleWare, prefix='', nodeApiType){

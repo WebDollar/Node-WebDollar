@@ -2,11 +2,7 @@ import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain
 
 class PPoWBlockchainBlockData extends InterfaceBlockchainBlockData {
 
-    constructor(blockchain, minerAddress, transactions, hashTransactions, hashData){
 
-        super(blockchain, minerAddress, transactions, hashTransactions, hashData);
-
-    }
 
 }
 

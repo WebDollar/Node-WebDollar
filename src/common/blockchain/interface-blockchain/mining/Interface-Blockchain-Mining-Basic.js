@@ -5,6 +5,8 @@ import consts from 'consts/const_global'
 
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import InterfaceBlockchainAddressHelper from "../addresses/Interface-Blockchain-Address-Helper";
+import AdvancedMessages from "../../../../node/menu/Advanced-Messages";
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class InterfaceBlockchainMiningBasic {
 
@@ -15,7 +17,7 @@ class InterfaceBlockchainMiningBasic {
 
         this.blockchain = blockchain;
 
-        if (minerAddress !== undefined)
+        if ( minerAddress )
             this.minerAddress = minerAddress;
 
         if (miningFeePerByte === undefined) miningFeePerByte = consts.MINING_POOL.MINING.FEE_PER_BYTE;
@@ -65,7 +67,7 @@ class InterfaceBlockchainMiningBasic {
 
         this._minerAddress = newAddress;
 
-        if (newAddress === undefined)
+        if ( !newAddress )
             this._unencodedMinerAddress = undefined;
         else
             this._unencodedMinerAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(newAddress);
@@ -78,10 +80,7 @@ class InterfaceBlockchainMiningBasic {
             return this.saveMinerAddress();
     }
 
-    async saveMinerAddress(minerAddress){
-
-        if (minerAddress === undefined)
-            minerAddress = this.minerAddress;
+    async saveMinerAddress(minerAddress = this.minerAddress){
 
         if (typeof minerAddress === "object" && minerAddress.hasOwnProperty("address"))
             minerAddress = minerAddress.address;
@@ -139,20 +138,23 @@ class InterfaceBlockchainMiningBasic {
         }
     }
 
-
-
-
-
-
-
-
-
     async startMining(){
+
+        if (this.started)
+            return;
 
         this.started = true;
         this.reset = false;
 
         StatusEvents.emit('mining/status-changed', true);
+
+        if ( !this.minerAddress ){
+
+            AdvancedMessages.alert("Mining suspended. No Mining Address", "Mining Error", "error", 5000);
+            this.stopMining();
+
+            return false;
+        }
 
         this._startMiningHashRateInterval();
 
@@ -224,6 +226,27 @@ class InterfaceBlockchainMiningBasic {
 
         }
 
+    }
+
+    // if it is in terminal asking for the password (required in POS)
+    async setPrivateKeyAddressForMiningAddress(){
+
+        let foundAddress = Blockchain.Wallet.getAddress(this.minerAddress);
+
+        let password = await foundAddress.getPrivateKey();
+
+        if (password){
+
+            foundAddress._privateKeyForMining = password;
+            console.warn("Mining Address ready for mining" + this.minerAddress );
+
+        } else {
+
+            console.warn("Password is invalid");
+            return false;
+        }
+
+        return true;
     }
 
 }

@@ -29,7 +29,6 @@ npm run build_browser && npm run build_browser_user_interface
 ```shell
 git clone https://github.com/WebDollar/vue-Frontend.git
 cd vue-Frontend
-git checkout MiningPools
 npm install
 cd .. # to go back to MiningPool1 folder for step 3
 ```
@@ -62,7 +61,7 @@ git pull origin MiningPools # for vue-Frontend
 ```
 ### Additional Info:
 
-#### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a> or <a href="https://webdftp.webdollarvpn.io/ftp/blockchainDB3.tar.gz">https://webdftp.webdollarvpn.io/ftp/blockchainDB3.tar.gz</a>
+#### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a>
 #### ^ These backups are made at every 6 hours.
 #### Create a folder named ```blockchainDB3``` inside Node-WebDollar1 and unpack the downloaded arhive to that folder. If the folder is already created, delete the contents inside it and download the backup inside.
 #### To unzip it, run: ```tar -zxvf blockchainDB3.tar.gz -C .``` -> always run this inside blockchainDB3 folder!

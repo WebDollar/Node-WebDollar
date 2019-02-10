@@ -18,6 +18,9 @@ import StatusEvents from "common/events/Status-Events";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+import Blockchain from "src/main-blockchain/Blockchain";
+
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
 
@@ -38,26 +41,20 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
-    async getNextBlock(){
+    async getNextBlock(showLogsOnlyOnce){
 
         let nextBlock, nextTransactions;
 
         try {
 
-            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte);
+            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
 
             nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
-            nextBlock.difficultyTargetPrev = Buffer.from( await this.blockchain.getDifficultyTarget() );
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             nextBlock.updateInterlink();
 
-            for (let i=0; i<nextTransactions.length; i++) {
-                if (nextTransactions[i].pendingTransactionsIncluded === undefined) nextTransactions[i].pendingTransactionsIncluded = 0;
-                nextTransactions[i].pendingTransactionsIncluded++;
-            }
-
-            nextBlock.data.transactions.pendingTransactionsWereIncluded = true;
+            nextBlock.data.transactions.markBlockDataTransactionsToBeInPending();
 
         } catch (Exception){
             console.error("Error creating next block ", Exception, nextBlock);
@@ -71,18 +68,18 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(
 
-                async ()=>{
+                    async ()=>{
 
-                    return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
-                        async ()=>{
-                            return await this._simulatedNextBlockMining(nextBlock, false);
-                        },
-                        false); //avoid displaying the changes
+                        return await this.blockchain.simulateNewBlock(nextBlock, true, revertActions,
+                            async ()=>{
+                                return await this._simulatedNextBlockMining(nextBlock, false);
+                            },
+                            false); //avoid displaying the changes
 
-                }) === false) throw {message: "Mining1 returned False"};
+                    }) === false) throw {message: "Mining1 returned False"};
 
         } catch (Exception){
-            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock);
+            console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : '');
             revertActions.revertOperations();
         }
 
@@ -92,27 +89,21 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
+
     /**
      * mine next block
      */
     async mineNextBlock(suspend){
 
+        let showLogsOnlyOnce = true;
+
         while (this.started && !global.TERMINATED){
-
-            if (this.minerAddress === undefined){
-
-                AdvancedMessages.alert("Mining suspended. No Mining Address", "Mining Error", "error", 5000);
-                this.stopMining();
-
-                return;
-            }
-
 
             //mining next blocks
 
             try {
 
-                let nextBlock = await this.getNextBlock();
+                let nextBlock = await this.getNextBlock(showLogsOnlyOnce);
 
                 let difficulty = await this.blockchain.getDifficultyTarget();
 
@@ -127,14 +118,14 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     if (nextBlock === undefined || nextBlock === null)
                         throw {message: "block is undefined"};
 
-                    nextBlock._computeBlockHeaderPrefix(); //calculate the Block Header Prefix
+                    nextBlock._computeBlockHeaderPrefix( true ); //calculate the Block Header Prefix
                 }
 
                 //avoid mining the same nonces on every machine that is mining the same address
                 let start = Math.floor( Math.random() * 3700000000 );
                 let end = 0xFFFFFFFF;
 
-                await this.mineBlock(nextBlock, difficulty, start, end);
+                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height, showLogsOnlyOnce);
 
 
             } catch (exception){
@@ -142,6 +133,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 this.stopMining();
             }
 
+            showLogsOnlyOnce = false;
 
         }
 
@@ -152,10 +144,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param block
      * @param difficulty
      */
-    async mineBlock( block,  difficulty, start, end ){
+    async mineBlock( block,  difficulty, start, end, height, showLogsOnlyOnce){
 
-        console.log("");
-        console.log(" ----------- mineBlock-------------");
+        if(showLogsOnlyOnce) {
+            console.log("");
+            console.log(" ----------- mineBlock-------------", height, "  ", difficulty.toString("hex"));
+        }
 
         try{
 
@@ -165,16 +159,19 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             let answer;
 
             try {
-                answer = await this.mine(block, difficulty, start, end);
+                answer = await this.mine(block, difficulty, start, end, height);
             } catch (exception){
                 console.error("Couldn't mine block " + block.height, exception);
-                answer.result = false;
+                answer = {
+                    result: false,
+                };
             }
 
-            if (answer.result && this.blockchain.blocks.length === block.height ){
+            if (answer && answer.result && this.blockchain.blocks.length === block.height ){
 
                 console.warn( "----------------------------------------------------------------------------");
-                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "WebDollar Block was mined ", block.height ," nonce (", answer.nonce+")", "timestamp", block.timeStamp, answer.hash.toString("hex"), " reward", (block.reward / WebDollarCoins.WEBD), "WEBD", block.data.minerAddress.toString("hex"));
+                console.warn( "difficulty prev: ", block.difficultyTargetPrev.toString("hex") );
                 console.warn( "----------------------------------------------------------------------------");
 
                 //check if I mined all the last K blocks
@@ -226,7 +223,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                console.error( "block ", block.height ," was not mined...");
+                if(showLogsOnlyOnce)
+                    console.error( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
@@ -242,18 +240,170 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
     }
 
-    calculateHash(nonce){
-        return this.block.computeHash(nonce);
+    calculateHash(){
+        return this.block.computeHash.apply(this.block, arguments);
     }
 
-    async _mineNonces(start, end){
+    getMedianTimestamp(){
+        return this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation);
+    }
+
+    async _minePOS(block, difficultyTarget){
+
+        this.end = 0;
+        this.block = block;
+
+        let whoIsMining = this.block.posMinerAddress || block.data.minerAddress;
+        let balance;
+
+        if (this._miningBalances)
+            balance = this._miningBalances[ whoIsMining.toString("hex") ];
+        else
+            balance = this.blockchain.accountantTree.getBalance( whoIsMining );
+
+        let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
+
+        //browser avoid asking for password
+        if (process.env.BROWSER && await Blockchain.Wallet.isAddressEncrypted( whoIsMining) )
+            return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                nonce: 0,
+                pos: {
+                    timestamp: medianTimestamp,
+                    posSignature: undefined,
+                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                    posMinerPublicKey: undefined,
+                }
+            };
+
+        if ( !balance || balance < consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT * WebDollarCoins.WEBD ){
+
+            await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 10000 : 1000 );
+
+            this.block.timeStamp = medianTimestamp;
+            let posSignature = await this.block._signPOSSignature();
+
+            return {
+                result: false,
+                hash: Buffer.from (consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                nonce: 0,
+                pos: {
+                    timestamp: medianTimestamp,
+                    posSignature: posSignature.signature,
+                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                    posMinerPublicKey: posSignature.publicKey,
+                }
+            };
+
+        }
+
+        // try all timestamps
+        let exceptionLogged = false;
+
+        let i = 0, done = false;
+
+        let errors = 0;
+
+        while (this.started && !this.resetForced && !(this.reset && this.useResetConsensus) && !done){
+
+            try {
+
+                if (this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime( medianTimestamp + i, this.block.height )) {
+
+                    let hash = await this.calculateHash(   medianTimestamp + i, whoIsMining, balance);
+                    this.block.timeStamp = medianTimestamp + i;
+
+                    if (hash.compare(this.bestHash) < 0) {
+
+                        this.bestHash = hash;
+                        this.bestHashNonce = medianTimestamp + i;
+
+                        if (this.bestHash.compare(difficultyTarget) <= 0) {
+
+                            let posSignature = await this.block._signPOSSignature();
+                            return {
+
+                                result: true,
+                                hash: hash,
+                                nonce: 0,
+                                pos: {
+                                    timestamp: medianTimestamp + i,
+                                    posSignature: posSignature.signature,
+                                    posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                                    posMinerPublicKey: posSignature.publicKey,
+                                }
+
+                            };
+
+                        }
+
+                    }
+
+                    if (consts.DEBUG && i % 300 === 0 && !exceptionLogged ) {
+                        console.log("medianTimestamp ", medianTimestamp," ", i, " timestamp ",medianTimestamp + i, hash.toString("hex"));
+                        await this.blockchain.sleep( 5 );
+                    }
+
+                    this._hashesPerSecond++;
+
+                    i++;
+
+                } else {
+
+                    await this.blockchain.sleep(100);
+                }
+
+            } catch (exception){
+
+                if (typeof exception === "object" && exception.message === "Timestamp of block is less than the network-adjusted time") {
+
+                    if ( Blockchain.MinerPoolManagement.minerPoolStarted &&  errors > 30 )
+                        break;
+
+                    errors++;
+
+                } else {
+                    done = true;
+
+                    exceptionLogged = true;
+                    console.error(exception);
+
+                }
+
+                await this.blockchain.sleep(200);
+
+            }
+
+        }
+
+        this.block.timeStamp = medianTimestamp;
+        let hash = await this.calculateHash(  this.block.timeStamp , whoIsMining, balance);
+
+        let posSignature = await this.block._signPOSSignature();
+
+        return {
+            result: false,
+            hash: hash,
+            nonce: 0,
+            pos: {
+                timestamp: medianTimestamp,
+                posSignature: posSignature.signature,
+                posMinerAddress: this.block.posMinerAddress ? this.block.posMinerAddress : undefined,
+                posMinerPublicKey: posSignature.publicKey,
+            }
+        };
+
+    }
+
+    async _mineNonces( start, end ){
 
         let nonce = start;
 
         if (start < 0 || end < 0 || start > end)
             return {
                 result: false,
-                hash: new Buffer(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET),
+                hash: new Buffer(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: -1,
             };
 
@@ -287,6 +437,14 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (exception){
             console.error("Error _mineNonces", "nonce", nonce, start, end );
+
+            if (Blockchain.MinerPoolManagement.minerPoolStarted)
+                this.resetForced = true;
+        }
+
+        if (consts.DEBUG && Math.random() < 0.05 ) {
+            console.log("current bestHash -", this.bestHash.toString("hex"), " target -", this.difficulty.toString("hex"));
+            await this.blockchain.sleep( 5 );
         }
 
         return {
@@ -303,7 +461,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
      * @param difficulty
      * @returns {Promise.<boolean>}
      */
-    async mine(block, difficulty, start, end){
+    async mine(block, difficulty, start, end, height){
 
         if (start === undefined) start = 0;
         if (end === undefined) end = 0xFFFFFFFF;

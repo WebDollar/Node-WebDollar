@@ -42,7 +42,7 @@ class PoolSettings {
         let result = await this._getPoolPrivateKey();
         result = result && await this._getPoolAddress();
 
-        if (poolFee !== undefined)
+        if (poolFee !== undefined )
             await this.setPoolFee(poolFee);
 
         result = result && await this._getPoolDetails();

@@ -24,7 +24,7 @@ class MinerPoolReferrals{
     }
 
     startLoadMinerPoolReferrals(){
-        if (this._referralTimeout !== undefined) return;
+        if (this._referralTimeout ) return;
         this._referralTimeout = setTimeout( this._loadReferrals.bind(this), 60*1000 );
     }
 
@@ -53,7 +53,7 @@ class MinerPoolReferrals{
 
             let data = await this.minerPoolManagement.minerPoolProtocol.getReferralData();
 
-            if (data === undefined || data === null) throw {message: "get-referrals didn't work"};
+            if ( !data ) throw {message: "get-referrals didn't work"};
 
             for (let i=0; i < data.referrals.referees.length; i++)
                 data.referrals.referees[i].referralAddress = this.minerPoolManagement.minerPoolMining.minerAddress;

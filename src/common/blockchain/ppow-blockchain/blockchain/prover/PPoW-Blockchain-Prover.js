@@ -45,7 +45,7 @@ class PPoWBlockchainProver{
 
             //for µ = |C[−k].interlink| down to 0 do
 
-            let C = chain.getBlock(chainLength - consts.POPOW_PARAMS.k);
+            let C = await chain.getBlock(chainLength - consts.POPOW_PARAMS.k);
 
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
                 for (let miu = C.interlink.length; miu >= 0; --miu) {
@@ -110,7 +110,7 @@ class PPoWBlockchainProver{
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
-                        B = await chain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m].height );
+                        B = await superChain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m].height );
 
 
                     count ++;
@@ -171,7 +171,7 @@ class PPoWBlockchainProver{
         if ( !this.proofActivated )
             return false;
 
-        if (this.proofPi !== undefined)
+        if ( this.proofPi )
             this.proofPi.destroyProof();
 
         console.info("Creating proof: ", this.blockchain.blocks.length);

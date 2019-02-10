@@ -222,7 +222,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             //let's verify if I already have this block
             let found = false, block = undefined;
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined) {
+            if (this.blockchain.proofPi ) {
 
                 let searchBlock = this.blockchain.proofPi.findBlockByHeight(proofsList[i].height);
 

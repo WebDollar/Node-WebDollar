@@ -1,3 +1,4 @@
+/* eslint-disable */
 import ed25519 from "common/crypto/ed25519";
 
 import AdvancedMessages from "node/menu/Advanced-Messages";
@@ -22,11 +23,12 @@ class InterfaceBlockchainAddress{
         this.unencodedAddress = null;
         this.publicKey = null;
 
-        if (db === undefined){
+        if ( !db )
             this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.WALLET_DATABASE);
-        } else {
+        else
             this.db = db;
-        }
+
+        this._privateKeyForMining = undefined;
 
     }
 
@@ -53,7 +55,7 @@ class InterfaceBlockchainAddress{
      */
     encrypt(data, password) {
 
-        if (password === undefined)
+        if ( !password )
             return data;
         else {
             let encr = null;
@@ -75,7 +77,7 @@ class InterfaceBlockchainAddress{
      */
     decrypt(data, password) {
 
-        if (password === undefined)
+        if ( !password )
             return data;
         else {
 
@@ -141,7 +143,7 @@ class InterfaceBlockchainAddress{
         try {
             let value = await this.db.get(key);
 
-            if (password !== undefined)
+            if ( password )
                 value = this.decrypt(value, password);
 
             return value;
@@ -153,15 +155,18 @@ class InterfaceBlockchainAddress{
 
     async getPrivateKey(password) {
 
-        if (password === undefined && await this.isPrivateKeyEncrypted()) {
+        if ( this._privateKeyForMining)
+            return this._privateKeyForMining;
 
-            if (password === undefined)
+        if ( !password && await this.isPrivateKeyEncrypted()) {
+
+            if (!password)
                 password = await InterfaceBlockchainAddressHelper.askForPassword();
 
-            if (password === null)
+            if (!password)
                 return null;
 
-        } else password = undefined;
+        }
 
         let privateKey = await this._getPrivateKey(password);
 
@@ -419,7 +424,7 @@ class InterfaceBlockchainAddress{
         try {
             let value = await this.db.get(key);
 
-            if (value === null)
+            if ( !value )
                 return false;
 
             await this.deserializeAddress(value);
@@ -444,7 +449,7 @@ class InterfaceBlockchainAddress{
         }
     }
 
-    async signMessage(serialization, password){
+    async signMessage(serialization, password, returnPublicKey = false){
 
         let addressGenerated;
 
@@ -455,7 +460,7 @@ class InterfaceBlockchainAddress{
             addressGenerated = InterfaceBlockchainAddressHelper.generateAddress(undefined, privateKey);
 
         } catch (exception) {
-            console.error("Error Serializing the Transaction", exception);
+            console.error("Error Getting Private Key", exception);
             throw exception;
         }
 
@@ -463,7 +468,8 @@ class InterfaceBlockchainAddress{
 
             let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
 
-            return signature;
+            if (returnPublicKey ) return {signature: signature, publicKey: addressGenerated.publicKey};
+            else return signature;
 
         } catch (exception){
             console.error("Error Signing the message ", exception);
@@ -502,7 +508,6 @@ class InterfaceBlockchainAddress{
             let signature = ed25519.sign( serialization, addressGenerated.privateKey.privateKey );
 
             transaction.from.addresses[addressIndex].signature = signature;
-            transaction.recalculateTxId();
 
             return signature;
 
@@ -518,7 +523,7 @@ class InterfaceBlockchainAddress{
     async _toStringDebug(){
 
         let privateKey = await this._getPrivateKey();
-        if (privateKey !== null || (privateKey.status !== undefined && privateKey.status === 404))
+        if (privateKey || (privateKey.status && privateKey.status === 404))
             privateKey = null;
 
         return "address" + this.address.toString() + (this.publicKey !== null ? "public key" + this.publicKey.toString() : '') + (privateKey !== null ? "private key" + privateKey.toString() : '')

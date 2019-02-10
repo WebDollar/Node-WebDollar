@@ -1,49 +1,26 @@
-const axios = require('axios');
-import consts from 'consts/const_global'
+/* eslint-disable */
+
+var rp = require('request-promise');
+
+import consts from 'consts/const_global';
 
 class DownloadHelper{
 
-    async post (request, data, timeout = 20000 ){
+    async downloadFile(address, timeout = 10000 ){
 
         try{
 
-            let axiosInstance = axios.create({
-                timeout: timeout,
-                responseType: 'json',
+            // Socket IO reports local Ip`s prefixed with ::ffff:
+            address = address.replace('::ffff:', '');
+
+            let data = await rp({
+                uri: address,
+                headers: {
+                    'User-Agent': 'Request-Promise'
+                },
+                json: true, // Automatically parses the JSON string in the response
+                timeout: timeout
             });
-
-            return await axiosInstance.post( request, data );
-
-        } catch (exception){
-            return null;
-        }
-
-    }
-
-    async downloadFile(address, timeout){
-
-        try{
-            let axiosInstance = axios.create({
-                timeout: timeout,
-                responseType: 'json',
-            });
-
-            let response = await axiosInstance.get(address);
-            if (response === null) return null;
-
-            let data = response.data;
-
-            if (typeof data === 'string'){
-                try {
-                    data = JSON.parse(data);
-                } catch (exception){
-
-                    if (consts.DEBUG)
-                        console.error("Error processing downloadFile data", data, exception);
-
-                    return null;
-                }
-            }
 
             if (typeof data === 'object') return data;
 
@@ -52,7 +29,7 @@ class DownloadHelper{
         catch(exception){
 
             if (consts.DEBUG)
-                console.error("ERROR downloading list: ", address );
+                console.error("DownloadHelper::downloadFile ERROR downloading list: ", address );
 
             return null;
         }

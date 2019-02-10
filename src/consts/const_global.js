@@ -1,3 +1,4 @@
+/* eslint-disable */
 const uuid = require('uuid');
 import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
 import  Utils from "common/utils/helpers/Utils"
@@ -21,8 +22,16 @@ consts.BLOCKCHAIN = {
 
     TIMESTAMP:{
         VALIDATION_NO_BLOCKS: 10,
+
+        NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET_AFTER_POS: 30,
+
         NETWORK_ADJUSTED_TIME_MAXIMUM_BLOCK_OFFSET: 10*60,
-        NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE: 10*60,
+        NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE: 30,
+    },
+
+    POS: {
+        MINIMUM_AMOUNT: 100,
+        MINIMUM_POS_TRANSFERS: 30,
     },
 
     BLOCKS_POW_LENGTH: 32,
@@ -40,30 +49,33 @@ consts.BLOCKCHAIN = {
         SAFETY_LAST_BLOCKS_DELETE_NODE: 100, //overwrite below
 
         SAFETY_LAST_ACCOUNTANT_TREES: 50, //overwrite below
-        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 150, //overwrite below
+        SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE: 60, //overwrite below
 
         SAFETY_LAST_BLOCKS_DELETE: undefined,
 
-        GZIPPED: true,
+        GZIPPED: false,
 
     },
 
     FORKS:{
 
         //forks larger than this will not be accepted
-        IMMUTABILITY_LENGTH: 20,
+        IMMUTABILITY_LENGTH: 60,
 
     },
 
     HARD_FORKS : {
 
-        TRANSACTIONS_BUG_2_BYTES: 46950,
-
-        TRANSACTIONS_OPTIMIZATION: 153060,
-        DIFFICULTY_TIME_BIGGER: 153060,
         WALLET_RECOVERY: 153060,
 
+        TRANSACTIONS_BUG_2_BYTES: 46950,
+        TRANSACTIONS_OPTIMIZATION: 153060,
+
+        DIFFICULTY_TIME_BIGGER: 153060,
         DIFFICULTY_REMOVED_CONDITION: 161990,
+
+        TRANSACTIONS_INCLUDING_ONLY_HEADER: 567698, // SAME AS POS
+        POS_ACTIVATION: 567810,
 
     }
 
@@ -121,6 +133,8 @@ consts.SPAM_GUARDIAN = {
     TRANSACTIONS:{
         MAXIMUM_IDENTICAL_INPUTS: 10,
         MAXIMUM_IDENTICAL_OUTPUTS: 255,
+        MAXIMUM_DIFF_NONCE_ACCEPTED_FOR_QUEUE: 500,
+        MAXIMUM_MISSING_NONCE_SEARCH: 5
     }
 
 };
@@ -181,7 +195,8 @@ consts.HASH_ARGON2_PARAMS = {
     algoNode: 0,
     algoBrowser: 0,
     hashLen: 32,
-    distPath: 'https://antelle.github.io/argon2-browser/dist'
+    // distPath: 'https://webdollar.io/public/WebDollar-dist/argon2'
+    distPath: 'https://antelle.net/argon2-browser/'
 };
 
 // change also to Browser-Mining-WebWorker.js
@@ -241,7 +256,8 @@ consts.MINING_POOL = {
 
     SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
 
-
+    SKIP_POW_REWARDS: false,
+    SKIP_POS_REWARDS: false
 
 };
 
@@ -251,10 +267,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.198.0",
+        VERSION: "1.203.2",
 
-        VERSION_COMPATIBILITY: "1.174",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.174",
+        VERSION_COMPATIBILITY: "1.200.1",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
 
         VERSION_COMPATIBILITY_UPDATE: "",
         VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
@@ -288,7 +304,7 @@ consts.SETTINGS = {
         },
 
         MAX_SIZE: {
-            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,       // in bytes
+            BLOCKS_MAX_SIZE_BYTES : 1 * 1024 * 1024 ,      // in bytes
             SOCKET_MAX_SIZE_BYRES : 3 * 1024 * 1024 + 50,    // in bytes
 
             SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES: 32 * 1024, //32 kb
@@ -382,14 +398,16 @@ consts.SETTINGS = {
     MEM_POOL : {
 
         TIME_LOCK : {
-            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 2 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
+            TRANSACTIONS_MAX_LIFE_TIME_IN_POOL_AFTER_EXPIRATION: 10 * consts.BLOCKCHAIN.LIGHT.VALIDATE_LAST_BLOCKS,
         },
 
-        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 100,
+        MAXIMUM_TRANSACTIONS_TO_DOWNLOAD: 1000,
 
         MINIMUM_TRANSACTION_AMOUNT: 100000, //10 WEBD
 
-    }
+    },
+    GEO_IP_ENABLED: true,
+    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -412,7 +430,7 @@ consts.TERMINAL_WORKERS = {
      * cpu-cpp
      * gpu
      */
-    TYPE: "cpu", //cpu-cpp
+    TYPE: process.env.TERMINAL_WORKERS_TYPE || "cpu", //cpu-cpp, or gpu
 
     // file gets created on build
     PATH: './dist_bundle/terminal_worker.js',
@@ -436,33 +454,99 @@ consts.TERMINAL_WORKERS = {
     //  Threading isn't used:
     //  - if it detects only 1 cpu.
     //  - if you use 0 and u got only 2 cpus.
-    CPU_MAX: 0, //for CPU-CPP use, 2x or even 3x threads
+
+    //  -100 no CPU mining
+
+    CPU_MAX: parseInt(process.env.TERMINAL_WORKERS_CPU_MAX) || 0, //for CPU-CPP use, 2x or even 3x threads
+
 };
 
-if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER !== undefined)
+consts.JSON_RPC = {
+    version: '1.0.0',
+    serverConfig: {
+        host: process.env.JSON_RPC_SERVER_HOST || '127.0.0.1',
+        port: process.env.JSON_RPC_SERVER_PORT,
+    },
+
+    // @see express-basic-auth package for configuration (except isEnabled)
+    basicAuth: {
+        users    : {},
+        isEnabled: process.env.JSON_RPC_BASIC_AUTH_ENABLE || false
+    },
+
+    // @see express-rate-limit package for configuration (except isEnabled)
+    rateLimit: {
+        windowMs : process.env.JSON_RPC_RATE_LIMIT_WINDOW       || 60 * 1000, // 1 minute
+        max      : process.env.JSON_RPC_RATE_LIMIT_MAX_REQUESTS || 60,        // limit each IP to 60 requests per windowMs,
+        isEnabled: process.env.JSON_RPC_RATE_LIMIT_ENABLE       || true
+    },
+};
+
+if ( process.env.JSON_RPC_BASIC_AUTH_USER  && process.env.JSON_RPC_BASIC_AUTH_PASS ) {
+
+    consts.JSON_RPC.basicAuth.users[process.env.JSON_RPC_BASIC_AUTH_USER] = process.env.JSON_RPC_BASIC_AUTH_PASS;
+
+    if ( consts.JSON_RPC.basicAuth.isEnabled )
+        consts.JSON_RPC.basicAuth.isEnabled = true;
+}
+
+if (process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER )
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER = process.env.MAXIMUM_CONNECTIONS_FROM_BROWSER;
 
-if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL !== undefined)
+if (process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL)
     consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL = process.env.MAXIMUM_CONNECTIONS_FROM_TERMINAL;
 
+consts.NETWORK_TYPE = {
+    id: 1,
+    name: "Webdollar MainNet"
+};
 
-if ( consts.DEBUG === true ){
+if ( consts.DEBUG === true ) {
+
+    consts.MINING_POOL.SKIP_POW_REWARDS = true;
+    consts.MINING_POOL.SKIP_POS_REWARDS = false;
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "3"+consts.SETTINGS.NODE.VERSION_COMPATIBILITY;
     consts.SETTINGS.NODE.SSL = false;
     consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR = 10000;
 
-    consts.SETTINGS.NODE.PORT = 8085;
+    //hard-forks
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 60;
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER = 70;
+    consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION = 80;
+    consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION = 90;
+    consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_INCLUDING_ONLY_HEADER = consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION;
 
-    //consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES = 100;
+    consts.SETTINGS.NODE.PORT = 2024;
 
     FallBackNodesList.nodes = [{
-        "addr": ["http://127.0.0.1:8085"],
+        "addr": ["http://testnet2.hoste.ro:8001"],
+        //"addr": ["http://86.126.138.61:2024"],
     }];
 
+    consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
+    consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
+
+    consts.SETTINGS.NODE.VERSION = "1.210.6" ;
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.6";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.6";
 
 }
 
+if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet') {
 
-export default consts
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
+
+    consts.NETWORK_TYPE = {
+        id: 2,
+        name: "Webdollar TestNet"
+    };
+
+}
+
+if (process.env.NETWORK !== undefined && process.env.NETWORK !== '' && process.env.NETWORK === 'testnet')
+    FallBackNodesList.nodes = FallBackNodesList.nodes_testnet;
+
+export default consts;

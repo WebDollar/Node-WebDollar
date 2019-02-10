@@ -28,7 +28,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.transactions.forEach((transaction) => {
             transaction.confirmed = true;
-            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(transaction);
+            // this.blockData.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
         });
 
     }
@@ -50,21 +50,36 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    destroyBlockDataTransactions(forceDeletion){
+    markBlockDataTransactionsToBeInPending(){
+
+        if (this.pendingTransactionsWereIncluded)
+            return;
+
+        for (let i=0; i<this.transactions.length; i++) {
+            if ( !this.transactions[i].pendingTransactionsIncluded ) this.transactions[i].pendingTransactionsIncluded = 0;
+            this.transactions[i].pendingTransactionsIncluded++;
+        }
+
+        this.pendingTransactionsWereIncluded = true;
+
+    }
+
+    destroyBlockDataTransactions(freeOldMemory){
 
         for (let i=0; i<this.transactions.length; i++) {
 
             if (this.pendingTransactionsWereIncluded)
                 this.transactions[i].pendingTransactionsIncluded--;
 
-            this.blockData.blockchain.transactions.pendingQueue._removePendingTransaction(this.transactions[i], forceDeletion);
+            if (this.pendingTransactionsWereIncluded <= 0) this.pendingTransactionsWereIncluded = undefined;
+
+            if (!freeOldMemory)
+                if ( !this.pendingTransactionsWereIncluded && !Blockchain.blockchain.transactions.pendingQueue.findPendingTransaction(this.transactions[i].txId)  )
+                    this.transactions[i].destroyTransaction();
 
             this.transactions[i] = undefined;
-            this.transactions.splice(i,1);
-            i--;
 
         }
-
         this.transactions = [];
 
         delete this.pendingTransactionsWereIncluded;
@@ -226,14 +241,29 @@ class InterfaceBlockchainBlockDataTransactions {
         return fee;
     }
 
-    freeTransactionsFromMemory(){
+    findTransactionInBlockData(transaction){
 
-        //
-        // this.destroyBlockDataTransactions(true);
-        //
-        // delete this.transactionsLoaded;
+        if (typeof transaction === "string") transaction = Buffer.from(transaction, "hex");
+
+        if (!Buffer.isBuffer(transaction) && typeof transaction === "object") transaction = transaction.txId;
+
+        for (let i=0; i <this.transactions.length; i++)
+            if (this.transactions[i].txId.equals(transaction))
+                return i;
+
+        return -1;
 
     }
+
+    freeTransactionsFromMemory(){
+
+        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return;
+
+        this.destroyBlockDataTransactions(true );
+        delete this.transactionsLoaded;
+
+    }
+
 
 }
 
