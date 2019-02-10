@@ -323,7 +323,7 @@ class NodeServer {
         for (let i = 0; i < NodesList.nodes.length; i++)
             if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL) {
 
-                if (isPoolActivated && NodesList.nodes[i].socket.node.protocol.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL)
+                if (isPoolActivated && NodesList.nodes[i].socket.node.protocol.nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL)
                     continue;
 
                 if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
@@ -354,7 +354,7 @@ class NodeServer {
             if (NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2) {
 
                 for (let i = 0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
+                    if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
                         if (!NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL)
                             NodesList.nodes[i].socket.disconnect();
 
