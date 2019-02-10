@@ -123,7 +123,9 @@ class PoolPayouts{
                 poolForkDifferencePerBlock = Math.ceil( poolFork / blocksConfirmed.length );
 
 
-            blocksConfirmed.forEach((blockConfirmed)=>{
+            for (let q =0; q < blocksConfirmed.length; q++){
+
+                let blockConfirmed = blocksConfirmed[q];
 
                 let totalDifficultyPOW = new BigNumber(0), totalDifficultyPOS = new BigNumber(0);
 
@@ -193,8 +195,9 @@ class PoolPayouts{
 
                 });
 
+                await this.blockchain.sleep(200);
 
-            });
+            }
 
             Log.info("Payout: Blocks Confirmed Processed", Log.LOG_TYPE.POOLS);
 
@@ -298,6 +301,8 @@ class PoolPayouts{
                 });
 
                 blocksConfirmed[i].payoutTransaction = true;
+
+                await this.blockchain.sleep(200);
             }
 
 
@@ -319,6 +324,9 @@ class PoolPayouts{
                 miner.__tempRewardConfirmedOther = 0; //paid this
 
                 total += this._toAddresses[i].amount;
+
+                if (i % 100 === 0)
+                    await this.blockchain.sleep(200);
 
             }
 
