@@ -58,7 +58,7 @@ class PoolsUtils {
         this.validatePoolActivated(poolActivated);
         this.validatePoolFee(poolReferralFee);
 
-        if (poolAddress !== undefined)
+        if (poolAddress)
             if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(poolAddress) === null) throw {message: "poolAddress is invalid"};
 
         return true;
@@ -163,12 +163,12 @@ class PoolsUtils {
 
     extractPoolURL(url){
 
-        if ( url === null || url === "" || url === undefined ) return null;
+        if ( !url ) return null;
 
         url = sanitizer.sanitize(url);
 
         let object = Utils.getLocation(url);
-        if (object !== null)
+        if (object )
             url = object.pathname;
 
         if (url.indexOf("/pool/") === 0) url = url.replace("/pool/","");

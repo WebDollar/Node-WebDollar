@@ -46,7 +46,7 @@ class PoolWorkManagement{
         if ( !hashes ) hashes = 500;
 
         if ( !blockInformationMinerInstance )
-            blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+            blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation.addBlockInformationMinerInstance(minerInstance);
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
@@ -88,7 +88,8 @@ class PoolWorkManagement{
 
         };
 
-        this.poolWork.lastBlockNonce += hashes;
+        if (!isPOS)
+            this.poolWork.lastBlockNonce += hashes;
 
         minerInstance.lastBlockInformation =  blockInformationMinerInstance;
         minerInstance.workBlock =  this.poolWork.lastBlock;
@@ -114,18 +115,18 @@ class PoolWorkManagement{
 
         try{
 
+            let wasBlockMined;
+
             if ( !minerInstance ) throw {message: "minerInstance is undefined"};
             if ( !work || typeof work !== "object") throw {message: "work is undefined"};
 
             if ( !Buffer.isBuffer(work.hash) || work.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH) throw {message: "hash is invalid"};
             if ( typeof work.nonce !== "number" ) throw {message: "nonce is invalid"};
 
-            let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation._addBlockInformationMinerInstance(minerInstance);
+            let blockInformationMinerInstance = this.poolManagement.poolData.lastBlockInformation.addBlockInformationMinerInstance(minerInstance);
 
-            prevBlock = prevBlock  || blockInformationMinerInstance.workBlock;
-
-            if ( !prevBlock )
-                throw {message: "miner instance - no block"};
+            if (!prevBlock) prevBlock = blockInformationMinerInstance.workBlock;
+            if ( !prevBlock ) throw {message: "miner instance - no block"};
 
             let isPos = BlockchainGenesis.isPoSActivated(prevBlock.height);
 
@@ -163,7 +164,7 @@ class PoolWorkManagement{
             }
 
             //returning false, because a new fork was changed in the mean while
-            if ( !isPos && this.blockchain.blocks.length-2 > prevBlock.height+1 )
+            if ( !isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
                 throw {message: "pool: block is already too old"};
 
             if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
@@ -171,14 +172,13 @@ class PoolWorkManagement{
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
 
-                let wasBlockMined;
-
                 try {
                     wasBlockMined = await blockInformationMinerInstance.wasBlockMined.apply(blockInformationMinerInstance, [prevBlock].concat(args));
                 } catch (exception){
                     wasBlockMined = false;
 
                     //TODO remove !isPOS to throw the error message always
+                    //TODO After the timestamp is used sent via the pool miners, this should be removed
                     if (!isPos)
                         throw exception;
                 }
@@ -241,10 +241,6 @@ class PoolWorkManagement{
 
                         this.poolManagement.poolData.addBlockInformation();
 
-
-                        blockInformationMinerInstance.poolWork = Buffer.from("00FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF","hex");
-                        blockInformationMinerInstance.poolWorkNonce = -1;
-
                         StatusEvents.emit("blockchain/new-blocks", { });
 
                     } catch (exception){
@@ -279,7 +275,19 @@ class PoolWorkManagement{
 
                 let workDone;
                 if (isPos) workDone = work.pos.balance;
-                else workDone = work.hash;
+                else {
+
+
+                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(2,64)+"FF";
+
+                    if ( work.hash.compare( Buffer.from( target, "hex") ) <= 0){
+                        work.hash =  Buffer.from("00000FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex");
+                        work.nonce = -1;
+                    }
+
+                    workDone = work.hash;
+
+                }
 
                 let difficulty = blockInformationMinerInstance.calculateDifficulty( prevBlock, workDone );
                 blockInformationMinerInstance.adjustDifficulty( prevBlock, difficulty, true, true);
@@ -296,9 +304,9 @@ class PoolWorkManagement{
                             if (typeof oldBlockInfo.miningHeights[height] === "object" && oldBlockInfo.miningHeights[height].isGreaterThan(0))
                                 if ( BlockchainGenesis.isPoSActivated(height) ){
 
-                                    let oldBlockInformationMinerInstance = oldBlockInfo._addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
+                                    let oldBlockInformationMinerInstance = oldBlockInfo.addBlockInformationMinerInstance( blockInformationMinerInstance.minerInstance )  ;
 
-                                    oldBlockInformationMinerInstance.adjustDifficulty({height: i}, difficulty, true, true,  oldBlockInformationMinerInstance );
+                                    oldBlockInformationMinerInstance.adjustDifficulty({height: height }, difficulty, true, true,  oldBlockInformationMinerInstance );
 
                                 }
 

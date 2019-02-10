@@ -287,6 +287,8 @@ class PoolRewardsManagement{
             //to mail fail trials
             if ( this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
 
+                if (i === this.poolData.blocksInfo.length-1 ) continue;
+
                 this.poolManagement.poolStatistics.poolBlocksUnconfirmed++;
 
                 Log.warn("==========================================", Log.LOG_TYPE.POOLS);
@@ -482,7 +484,7 @@ class PoolRewardsManagement{
 
             if (nothing) return;
 
-            let newBlockInformationMinerInstance = newBlockInformation._addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
+            let newBlockInformationMinerInstance = newBlockInformation.addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
             blockInformationMinersInstance.cancelReward();
 

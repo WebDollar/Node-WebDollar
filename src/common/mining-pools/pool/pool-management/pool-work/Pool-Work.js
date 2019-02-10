@@ -23,12 +23,14 @@ class PoolWork {
     }
 
     startGarbageCollector(){
-        this._garbageCollectorInterval = setTimeout( this._garbageCollector.bind(this), 30000);
+        if (!this._garbageCollectorInterval)
+            this._garbageCollectorInterval = setTimeout( this._garbageCollector.bind(this), 30000);
     }
 
     stopGarbageCollector(){
 
         if ( this._garbageCollectorInterval ) clearTimeout(this._garbageCollectorInterval);
+        this._garbageCollectorInterval = undefined;
 
     }
 
@@ -119,11 +121,12 @@ class PoolWork {
     }
 
 
-    _garbageCollector(){
+    async _garbageCollector(){
 
         try{
 
             let time = (new Date().getTime()/1000) - BlockchainGenesis.timeStampOffset;
+            let destroyed = 0;
 
             for (let i=0; i<this._blocksList.length; i++) {
 
@@ -154,9 +157,15 @@ class PoolWork {
                         this._blocksList[i].instances = undefined;
 
                         this._blocksList.splice(i, 1);
+                        destroyed++;
+
+                        if (destroyed % 10 === 0)
+                            await this.blockchain.sleep(100);
 
                         i--;
                     }
+
+
 
             }
 

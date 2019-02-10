@@ -4,7 +4,6 @@
 import consts from 'consts/const_global'
 
 const atob = require('atob');
-const btoa = require('btoa');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
 import Utils from "common/utils/helpers/Utils";

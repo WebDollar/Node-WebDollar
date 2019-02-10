@@ -82,8 +82,10 @@ class PoolPayouts{
         Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
         Log.info("--------------------------------------------------", Log.LOG_TYPE.POOLS);
 
+        //last block should not be processed at the moment to avoid problems with redistribution
+
         let blocksConfirmed = [];
-        for (let i=0; i<this.poolData.blocksInfo.length-1; i++)
+        for (let i=0; i<this.poolData.blocksInfo.length-2; i++)
             if (this.poolData.blocksInfo[i].confirmed && !this.poolData.blocksInfo[i].payout &&  !this.poolData.blocksInfo[i].payoutTransaction )
                 if(this.poolData.blocksInfo[i].block)
                     if ( (BlockchainGenesis.isPoSActivated( this.poolData.blocksInfo[i].block.height ) && paymentType === "pos") ||  ( !BlockchainGenesis.isPoSActivated( this.poolData.blocksInfo[i].block.height ) && paymentType === "pow" ) )
@@ -125,7 +127,7 @@ class PoolPayouts{
 
                 let totalDifficultyPOW = new BigNumber(0), totalDifficultyPOS = new BigNumber(0);
 
-                this.poolManagement.poolRewardsManagement.redistributePoolDataBlockInformation( blockConfirmed, blockConfirmed, paymentType === "pow" ? "pos" : "pow");
+                this.poolManagement.poolRewardsManagement.redistributePoolDataBlockInformation( blockConfirmed, blockConfirmed, (paymentType === "pow") ? "pos" : "pow");
 
                 blockConfirmed.blockInformationMinersInstances.forEach((blockInformationMinerInstance)=>{
                     totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);
@@ -199,9 +201,9 @@ class PoolPayouts{
             //add rewardConfirmedOther
             this.poolData.miners.forEach((miner)=>{
 
-                if ( (miner.rewardConfirmed + miner.__tempRewardConfirmedOther ) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
+                if ( (miner.rewardConfirmedOther + miner.__tempRewardConfirmedOther ) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
 
-                    this._addAddressTo(miner.address).amount += miner.rewardConfirmed + miner.__tempRewardConfirmedOther;
+                    this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther + miner.__tempRewardConfirmedOther;
 
                     miner.__tempRewardConfirmedOther = 0;
                     miner.rewardConfirmedOther = 0;
@@ -277,7 +279,8 @@ class PoolPayouts{
 
                         miner.__tempRewardConfirmedOther = 0;
 
-                        blockInformationMinerInstance.minerInstanceTotalDifficulty = new BigNumber(0);
+                        blockInformationMinerInstance.reset();
+
                         blockInformationMinerInstance.reward = 0; //i already paid
 
                         if ( miner.referrals.referralLinkMiner  ) {

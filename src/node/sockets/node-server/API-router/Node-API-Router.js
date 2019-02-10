@@ -82,6 +82,8 @@ class NodeAPIRouter{
 
         this._addRoute( 'pools/miners', NodeAPIPublicPools.minersInstances, nodeApiType, 5, app, prefix, middleWare );
 
+        this._addRoute( 'pools/pool-data', NodeAPIPublicPools.poolData, nodeApiType, 5, app, prefix, middleWare );
+
         this._addRoute( 'transactions/pending', NodeAPIPublicTransactions.pending, nodeApiType, 200 , app, prefix, middleWare );
         
         // respond with "hello"

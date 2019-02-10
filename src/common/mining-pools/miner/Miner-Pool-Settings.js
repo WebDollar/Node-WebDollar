@@ -229,6 +229,7 @@ class MinerPoolSettings {
 
     async _addPoolsList(){
 
+        await this.addPoolList("/pool/1/WebDPoolUS/0.01/14f1f8d096f60216bc7bb84ed539ef98bb0384894322747d8fcd3dc324babd67/https:$$webdpool.us:80", undefined, true);
         await this.addPoolList("/pool/1/BACMpool/0.01/21dc1f57cb7338963ea159877b4ade97b71dd11ac17292e3852bdc33a26a17e4/https:$$pool.bacm.ro:443", undefined, true);
         await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
         await this.addPoolList("/pool/1/WMP/0.02/c01f57930c27e78e434de1243ae02b98e56d6cd3df42d136be1a1c0a0a9a8624/https:$$server.webdollarminingpool.com:443", undefined, true);

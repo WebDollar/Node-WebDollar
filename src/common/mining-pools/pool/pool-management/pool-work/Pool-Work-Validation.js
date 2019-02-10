@@ -29,21 +29,28 @@ class PoolWorkValidation{
 
     stopPoolWorkValidation(){
         clearTimeout(this._timeoutPoolWorkValidation);
+        this._timeoutPoolWorkValidation = undefined;
+
         clearInterval(this._intervalPoolWorkDuplicateRemoval);
+        this._intervalPoolWorkDuplicateRemoval = undefined;
     }
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
         try{
 
-            if (!work.hash)
-                return;
+            if (!work.hash) return;
 
             work.hashHex = work.hash.toString("hex");
+
             if ( this._worksDuplicate[work.hashHex] )
                 return;
 
-            if (typeof work.timeDiff === "number") {
+            this._worksDuplicate [ work.hashHex ] = new Date().getTime();
+
+            let isPOS = BlockchainGenesis.isPoSActivated(work.h);
+
+            if ( !isPOS && typeof work.timeDiff === "number") {
 
                 let hashesFactor = Math.max(0.5, Math.min(2, ( 80000 / work.timeDiff ))); //80 sec
 
@@ -56,12 +63,13 @@ class PoolWorkValidation{
             minerInstance.dateActivity = new Date().getTime() / 1000;
 
             let workData = {
+                hashHex: work.hashHex,
                 work: work,
                 minerInstance: minerInstance
             };
 
 
-            if (BlockchainGenesis.isPoSActivated(work.h)) {
+            if (isPOS) {
 
                 //avoid validating not signed POS
                 if ( !work.pos || !work.pos.posSignature )
@@ -69,8 +77,6 @@ class PoolWorkValidation{
 
                 forced = true;
             }
-
-            this._worksDuplicate [ work.hashHex ] = new Date().getTime();
 
             if ( work.result || forced  ){
 
@@ -111,7 +117,7 @@ class PoolWorkValidation{
             for (let key in this._works){
 
                 try {
-                    await this._validateWork(this._works[i]);
+                    await this._validateWork(this._works[key]);
                 } catch (exception){
 
                 }
