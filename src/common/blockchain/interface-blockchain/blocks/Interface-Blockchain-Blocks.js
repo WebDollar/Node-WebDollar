@@ -36,15 +36,14 @@ class InterfaceBlockchainBlocks{
 
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
 
-        this.savingManager = new SavingManager(this);
-        this.loadingManager = new LoadingManager(this);
+        this.savingManager = new SavingManager(this.blockchain);
+        this.loadingManager = new LoadingManager(this.blockchain, this.savingManager);
+
         this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
 
     }
 
-    addBlock(block, revertActions, saveBlock, showUpdate = true){
-
-        this[this.length] =  block;
+    async addBlock(block, revertActions, saveBlock, showUpdate = true){
 
         this.length += 1;
 
@@ -52,18 +51,17 @@ class InterfaceBlockchainBlocks{
             this.emitBlockCountChanged();
 
         if (saveBlock)
-            this.emitBlockInserted(block);
+            await this.emitBlockInserted(block);
 
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
         this.chainWork = this.chainWork.plus( block.workDone );
 
-
     }
 
-    emitBlockInserted(block){
-        StatusEvents.emit("blockchain/block-inserted", block !== undefined ? block : this[this._length-1]);
+    async emitBlockInserted(block){
+        StatusEvents.emit("blockchain/block-inserted", block ? block : await this.last );
     }
 
     emitBlockCountChanged(){
@@ -72,13 +70,8 @@ class InterfaceBlockchainBlocks{
 
     async spliceBlocks(after, showUpdate = true){
 
-        for (let i = this.length - 1; i >= after; i--) {
-
-            //optimize save workDone for each block
-            let block = await this.getBlock(i);
-
-            this.chainWork = this.chainWork.minus( block.workDone);
-        }
+        for (let i = this.length - 1; i >= after; i--)
+            this.chainWork = this.chainWork.minus( await this.loadingManager.getBlockWork() );
 
         if (this.length === 0)
             this._chainWork =  new BigInteger(0);

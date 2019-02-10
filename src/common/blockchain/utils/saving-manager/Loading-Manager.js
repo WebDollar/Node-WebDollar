@@ -1,12 +1,14 @@
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
+import consts from "consts/const_global";
 
 const CLEAR_OLD_UNSED_BLOCKS_INTERVAL = 60*1000;
 
 class LoadingManager{
 
-    constructor(blockchain){
+    constructor(blockchain, savingManager){
 
         this.blockchain = blockchain;
+        this.savingManager = savingManager;
 
         this.loadedBlocks = {};
 
@@ -15,24 +17,28 @@ class LoadingManager{
     }
 
     async getBlockDifficulty(height){
+        return this.blockchain.db.get("blockDiff"+height);
+    }
 
-        let data = await this.blockchain.db.get("blockDiff"+height);
-        return data;
-
+    async getBlockWork(height){
+        let prevDifficulty = await this.getBlockDifficulty(height );
+        return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( prevDifficulty.toString("hex"), 16 ) );
     }
 
     async getBlock(height){
 
-        if(this.loadedBlocks[height]!==undefined){
+        if (this.savingManager[]  )
+
+        if (height >= this.blockchain.blocks.length)
+            throw {message: "getBlock  invalid height", height: height};
+
+        if (!this.loadedBlocks[height]){
 
             this.loadedBlocks[height].lastTimeUsed = new Date().getTime();
             return this.loadedBlocks[height];
 
-        }else{
-
-            return await this._loadBlock(height);
-
-        }
+        }else
+            return this._loadBlock(height);
 
     }
 
@@ -71,7 +77,7 @@ class LoadingManager{
 
         for (let key in this.loadedBlocks){
 
-            if(new Date().getTime() - this.loadedBlocks[key].lastTimeUsed > CLEAR_OLD_UNSED_BLOCKS_INTERVAL) {
+            if (new Date().getTime() - this.loadedBlocks[key].lastTimeUsed > CLEAR_OLD_UNSED_BLOCKS_INTERVAL) {
 
                 //check if it is not being saved by the Save Manager
 

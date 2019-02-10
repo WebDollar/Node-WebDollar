@@ -539,7 +539,7 @@ class InterfaceBlockchainFork {
 
         if (success) {
             StatusEvents.emit("blockchain/new-blocks", {});
-            this.blockchain.blocks.emitBlockInserted(  ) ;
+            await this.blockchain.blocks.emitBlockInserted(  ) ;
         }
 
         // it was done successfully
@@ -549,7 +549,7 @@ class InterfaceBlockchainFork {
 
         Blockchain.blockchain.accountantTree.emitBalancesChanges();
         Blockchain.blockchain.blocks.recalculateNetworkHashRate();
-        Blockchain.blockchain.blocks.emitBlockInserted();
+        await Blockchain.blockchain.blocks.emitBlockInserted();
         Blockchain.blockchain.blocks.emitBlockCountChanged();
 
         try {

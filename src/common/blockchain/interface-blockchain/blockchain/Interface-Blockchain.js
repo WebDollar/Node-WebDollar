@@ -86,7 +86,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
-        this.blocks.addBlock(block, revertActions, saveBlock, showUpdate);
+        await this.blocks.addBlock(block, revertActions, saveBlock, showUpdate);
 
         if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
@@ -342,12 +342,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if ( numBlocks  === undefined)
             try {
-                //load the number of blocks
-                numBlocks = await this.db.get(this._blockchainFileName);
-                if (numBlocks === null) {
-                    Log.error("numBlocks was not found", Log.LOG_TYPE.SAVING_MANAGER);
+
+                numBlocks = await this.blocks.readBLockchainLength();
+
+                if (!numBlocks)
                     return false;
-                }
 
                 Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
                 Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
