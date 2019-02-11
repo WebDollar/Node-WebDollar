@@ -285,7 +285,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficultyBigNumber = Serialization.deserializeBigNumber(buffer, offset); offset= difficultyBigNumber.newOffset;
                 let difficulty = difficultyBigNumber.number;
 
-                if (difficulty.isGreaterThan(0))
+                if (difficulty.isGreaterThan(0) && this.miner )
                     this.adjustDifficulty({height: height}, difficulty, false, false );
 
             }
@@ -296,7 +296,7 @@ class PoolDataBlockInformationMinerInstance {
                 let difficultyBigNumber = Serialization.deserializeBigNumber(buffer, offset); offset= difficultyBigNumber.newOffset;
                 let difficulty = difficultyBigNumber.number;
 
-                if (difficulty.isGreaterThan(0))
+                if (difficulty.isGreaterThan(0) && this.miner)
                     this.adjustDifficulty({height: height}, difficulty, false, false );
             }
 
