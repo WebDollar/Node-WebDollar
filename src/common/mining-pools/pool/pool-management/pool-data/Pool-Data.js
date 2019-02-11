@@ -162,7 +162,7 @@ class PoolData {
         for (let i = 0; i < this.miners.length; ++i) {
             list.push(this.miners[i].serializeMiner());
 
-            if (this.miners.length % 10 === 0)
+            if ( i % 10 === 0)
                 await Utils.sleep(10)
 
         }
