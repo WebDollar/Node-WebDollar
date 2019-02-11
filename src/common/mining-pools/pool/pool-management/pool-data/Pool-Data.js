@@ -163,7 +163,7 @@ class PoolData {
 
             buffer.push(this.miners[i].serializeMiner());
 
-            if ( buffer.length === 1000) {
+            if ( buffer.length === 100) {
                 await Utils.sleep(100);
                 lists.push(Buffer.concat(buffer));
                 buffer = [];
