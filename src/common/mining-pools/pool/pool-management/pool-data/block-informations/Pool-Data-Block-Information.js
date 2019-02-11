@@ -225,7 +225,7 @@ class PoolDataBlockInformation {
 
         if (hasBlock === 1){
 
-            this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
+            this.block =await  this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
             let height = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;

@@ -12,6 +12,7 @@ import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
 import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
 import Log from "../../../utils/logging/Log";
+import NodeBlockchainPropagation from "../../../sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -41,18 +42,33 @@ class InterfaceBlockchainBlocks{
 
     }
 
-    async addBlock(block, revertActions, saveBlock, showUpdate = true){
+    async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
 
         this.length += 1;
 
         if (showUpdate)
             this.emitBlockCountChanged();
 
-        if (saveBlock)
+        if (saveBlock) {
+
+            this.savingManager.addBlockToSave(block);
             await this.emitBlockInserted(block);
+
+            NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
+
+        } else {
+
+            this.loadingManager.addBlockToLoaded(block.height, block);
+
+        }
 
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
+
+        if (saveBlock) {
+
+
+        }
 
         this.chainWork = this.chainWork.plus( block.workDone );
 

@@ -23,9 +23,9 @@ else  inheritBlockchainBlock = InterfaceBlock;
 
 class MiniBlockchainBlock extends inheritBlockchainBlock {
 
-    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
+    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChain, difficultyTargetPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, difficultyTargetPrev, timeStamp, nonce, data, height, db);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 

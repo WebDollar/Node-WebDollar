@@ -30,22 +30,21 @@ class InterfaceBlockchainBlockCreator{
     /*
         Generate a new block at the end of Blockchain
      */
-    _createBlockNew(height, blockValidation, minerAddress, transactions, args){
+    async _createBlockNew(height, blockValidation, minerAddress, transactions, args){
 
         //validate miner Address
 
         args.unshift( this.blockchain, minerAddress, transactions, undefined, undefined );
         let data = new this.blockDataClass(...args);
 
-        return new this.blockClass( this.blockchain, blockValidation, 1, undefined, this.blockchain.getHashPrev(),   this.blockchain.getBlock().calculateNewChainHash(), undefined, 0, data, height, this.db);
+        return new this.blockClass( this.blockchain, blockValidation, 1, undefined, await blockValidation.getHashPrevCallback(height), await blockValidation.getDifficultyCallback(height),  await blockValidation.getChainHashCallback(height), undefined, 0, data, height, this.db);
 
     }
 
     createBlockNew(minerAddress, blockValidation, transactions){
 
-        if (blockValidation === undefined){
+        if (!blockValidation )
             blockValidation = this.blockchain.createBlockValidation();
-        }
 
         try {
 
@@ -58,7 +57,7 @@ class InterfaceBlockchainBlockCreator{
 
         let restArgs = [];
         for (let i=2; i<arguments.length; i++ )
-            restArgs.push(arguments[i])
+            restArgs.push(arguments[i]);
 
         if (this.blockchain.blocks.length === 0){  //Genesis Block
 
@@ -72,9 +71,9 @@ class InterfaceBlockchainBlockCreator{
 
     }
 
-    createEmptyBlock(height, blockValidation){
+    async createEmptyBlock(height, blockValidation){
 
-        return new this.blockClass(this.blockchain, blockValidation, 1, undefined, undefined, undefined, undefined, 0, null, height, this.db);
+        return new this.blockClass(this.blockchain, blockValidation,      1, undefined, await blockValidation.getHashPrevCallback(height), await blockValidation.getDifficultyCallback(height),  await blockValidation.getChainHashCallback(height), undefined,  0,       null, height, this.db);
 
     }
 

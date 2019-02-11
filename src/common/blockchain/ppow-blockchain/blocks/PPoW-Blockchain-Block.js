@@ -10,9 +10,9 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db) {
+    constructor (blockchain, blockValidation, version, hash, hashPrev, difficultyTargetPrev, hashChain, timeStamp, nonce, data, height, db) {
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, difficultyTargetPrev, hashChain, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
         this._level = undefined;
@@ -202,7 +202,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation , onlyHeader , usePrevHash){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation , onlyHeader ){
 
 
         offset = InterfaceBlockchainBlock.prototype.deserializeBlock.apply(this, arguments);

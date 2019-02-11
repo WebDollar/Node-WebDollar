@@ -75,42 +75,24 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         }
 
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
         if (! (await this.validateBlockchainBlock(block)) ) // the block has height === this.blocks.length
             return false;
-
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         //let's check again the heights
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
 
-        await this.blocks.addBlock(block, revertActions, saveBlock, showUpdate);
 
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         //hard fork
         if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && block.height === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY-1 )
             await this.hardForks.revertAllTransactions("WEBD$gC9h7iFUURqhGUL23U@7Ccyb@X$2BCCpSH$", 150940, revertActions, 18674877890000, "WEBD$gDZwjjD7ZE5+AE+44ITr8yo5E2aXYT3mEH$");
 
-
         await this._blockIncluded( block);
 
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
-        if (saveBlock) {
-
-            this.blocks.savingManager.addBlockToSave(block);
-
-            // propagating a new block in the network
-            NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
-        }
+        await this.blocks.addBlock(block, revertActions, saveBlock, showUpdate, socketsAvoidBroadcast);
 
         await this._onBlockCreated(block,  saveBlock);
-
-
-        if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
         if (resetMining && this.mining ) //reset mining
             this.mining.resetMining();
@@ -264,8 +246,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         for (let i = startingHeight; i < endingHeight; i++ ) {
 
             let block  = await this.getBlock(i);
-            if ( block !== undefined)
+            if ( block )
                 this.blocks.savingManager.addBlockToSave( block );
+
         }
 
         console.warn("Saving Blockchain. Starting from ", startingHeight, endingHeight);
@@ -441,8 +424,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         revertActions.push( { name: "breakpoint" } );
 
-        let block = this.blockCreator.createEmptyBlock(i, blockValidation);
-        block.height = i;
+        let block = await this.blockCreator.createEmptyBlock(i, blockValidation);
 
         try{
 

@@ -27,13 +27,13 @@ class LoadingManager{
 
     async getBlock(height){
 
-        if ( this.savingManager.pendingQueue[height] )
-            return this.savingManager.pendingQueue[height][0].block;
+        if ( this.savingManager._pendingBlocksList[height] )
+            return this.savingManager._pendingBlocksList[height][0].block;
 
         if (height >= this.blockchain.blocks.length)
             throw {message: "getBlock  invalid height", height: height};
 
-        if (!this.loadedBlocks[height]){
+        if (this.loadedBlocks[height]){
 
             this.loadedBlocks[height].lastTimeUsed = new Date().getTime();
             return this.loadedBlocks[height];
@@ -50,7 +50,7 @@ class LoadingManager{
         let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this.blockchain), this.blockchain.getDifficultyTarget.bind(this.blockchain), this.blockchain.getTimeStamp.bind(this.blockchain), this.blockchain.getHashPrev.bind(this.blockchain), validationType );
 
         try {
-            let block = this.blockchain.blockCreator.createEmptyBlock(height, blockValidation);
+            let block = await this.blockchain.blockCreator.createEmptyBlock(height, blockValidation);
             block.height = height;
 
             block.prevDifficultyTarget = this.blockchain.getDifficultyTarget(height);
@@ -59,8 +59,7 @@ class LoadingManager{
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};
 
-            block.lastTimeUsed = new Date().getTime();
-            this.loadedBlocks[height] = block;
+            this.addBlockToLoaded(height, block);
 
             return block;
 
@@ -71,6 +70,13 @@ class LoadingManager{
         }
 
         return null;
+
+    }
+
+    addBlockToLoaded(height, block){
+
+        block.lastTimeUsed = new Date().getTime();
+        this.loadedBlocks[height] = block;
 
     }
 

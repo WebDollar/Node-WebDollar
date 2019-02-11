@@ -371,7 +371,7 @@ class PoolRewardsManagement{
 
                 let blockValidation = this._createServerBlockValidation(i, this._serverBlocks.length-1);
 
-                let block = this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
+                let block = await this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
                 block.data._onlyHeader = true; //only header
                 block.deserializeBlock(answer.block, i, undefined, blockInfo.block.difficultyTargetPrev);
 

@@ -234,7 +234,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             }
 
             if (!found) {
-                block = this.blockchain.blockCreator.createEmptyBlock(proofsList[i].height);
+                block = await this.blockchain.blockCreator.createEmptyBlock(proofsList[i].height);
                 await block.importBlockFromHeader( proofsList[i] );
             }
 

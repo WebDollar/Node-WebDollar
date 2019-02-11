@@ -15,7 +15,7 @@ class InterfaceBlockchainBlock {
 
     //everything is buffer
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db){
+    constructor (blockchain, blockValidation, version, hash, hashPrev, difficultyTargetPrev, hashChain, timeStamp, nonce, data, height, db){
 
         this.blockchain = blockchain;
 
@@ -23,7 +23,8 @@ class InterfaceBlockchainBlock {
 
         this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
 
-        //this._hashPrev;
+        this.hashPrev = hashPrev;
+        this.difficultyTargetPrev = difficultyTargetPrev;
 
         this.hashChain = hashChain||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
@@ -69,37 +70,13 @@ class InterfaceBlockchainBlock {
         this.data = data;
 
 
-        //computed data
-        this.computedSerialization = undefined;
-
         this.difficultyTarget = null; // difficulty set by Blockchain
-        //this.difficultyTargetPrev = null; // difficulty set by Blockchain
 
         this.reward = undefined;
 
         this.db = db;
 
         this._socketPropagatedBy = undefined;
-
-        this._workDone = undefined;
-
-    }
-
-    get difficultyTargetPrev(){
-
-        if (this._difficultyTargetPrev  !== undefined) return this._difficultyTargetPrev;
-        if (this.blockValidation === undefined) return this.blockchain.getDifficultyTarget(this.height);
-
-        return this.blockValidation.getDifficultyCallback(this.height);
-
-    }
-
-    get hashPrev(){
-
-        if (this._hashPrev !== undefined) return this._hashPrev;
-        if (this.blockValidation === undefined) return this.blockchain.getHashPrev(this.height);
-
-        return this.blockValidation.getHashPrevCallback(this.height);
 
     }
 
@@ -151,8 +128,8 @@ class InterfaceBlockchainBlock {
         if ( ! this.blockValidation.blockValidationType["skip-prev-hash-validation"] ){
 
             //validate hashPrev
-            let previousHash = this.blockValidation.getHashPrevCallback(this.height);
-            if ( previousHash === null || !Buffer.isBuffer(previousHash))
+            let previousHash = await this.blockValidation.getHashPrevCallback(this.height);
+            if ( !previousHash || !Buffer.isBuffer(previousHash))
                 throw {message: 'previous hash is not given'};
 
             if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
@@ -361,7 +338,7 @@ class InterfaceBlockchainBlock {
 
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false, usePrevHash = false){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
@@ -370,7 +347,7 @@ class InterfaceBlockchainBlock {
         if (reward ) this.reward = reward;
         else this.reward = BlockchainMiningReward.getReward(this.height);
 
-        if (difficultyTargetPrev ) this._difficultyTargetPrev = difficultyTargetPrev;
+        if (difficultyTargetPrev ) this.difficultyTargetPrev = difficultyTargetPrev;
 
         if ( blockLengthValidation && (buffer.length - offset) > consts.SETTINGS.PARAMS.MAX_SIZE.BLOCKS_MAX_SIZE_BYTES )
             throw {message: "Block Size is bigger than the MAX_SIZE.BLOCKS_MAX_SIZE_BYTES", bufferLength: buffer.length };
@@ -384,8 +361,7 @@ class InterfaceBlockchainBlock {
             offset += 2;
 
             //TODO  put hashPrev into block.data
-            if (usePrevHash)
-                this._hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+            this.hashPrev = BufferExtended.substr(buffer, offset, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
             offset += consts.BLOCKCHAIN.BLOCKS_POW_LENGTH;
 
             this.timeStamp = Serialization.deserializeNumber4Bytes( buffer, offset);
@@ -468,7 +444,7 @@ class InterfaceBlockchainBlock {
                 return false;
             }
 
-            this.deserializeBlock(buffer, this.height );
+            this.deserializeBlock(buffer, this.height, undefined);
 
             return true;
         }
