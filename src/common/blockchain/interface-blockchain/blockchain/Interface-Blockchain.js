@@ -131,7 +131,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         // in case it is not a fork controlled blockchain
 
         if (block.height === 0 ) {
-            //validate genesis
+            //validate genesis11
             BlockchainGenesis.validateGenesis(block);
         }
 

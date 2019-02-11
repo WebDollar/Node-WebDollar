@@ -65,10 +65,6 @@ class InterfaceBlockchainBlocks{
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
-        if (saveBlock) {
-
-
-        }
 
         this.chainWork = this.chainWork.plus( block.workDone );
 

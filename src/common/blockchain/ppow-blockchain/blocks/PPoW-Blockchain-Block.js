@@ -20,8 +20,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this._provesClculatedInserted = undefined;
     }
 
-    updateInterlink(){
-        this.interlink = this.calculateInterlink();
+    async updateInterlink(){
+        this.interlink = await this.calculateInterlink();
     }
 
     get level(){
@@ -67,7 +67,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     /**
      * Algorithm 1
      */
-    calculateInterlink(){
+    async calculateInterlink(){
 
         if (this.blockValidation.blockValidationType["skip-interlinks-update"] === true) return this.interlink;
 
@@ -76,7 +76,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let blockLevel = 0;
         // interlink = interlink'
-        let prevBlock = this.blockValidation.getBlockCallBack( this.height );
+        let prevBlock =  await this.blockValidation.getBlockCallBack( this.height );
 
         if (prevBlock === BlockchainGenesis) blockLevel = 0;
         else
@@ -294,11 +294,11 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
 
-    validateBlockInterlinks(){
+    async validateBlockInterlinks(){
 
         if (!this.blockValidation.blockValidationType["skip-validation-interlinks"]) {
 
-            let interlink = this.calculateInterlink();
+            let interlink = await this.calculateInterlink();
 
             if (interlink.length !== this.interlink.length)
                 throw {message: "interlink has different sizes"};
@@ -325,7 +325,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         if (!answer)
             return answer;
 
-        this.validateBlockInterlinks();
+        await this.validateBlockInterlinks();
 
         return true;
 

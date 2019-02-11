@@ -18,7 +18,7 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
     async _blockIncluded(block){
 
-        block.updateInterlink();
+        await block.updateInterlink();
 
 
         if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {

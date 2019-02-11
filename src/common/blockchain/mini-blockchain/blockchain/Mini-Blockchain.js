@@ -108,7 +108,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
     }
 
-    /**
+    /**11
      * operate the mini-blockchain accountant tree
      * mini-blockchain, will update reward and take in consideration all transactions
      * @param block
