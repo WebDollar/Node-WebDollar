@@ -219,7 +219,7 @@ class PoolData {
 
                     buffer = await this._db.get("minersList_" + index, 60000, true);
 
-                    let response = this._deserializeMiners(buffer, 0, numMiners - i);
+                    let response = this._deserializeMiners( buffer, 0, (numMiners - i) % 101 );
                     if ( !response )
                         throw 'Unable to load miners from DB'
 
