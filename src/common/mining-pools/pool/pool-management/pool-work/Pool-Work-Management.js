@@ -235,6 +235,7 @@ class PoolWorkManagement{
 
                         try {
                             blockInformation.block = block;
+                            blockInformation.height = block.height;
                         } catch (exception){
                             console.error("blockInformation block", exception);
                         }
@@ -276,7 +277,7 @@ class PoolWorkManagement{
                 else {
 
 
-                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(4,64)+"FFFF";
+                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(3,64)+"FFF";
                     target = Buffer.from( target, "hex" );
 
                     if ( work.hash.compare( target ) <= 0){

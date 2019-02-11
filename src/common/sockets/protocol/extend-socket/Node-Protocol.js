@@ -189,7 +189,7 @@ class NodeProtocol {
             l: Blockchain.blockchain.blocks.length,
             h: Blockchain.blockchain.blocks.last.calculateNewChainHash(),
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
-            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi !== undefined && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true, // i also have the proof
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi  && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true, // i also have the proof
             W: Blockchain.blockchain.blocks.chainWorkSerialized, // chain work
         }, callback);
     }

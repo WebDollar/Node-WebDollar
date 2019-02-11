@@ -23,12 +23,12 @@ const ROOMS = {
 
     TERMINALS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 20,
+        SERVER_FREE_ROOM : 40,
     },
 
     BROWSERS:{
         TIME_TO_PASS_TO_CONNECT_NEW_CLIENT : 4*1000,
-        SERVER_FREE_ROOM : 20,
+        SERVER_FREE_ROOM : 40,
     },
 
 };
@@ -46,7 +46,7 @@ class NodeServer {
 
         this.loaded = false;
 
-        setInterval(this._disconenctOldSockets.bind(this), 30 * 1000);
+        setInterval(this._disconnectOldSockets.bind(this), 30 * 1000);
 
         this._rooms = {
 
@@ -154,29 +154,26 @@ class NodeServer {
                     return;
                 }
 
-                let semiPublicKeyConsensus = socket.request._query["semiPublicKeyConsensus"];
+                if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
-                if (consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS === undefined || consts.MINING_POOL.SEMI_PUBLIC_KEY_CONSENSUS.indexOf(semiPublicKeyConsensus) === -1 )
-                    if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
+                    //be sure it is not a fallback node
+                    let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
 
-                        //be sure it is not a fallback node
-                        let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
+                    if ( !nodeDomain || !waitlist.waitlist || !waitlist.waitlist.isFallback) {
 
-                        if (nodeDomain === '' || nodeDomain === undefined || waitlist.waitlist === null || !waitlist.waitlist.isFallback) {
-
-                            if (Math.random() < 0.05) console.warn("too many terminal connections");
-                            return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
-
-                        }
-
-                    } else
-
-                    if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER)) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
-
-                        if (Math.random() < 0.05) console.warn("too many browser connections");
+                        if (Math.random() < 0.05) console.warn("too many terminal connections");
                         return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
                     }
+
+                } else
+
+                if (NODE_TYPE.NODE_WEB_PEER === nodeType && ( (NodesList.countNodesByType(NODE_TYPE.NODE_WEB_PEER) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_BROWSER)) || Blockchain.blockchain.agent.status === AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) && !consts.DEBUG) {
+
+                    if (Math.random() < 0.05) console.warn("too many browser connections");
+                    return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+
+                }
 
 
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && this._rooms.terminals.serverSits <= 0)
@@ -189,7 +186,7 @@ class NodeServer {
                     }else {
 
                         let waitlist = NodesWaitlist._searchNodesWaitlist(nodeDomain, undefined, NODE_TYPE.NODE_TERMINAL); //it should need a confirmation
-                        if ( waitlist === null || waitlist.waitlist === null) //it will also disconnect the socket
+                        if ( !waitlist || !waitlist.waitlist ) //it will also disconnect the socket
                             return  await NodePropagationList.propagateWaitlistSimple(socket, nodeType, true);
 
                     }
@@ -308,34 +305,36 @@ class NodeServer {
         if (NodeExpress.port === 0) return '';
         if (NodeExpress.domain  === '') return '';
 
-        if ( getIP ){
-
+        if ( getIP )
             return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port;
-
-        }
 
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
 
 
     }
 
-    _disconenctOldSockets() {
+    _disconnectOldSockets() {
 
         let time = new Date().getTime();
 
+        let isPoolActivated = Blockchain.isPoolActivated;
+
         //disconnect unresponsive nodes
         for (let i = 0; i < NodesList.nodes.length; i++)
-            if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
+            if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL) {
+
+                if (isPoolActivated && NodesList.nodes[i].socket.node.protocol.nodeConsensusType === NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL)
+                    continue;
 
                 if (NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL_TOO_OLD_BLOCKS) {
 
-                    if (NodesList.nodes[i].socket.node.protocol.blocks === NodesList.nodes[i].socket.node.protocol.blocksPrevious){
+                    if (NodesList.nodes[i].socket.node.protocol.blocks === NodesList.nodes[i].socket.node.protocol.blocksPrevious) {
 
                         NodesList.nodes[i].socket.node.protocol.sendLastBlock();
 
                         setTimeout(() => {
 
-                            if ( NodesList.nodes[i] )
+                            if (NodesList.nodes[i])
                                 NodesList.nodes[i].socket.disconnect();
 
                         }, 3000);
@@ -347,14 +346,15 @@ class NodeServer {
                     }
 
                 }
+            }
 
 
-        if (!Blockchain.isPoolActivated ) {
+        if (!isPoolActivated ) {
 
             if (NodesList.countNodesByType(NODE_TYPE.NODE_TERMINAL) > consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL / 2) {
 
                 for (let i = 0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i].socket.node !== undefined && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
+                    if (NodesList.nodes[i].socket.node && NodesList.nodes[i].socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL)
                         if (!NodesList.nodes[i].isFallback && NodesList.nodes[i].date - time > TIME_DISCONNECT_TERMINAL)
                             NodesList.nodes[i].socket.disconnect();
 

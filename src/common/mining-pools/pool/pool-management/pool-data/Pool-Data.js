@@ -202,12 +202,18 @@ class PoolData {
     }
 
 
-    _serializeBlockInformation(){
+    async _serializeBlockInformation(){
 
         let list = [Serialization.serializeNumber4Bytes(this.blocksInfo.length)];
 
-        for (let i = 0; i < this.blocksInfo.length; ++i)
-            list.push(this.blocksInfo[i].serializeBlockInformation());
+        for (let blockInfo of this.blocksInfo){
+
+            list.push( blockInfo.serializeBlockInformation());
+
+            if ( blockInfo.blockInformationMinersInstances.length > 100)
+                await this.poolManagement.blockchain.sleep(500);
+
+        }
 
         return Buffer.concat(list);
     }
@@ -351,7 +357,7 @@ class PoolData {
 
         try{
 
-            let buffer = this._serializeBlockInformation();
+            let buffer = await this._serializeBlockInformation();
 
             let response = await this._db.save("blocksInformation", buffer);
             if (response !== true) {

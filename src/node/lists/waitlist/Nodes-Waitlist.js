@@ -139,7 +139,7 @@ class NodesWaitlist {
         if (sckAddresses.length > 0){
 
             let waitListObject = new NodesWaitlistObject( sckAddresses, nodeType, nodeConsensusType, level, backedBy , connected, socket );
-            GeoLocationLists._includeAddress(sckAddresses[0]);
+            GeoLocationLists.includeAddress(sckAddresses[0]);
 
             let list;
 

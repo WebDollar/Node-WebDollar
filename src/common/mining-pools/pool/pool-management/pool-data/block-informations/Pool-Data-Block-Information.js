@@ -127,24 +127,23 @@ class PoolDataBlockInformation {
 
     serializeBlockInformation(){
 
-        let buffers = [];
+        let buffers = [
 
-        buffers.push ( Serialization.serializeNumber1Byte( 0x03 ));
+            Serialization.serializeNumber1Byte( 0x03 ),
+            Serialization.serializeNumber4Bytes( this.height || 500 )
 
-        buffers.push ( Serialization.serializeNumber4Bytes( this.height || 500 ));
+        ];
 
         let minerInstances = [];
 
         if (this.blockInformationMinersInstances && Array.isArray(this.blockInformationMinersInstances) )
-            for (let i=0; i<this.blockInformationMinersInstances.length; i++) {
+            for (let blockInfoMinerInstance of this.blockInformationMinersInstances)
                 try {
-                    if (this.blockInformationMinersInstances[i].minerInstance && this.blockInformationMinersInstances[i].reward > 0)
-                        minerInstances.push(this.blockInformationMinersInstances[i].serializeBlockInformationMinerInstance());
+                    if ( blockInfoMinerInstance.minerInstance && blockInfoMinerInstance.reward > 0)
+                        minerInstances.push( blockInfoMinerInstance.serializeBlockInformationMinerInstance() );
                 } catch (exception){
 
                 }
-            }
-
 
         buffers.push ( Serialization.serializeNumber4Bytes(minerInstances.length) );
 

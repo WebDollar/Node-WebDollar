@@ -209,8 +209,11 @@ class MinerPoolProtocol extends PoolProtocolList{
     async _connectionEstablishedWithPool(socket ){
 
         this.minerPoolManagement.minerPoolMining.resetForced = true;
+
         if (this.minerPoolManagement.minerPoolMining._isBeingMining)
             await this.minerPoolManagement.minerPoolMining._isBeingMining;
+
+        this.minerPoolManagement.minerPoolMining.resetForced = false;
 
         socket.node.protocol.pool = {
         };

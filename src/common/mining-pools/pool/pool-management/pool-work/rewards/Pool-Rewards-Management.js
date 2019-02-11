@@ -62,64 +62,65 @@ class PoolRewardsManagement{
 
         //check for penalties
 
-        let penaltiesMinerInstances = {
-            length: 0,
-        };
+        let penaltiesMinerInstances = {};
+        let penaltiesMinerInstancesCount = 0;
 
-        // try{
-        //
-        //     this.poolData.blocksInfo.forEach( (blockInfo)=>{
-        //
-        //         let block = this.blockchain.blocks[blockInfo.height];
-        //         if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 50 )
-        //             if (BlockchainGenesis.isPoSActivated(blockInfo.height))
-        //
-        //                 blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
-        //
-        //                     let penalty;
-        //                     if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
-        //                         penalty = true;
-        //
-        //                     if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
-        //                         penalty = true;
-        //
-        //                     if (penalty) {
-        //                         penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
-        //                         penaltiesMinerInstances.length++;
-        //                     }
-        //
-        //                 });
-        //
-        //     });
-        //
-        //     //redistribute all pool POS
-        //     if (penaltiesMinerInstances.length > 0)
-        //         for (let minerAddress in penaltiesMinerInstances) {
-        //
-        //             this.poolData.blocksInfo.forEach( (blockInfo)=> {
-        //
-        //                 blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
-        //
-        //                     if (blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
-        //
-        //                         //redistribute all pool POS
-        //                         blockInformationMinerInstance.cancelDifficulties();
-        //                         blockInformationMinerInstance.cancelReward();
-        //
-        //                     }
-        //
-        //                 });
-        //
-        //             });
-        //
-        //         }
-        //
-        //
-        // } catch (exception){
-        //
-        //     console.error("Pool Rewards Redistribution error")
-        //
-        // }
+        try{
+
+            for ( let blockInfo of this.poolData.blocksInfo)
+                if ( blockInfo.block && BlockchainGenesis.isPoSActivated(blockInfo.block.height) ){
+
+                    let block = this.blockchain.blocks[blockInfo.height];
+
+                    if ( block && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks.length >= block.height+5 && this.blockchain.blocks.length-50 <= block.height )
+                        for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
+                            if (!blockInformationMinerInstance.penalty){
+
+                                let penalty;
+
+                                if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
+                                    penalty = true;
+
+                                if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
+                                    penalty = true;
+
+                                if (penalty && !penaltiesMinerInstances[ blockInformationMinerInstance.address.toString("hex") ] ) {
+
+                                    penaltiesMinerInstances[ blockInformationMinerInstance.address.toString("hex") ] = blockInformationMinerInstance.address;
+                                    penaltiesMinerInstancesCount++;
+
+                                    console.info("penalty activated", blockInformationMinerInstance.addressWIF );
+
+                                }
+
+                        }
+
+                }
+
+            //redistribute all pool POS
+            if (penaltiesMinerInstancesCount > 0)
+                for (let minerAddress in penaltiesMinerInstances)
+                    for (let blockInfo of this.poolData.blocksInfo)
+                        for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
+                            if ( !blockInformationMinerInstance.penalty && blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
+
+                                //redistribute all pool POS
+                                blockInformationMinerInstance.cancelDifficulties("pos" );
+                                blockInformationMinerInstance.cancelReward();
+
+                                blockInformationMinerInstance.penalty = true;
+
+                            }
+
+
+
+        } catch (exception){
+
+            console.error("Pool Rewards Redistribution error")
+
+        }
+
+        await this.blockchain.sleep(500);
 
 
         let confirmationsPool = 0;
@@ -135,10 +136,10 @@ class PoolRewardsManagement{
             try {
 
                 let firstBlock;
-                for (let i = 0; i < this.poolData.blocksInfo.length; i++)
-                    if (this.poolData.blocksInfo[i].block )
-                        if ( !firstBlock  || this.poolData.blocksInfo[i].block.height < firstBlock)
-                            firstBlock = this.poolData.blocksInfo[i].block.height;
+                for (let blockInfo of this.poolData.blocksInfo)
+                    if (blockInfo.block )
+                        if ( !firstBlock  || blockInfo.block.height < firstBlock)
+                            firstBlock = blockInfo.block.height;
 
                 for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
 
@@ -175,31 +176,33 @@ class PoolRewardsManagement{
         //recalculate the confirmations
         for (let i = this.poolData.blocksInfo.length-1; i >= 0; i--  ){
 
+            let blockInfo = this.poolData.blocksInfo[i];
+
             //already confirmed
-            if ( this.poolData.blocksInfo[i].payoutTransaction  ) {
+            if ( blockInfo.payoutTransaction  ) {
 
                 let found = false;
 
                 //verify if the transaction was included
                 //at least 2 confirmations
-                if (!this.poolData.blocksInfo[i].payoutTx) found = true;
+                if (!blockInfo.payoutTx) found = true;
                 else
                 for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- )
-                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( this.poolData.blocksInfo[i].payoutTx ) >= 0 ){
+                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( blockInfo.payoutTx ) >= 0 ){
                         found = true;
                         break;
                     }
 
                 //let's delete old payouts
                 if (found){
-                    this.poolData.blocksInfo[i].payout = true;
+                    blockInfo.payout = true;
                     Log.warn("BLOCK TRANSACTION PAYOUT CONFIRMED "+i, Log.LOG_TYPE.POOLS);
                 }
 
             }
 
             //already confirmed
-            if ( this.poolData.blocksInfo[i].payout){
+            if ( blockInfo.payout){
 
                 //let's delete old payouts
                 this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid++;
@@ -212,12 +215,12 @@ class PoolRewardsManagement{
             }
 
             //already confirmed
-            if (this.poolData.blocksInfo[i].confirmed)
+            if (blockInfo.confirmed)
                 continue;
 
-            let blockInfo = this.poolData.blocksInfo[i].block;
+            let block = blockInfo.block;
 
-            if ( !blockInfo ){
+            if ( !block ){
 
                 if (i === this.poolData.blocksInfo.length-1 ) continue;
                 else { //for some reasons, maybe save/load
@@ -226,7 +229,7 @@ class PoolRewardsManagement{
                     Log.warn("REDISTRIBUTION1 DONE 1 "+i, Log.LOG_TYPE.POOLS);
                     Log.warn("==========================================", Log.LOG_TYPE.POOLS);
                     
-                    this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
+                    this.redistributePoolDataBlockInformation(blockInfo, i );
                     continue;
                 }
 
@@ -234,18 +237,18 @@ class PoolRewardsManagement{
 
 
             //not ready at the moment
-            if (blockInfo.height > this.blockchain.blocks.length) {
+            if (block.height > this.blockchain.blocks.length) {
                 poolBlocksBeingConfirmed++;
                 continue;
             }
 
             //confirm using my own blockchain / light blockchain
-            if (this.blockchain.blocks.blocksStartingPoint < blockInfo.height){ //i can confirm the block by myself
+            if (this.blockchain.blocks.blocksStartingPoint < block.height){ //i can confirm the block by myself
 
-                let block = await this.blockchain.getBlock(blockInfo.height);
-                if (  !block ) continue;
+                let blockckahinBlock = await this.blockchain.getBlock(blockInfo.height);
+                if (  !blockckahinBlock ) continue;
 
-                if ( BufferExtended.safeCompare( blockInfo.hash, block.hash  ) ){
+                if ( BufferExtended.safeCompare( block.hash, blockckahinBlock.hash  ) ){
 
                     found = true;
 
@@ -253,39 +256,39 @@ class PoolRewardsManagement{
                     //using confirmations as a confirmation system
                     if (CONFIRMATION_METHOD === 1) {
 
-                        let confirmation = confirmations[blockInfo.height];
-                        this.poolData.blocksInfo[i].confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
+                        let confirmation = confirmations[block.height];
+                        blockInfo.confirmations = confirmation.confirmationsOthersUnique + confirmation.confirmationsOthers / 2 + Math.min(confirmation.confirmationsPool / 4, CONFIRMATIONS_REQUIRE_OTHER_MINERS ? 2 : 10000);
 
                     } else if (CONFIRMATION_METHOD === 2)
-                        this.poolData.blocksInfo[i].confirmations = (this.blockchain.blocks.length - blockInfo.height);
+                        blockInfo.confirmations = (this.blockchain.blocks.length - block.height);
 
-                    this.poolData.blocksInfo[i].confirmationsFailsTrials = 0;
+                    blockInfo.confirmationsFailsTrials = 0;
 
                 } else{
 
-                    if ( this.blockchain.blocks.length  > blockInfo.height + VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START )
-                        this.poolData.blocksInfo[i].confirmationsFailsTrials++;
+                    if ( this.blockchain.blocks.length  > block.height + VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START )
+                        blockInfo.confirmationsFailsTrials++;
 
                 }
 
             } else { //i can not confirm the block because I am in browser and I need to use the server
 
                 //not enough blocks
-                if (blockInfo.height < this.blockchain.blocks.length + LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
+                if (block.height < this.blockchain.blocks.length + LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS)
                     continue;
 
-                found = await this._confirmUsingPoolServer(this.poolData.blocksInfo[i]);
+                found = await this._confirmUsingPoolServer(blockInfo);
 
                 if (!found)
-                    this.poolData.blocksInfo[i].confirmationsFailsTrials++;
+                    blockInfo.confirmationsFailsTrials++;
 
             }
 
             if (!found)
-                this.poolData.blocksInfo[i].confirmations = 0;
+                blockInfo.confirmations = 0;
 
             //to mail fail trials
-            if ( this.poolData.blocksInfo[i].confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
+            if ( blockInfo.confirmationsFailsTrials > MAXIMUM_FAIL_CONFIRMATIONS ){
 
                 if (i === this.poolData.blocksInfo.length-1 ) continue;
 
@@ -295,16 +298,16 @@ class PoolRewardsManagement{
                 Log.warn("REDISTRIBUTION1 DONE 2 "+ i, Log.LOG_TYPE.POOLS);
                 Log.warn("==========================================", Log.LOG_TYPE.POOLS);
 
-                this.redistributePoolDataBlockInformation(this.poolData.blocksInfo[i], i );
+                this.redistributePoolDataBlockInformation(blockInfo, i );
                 continue;
             }
 
-            if (found && this.poolData.blocksInfo[i].confirmations > CONFIRMATIONS_REQUIRED){
+            if (found && blockInfo.confirmations > CONFIRMATIONS_REQUIRED){
 
-                this.poolData.blocksInfo[i].confirmed = true;
+                blockInfo.confirmed = true;
 
                 //convert reward to confirmedReward
-                this.poolData.blocksInfo[i].blockInformationMinersInstances.forEach((minerInstance)=>{
+                for (let minerInstance of blockInfo.blockInformationMinersInstances) {
 
                     minerInstance.calculateReward(false);
 
@@ -317,13 +320,14 @@ class PoolRewardsManagement{
                         minerInstance.miner.referrals.referralLinkMiner.rewardReferralTotal -= minerInstance.rewardForReferral;
                     }
 
-                });
+                }
 
                 this.poolManagement.poolStatistics.poolBlocksConfirmed++;
 
             } else
                 poolBlocksBeingConfirmed++;
 
+            await this.blockchain.sleep(100);
         }
 
         this.poolManagement.poolStatistics.poolBlocksBeingConfirmed = poolBlocksBeingConfirmed;
@@ -362,7 +366,7 @@ class PoolRewardsManagement{
                     onlyHeader: true
                 }, i, 6000);
 
-                if (answer === null || answer.result !== true) break;
+                if ( !answer || !answer.result ) break;
 
 
                 let blockValidation = this._createServerBlockValidation(i, this._serverBlocks.length-1);
@@ -475,14 +479,14 @@ class PoolRewardsManagement{
         if ( !newBlockInformation || newBlockInformation.block || newBlockInformation === blockInformation )
             newBlockInformation = this.poolData.addBlockInformation();
 
-        blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
+        for (let blockInformationMinersInstance of blockInformation.blockInformationMinersInstances) {
 
             let nothing = true;
 
             if ( (!workType || workType === "pow") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.isGreaterThan(0)  ) nothing = false;
             if ( (!workType || workType === "pos") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.isGreaterThan(0)  ) nothing = false;
 
-            if (nothing) return;
+            if (nothing) continue;
 
             let newBlockInformationMinerInstance = newBlockInformation.addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
@@ -500,7 +504,7 @@ class PoolRewardsManagement{
 
             blockInformationMinersInstance.calculateReward(false );
 
-        });
+        }
 
         //clear the blockInformation
         if (!workType)
