@@ -318,72 +318,35 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async _loadBlockchain( indexStartLoadingOffset , indexStartProcessingOffset , numBlocks){
+    async _loadBlockchain( ){
 
         if (process.env.BROWSER)
             return true;
 
-        if ( numBlocks  === undefined)
-            try {
-
-                numBlocks = await this.blocks.readBlockchainLength();
-
-                if (!numBlocks)
-                    return false;
-
-                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-                Log.info("LOADING BLOCKS", numBlocks, Log.LOG_TYPE.SAVING_MANAGER);
-                Log.info("=======================", Log.LOG_TYPE.SAVING_MANAGER);
-
-            } catch (exception){
-
-                numBlocks = 0;
-
-            }
-
+        let numBlocks = await this.blocks.readBlockchainLength();
         await this.blocks.clearBlocks();
+        this.accountantTree.clear();
 
         global.INTERFACE_BLOCKCHAIN_LOADING = true;
 
         let answer = true;
 
+        let revertActions = new RevertActions(this);
+
         try {
 
-            let indexStart = 0;
-
-            if (indexStartLoadingOffset !== undefined)
-                indexStart = numBlocks - indexStartLoadingOffset;
-
-            if (indexStartProcessingOffset !== undefined) {
-
-                indexStartProcessingOffset = numBlocks - indexStartProcessingOffset;
-
-                console.warn("===========================================================");
-                console.warn("Fast Blockchain Loading");
-                console.warn("Blocks Processing starts at: ", indexStartProcessingOffset);
-                console.warn("===========================================================");
-
-            }
-
-            this.blocks.length = indexStart || 0; // marking the first blocks as undefined
-
-            let index = 0;
+            let index;
 
             try {
 
-                for (index = indexStart; index < numBlocks; ++index ) {
+                for ( index = 0; index < numBlocks; ++index ) {
 
-                    let validationType = this._getLoadBlockchainValidationType(indexStart, index, numBlocks, indexStartProcessingOffset );
+                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), undefined );
 
-                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), validationType );
+                    let block = await this._loadBlock( index, blockValidation, revertActions);
 
-                    let block = await this._loadBlock(indexStart, index, blockValidation);
-
-                    block.blockValidation.blockValidationType = {};
-
-                    if (index > 0 && index % 10000 === 0) {
+                    if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
-                    }
 
                 }
 
@@ -392,17 +355,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             } catch (exception){
                 console.error("Error loading block", index, exception);
 
-                if ( this.blocks.length < 10)
-                    answer = false;
-                else
-                if (indexStartProcessingOffset !== undefined)
-                    answer = false;
-
             }
 
         } catch (exception){
 
-            if (this.accountantTree !== undefined)
+            if (this.accountantTree )
                 Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.accountantTree.serializeMiniAccountant().toString("hex"));
 
             Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.blocks.length-1);
@@ -418,13 +375,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
 
-    async _loadBlock(indexStart, i, blockValidation){
+    async _loadBlock( index, blockValidation, revertActions ){
 
-        let revertActions = new RevertActions(this);
+        if (!blockValidation)
+            blockValidation = this.createBlockValidation();
 
         revertActions.push( { name: "breakpoint" } );
 
-        let block = await this.blockCreator.createEmptyBlock(i, blockValidation);
+        let block = await this.blockCreator.createEmptyBlock( index, blockValidation);
 
         try{
 
@@ -435,24 +393,22 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions, false) ) {
 
-                if (i % 100 === 0)
-                    console.warn("blockchain loaded successfully index ", i);
+                if ( index % 100 === 0)
+                    console.warn("blockchain l11oaded successfully index ", index);
 
             }
             else {
-                console.error("blockchain is invalid at index " + i);
-                throw {message: "blockchain is invalid at index ", height: i};
+                console.error("blockchain is invalid at index " + index);
+                throw {message: "blockchain is invalid at index ", height: index};
             }
 
         } catch (exception){
-            console.error("blockchain LOADING stopped at " + i, exception);
-            revertActions.revertOperations();
-            revertActions.destroyRevertActions();
+            console.error("blockchain LOADING stopped at " + index, exception);
+            await revertActions.revertOperations("breakpoint");
 
             throw exception;
         }
 
-        revertActions.destroyRevertActions();
         return block;
     }
 

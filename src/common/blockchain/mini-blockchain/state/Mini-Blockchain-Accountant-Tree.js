@@ -269,6 +269,13 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
     }
 
+    clear(){
+
+        this.root.destroyNode();
+        this.createRoot();
+
+    }
+
 }
 
 export default MiniBlockchainAccountantTree

@@ -124,10 +124,12 @@ class InterfaceBlockchainBlocks{
         let last, first;
         for (let i = Math.max( this.blockchain.blocks.blocksStartingPoint, Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS*3)); i<this.blockchain.blocks.endingPosition; i++) {
 
-            if (i < 0) continue;
-            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+            let block = await this.blockchain.getBlock(i);
 
-            if( BlockchainGenesis.isPoSActivated( this.blockchain.blocks[i].height ) )
+            if (i < 0) continue;
+            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ block.difficultyTarget.toString("hex") ) );
+
+            if( BlockchainGenesis.isPoSActivated( block.height ) )
                 SumDiffPoS = SumDiffPoS.plus( diff );
             else
                 SumDiffPoW = SumDiffPoW.plus( diff );

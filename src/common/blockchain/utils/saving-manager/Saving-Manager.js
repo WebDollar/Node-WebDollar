@@ -164,7 +164,7 @@ class SavingManager{
 
     async readBlockchainLength(){
 
-        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 200, 1000000);
+        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 20000, 1000000);
 
         if ( !numBlocks ) {
             Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
