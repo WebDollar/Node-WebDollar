@@ -73,7 +73,7 @@ class InterfaceBlockchainBlockCreator{
 
     async createEmptyBlock(height, blockValidation){
 
-        return new this.blockClass(this.blockchain, blockValidation,      1, undefined, await blockValidation.getHashPrevCallback(height), await blockValidation.getDifficultyCallback(height),  await blockValidation.getChainHashCallback(height), undefined,  0,       null, height, this.db);
+        return new this.blockClass(this.blockchain, blockValidation,      1, undefined, undefined, undefined,  undefined, undefined,  0,       null, height, this.db);
 
     }
 

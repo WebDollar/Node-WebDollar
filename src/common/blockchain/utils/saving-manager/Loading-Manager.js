@@ -1,7 +1,9 @@
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import consts from "consts/const_global";
 
-const CLEAR_OLD_UNSED_BLOCKS_INTERVAL = 60*1000;
+const CLEAR_OLD_UNUSED_BLOCKS_INTERVAL = 30*1000;
+const CLEAR_OLD_UNUSED_BLOCKS = 5*60*1000;
+const MAX_BLOCKS_MEMORY = 1000;
 
 class LoadingManager{
 
@@ -11,8 +13,9 @@ class LoadingManager{
         this.savingManager = savingManager;
 
         this.loadedBlocks = {};
+        this.loadedBlocksCount = 0;
 
-        this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNSED_BLOCKS_INTERVAL );
+        this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNUSED_BLOCKS_INTERVAL );
 
     }
 
@@ -51,10 +54,9 @@ class LoadingManager{
 
         try {
             let block = await this.blockchain.blockCreator.createEmptyBlock(height, blockValidation);
-            block.height = height;
 
-            block.prevDifficultyTarget = this.blockchain.getDifficultyTarget(height);
-            block.difficultyTarget = this.blockchain.getDifficultyTarget(height+1, true);
+            block.difficultyTargetPrev = this.getBlockDifficulty(height);
+            block.difficultyTarget = this.getBlockDifficulty(height+1);
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};
@@ -80,21 +82,19 @@ class LoadingManager{
 
     }
 
-    async _clearOldUnusedBlocks(){
+    _clearOldUnusedBlocks(){
 
-        for (let key in this.loadedBlocks){
-
-            if (new Date().getTime() - this.loadedBlocks[key].lastTimeUsed > CLEAR_OLD_UNSED_BLOCKS_INTERVAL) {
+        let date = new Date().getTime();
+        for (let key in this.loadedBlocks)
+            if ( date - this.loadedBlocks[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS) {
 
                 //check if it is not being saved by the Save Manager
-
                 delete this.loadedBlocks[key];
+                this.loadedBlocksCount--;
 
             }
 
-        }
-
-        this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNSED_BLOCKS_INTERVAL );
+        this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNUSED_BLOCKS_INTERVAL );
 
     }
 
