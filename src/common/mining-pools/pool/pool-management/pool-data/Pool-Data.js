@@ -163,8 +163,8 @@ class PoolData {
 
             buffer.push(this.miners[i].serializeMiner());
 
-            if ( i > 0 && i % 100 === 0 && buffer.length > 0) {
-                await Utils.sleep(10);
+            if ( buffer.length === 1000) {
+                await Utils.sleep(100);
                 lists.push(Buffer.concat(buffer));
                 buffer = [];
             }
@@ -214,19 +214,17 @@ class PoolData {
 
                 let numMiners = Serialization.deserializeNumber4Bytes(buffer, 0);
 
-                let i = 0, index = 0;
+                let i = 0, index = 1;
                 while (i < numMiners) {
 
-                    index++;
                     buffer = await this._db.get("minersList_" + index, 60000, true);
 
                     let response = this._deserializeMiners(buffer, 0, numMiners - i);
-                    if (response !== true) {
-                        console.log('Unable to load miners from DB');
-                        return false;
-                    }
+                    if ( !response )
+                        throw 'Unable to load miners from DB'
 
                     i += 100;
+                    index++;
                 }
 
             } else {
