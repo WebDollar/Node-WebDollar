@@ -108,19 +108,17 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 }
 
-                this.data.transactions.transactions.forEach((tx)=>{
+                for (let tx of this.data.transactions.transactions){
 
-                    tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( whoIsMining ))
+                    for (let from of tx.from.addresses)
+                        if ( from.unencodedAddress.equals( whoIsMining ) )
                             balance += from.amount;
-                    });
 
-                    tx.to.addresses.forEach((to)=>{
+                    for (let to of tx.to.addresses)
                         if ( to.unencodedAddress.equals( whoIsMining ))
                             balance -= to.amount;
-                    });
 
-                });
+                }
 
             }
 
@@ -137,12 +135,10 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                     //s += block.height + " ";
 
-                    block.data.transactions.transactions.forEach((tx) => {
-                        tx.to.addresses.forEach((to) => {
+                    for (let tx of block.data.transactions.transactions)
+                        for (let to of tx.to.addresses)
                             if (to.unencodedAddress.equals(whoIsMining))
                                 balance -= to.amount;
-                        });
-                    });
                 }
 
                 //console.log("After Balance ", balance, s);
