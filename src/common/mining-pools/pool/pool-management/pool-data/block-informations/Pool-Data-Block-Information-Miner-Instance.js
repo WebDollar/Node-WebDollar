@@ -170,6 +170,9 @@ class PoolDataBlockInformationMinerInstance {
 
             if (diff > 0 && this.blockInformation._timeRemaining > 0)
                 ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining*2 );
+
+            if(ratio>1) ratio = 1;
+
         }
 
         let rewardPOW = BigNumber(0);
