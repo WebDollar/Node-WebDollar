@@ -254,8 +254,6 @@ consts.MINING_POOL = {
 
     },
 
-    SEMI_PUBLIC_KEY_CONSENSUS: undefined, //undefined or an array of SEMI_PUBLIC_KEYS
-
     SKIP_POW_REWARDS: false,
     SKIP_POS_REWARDS: false
 

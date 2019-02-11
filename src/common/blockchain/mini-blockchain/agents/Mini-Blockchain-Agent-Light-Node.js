@@ -89,7 +89,7 @@ class MiniBlockchainAgentLightNode extends inheritAgentClass{
 
             this._intervalWebRTC =  setInterval( () => {
 
-                if (this.blockchain.proofPi !== undefined)
+                if (this.blockchain.proofPi )
                     if ( new Date().getTime() - this.blockchain.proofPi.date.getTime() >= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK *1000 * 2) {
                         if (Math.random() < 2*WEBRTC_MINIMUM_LIGHT_PROBABILITY && this.status === AGENT_STATUS.AGENT_STATUS_SYNCHRONIZED_SLAVES) {
                             console.warn("mini blockchain agent light synchronization");

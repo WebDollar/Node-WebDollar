@@ -83,7 +83,7 @@ class SocketProtocol {
 
             let answer = this.node.sendRequest(request, requestData);
 
-            if (answer === null)
+            if ( !answer )
                 clearReturnFunction();
 
         });

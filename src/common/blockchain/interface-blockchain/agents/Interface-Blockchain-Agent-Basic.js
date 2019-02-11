@@ -87,7 +87,7 @@ class InterfaceBlockchainAgentBasic {
 
                 this._intervalVerifyConsensus = setInterval( () => {
 
-                    if (this._prevDate !== undefined && this._prevBlocks === this.blockchain.blocks.length ) {
+                    if ( this._prevDate && this._prevBlocks === this.blockchain.blocks.length ) {
 
                         if (this.status !== AGENT_STATUS.AGENT_STATUS_NOT_SYNCHRONIZED) {
                             console.warn("agent basic synchronization");
