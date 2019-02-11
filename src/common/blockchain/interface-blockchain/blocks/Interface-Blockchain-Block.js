@@ -138,7 +138,9 @@ class InterfaceBlockchainBlock {
             //validate hashChain
             if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
-                let prevBlockChainNew = this.blockValidation.getBlockCallBack(this.height).calculateNewChainHash();
+                let prevBlock = await this.blockValidation.getBlockCallBack(this.height);
+
+                let prevBlockChainNew = await prevBlock.calculateNewChainHash();
                 if ( !prevBlockChainNew || !Buffer.isBuffer(prevBlockChainNew))
                     throw {message: 'previous chain hash is not given'};
 

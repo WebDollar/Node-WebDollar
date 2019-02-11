@@ -46,7 +46,7 @@ class BlockchainDifficulty{
 
 
         if (blockNumber <= consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_REMOVED_CONDITION) {
-            let diff = blockTimestamp - getTimeStampCallback(blockNumber);
+            let diff = blockTimestamp - await getTimeStampCallback(blockNumber);
             if (blockNumber > consts.BLOCKCHAIN.HARD_FORKS.DIFFICULTY_TIME_BIGGER && ( Math.abs(diff) <= consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK / 2 ))
                 throw {message: "Blocks generated too fast"};
         }
@@ -70,18 +70,18 @@ class BlockchainDifficulty{
             //adding blocks 0..8
             for (let i = firstBlock; i < blockNumber; i++) {
                 //the difference between Ti-(Ti-1) is actually the time for Ti
-                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
+                how_much_it_took_to_mine_X_Blocks += await getTimeStampCallback(i + 1) - await getTimeStampCallback(i);
                 how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
                 //console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
             }
 
             //adding block 9
-            how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
+            how_much_it_took_to_mine_X_Blocks += blockTimestamp - await getTimeStampCallback(blockNumber);
             how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
             if(consts.DEBUG){
-                console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - getTimeStampCallback(blockNumber) );
+                console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - await getTimeStampCallback(blockNumber) );
                 console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
             }
 
@@ -152,18 +152,18 @@ class BlockchainDifficulty{
             //adding blocks 0..8
             for (let i = firstBlock; i < blockNumber; i++) {
                 //the difference between Ti-(Ti-1) is actually the time for Ti
-                how_much_it_took_to_mine_X_Blocks += getTimeStampCallback(i + 1) - getTimeStampCallback(i);
+                how_much_it_took_to_mine_X_Blocks += await getTimeStampCallback(i + 1) - await getTimeStampCallback(i);
                 how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
-                //console.log("block ",i," timestamp ", getTimeStampCallback(i + 1), " time ", getTimeStampCallback(i + 1) - getTimeStampCallback(i) );
+                //console.log("block ",i," timestamp ", await getTimeStampCallback(i + 1), " time ", await getTimeStampCallback(i + 1) - await getTimeStampCallback(i) );
             }
 
 
             //adding block 9
-            how_much_it_took_to_mine_X_Blocks += blockTimestamp - getTimeStampCallback(blockNumber);
+            how_much_it_took_to_mine_X_Blocks += blockTimestamp - await getTimeStampCallback(blockNumber);
             how_much_it_should_have_taken_X_Blocks += consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
-            console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - getTimeStampCallback(blockNumber) );
+            console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - await getTimeStampCallback(blockNumber) );
             console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
 
             let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
