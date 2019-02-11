@@ -153,31 +153,34 @@ class PoolData {
     }
 
 
-
-
     async _serializeMiners() {
 
-        let list = [Serialization.serializeNumber4Bytes(this.miners.length)];
+        let lists = [Serialization.serializeNumber4Bytes(this.miners.length)];
+
+        let buffer = [];
 
         for (let i = 0; i < this.miners.length; ++i) {
-            list.push(this.miners[i].serializeMiner());
 
-            if ( i % 10 === 0)
-                await Utils.sleep(10)
+            buffer.push(this.miners[i].serializeMiner());
+
+            if ( i > 0 && i % 100 === 0 && buffer.length > 0) {
+                await Utils.sleep(10);
+                lists.push(Buffer.concat(buffer));
+                buffer = [];
+            }
 
         }
 
-        return Buffer.concat(list);
+        if (buffer.length > 0)
+            lists.push(Buffer.concat(buffer));
+
+        return lists;
     }
 
-    _deserializeMiners(buffer, offset = 0) {
+    _deserializeMiners(buffer, offset = 0, numMiners) {
 
         try {
 
-            let numMiners = Serialization.deserializeNumber4Bytes( buffer, offset );
-            offset += 4;
-
-            this.miners = [];
             for (let i = 0; i < numMiners; ++i) {
 
                 let miner = new PoolDataMiner( this, i );
@@ -188,11 +191,6 @@ class PoolData {
 
             }
 
-            for (let i=0; i< this.miners.length; i++) {
-                this.miners[i].referrals.findReferralLinkAddress();
-                this.miners[i].referrals.refreshRefereeAddresses();
-            }
-
             return true;
 
         } catch (exception){
@@ -201,16 +199,106 @@ class PoolData {
         }
     }
 
+    /**
+     * Load miners from database
+     * @returns {boolean} true is success, otherwise false
+     */
+    async _loadMinersList() {
+
+        try{
+
+            this.miners = [];
+
+            let buffer = await this._db.get("minersList_0",  60000, true);
+            if (buffer){
+
+                let numMiners = Serialization.deserializeNumber4Bytes(buffer, 0);
+
+                let i = 0, index = 0;
+                while (i < numMiners) {
+
+                    index++;
+                    buffer = await this._db.get("minersList_" + index, 60000, true);
+
+                    let response = this._deserializeMiners(buffer, 0, numMiners - i);
+                    if (response !== true) {
+                        console.log('Unable to load miners from DB');
+                        return false;
+                    }
+
+                    i += 100;
+                }
+
+            } else {
+
+                buffer = await this._db.get("minersList",  60000, true);
+                let offset = 0;
+
+                if (buffer) {
+                    let numMiners = Serialization.deserializeNumber4Bytes(buffer, offset);
+                    offset += 4;
+
+                    let response = this._deserializeMiners(buffer, offset, numMiners);
+                    if (!response)
+                        throw 'Unable to load miners from DB';
+                }
+
+
+            }
+
+            for (let i=0; i< this.miners.length; i++) {
+                this.miners[i].referrals.findReferralLinkAddress();
+                this.miners[i].referrals.refreshRefereeAddresses();
+            }
+
+            return true;
+        }
+        catch (exception){
+
+            console.log('ERROR loading miners from BD: ',  exception);
+            return false;
+        }
+    }
+
+    /**
+     * Save miners to database
+     * @returns {boolean} true is success, otherwise false
+     */
+    async saveMinersList() {
+
+        try{
+
+            let lists = await this._serializeMiners();
+
+            for (let i=0; i < lists.length; i++){
+
+                let response = await this._db.save("minersList_"+i, lists[i] );
+
+                if ( !response )
+                    throw 'Unable to save miners to DB'
+
+            }
+
+
+            return true;
+        }
+        catch (exception){
+
+            console.log('ERROR saving miners in DB: ',  exception);
+            return false;
+        }
+    }
+
 
     async _serializeBlockInformation(){
 
         console.info("SAVING POOL DATA");
 
-        let list = [Serialization.serializeNumber4Bytes(this.blocksInfo.length)];
+        let lists = [ Serialization.serializeNumber4Bytes(this.blocksInfo.length) ];
 
         for (let blockInfo of this.blocksInfo){
 
-            list.push( blockInfo.serializeBlockInformation());
+            lists.push( blockInfo.serializeBlockInformation() );
 
             if ( blockInfo.blockInformationMinersInstances.length > 100)
                 await this.poolManagement.blockchain.sleep(500);
@@ -219,17 +307,12 @@ class PoolData {
 
         console.info("SAVE DONE");
 
-        return Buffer.concat(list);
+        return lists;
     }
 
-    async _deserializeBlockInformation(buffer, offset = 0){
+    async _deserializeBlockInformation(buffer, offset = 0, numBlocksInformation){
 
         try {
-
-            let numBlocksInformation = Serialization.deserializeNumber4Bytes( buffer, offset, );
-            offset += 4;
-
-            this.blocksInfo = [];
 
             console.info("Pool Blocks Data Length", numBlocksInformation);
 
@@ -251,11 +334,6 @@ class PoolData {
             }
 
 
-            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo.length-1].blockInformationMinersInstances.length > 0){
-                this.addBlockInformation();
-            }
-
-
             return true;
 
         } catch (exception){
@@ -265,93 +343,64 @@ class PoolData {
 
     }
 
-    /**
-     * Load miners from database
-     * @returns {boolean} true is success, otherwise false
-     */
-    async _loadMinersList() {
-
-        try{
-
-            let buffer = await this._db.get("minersList",  60000, true);
-
-            if (buffer !== null) {
-                let response = this._deserializeMiners(buffer);
-                if (response !== true){
-                    console.log('Unable to load miners from DB');
-                    return false;
-                }
-
-            }
-
-
-            return true;
-        }
-        catch (exception){
-
-            console.log('ERROR loading miners from BD: ',  exception);
-            return false;
-        }
-    }
-
     async _loadBlockInformations(){
 
+        if (consts.DEBUG) {
+            console.log('Pool Data is not loaded in Debug');
+            return true;
+        }
+
+        this.blocksInfo = [];
+
         try{
 
-            let buffer = await this._db.get("blocksInformation", 60000, true);
+            let buffer = await this._db.get("blocksInformation_0", 60000, true);
+            if (buffer){
 
-            if (buffer !== null) {
+                    let numBlocksInformation = Serialization.deserializeNumber4Bytes(buffer, 0,);
 
-                if (consts.DEBUG) {
-                    console.log('Pool Data is not loaded in Debug');
-                    return true;
+                    for (let i=0; i < numBlocksInformation; i++){
+
+                        buffer = await this._db.get("blocksInformation_"+(i+1), 60000, true);
+                        let response = await this._deserializeBlockInformation(buffer, 0, 1);
+                        if ( !response )
+                            throw 'Unable to load miners from DB'
+                    }
+
+            } else {
+
+                buffer = await this._db.get("blocksInformation", 60000, true);
+                let offset = 0;
+
+                if (buffer) {
+                    let numBlocksInformation = Serialization.deserializeNumber4Bytes(buffer, offset,);
+                    offset += 4;
+
+                    let response = await this._deserializeBlockInformation(buffer, offset, numBlocksInformation);
+                    if (!response)
+                        throw 'Unable to load miners from DB'
                 }
 
-                let response = await this._deserializeBlockInformation(buffer);
-
-                if (response !== true) {
-                    console.log('Unable to load miners from DB');
-                    return false;
-                }
-
-                console.warn("==========================================================");
-                console.warn("POOLS BLOCK INFORMATION LOADED: " + this.blocksInfo.length);
-                console.warn("==========================================================");
 
             }
+
+            if ( this.blocksInfo.length > 0 && this.blocksInfo[this.blocksInfo.length-1].block && this.blocksInfo[this.blocksInfo.length-1].blockInformationMinersInstances.length > 0)
+                this.addBlockInformation();
+
+            console.warn("==========================================================");
+            console.warn("POOLS BLOCK INFORMATION LOADED: " + this.blocksInfo.length);
+            console.warn("==========================================================");
 
             return true;
 
         } catch (exception){
-
-        }
-
-    }
-
-    /**
-     * Save miners to database
-     * @returns {boolean} true is success, otherwise false
-     */
-    async saveMinersList() {
-
-        try{
-
-            let buffer = await this._serializeMiners();
-
-            let response = await this._db.save("minersList", buffer);
-            if (response !== true) {
-                console.log('Unable to save miners to DB');
-                return false;
-            }
-
-            return true;
-        }
-        catch (exception){
-
-            console.log('ERROR saving miners in DB: ',  exception);
+            console.log('Unable to load miners from DB');
             return false;
         }
+
     }
+
+
 
     /**
      * Save miners to database
@@ -361,12 +410,15 @@ class PoolData {
 
         try{
 
-            let buffer = await this._serializeBlockInformation();
+            let lists = await this._serializeBlockInformation();
 
-            let response = await this._db.save("blocksInformation", buffer);
-            if (response !== true) {
-                console.log('Unable to save miners to DB');
-                return false;
+            for (let i=0; i < lists.length; i++){
+
+                let response = await this._db.save("blocksInformation_"+i, lists[i] );
+
+                if ( !response )
+                    throw 'Unable to save miners to DB'
+
             }
 
             return true;
@@ -389,7 +441,9 @@ class PoolData {
             try {
 
                 answer = await this.saveMinersList();
-                await Utils.sleep(1000);
+
+                await Utils.sleep(3000);
+
                 answer = answer && (await this.saveBlocksInformation());
 
 
@@ -401,7 +455,7 @@ class PoolData {
             global.POOL_SAVED = true;
         }
 
-        setTimeout( this._savePoolData.bind(this), 10000);
+        setTimeout( this._savePoolData.bind(this), 3*60*1000);
         return answer;
     }
 

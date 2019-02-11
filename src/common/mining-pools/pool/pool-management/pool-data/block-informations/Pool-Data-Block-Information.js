@@ -166,7 +166,7 @@ class PoolDataBlockInformation {
                 array.push(this.block.serializeBlock());
 
             } catch (exception){
-                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block !== null ? this.block.toJSON() : '');
+                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block ? this.block.toJSON() : '');
                 console.log(exception);
 
             }
