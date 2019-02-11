@@ -19,6 +19,8 @@ class InterfaceBlockchainBasic{
 
         this.agent = agent;
 
+        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
+
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
         this.blocks = new InterfaceBlockchainBlocks(this, this.db);

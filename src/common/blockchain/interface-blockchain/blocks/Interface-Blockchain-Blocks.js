@@ -39,8 +39,6 @@ class InterfaceBlockchainBlocks{
         this.savingManager = new SavingManager(this.blockchain);
         this.loadingManager = new LoadingManager(this.blockchain, this.savingManager);
 
-        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
-
     }
 
     async addBlock(block, revertActions, saveBlock, showUpdate = true){
@@ -82,7 +80,7 @@ class InterfaceBlockchainBlocks{
             this.emitBlockCountChanged();
     }
 
-    clearBlocks(){
+    async clearBlocks(){
         return this.spliceBlocks(0, true);
     }
 
@@ -95,12 +93,12 @@ class InterfaceBlockchainBlocks{
 
     // aka head
     get last() {
-        return this.getBlock(this.length - 1);
+        return this.loadingManager.getBlock(this.length - 1);
     }
 
     // aka tail
     get first() {
-        return this.getBLock( this.blocksStartingPoint );
+        return this.loadingManager.getBlock( this.blocksStartingPoint );
     }
 
     async recalculateNetworkHashRate(){
@@ -168,29 +166,12 @@ class InterfaceBlockchainBlocks{
         return this._chainWork;
     }
 
-    async readBLockchainLength(){
-
-        let numBlocks = await this.db.get(this._blockchainFileName, 200, 1000000);
-
-        if ( !numBlocks ) {
-            Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
-            return undefined;
-        }
-
-        return numBlocks;
+    async readBlockchainLength(){
+        return this.savingManager.readBlockchainLength();
     }
 
     async saveBlockchainLength(length = this.length){
-
-        let answer = await this.db.save(this._blockchainFileName, length, 20000, 1000000) ;
-
-        if (!answer) {
-            Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
-            return false;
-        }
-
-        return true;
-
+        return this.savingManager.saveBlockchainLength(length);
     }
 
 }

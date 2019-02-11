@@ -16,6 +16,7 @@ class SavingManager{
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
         this._factor = Math.floor( Math.random()*10 );
+
     }
 
 
@@ -158,6 +159,31 @@ class SavingManager{
 
         global.INTERFACE_BLOCKCHAIN_SAVED = true;
 
+
+    }
+
+    async readBlockchainLength(){
+
+        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 200, 1000000);
+
+        if ( !numBlocks ) {
+            Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return undefined;
+        }
+
+        return numBlocks;
+    }
+
+    async saveBlockchainLength(length ){
+
+        let answer = await this.blockchain.db.save( this.blockchain._blockchainFileName, length, 20000, 1000000) ;
+
+        if (!answer) {
+            Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return false;
+        }
+
+        return true;
 
     }
 

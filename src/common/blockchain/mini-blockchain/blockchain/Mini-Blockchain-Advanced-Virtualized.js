@@ -29,7 +29,7 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
         }
 
 
-        let numBlocks = await this.readNumberSavedBlocks();
+        let numBlocks = await this.blocks.readBlockchainLength();
         if( numBlocks === false ) return { result:false };
 
         await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true, true );

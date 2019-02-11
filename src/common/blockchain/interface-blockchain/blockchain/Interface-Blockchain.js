@@ -343,7 +343,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if ( numBlocks  === undefined)
             try {
 
-                numBlocks = await this.blocks.readBLockchainLength();
+                numBlocks = await this.blocks.readBlockchainLength();
 
                 if (!numBlocks)
                     return false;
@@ -358,7 +358,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             }
 
-        this.blocks.clearBlocks();
+        await this.blocks.clearBlocks();
 
         global.INTERFACE_BLOCKCHAIN_LOADING = true;
 
@@ -476,8 +476,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     async removeBlockchain( index ){
 
-        this.blocks.spliceBlocks(index, true);
-        this.blocks.saveBlocks();
+        await this.blocks.spliceBlocks(index, true);
+        await this.blocks.saveBlockchainLength();
 
         return true;
     }
@@ -499,7 +499,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (process.env.BROWSER)
             return true;
 
-        await this.savingManager.saveAllBlocks();
+        await this.blocks.savingManager.saveAllBlocks();
 
     }
 
