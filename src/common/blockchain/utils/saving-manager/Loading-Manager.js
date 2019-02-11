@@ -27,7 +27,8 @@ class LoadingManager{
 
     async getBlock(height){
 
-        if (this.savingManager[]  )
+        if ( this.savingManager.pendingQueue[height] )
+            return this.savingManager.pendingQueue[height][0].block;
 
         if (height >= this.blockchain.blocks.length)
             throw {message: "getBlock  invalid height", height: height};
