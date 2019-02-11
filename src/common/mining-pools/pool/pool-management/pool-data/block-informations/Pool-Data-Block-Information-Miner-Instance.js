@@ -122,7 +122,7 @@ class PoolDataBlockInformationMinerInstance {
         } else { //POW difficulty
 
             //it is already another instance
-            let prevDifficulty = blockInformationMinerInstance._minerInstanceTotalDifficultiesPOW[height]||BigNumber(0);
+            let prevDifficulty = blockInformationFirstMinerInstance._minerInstanceTotalDifficultiesPOW[height]||BigNumber(0);
 
             if ( prevDifficulty.isLessThan(difficulty)) {
 
