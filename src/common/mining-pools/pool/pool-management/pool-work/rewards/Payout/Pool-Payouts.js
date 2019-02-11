@@ -130,7 +130,7 @@ class PoolPayouts{
                 for (let blockInformationMinerInstance of blockConfirmed.blockInformationMinersInstances){
                     totalDifficultyPOW = totalDifficultyPOW.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOW);
                     totalDifficultyPOS = totalDifficultyPOS.plus(blockInformationMinerInstance.minerInstanceTotalDifficultyPOS);
-                };
+                }
 
                 if ( !totalDifficultyPOW.isEqualTo(blockConfirmed.totalDifficultyPOW)  )
                     console.error( "Total POW Difficulty doesn't match", {totalDifficultyPOW: totalDifficultyPOW,  blockConfirmedDifficulty: blockConfirmed.totalDifficultyPOW });
@@ -160,7 +160,7 @@ class PoolPayouts{
                     blockInformationMinerInstance.calculateReward(false);
                     sumReward += blockInformationMinerInstance.reward;
                     sumReward += blockInformationMinerInstance.rewardForReferral;
-                };
+                }
 
                 let difference = (sumReward - maxSumReward) + poolForkDifferencePerBlock;
 
@@ -169,15 +169,11 @@ class PoolPayouts{
 
                     difference = Math.ceil( difference  / blockConfirmed.blockInformationMinersInstances.length );
 
-                    for (let blockInformationMinerInstance of blockConfirmed.blockInformationMinersInstances){
-
+                    for (let blockInformationMinerInstance of blockConfirmed.blockInformationMinersInstances)
                         if (blockInformationMinerInstance.reward - difference > 0) {
                             blockInformationMinerInstance.miner.rewardConfirmed -= difference;
                             blockInformationMinerInstance.reward -= difference;
                         }
-
-
-                    }
 
                 }
 
@@ -189,17 +185,16 @@ class PoolPayouts{
                     if ( blockInformationMinerInstance.miner.referrals.referralLinkMiner )
                         blockInformationMinerInstance.miner.referrals.referralLinkMiner.miner.__tempRewardConfirmedOther += blockInformationMinerInstance.rewardForReferral;
 
-                };
+                }
 
-                await this.blockchain.sleep(500);
+                await this.blockchain.sleep(1000);
 
             }
 
             Log.info("Payout: Blocks Confirmed Processed", Log.LOG_TYPE.POOLS);
 
             //add rewardConfirmedOther
-            for (let miner of this.poolData.miners){
-
+            for (let miner of this.poolData.miners)
                 if ( (miner.rewardConfirmedOther + miner.__tempRewardConfirmedOther ) >= consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT ) {
 
                     this._addAddressTo(miner.address).amount += miner.rewardConfirmedOther + miner.__tempRewardConfirmedOther;
@@ -208,8 +203,6 @@ class PoolPayouts{
                     miner.rewardConfirmedOther = 0;
 
                 }
-
-            }
 
             await this.blockchain.sleep(500);
 
@@ -223,24 +216,27 @@ class PoolPayouts{
             for (let toAddress of this._toAddresses)
                 toAddress.amount = Math.floor( toAddress.amount );
 
+            await this.blockchain.sleep(500);
+
             Log.info("Number of original recipients: " + this._toAddresses.length, Log.LOG_TYPE.POOLS);
 
             this._removeAddressTo(this.blockchain.mining.unencodedMinerAddress);
 
             Log.info("Number of initial recipients: " + this._toAddresses.length, Log.LOG_TYPE.POOLS);
 
-            for (let i=this._toAddresses.length-1; i >= 0; i--){
+            for (let i=this._toAddresses.length-1; i >= 0; i--)
                 if (this._toAddresses[i].amount < consts.MINING_POOL.MINING.MINING_POOL_MINIMUM_PAYOUT)
                     this._removeAddressTo(this._toAddresses[i].address);
-            }
 
             let totalToPay = 0;
 
             for (let toAddress of this._toAddresses)
                 totalToPay += toAddress.amount;
 
+            Log.info("======================================= " , Log.LOG_TYPE.POOLS);
             Log.info("Number of recipients: " + this._toAddresses.length, Log.LOG_TYPE.POOLS);
             Log.info("Payout Total To Pay: " + (totalToPay / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
+            Log.info("======================================= " , Log.LOG_TYPE.POOLS);
 
             let index = 0;
             let transactions = [];
