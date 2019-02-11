@@ -87,10 +87,9 @@ class PoolPayouts{
         let blocksConfirmed = [];
 
         for (let blockInfo of this.poolData.blocksInfo)
-            if ( blockInfo.confirmed && !blockInfo.payout &&  !blockInfo.payoutTransaction )
-                if(blockInfo.block)
-                    if ( (BlockchainGenesis.isPoSActivated( blockInfo.block.height ) && paymentType === "pos") ||  ( !BlockchainGenesis.isPoSActivated( blockInfo.block.height ) && paymentType === "pow" ) )
-                        blocksConfirmed.push(blockInfo);
+            if ( blockInfo.block && blockInfo.confirmed && !blockInfo.payout &&  !blockInfo.payoutTransaction )
+                if ( (BlockchainGenesis.isPoSActivated( blockInfo.block.height ) && paymentType === "pos") ||  ( !BlockchainGenesis.isPoSActivated( blockInfo.block.height ) && paymentType === "pow" ) )
+                    blocksConfirmed.push(blockInfo);
 
         console.info("Payout: Blocks confirmed: ", blocksConfirmed.length);
 
