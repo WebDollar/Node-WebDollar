@@ -206,11 +206,13 @@ class PoolData {
 
         let list = [Serialization.serializeNumber4Bytes(this.blocksInfo.length)];
 
-        for (let i = 0; i < this.blocksInfo.length; ++i) {
-            list.push(this.blocksInfo[i].serializeBlockInformation());
+        for (let blockInfo of this.blocksInfo){
 
-            if (this.blocksInfo[i].blockInformationMinersInstances.length > 100)
-                await this.poolManagement.blockchain.sleep(250);
+            list.push( blockInfo.serializeBlockInformation());
+
+            if ( blockInfo.blockInformationMinersInstances.length > 100)
+                await this.poolManagement.blockchain.sleep(500);
+
         }
 
         return Buffer.concat(list);
