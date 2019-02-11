@@ -211,8 +211,8 @@ class PoolDataBlockInformation {
 
             offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset, version);
 
-            if ( !blockInformationMinerInstance.minerInstance ||  (blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.isEqualTo(0) && blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.isEqualTo(0) ) )
-                this.blockInformationMinersInstances.slice( this.blockInformationMinersInstances.length-1 );
+            if ( !blockInformationMinerInstance.minerInstance || !blockInformationMinerInstance.miner  ||  (blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.isEqualTo(0) && blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.isEqualTo(0) ) )
+                this.blockInformationMinersInstances.splice( this.blockInformationMinersInstances.length-1 );
 
 
         }

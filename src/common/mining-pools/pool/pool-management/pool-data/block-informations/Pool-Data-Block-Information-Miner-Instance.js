@@ -270,9 +270,6 @@ class PoolDataBlockInformationMinerInstance {
                     }
                 }
             });
-        else {
-            console.log( "miner is null", this.poolManagement.poolData.miners.length );
-        }
 
         if (version === 0x02){
 

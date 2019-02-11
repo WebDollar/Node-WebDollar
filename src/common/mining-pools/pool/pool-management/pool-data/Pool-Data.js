@@ -204,6 +204,8 @@ class PoolData {
 
     async _serializeBlockInformation(){
 
+        console.info("SAVING POOL DATA");
+
         let list = [Serialization.serializeNumber4Bytes(this.blocksInfo.length)];
 
         for (let blockInfo of this.blocksInfo){
@@ -214,6 +216,8 @@ class PoolData {
                 await this.poolManagement.blockchain.sleep(500);
 
         }
+
+        console.info("SAVE DONE");
 
         return Buffer.concat(list);
     }
