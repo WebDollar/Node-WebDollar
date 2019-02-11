@@ -29,7 +29,7 @@ class PoolDataMinerInstance {
     }
 
     get address(){
-        return this.miner.address;
+        return this.miner ? this.miner.address : undefined;
     }
 
     get addressWIF(){

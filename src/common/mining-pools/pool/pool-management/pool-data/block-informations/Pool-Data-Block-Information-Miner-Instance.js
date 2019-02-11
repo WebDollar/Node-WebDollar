@@ -311,7 +311,7 @@ class PoolDataBlockInformationMinerInstance {
     }
 
     get address(){
-        return this.minerInstance.miner.address;
+        return this.minerInstance.miner ? this.minerInstance.miner.address : undefined;
     }
 
     get minerAddress(){
