@@ -235,6 +235,7 @@ class PoolWorkManagement{
 
                         try {
                             blockInformation.block = block;
+                            blockInformation.height = block.height;
                         } catch (exception){
                             console.error("blockInformation block", exception);
                         }

@@ -62,64 +62,63 @@ class PoolRewardsManagement{
 
         //check for penalties
 
-        let penaltiesMinerInstances = {
-            length: 0,
-        };
+        let penaltiesMinerInstances = {};
+        let penaltiesMinerInstancesCount = 0;
 
-        // try{
-        //
-        //     this.poolData.blocksInfo.forEach( (blockInfo)=>{
-        //
-        //         let block = this.blockchain.blocks[blockInfo.height];
-        //         if ( blockInfo && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && block && this.blockchain.blocks.length - blockInfo.height >= 50 )
-        //             if (BlockchainGenesis.isPoSActivated(blockInfo.height))
-        //
-        //                 blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
-        //
-        //                     let penalty;
-        //                     if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
-        //                         penalty = true;
-        //
-        //                     if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
-        //                         penalty = true;
-        //
-        //                     if (penalty) {
-        //                         penaltiesMinerInstances[blockInformationMinerInstance.minerAddress.toString("hex")] = blockInformationMinerInstance.minerAddress;
-        //                         penaltiesMinerInstances.length++;
-        //                     }
-        //
-        //                 });
-        //
-        //     });
-        //
-        //     //redistribute all pool POS
-        //     if (penaltiesMinerInstances.length > 0)
-        //         for (let minerAddress in penaltiesMinerInstances) {
-        //
-        //             this.poolData.blocksInfo.forEach( (blockInfo)=> {
-        //
-        //                 blockInfo.blockInformationMinersInstances.forEach((blockInformationMinerInstance) => {
-        //
-        //                     if (blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
-        //
-        //                         //redistribute all pool POS
-        //                         blockInformationMinerInstance.cancelDifficulties();
-        //                         blockInformationMinerInstance.cancelReward();
-        //
-        //                     }
-        //
-        //                 });
-        //
-        //             });
-        //
-        //         }
-        //
-        //
-        // } catch (exception){
-        //
-        //     console.error("Pool Rewards Redistribution error")
-        //
-        // }
+        try{
+
+            for ( let blockInfo of this.poolData.blocksInfo)
+                if ( blockInfo.block && BlockchainGenesis.isPoSActivated(blockInfo.block.height) ){
+
+                    let block = this.blockchain.blocks[blockInfo.height];
+
+                    if ( block && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks.length >= block.height+5 && this.blockchain.blocks.length-50 <= block.height )
+                        for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
+                            if (!blockInformationMinerInstance.penalty){
+
+                                let penalty;
+
+                                if (block.posMinerAddress && block.posMinerAddress.equals(blockInformationMinerInstance.minerAddress) && !block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress))
+                                    penalty = true;
+
+                                if (block.data.minerAddress.equals(blockInformationMinerInstance.minerAddress))
+                                    penalty = true;
+
+                                if (penalty && !penaltiesMinerInstances[ blockInformationMinerInstance.address.toString("hex") ] ) {
+
+                                    penaltiesMinerInstances[ blockInformationMinerInstance.address.toString("hex") ] = blockInformationMinerInstance.address;
+                                    penaltiesMinerInstancesCount++;
+
+                                    console.info("penalty activated", blockInformationMinerInstance.addressWIF );
+
+                                }
+
+                        }
+
+                }
+
+            //redistribute all pool POS
+            if (penaltiesMinerInstancesCount > 0)
+                for (let minerAddress in penaltiesMinerInstances)
+                    for (let blockInfo of this.poolData.blocksInfo)
+                        for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
+                            if ( !blockInformationMinerInstance.penalty && blockInformationMinerInstance.minerAddress.equals( penaltiesMinerInstances[minerAddress] )) {
+
+                                //redistribute all pool POS
+                                blockInformationMinerInstance.cancelDifficulties("pos" );
+                                blockInformationMinerInstance.cancelReward();
+
+                                blockInformationMinerInstance.penalty = true;
+
+                            }
+
+
+
+        } catch (exception){
+
+            console.error("Pool Rewards Redistribution error")
+
+        }
 
 
         let confirmationsPool = 0;
@@ -135,10 +134,10 @@ class PoolRewardsManagement{
             try {
 
                 let firstBlock;
-                for (let i = 0; i < this.poolData.blocksInfo.length; i++)
-                    if (this.poolData.blocksInfo[i].block )
-                        if ( !firstBlock  || this.poolData.blocksInfo[i].block.height < firstBlock)
-                            firstBlock = this.poolData.blocksInfo[i].block.height;
+                for (let blockInfo of this.poolData.blocksInfo)
+                    if (blockInfo.block )
+                        if ( !firstBlock  || blockInfo.block.height < firstBlock)
+                            firstBlock = blockInfo.block.height;
 
                 for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
 
@@ -304,7 +303,7 @@ class PoolRewardsManagement{
                 this.poolData.blocksInfo[i].confirmed = true;
 
                 //convert reward to confirmedReward
-                this.poolData.blocksInfo[i].blockInformationMinersInstances.forEach((minerInstance)=>{
+                for (let minerInstance of this.poolData.blocksInfo[i].blockInformationMinersInstances) {
 
                     minerInstance.calculateReward(false);
 
@@ -317,7 +316,7 @@ class PoolRewardsManagement{
                         minerInstance.miner.referrals.referralLinkMiner.rewardReferralTotal -= minerInstance.rewardForReferral;
                     }
 
-                });
+                }
 
                 this.poolManagement.poolStatistics.poolBlocksConfirmed++;
 
@@ -362,7 +361,7 @@ class PoolRewardsManagement{
                     onlyHeader: true
                 }, i, 6000);
 
-                if (answer === null || answer.result !== true) break;
+                if ( !answer || !answer.result ) break;
 
 
                 let blockValidation = this._createServerBlockValidation(i, this._serverBlocks.length-1);
@@ -475,14 +474,14 @@ class PoolRewardsManagement{
         if ( !newBlockInformation || newBlockInformation.block || newBlockInformation === blockInformation )
             newBlockInformation = this.poolData.addBlockInformation();
 
-        blockInformation.blockInformationMinersInstances.forEach( (blockInformationMinersInstance)=>{
+        for (let blockInformationMinersInstance of blockInformation.blockInformationMinersInstances) {
 
             let nothing = true;
 
             if ( (!workType || workType === "pow") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOW.isGreaterThan(0)  ) nothing = false;
             if ( (!workType || workType === "pos") && blockInformationMinersInstance.minerInstanceTotalDifficultyPOS.isGreaterThan(0)  ) nothing = false;
 
-            if (nothing) return;
+            if (nothing) continue;
 
             let newBlockInformationMinerInstance = newBlockInformation.addBlockInformationMinerInstance( blockInformationMinersInstance.minerInstance );
 
@@ -500,7 +499,7 @@ class PoolRewardsManagement{
 
             blockInformationMinersInstance.calculateReward(false );
 
-        });
+        }
 
         //clear the blockInformation
         if (!workType)
