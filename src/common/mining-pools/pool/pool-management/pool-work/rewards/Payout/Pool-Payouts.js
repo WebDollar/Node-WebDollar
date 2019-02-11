@@ -109,8 +109,9 @@ class PoolPayouts{
             Log.info("Payout: Initialized ", Log.LOG_TYPE.POOLS);
 
             let totalSumReward = 0;
-            for (let i=0; i<blocksConfirmed.length; i++)
-                totalSumReward += BlockchainMiningReward.getReward(blocksConfirmed[i].block.height) * (1 - this.poolManagement.poolSettings.poolFee);
+
+            for (let blockConfirmed of blocksConfirmed)
+                totalSumReward += BlockchainMiningReward.getReward( blockConfirmed.block.height) * (1 - this.poolManagement.poolSettings.poolFee );
 
             let poolFork = totalSumReward - Blockchain.blockchain.accountantTree.getBalance( this.blockchain.mining.minerAddress );
 
@@ -219,8 +220,8 @@ class PoolPayouts{
             if (this._toAddresses.length === 0) throw {message: "No Addresses to send money"};
 
             //let's floor the data
-            for (let i=0; i < this._toAddresses.length; i++)
-                this._toAddresses[i].amount = Math.floor( this._toAddresses[i].amount );
+            for (let toAddress of this._toAddresses)
+                toAddress.amount = Math.floor( toAddress.amount );
 
             Log.info("Number of original recipients: " + this._toAddresses.length, Log.LOG_TYPE.POOLS);
 
@@ -234,8 +235,9 @@ class PoolPayouts{
             }
 
             let totalToPay = 0;
-            for (let i=0; i< this._toAddresses.length; i++ )
-                totalToPay += this._toAddresses[i].amount;
+
+            for (let toAddress of this._toAddresses)
+                totalToPay += toAddress.amount;
 
             Log.info("Number of recipients: " + this._toAddresses.length, Log.LOG_TYPE.POOLS);
             Log.info("Payout Total To Pay: " + (totalToPay / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
@@ -303,7 +305,7 @@ class PoolPayouts{
             }
 
 
-            let total = 0;
+            let total = 0, i=0;
 
             for (let toAddress of this._toAddresses){
 
@@ -326,6 +328,7 @@ class PoolPayouts{
                 if (i % 100 === 0)
                     await this.blockchain.sleep(200);
 
+                i++;
             }
 
             Log.info("Payout Total Paid "+ (total / WebDollarCoins.WEBD), Log.LOG_TYPE.POOLS);
