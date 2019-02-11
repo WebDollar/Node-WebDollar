@@ -225,6 +225,8 @@ class PoolData {
 
                     i += 100;
                     index++;
+
+                    console.info("Loading ",i );
                 }
 
             } else {
