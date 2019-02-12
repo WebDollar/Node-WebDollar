@@ -1,9 +1,10 @@
 import consts from "consts/const_global";
 
-import BlockManager from "apps/Blocks-Manager"
-import BlockDifficultyManager from "apps/Difficulty-Manager"
-import BlockChainHashManager from "apps/ChainHash-Manager"
-import BlockHashManager from "apps/Hash-Manager"
+import BlockManager from "./apps/Block-Manager"
+import BlockDifficultyManager from "./apps/Block-Difficulty-Manager"
+import BlockChainHashManager from "./apps/Block-ChainHash-Manager"
+import BlockHashManager from "./apps/Block-Hash-Manager"
+import ChainWorkManager from "./apps/ChainWork-Manager";
 
 class LoadingManager{
 
@@ -12,20 +13,25 @@ class LoadingManager{
         this.blockchain = blockchain;
         this.savingManager = savingManager;
 
-        this.difficultyManager = new BlockDifficultyManager(blockchain, savingManager);
-        this.chainHashManager = new BlockChainHashManager(blockchain, savingManager);
-        this.blocksManager = new BlockManager(blockchain, savingManager, this.difficultyManager, this.chainHashManager);
-        this.hashManager = new BlockHashManager(blockchain, savingManager);
-        this.chainWork = new ChainWork(blockchain, savingManager);
+        this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager);
+        this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager);
+        this.blockManager = new BlockManager(blockchain, savingManager, this.blockDifficultyManager, this.blockChainHashManager, this.blockHashManager);
+        this.blockHashManager = new BlockHashManager(blockchain, savingManager);
+
+        this.chainWorkManager = new ChainWorkManager(blockchain, savingManager);
 
     }
 
     async getBlockDifficulty(height){
-        return this.difficultyManager.getData(height);
+        return this.blockDifficultyManager.getData(height);
     }
 
     async getBlockHash(height){
-        return this.hashManager.getData(height);
+        return this.blockHashManager.getData(height);
+    }
+
+    async getBlockChainHash(height){
+        return this.blockChainHashManager.getData(height);
     }
 
     async getBlockWork(height){
@@ -34,7 +40,11 @@ class LoadingManager{
     }
 
     async getBlock(height){
-        return this.blocksManager.getData(height);
+        return this.blockManager.getData(height);
+    }
+
+    async getChainWork(height){
+        return this.chainWorkManager.getData(height);
     }
 
 

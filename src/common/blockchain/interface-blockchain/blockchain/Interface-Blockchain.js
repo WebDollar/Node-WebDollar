@@ -282,9 +282,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                 for ( index = 0; index < numBlocks; ++index ) {
 
-                    let blockValidation = new InterfaceBlockchainBlockValidation(  this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), undefined );
-
-                    let block = await this._loadBlock( index, blockValidation, revertActions);
+                    let block = await this._loadBlock( index, undefined, revertActions);
 
                     //TODO should be disabled
                     await block.saveBlockDifficulty();

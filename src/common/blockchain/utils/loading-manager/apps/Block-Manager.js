@@ -9,6 +9,7 @@ class BlockManager extends MemoryManager{
         this._difficultyManager = difficultyManager;
         this._chainHashManager = chainHashManager;
         this._hashManager = hashManager;
+        this._chainHashManager = chainHashManager;
 
     }
 
@@ -29,7 +30,7 @@ class BlockManager extends MemoryManager{
             block.difficultyTargetPrev = this._difficultyManager.getData(height);
             block.difficultyTarget = this._difficultyManager.getData(height+1);
             block.hash = this._hashManager.getData(height+1);
-            //block.chainHash = this._chainHashManager
+            block.chainHash = this._chainHashManager.getData(height);
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};

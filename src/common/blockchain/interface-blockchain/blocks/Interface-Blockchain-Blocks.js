@@ -31,9 +31,7 @@ class InterfaceBlockchainBlocks{
 
         this._networkHashRate = 0 ;
 
-        this._chainWork =  new BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
-
 
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
 
@@ -65,8 +63,6 @@ class InterfaceBlockchainBlocks{
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
-
-        this.chainWork = this.chainWork.plus( block.workDone );
 
     }
 
@@ -169,15 +165,6 @@ class InterfaceBlockchainBlocks{
 
     get length(){
         return this._length;
-    }
-
-    set chainWork(newValue){
-        this._chainWork = newValue;
-        this.chainWorkSerialized = Serialization.serializeBigInteger( newValue );
-    }
-
-    get chainWork(){
-        return this._chainWork;
     }
 
     async readBlockchainLength(){
