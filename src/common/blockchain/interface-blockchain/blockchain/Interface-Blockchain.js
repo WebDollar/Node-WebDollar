@@ -35,7 +35,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         for (let i = this.blocks.blocksStartingPoint; i < this.blocks.length; i++) {
 
             let block = await this.blocks.getBlock( i );
-            if ( false === await this.validateBlockchainBlock( block ) )
+            if ( await this.validateBlockchainBlock( block ) === false )
                 return false;
         }
 
@@ -81,8 +81,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         //let's check again the heights
         if (block.height !== this.blocks.length)
             throw {message: 'height of a new block is not good... ', height: block.height, blocksLength: this.blocks.length};
-
-
 
         //hard fork
         if ( !block.blockValidation.blockValidationType['skip-accountant-tree-validation'] && block.height === consts.BLOCKCHAIN.HARD_FORKS.WALLET_RECOVERY-1 )
@@ -198,7 +196,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
 
-        let timeStamp = await this.blocks.loadingManager.getTimeStamp(height-1);
+        let timeStamp = await this.blocks.loadingManager.getBlockTimestamp(height-1);
         if ( !timeStamp ) throw {message: "getTimeStamp invalid height ", height: height};
 
         return timeStamp;
@@ -287,7 +285,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     //TODO should be disabled
                     await block.saveBlockDifficulty();
                     await block.saveBlockHash();
-                    await block.saveNewChainHash();
+                    await block.saveBlockNewChainHash();
+                    await block.saveBlockTimestamp();
 
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();

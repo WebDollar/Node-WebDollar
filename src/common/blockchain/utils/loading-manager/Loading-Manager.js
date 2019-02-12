@@ -17,9 +17,10 @@ class LoadingManager{
 
         this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager);
         this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager);
-        this.blockManager = new BlockManager(blockchain, savingManager, this.blockDifficultyManager, this.blockChainHashManager, this.blockHashManager);
         this.blockHashManager = new BlockHashManager(blockchain, savingManager);
         this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager);
+
+        this.blockManager = new BlockManager(blockchain, savingManager, this.blockDifficultyManager, this.blockChainHashManager, this.blockHashManager);
 
         this.chainWorkManager = new ChainWorkManager(blockchain, savingManager);
 
