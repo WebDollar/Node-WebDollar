@@ -1,4 +1,5 @@
 import MiniBlockchainAdvanced from "./Mini-Blockchain-Advanced"
+import global from "../../../../consts/global";
 
 class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
@@ -19,18 +20,12 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
             console.error("Loading BLocks raised an error");
             await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true, undefined);
 
-            await this.prover.provesCalculated._saveProvesCalculated();
-
-            //save all difficulties for all blocks
-            await this.saveVirtualizedDificulties();
-
             return;
-
         }
 
 
         let numBlocks = await this.blocks.readBlockchainLength();
-        if( numBlocks === false ) return { result:false };
+        if( !numBlocks ) return { result:false };
 
         await MiniBlockchainAdvanced.prototype._loadBlockchain.call(this, true, true );
 
@@ -41,18 +36,18 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
     }
 
-    async saveAccountantTree(serialization, length){
+    async saveMiniBlockchain(){
 
         if (process.env.BROWSER) return;
 
-        MiniBlockchainAdvanced.prototype.saveAccountantTree.apply(this, arguments );
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
-        console.log("intraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
+        let answer = await MiniBlockchainAdvanced.prototype.saveMiniBlockchain.call(this, false );
 
         //save proofs
-        let answer = await this.prover.provesCalculated._saveProvesCalculated();
-        console.log("SAVEEEEEEEEED "+answer)
+        answer = answer && await this.prover.provesCalculated._saveProvesCalculated();
 
+        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
     }
 
     async saveVirtualizedDificulties(){

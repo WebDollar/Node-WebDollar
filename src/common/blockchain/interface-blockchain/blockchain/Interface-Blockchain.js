@@ -259,65 +259,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
-    setFastLoadingValidationType(validationType){
-
-        if(!validationType) validationType = {"skip-sleep": true};
-
-            validationType["skip-prev-hash-validation"] = true;
-            validationType["skip-accountant-tree-validation"] = true;
-            validationType["skip-mini-blockchain-simulation"] = true;
-            validationType["skip-validation-transactions-from-values"] = true;
-            validationType["skip-validation-timestamp"] = true;
-            validationType["skip-validation-timestamp-network-adjusted-time"] = true;
-            validationType["skip-block-data-validation"] = true;
-            validationType["skip-block-data-transactions-validation"] = true;
-            validationType["skip-validation-interlinks"] = true;
-            validationType["skip-validation"] = true;
-            validationType["skip-interlinks-update"] = true;
-            validationType["skip-target-difficulty-validation"] = true;
-            validationType["skip-calculating-proofs"] = true;
-            validationType["skip-calculating-block-nipopow-level"] = true;
-            validationType["skip-saving-light-accountant-tree-serializations"] = true;
-            validationType["skip-recalculating-hash-rate"] = true;
-
-            if (Math.random() > 0.0001 || BlockchainGenesis.isPoSActivated( i ))
-                validationType["skip-validation-PoW-hash"] = true;
-
-        return validationType;
-
-    }
-
-    _getLoadBlockchainValidationType(indexStart, i, numBlocks, indexStartProcessingOffset){
-
-        let validationType = {"skip-sleep": true} ;
-
-        if (indexStartProcessingOffset !== undefined ){
-
-            //fast loading Blockchain
-            if ( i <= indexStartProcessingOffset )
-
-               this.setFastLoadingValidationType(validationType);
-
-
-        } else {
-
-            if ( indexStart < numBlocks ){
-
-                validationType["skip-recalculating-hash-rate"] = true;
-
-                if ( i < numBlocks - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE )
-                    validationType["skip-saving-light-accountant-tree-serializations"] = true;
-
-                validationType["skip-calculating-proofs"] = true;
-
-            }
-
-        }
-
-        return validationType;
-
-    }
-
     async _loadBlockchain( ){
 
         if (process.env.BROWSER)
@@ -345,8 +286,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     let block = await this._loadBlock( index, blockValidation, revertActions);
 
+                    //TODO should be disabled
+                    await block.saveBlockDifficulty();
+
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
+
+                    if (index % 10000 === 0)
+                        await this.blocks.savingManager.saveBlockchain();
 
                 }
 
@@ -421,9 +368,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     createBlockValidation(){
-
         return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), {} );
-
     }
 
 
