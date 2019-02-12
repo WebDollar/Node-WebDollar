@@ -100,19 +100,16 @@ class NodeServer {
 
                 if (socket.request._query["msg"] !== "HelloNode"){
                     console.error("No Hello Msg");
-                    socket.disconnect();
-                    return
+                    return socket.disconnect();
                 }
 
-                if (socket.request._query["version"] === undefined || socket.request._query["version"] < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
+                if (!socket.request._query["version"] || socket.request._query["version"] < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
                     if (Math.random() < 0.05)
                         console.error("version is invalid", socket.request._query["version"]);
-                    socket.disconnect();
-                    return
+                    return socket.disconnect();
                 }
 
-                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID )
-                    return false;
+                if ( socket.request._query["uuid"] === consts.SETTINGS.UUID ) return false;
 
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
@@ -120,8 +117,7 @@ class NodeServer {
                 let nodeConsensusType = socket.request._query["nodeConsensusType"];
                 if (typeof nodeConsensusType === "string") nodeConsensusType = parseInt(nodeConsensusType);
 
-                let nodeDomain = socket.request._query["domain"];
-                if ( nodeDomain === undefined) nodeDomain = "";
+                let nodeDomain = socket.request._query["domain"]||'';
 
                 if (nodeDomain.indexOf("my-ip:")>=0)
                     nodeDomain = nodeDomain.replace("my-ip", socket.request.connection.remoteAddress);
@@ -129,30 +125,24 @@ class NodeServer {
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
 
-                if ( socket.request._query["uuid"] === undefined || [NODE_TYPE.NODE_TERMINAL, NODE_TYPE.NODE_WEB_PEER].indexOf( nodeType ) === -1) {
+                if ( !socket.request._query["uuid"] || (nodeType !== NODE_TYPE.NODE_TERMINAL && nodeType !== NODE_TYPE.NODE_WEB_PEER)) {
                     console.error("invalid uuid or nodeType");
-                    socket.disconnect();
-                    return;
+                    return socket.disconnect();
                 }
 
 
-                if ( (Blockchain.PoolManagement !== undefined && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
-                     (Blockchain.ServerPoolManagement !== undefined && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
-
+                if ( (Blockchain.PoolManagement && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
+                     (Blockchain.ServerPoolManagement && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
 
                     if (Math.random() < 0.1)
                         console.error("disconnecting user for being simple node", nodeConsensusType);
 
-                    socket.disconnect();
-                    return;
-
+                    return socket.disconnect();
                 }
 
                 //avoid allowing
-                if (!Blockchain.blockchain.agent.consensus){
-                    socket.disconnect();
-                    return;
-                }
+                if (!Blockchain.blockchain.agent.consensus)
+                    return socket.disconnect();
 
                 if (NODE_TYPE.NODE_TERMINAL === nodeType && NodesList.countNodesByType( NODE_TYPE.NODE_TERMINAL ) > (Blockchain.isPoolActivated ?   consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL_POOL : consts.SETTINGS.PARAMS.CONNECTIONS.TERMINAL.SERVER.MAXIMUM_CONNECTIONS_FROM_TERMINAL) ) {
 
@@ -296,7 +286,7 @@ class NodeServer {
     async getServerHTTPAddress(getIP) {
 
 
-        if (NodeExpress === undefined) return '';
+        if ( !NodeExpress ) return '';
 
         if ( !this.loaded )
             await NodeExpress.startExpress();
