@@ -15,6 +15,8 @@ class NodesStats {
 
     constructor(){
 
+        this._timeStart = new Date().getTime();
+
         this.statsClients = 0;
         this.statsServer = 0;
         this.statsWebPeers = 0;
@@ -47,6 +49,13 @@ class NodesStats {
         }
 
         console.info(" v: ", consts.SETTINGS.NODE.VERSION);
+        let now = Math.floor( (new Date().getTime() - this._timeStart)/60000);
+        let m = now % 60;  now = now / 60;
+        let h = now % 24;  now = now / 24;
+        let d = now % 30; now = now / 30;
+
+        console.info( `up time ${d} d ${h} h ${m} m` );
+
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
 

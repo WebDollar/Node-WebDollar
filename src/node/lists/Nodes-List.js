@@ -242,8 +242,10 @@ class NodesList {
 
         for (let i=this.nodes.length-1; i>=0; i--)
             if (this.nodes[i].socket.disconnected) {
+
                 this.countsNodeTypes[ this.nodes[i].socket.node.protocol.nodeType ]--;
-                this.countsNodeConnectionTypes[this.nodes[i].socket.protocol.connectionType]--;
+                this.countsNodeConnectionTypes[ this.nodes[i].socket.node.protocol.connectionType ]--;
+
                 this.nodes.splice(i, 1);
             }
 
