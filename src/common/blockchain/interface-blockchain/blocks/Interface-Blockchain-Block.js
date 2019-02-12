@@ -396,6 +396,16 @@ class InterfaceBlockchainBlock {
         return this.db.save("blockTimestamp" + this.height, this.timeStamp);
     }
 
+    async saveChainWork(){
+
+        let buffer = await this.db.get("chainWork"+this.height-1 );
+        let chainWork = Serialization.deserializeBigInteger(buffer);
+
+        chainWork = chainWork.plus( this.workDone);
+
+        return this.db.save("chainWork"+this.height, Serialization.serializeBigInteger( chainWork ) )
+    }
+
     async saveBlock(){
 
         let key = "block" + this.height;
@@ -418,6 +428,7 @@ class InterfaceBlockchainBlock {
                 answer = answer && await this.saveBlockHash();
                 answer = answer && await this.saveBlockNewChainHash();
                 answer = answer && await this.saveBlockTimestamp();
+                answer = answer && await this.saveChainWork();
             }
             catch (exception){
                 console.error('ERROR on SAVE block: ',  exception);

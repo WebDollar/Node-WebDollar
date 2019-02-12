@@ -287,6 +287,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     await block.saveBlockHash();
                     await block.saveBlockNewChainHash();
                     await block.saveBlockTimestamp();
+                    await block.saveChainWork();
 
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
