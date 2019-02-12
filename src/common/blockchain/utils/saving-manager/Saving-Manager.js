@@ -16,6 +16,7 @@ class SavingManager{
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
         this._factor = Math.floor( Math.random()*10 );
+        this._lastSave = 0;
     }
 
 
@@ -99,8 +100,13 @@ class SavingManager{
                 }
 
                 //saving Accountant Tree
-                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0)
-                    await this.blockchain.saveAccountantTree(this.blockchain.accountantTree.serializeMiniAccountant(false, 5000), this.blockchain.blocks.length );
+                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0 && this._lastSave !== block.block.height) {
+                    let length = this.blockchain.blocks.length;
+                    let serialization = this.blockchain.accountantTree.serializeMiniAccountant(false, 5000);
+                    await this.blockchain.sleep(5000);
+                    await this.blockchain.saveAccountantTree( serialization, length );
+                    this._lastSave = block.block.height;
+                }
 
 
                 block.saving = false;
