@@ -67,8 +67,8 @@ class NodeProtocol {
         //check if it is a unique connection, add it to the list
         let connections = NodesList.countNodeSocketByAddress(this.node.sckAddress, "all");
 
-        if (validationDoubleConnectionsTypes["uuid"] && connections.countUUIDs !== 0 ) return false;
-        if (validationDoubleConnectionsTypes["ip"] && connections.countIPs > ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))  return false;
+        if (validationDoubleConnectionsTypes.uuid && connections.countUUIDs !== 0 ) return false;
+        if (validationDoubleConnectionsTypes.ip && connections.countIPs > ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))  return false;
 
         console.log("RECEIVED HELLO NODE BACK", response.version);
 

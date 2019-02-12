@@ -109,12 +109,13 @@ class SocketAddress {
 
         //uuid validation
 
-        if ( validationDoubleConnectionsTypes["uuid"])
-            return (this.uuid && this.uuid && this.uuid === sckAddress.uuid);
+        if ( validationDoubleConnectionsTypes.uuid)
+            if (this.uuid && this.uuid && this.uuid === sckAddress.uuid)
+                return true;
 
-        if ( validationDoubleConnectionsTypes["ip"] ) {
+        if ( validationDoubleConnectionsTypes.ip ) {
 
-            if (validationDoubleConnectionsTypes["port"])
+            if (validationDoubleConnectionsTypes.port)
                 return (this.address + ":" + this.port === sckAddress.address + ":" + sckAddress.port);
             else
                 return this.address === sckAddress.address;
