@@ -28,7 +28,7 @@ class InterfaceBlockchainBlocks{
 
         this.blocksStartingPoint = 0;
         this._length = 0;
-        this.chainWork = BigInteger(0;
+        this.chainWork = BigInteger(0);
         this.chainWorkSerialized = new Buffer(0);
 
         this._networkHashRate = 0 ;

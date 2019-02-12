@@ -436,7 +436,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     throw {message: "block never received "+ nextBlockHeight};
 
                 if ( !downloadingList[i].result || !downloadingList[i].block || !Buffer.isBuffer(downloadingList[i].block) ) {
-                    console.error("Fork Answer received ", downloadingList[i]);
+                    console.error11("Fork Answer received ", downloadingList[i]);
                     throw {message: "Fork Answer is not Buffer"};
                 }
 
@@ -446,8 +446,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
                     await this.blockchain.sleep(15);
 
-                let existingBlock = await this.blockchain.getBlock(block.height);
-                if ( existingBlock && block.newChainHash.equals( existingBlock.newChainHash ) )
+                let newChainHash = await this.blockchain.getChainHash( block.height+1 );
+                if ( newChainHash.equals( block.newChainHash ) )
                     throw {message: "You gave me a block which I already have have the same block"};
 
                 let result;
@@ -505,7 +505,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (!this.protocol.acceptBlocks && this.protocol.acceptBlockHeaders)
                 block.data._onlyHeader = true; //avoiding to store the transactions
 
-            block.deserializeBlock( blockData, blockHeight, undefined , await validationBlock.getDifficultyTarget(  blockHeight )  );
+            block.deserializeBlock( blockData, blockHeight, undefined , await validationBlock.getDifficultyCallback(  blockHeight )  );
 
         } catch (Exception) {
             console.error("Error deserializing blocks ", Exception, blockData);
