@@ -144,7 +144,7 @@ class CLI {
             let answer = null;
 
             //Trick for blocks length and address nonce
-            Blockchain.blockchain.blocks.length = timelock+1;
+            Blockchain.blockchain.blocks._length = timelock+1;
 
             for(let i=0; i<Blockchain.Wallet.addresses.length; i++)
                 if(addressString === Blockchain.Wallet.addresses[i].address)

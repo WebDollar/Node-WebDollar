@@ -28,10 +28,10 @@ class InterfaceBlockchainBlocks{
 
         this.blocksStartingPoint = 0;
         this._length = 0;
+        this.chainWork = BigInteger(0;
+        this.chainWorkSerialized = new Buffer(0);
 
         this._networkHashRate = 0 ;
-
-        this.chainWorkSerialized = new Buffer(0);
 
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
 
@@ -41,8 +41,6 @@ class InterfaceBlockchainBlocks{
     }
 
     async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
-
-        this.length += 1;
 
         if (showUpdate)
             this.emitBlockCountChanged();
@@ -60,6 +58,8 @@ class InterfaceBlockchainBlocks{
 
         }
 
+        await this.setLength( this.length + 1 );
+
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
@@ -76,16 +76,11 @@ class InterfaceBlockchainBlocks{
 
     async spliceBlocks(after, showUpdate = true){
 
-        for (let i = this.length - 1; i >= after; i--)
-            this.chainWork = this.chainWork.minus( await this.loadingManager.getBlockWork() );
-
-        if (this.length === 0)
-            this._chainWork =  new BigInteger(0);
-
-        this.length = after;
+        await this.setLength( after );
 
         if (showUpdate)
             this.emitBlockCountChanged();
+
     }
 
     async clearBlocks(){
@@ -159,8 +154,12 @@ class InterfaceBlockchainBlocks{
         return this._networkHashRate;
     }
 
-    set length(newValue){
+    async setLength(newValue){
+
         this._length = newValue;
+
+        this.chainWork = await this.loadingManager.getChainWork(newValue-1 );
+        this.chainWorkSerialized = Serialization.serializeBigInteger( this.chainWork );
     }
 
     get length(){

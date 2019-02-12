@@ -139,7 +139,7 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;
 
-        Blockchain.blockchain.blocks.length = work.h;
+        Blockchain.blockchain.blocks._length = work.h;
         Blockchain.blockchain.blocks.emitBlockCountChanged();
 
         this._miningWork.start = work.start;

@@ -13,35 +13,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         super(agent);
 
         this.lightAccountantTreeSerializations = {};
-        this.lightAccountantTreeSerializationsGzipped = {};
-
-    }
-
-
-    async _onBlockCreated(block, saveBlock){
-
-        await MiniBlockchain.prototype._onBlockCreated.call(this, block, saveBlock);
-
-        if ( ! block.blockValidation.blockValidationType["skip-saving-light-accountant-tree-serializations"] ){
-
-            // let serialization = this.accountantTree.serializeMiniAccountant();
-            //
-            // this.lightAccountantTreeSerializations[block.height+1] = serialization;
-            // this.lightAccountantTreeSerializationsGzipped[block.height+1] = undefined;
-
-            //gzip is being calculated later on
-
-            //delete old lightAccountantTreeSerializations
-
-            // let index = this.blocks.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_ACCOUNTANT_TREES_TO_DELETE - 2;
-            //
-            // while (this.lightAccountantTreeSerializations[index] !== undefined){
-            //     delete this.lightAccountantTreeSerializations[index];
-            //     delete this.lightAccountantTreeSerializationsGzipped[index];
-            //     index--;
-            // }
-
-        }
 
     }
 
@@ -59,11 +30,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) ){
 
-            if (gzipped)
-                return this.lightAccountantTreeSerializationsGzipped[height];
-            else
-                return this.lightAccountantTreeSerializations[height];
-
+            return this.lightAccountantTreeSerializations[height];
         }
 
         // else I need to compute it, by removing n-1..n

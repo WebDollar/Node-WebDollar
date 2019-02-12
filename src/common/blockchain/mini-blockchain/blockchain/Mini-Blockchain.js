@@ -140,38 +140,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
 
 
-    /**
-     * Load blocks and check the Accountant Tree
-     * @returns boolean
-     */
-    async _loadBlockchain(){
-
-        if (process.env.BROWSER)
-            return true;
-
-        try {
-
-            let result;
-
-            result = await inheritBlockchain.prototype._loadBlockchain.call( this  );
-
-            if ( result === false )
-                throw {message: "Problem loading the blockchain"};
-
-            //check the accountant Tree if matches
-            console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
-
-            //TODO verify accountantTree
-
-            return result;
-
-        } catch (exception){
-
-            console.error("Couldn't load  MiniBlockchain", exception);
-            return false;
-        }
-
-    }
 
 
 

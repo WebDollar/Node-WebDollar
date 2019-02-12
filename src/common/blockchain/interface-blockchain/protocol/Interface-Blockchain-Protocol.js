@@ -111,7 +111,7 @@ class InterfaceBlockchainProtocol {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
                         s: this.blockchain.blocks.blocksStartingPoint,
-                        p: this.blockchain.agent.light ? ( this.blockchain.proofPi !== undefined && this.blockchain.proofPi.validatesLastBlock() ? true : false ) : true,
+                        p: this.blockchain.agent.light ? ( (this.blockchain.proofPi && this.blockchain.proofPi.validatesLastBlock() ) ? true : false ) : true,
                         W: this.blockchain.blocks.chainWorkSerialized,
                     } );
                 }
