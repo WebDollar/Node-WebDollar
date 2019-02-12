@@ -277,7 +277,7 @@ class PoolData {
                 if ( !response )
                     throw 'Unable to save miners to DB'
 
-                await this.poolManagement.blockchain.sleep(500);
+                await this.poolManagement.blockchain.sleep(1000);
             }
 
 
@@ -420,7 +420,7 @@ class PoolData {
                 if ( !response )
                     throw 'Unable to save miners to DB'
 
-                await this.poolManagement.blockchain.sleep(500);
+                await this.poolManagement.blockchain.sleep(2000);
             }
 
             return true;
