@@ -153,35 +153,25 @@ class PPoWBlockchainProvesCalculated{
 
     async _DeserializationProves(Buffer, offset = 0) {
 
-        if ( Object.keys(Buffer).length !== 0 ){
+        let levelsLength = Serialization.deserializeNumber2Bytes(Buffer, offset);
+        offset += 2;
 
-            let levelsLength = Serialization.deserializeNumber2Bytes(Buffer, offset);
-            offset += 2;
+        for (let i = -1; i < levelsLength; i++) {
 
-            console.log(levelsLength);
+            let currentLevelLength = Serialization.deserializeNumber3Bytes(Buffer, offset);
+            offset += 3;
 
-            if( levelsLength !== 0 ) {
+            if (currentLevelLength !== 0) {
 
-                for (let i = -1; i < levelsLength; i++) {
+                for (let j = 0; j < currentLevelLength; j++) {
 
-                    let currentLevelLength = Serialization.deserializeNumber3Bytes(Buffer, offset);
-                    offset += 3;
+                    this.levels[i][j] = {};
+                    // let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
+                    // this.levels[i][j].hash = deserializeResult.hash;
+                    // offset = deserializeResult.offset;
 
-                    if (currentLevelLength !== 0) {
-
-                        for (let j = 0; j < currentLevelLength; j++) {
-
-                            this.levels[i][j] = {};
-                            // let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
-                            // this.levels[i][j].hash = deserializeResult.hash;
-                            // offset = deserializeResult.offset;
-
-                            this.levels[i][j] = Serialization.deserializeNumber4Bytes(Buffer,offset);
-                            offset += 4;
-
-                        }
-
-                    }
+                    this.levels[i][j] = Serialization.deserializeNumber4Bytes(Buffer,offset);
+                    offset += 4;
 
                 }
 
@@ -213,7 +203,7 @@ class PPoWBlockchainProvesCalculated{
 
             let buffer = await this.db.get(key, 12000);
 
-            if (buffer === null || !Buffer.isBuffer(buffer)) {
+            if ( !buffer || !Buffer.isBuffer(buffer)) {
                 console.error("Proof for key "+key+" was not found");
                 return false;
             }

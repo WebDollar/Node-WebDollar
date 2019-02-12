@@ -264,7 +264,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (process.env.BROWSER)
             return true;
 
-        let numBlocks = await this.blocks.readBlockchainLength();
+        let numBlocks = await this.blocks.loadingManager.readBlockchainLength();
         await this.blocks.clearBlocks();
         this.accountantTree.clear();
 
@@ -314,7 +314,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.blocks.length-1);
             Log.error("blockchain.load raised an exception", Log.LOG_TYPE.SAVING_MANAGER,exception);
-
 
             answer = false;
         }

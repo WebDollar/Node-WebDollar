@@ -189,7 +189,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
         console.log("_loadLightSettings load" );
 
-        let numBlocks = this.blocks.readBlockchainLength();
+        let numBlocks = this.blocks.loadingManager.readBlockchainLength();
         if( numBlocks === false ) return { result:false };
 
         // trying to read the diffIndex
