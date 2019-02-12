@@ -245,7 +245,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         }
 
-        this.forkProofPi.calculateProofHash();
+        await this.forkProofPi.calculateProofHash();
 
     }
 

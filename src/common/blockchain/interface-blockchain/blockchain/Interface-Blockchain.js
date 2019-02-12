@@ -292,10 +292,12 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
 
-                    if (index % 10000 === 0)
+                    if (index > 0 && index % 10000 === 0)
                         await this.blocks.savingManager.saveBlockchain();
 
                 }
+
+                await this.blocks.savingManager.saveBlockchain();
 
                 await this.db.restart();
 
@@ -329,7 +331,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         revertActions.push( { name: "breakpoint" } );
 
-        let block = await this.blockCreator.createEmptyBlock( index, blockValidation);
+        let block = await this.blockCreator._createBlockNew( index, blockValidation, undefined, undefined, []);
 
         try{
 

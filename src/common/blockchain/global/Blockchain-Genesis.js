@@ -20,6 +20,8 @@ class BlockchainGenesis{
         this.difficultyTargetPOS = new Buffer ( "00000000000006ece3173c784c7d4871c061a1f20eca8f33aa76fb15846e0c13", "hex" ); //smallest difficulty
 
         this.address = BufferExtended.fromBase("WEBD$gBzsiV+$FARK8qSGqs09V6AEDBi#@fP6n7$"); // genesis address
+
+        this.height = 0;
     }
 
     validateGenesis(block){

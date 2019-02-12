@@ -57,8 +57,8 @@ class PPoWBlockchainProofBasic{
         let list = [];
 
         for (let i=0; i<this.blocks.length; i++){
-            let block = await this.blockchain.getBlock(i);
-            list.push(this.serializeProof(block.getBlockHeader()));
+            let block = await this.blockchain.getBlock( this.blocks[i]+1 );
+            list.push( this.serializeProof(block.getBlockHeader()) );
         }
 
         this.proofSerialized  = Buffer.concat(list);
@@ -114,11 +114,11 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    calculateProofHash(){
+    async calculateProofHash(){
 
         let buffers = [];
         for (let i=0; i <this.blocks.length; i++)
-            buffers.push(this.blocks[i].hash);
+            buffers.push( await this.blockchain.getDifficultyTarget( this.blocks[i]+1 ) );
 
         let buffer = Buffer.concat(buffers);
 

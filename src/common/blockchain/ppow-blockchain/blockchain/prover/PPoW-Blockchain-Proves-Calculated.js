@@ -23,71 +23,74 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-    deleteBlock(block, level){
+    deleteBlock(height, level){
 
-        if ( level === undefined && !block.difficultyTarget )
-            return;
+        if (typeof height === "object") {
+            level = height.level;
+            height = height.height;
+        }
 
-        try {
-            if ( !level )
-                level = block.level;
-        } catch (exception){
-            console.error("couldn't get level", exception);
-            return;
+
+        if ( level  === undefined){
+            console.error("couldn't get level");
+            return false;
         }
 
         //deleting old ones if they have a different level
-        if (this.allBlocks[block.height] && this.allBlocks[block.height] === block && this.allBlocks[block.height] !== level) {
+        if (this.allBlocks[height] && this.allBlocks[height] !== level) {
 
-            let oldlevel = this.allBlocks[block.height];
+            let oldlevel = this.allBlocks[height];
             this.levelsLengths[oldlevel]--;
 
-            this.allBlocks[block.height] = undefined;
+            delete this.allBlocks[height];
 
-            let oldPos = this._binarySearch(this.levels[oldlevel], block);
-            if (this.levels[oldlevel][oldPos] === block)
+            let oldPos = this._binarySearch( this.levels[oldlevel], height);
+            if (this.levels[oldlevel][oldPos] === height)
                 this.levels[oldlevel].splice(oldPos, 1);
 
         }
 
     }
 
-    updateBlock(block){
+    updateBlock(height, level){
 
-        if ( !block ) return false;
+        if (typeof height === "object") {
+            level = height.level;
+            height = height.height;
+        }
 
-        let level, pos;
+
+        if ( level  === undefined){
+            console.error("couldn't get level");
+            return false;
+        }
+
+        let pos;
 
         try {
 
-            if (level === undefined && !block.difficultyTarget )
-                return;
+            pos = this._binarySearch( this.levels[level], height );
 
-            level = block.level;
-            pos = this._binarySearch(this.levels[level], block);
+            this.deleteBlock(height, level);
 
-            this.deleteBlock(block);
-
-            if (this.levels[level][pos] && this.levels[level][pos].height === block.height) {
-                this.levels[level][pos] = block;
-                return;
-            }
+            if (this.levels[level][pos] && this.levels[level][pos] === height)
+                return true;
 
             this.levelsLengths[level]++;
-            this.allBlocks[block.height] = level;
+            this.allBlocks[height] = level;
 
             if (this.levels[level].length === 0)
-                this.levels[level] = [block];
+                this.levels[level] = [height];
             else {
 
-                if (block.height > this.levels[level][this.levels[level].length - 1].height)
-                    this.levels[level].push(block);
+                if (height > this.levels[level][this.levels[level].length - 1])
+                    this.levels[level].push(height);
                 else {
 
                     if (pos === 0)
-                        this.levels[level].unshift(block);
+                        this.levels[level].unshift(height);
                     else
-                        this.levels[level].splice(pos, 0, block);
+                        this.levels[level].splice(pos, 0, height);
                 }
 
             }
@@ -105,7 +108,7 @@ class PPoWBlockchainProvesCalculated{
      */
     _binarySearch (array, value) {
 
-        if (array === undefined) return -1;
+        if ( !array ) return -1;
 
         var guess,
             min = 0,
@@ -137,8 +140,8 @@ class PPoWBlockchainProvesCalculated{
             array.push( Serialization.serializeNumber3Bytes(this.levels[i].length) );
             for (let j=0; j< this.levels[i].length; j++){
 
-                array.push( Serialization.serializeHashOptimized(this.levels[i][j].hash) ); //max 32 bytes
-                array.push( Serialization.serializeNumber4Bytes(this.levels[i][j].height) );
+                //array.push( Serialization.serializeHashOptimized(this.levels[i][j].hash) ); //max 32 bytes
+                array.push( Serialization.serializeNumber4Bytes( this.levels[i][j] ) );
 
             }
 
@@ -169,11 +172,11 @@ class PPoWBlockchainProvesCalculated{
                         for (let j = 0; j < currentLevelLength; j++) {
 
                             this.levels[i][j] = {};
-                            let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
-                            this.levels[i][j].hash = deserializeResult.hash;
-                            offset = deserializeResult.offset;
+                            // let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
+                            // this.levels[i][j].hash = deserializeResult.hash;
+                            // offset = deserializeResult.offset;
 
-                            this.levels[i][j].height = Serialization.deserializeNumber4Bytes(Buffer,offset);
+                            this.levels[i][j] = Serialization.deserializeNumber4Bytes(Buffer,offset);
                             offset += 4;
 
                         }
@@ -188,10 +191,7 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-    async _saveProvesCalculated(key){
-
-        if (key === undefined)
-            key = this.blockchain._blockchainFileName+"_proves_calculated";
+    async _saveProvesCalculated(key = this.blockchain._blockchainFileName+"_proves_calculated"){
 
 
         let buffer = await this._SerializationProves();

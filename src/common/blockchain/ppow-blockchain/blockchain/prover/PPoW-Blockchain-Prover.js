@@ -65,12 +65,12 @@ class PPoWBlockchainProver{
                         let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
 
                         for (let i=index; i<chainBlocks.length; i++)
-                            if ( chainBlocks[i].height < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i].height >= B.height ){
+                            if ( chainBlocks[i] < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i] >= B.height ){
 
                                 superChain.push(chainBlocks[i]);
 
                                 // π ← π ∪ α
-                                if ( underlyingChain.blocksIndex[ chainBlocks[i].height ] === undefined )
+                                if ( !underlyingChain.blocksIndex[ chainBlocks[i] ] )
                                     underlyingChain.push(chainBlocks[i]);
 
                             }
@@ -128,10 +128,10 @@ class PPoWBlockchainProver{
 
         }
 
-        if (underlyingChain !== null) {
+        if (underlyingChain ) {
 
             underlyingChain.blocks.sort(function(a, b) {
-                return a.height - b.height;
+                return a - b;
             });
 
             await underlyingChain.calculateProofHash();
