@@ -31,11 +31,11 @@ class NodesList {
         this.countsNodeTypes = {
             0:0,
             1:0,
-            2:0,
         };
         this.countsNodeConnectionTypes = {
             0:0,
             1:0,
+            2:0,
         };
 
         setInterval( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
