@@ -110,7 +110,7 @@ class SocketAddress {
         //uuid validation
 
         if ( validationDoubleConnectionsTypes.uuid)
-            if (this.uuid && this.uuid && this.uuid === sckAddress.uuid)
+            if (this.uuid && sckAddress.uuid && this.uuid === sckAddress.uuid)
                 return true;
 
         if ( validationDoubleConnectionsTypes.ip ) {
