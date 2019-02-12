@@ -57,7 +57,7 @@ class NodesStats {
         let h = now % 24;  now = now / 24;
         let d = now % 30; now = now / 30;
 
-        console.log( `up time ${d}d ${h}h ${m}m` );
+        console.info( `up time ${d}d ${h}h ${m}m` );
 
         BansList._listBans();
 
