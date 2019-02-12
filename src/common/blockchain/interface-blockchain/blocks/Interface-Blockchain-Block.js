@@ -388,6 +388,10 @@ class InterfaceBlockchainBlock {
         return this.db.save("blockHash" + this.height, this.hash);
     }
 
+    async saveNewChainHash(){
+        return this.db.save("blockNewChainHash" + this.height, this.newChainHash);
+    }
+
     async saveBlock(){
 
         let key = "block" + this.height;
@@ -408,6 +412,7 @@ class InterfaceBlockchainBlock {
                 answer = answer && await this.db.save(key, bufferValue);
                 answer = answer && await this.saveBlockDifficulty();
                 answer = answer && await this.saveBlockHash();
+                answer = answer && await this.saveNewChainHash();
             }
             catch (exception){
                 console.error('ERROR on SAVE block: ',  exception);

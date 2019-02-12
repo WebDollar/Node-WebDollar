@@ -56,7 +56,7 @@ class InterfaceBlockchainBlocks{
 
         } else {
 
-            this.loadingManager.addBlockToLoaded(block.height, block);
+            this.loadingManager.blockManager.addToLoaded(block.height, block);
 
         }
 
@@ -168,7 +168,7 @@ class InterfaceBlockchainBlocks{
     }
 
     async readBlockchainLength(){
-        let length = await this.savingManager.readBlockchainLength();
+        let length = await this.loadingManager.readBlockchainLength();
         if (!length) return false;
         this.length = length;
     }

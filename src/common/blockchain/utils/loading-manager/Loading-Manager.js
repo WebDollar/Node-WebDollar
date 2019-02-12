@@ -4,7 +4,9 @@ import BlockManager from "./apps/Block-Manager"
 import BlockDifficultyManager from "./apps/Block-Difficulty-Manager"
 import BlockChainHashManager from "./apps/Block-ChainHash-Manager"
 import BlockHashManager from "./apps/Block-Hash-Manager"
+import BlockTimestampManager from "./apps/Block-Timestamp-Manager"
 import ChainWorkManager from "./apps/ChainWork-Manager";
+import Log from "../../../utils/logging/Log";
 
 class LoadingManager{
 
@@ -17,9 +19,14 @@ class LoadingManager{
         this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager);
         this.blockManager = new BlockManager(blockchain, savingManager, this.blockDifficultyManager, this.blockChainHashManager, this.blockHashManager);
         this.blockHashManager = new BlockHashManager(blockchain, savingManager);
+        this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager);
 
         this.chainWorkManager = new ChainWorkManager(blockchain, savingManager);
 
+    }
+
+    async getBlockTimestamp(height){
+        return this.blockTimestampManager.getData(height);
     }
 
     async getBlockDifficulty(height){
@@ -47,6 +54,18 @@ class LoadingManager{
         return this.chainWorkManager.getData(height);
     }
 
+
+    async readBlockchainLength(){
+
+        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 20000, 1000000);
+
+        if ( !numBlocks ) {
+            Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return undefined;
+        }
+
+        return numBlocks;
+    }
 
 }
 

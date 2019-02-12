@@ -185,10 +185,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
 
-        let block = await this.blocks.loadingManager.getBlock(height-1);
-        if ( !block ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+        let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height-1);
+        if ( !difficulty ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
-        return block.difficultyTarget;
+        return difficultyTarget;
 
     }
 
@@ -198,10 +198,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
 
-        let block = await this.blocks.loadingManager.getBlock(height-1);
-        if ( !block ) throw {message: "getTimeStamp invalid height ", height: height};
+        let timeStamp = await this.blocks.loadingManager.getTimeStamp(height-1);
+        if ( !timeStamp ) throw {message: "getTimeStamp invalid height ", height: height};
 
-        return block.timeStamp;
+        return timeStamp;
 
     }
 
@@ -211,7 +211,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height};
 
-        let block = await this.blocks.loadingManager.getBlock(height-1);
+        let block = await this.blocks.loadingManager.getBlockHash(height-1);
         if ( !block ) throw {message: "getHashPrev invalid height ", height: height};
 
         return block.hash;
@@ -224,10 +224,10 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
 
-        let block = await this.blocks.loadingManager.getBlock(height-1);
-        if ( !block ) throw {message: "getChainHash invalid height ", height: height};
+        let chainHash = await this.blocks.loadingManager.getBlockChainHash(height-1);
+        if ( !chainHash ) throw {message: "getChainHash invalid height ", height: height};
 
-        return block.hashChain;
+        return chainHash;
 
     }
 
@@ -286,7 +286,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     //TODO should be disabled
                     await block.saveBlockDifficulty();
-                    await this.saveBlockHash();
+                    await block.saveBlockHash();
+                    await block.saveNewChainHash();
 
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
@@ -313,7 +314,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             Log.error("serializeMiniAccountantTreeERRROR", Log.LOG_TYPE.SAVING_MANAGER, this.blocks.length-1);
             Log.error("blockchain.load raised an exception", Log.LOG_TYPE.SAVING_MANAGER,exception);
 
-            answer = false;
+            answer = false
         }
 
         global.INTERFACE_BLOCKCHAIN_LOADING = false;
