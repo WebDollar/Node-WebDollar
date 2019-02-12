@@ -94,10 +94,10 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         this._computeHash();
 
-        if (initialHash === null && this.hash !== null)
+        if (!initialHash && this.hash)
             return false; // different hash
 
-        if (initialHash.sha256 === null && this.hash.sha256 !== null) // different hash
+        if (!initialHash.sha256 && this.hash.sha256 ) // different hash
             return false;
 
         if (this.hash.sha256.length !== initialHash.sha256.length)

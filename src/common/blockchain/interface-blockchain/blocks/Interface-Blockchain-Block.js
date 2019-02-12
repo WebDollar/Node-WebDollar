@@ -21,14 +21,16 @@ class InterfaceBlockchainBlock {
 
         this.version = version||0; // 2 bytes version                                                 - 2 bytes
 
-        this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
-
+        //prev information
         this.hashPrev = hashPrev;
         this.difficultyTargetPrev = difficultyTargetPrev;
-
         this.hashChain = hashChain||null; // 256-bit hash sha256    l                                         - 32 bytes, sha256
 
+        //current information
         this.nonce = nonce||0;//	int 2^8^5 number (starts at 0)-  int,                              - 5 bytes
+        this.hash = hash||null; // 256-bit hash based on all of the transactions in the block     - 32 bytes, sha256
+        this.newChainHash = null;
+        this.difficultyTarget = null; // difficulty set by Blockchain
 
         this.height = (typeof height === "number" ? height : null); // index set by me
 
@@ -37,11 +39,11 @@ class InterfaceBlockchainBlock {
 
         this.blockValidation = blockValidation;
 
-        if ( timeStamp === undefined  || timeStamp === null) {
+        if ( !timeStamp ) {
 
             timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
 
-            if (timeStamp === undefined || timeStamp === null)
+            if (!timeStamp)
                 timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
 
             timeStamp += Math.floor( Math.random()*5   );
@@ -54,8 +56,6 @@ class InterfaceBlockchainBlock {
                 timeStamp = exception.medianTimestamp + 1;
 
                 this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
-
-                //timeStamp = exception.medianTimestamp + consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK + 1;
             }
 
 
@@ -70,7 +70,6 @@ class InterfaceBlockchainBlock {
         this.data = data;
 
 
-        this.difficultyTarget = null; // difficulty set by Blockchain
 
         this.reward = undefined;
 
@@ -135,20 +134,6 @@ class InterfaceBlockchainBlock {
             if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
                 throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
 
-            //validate hashChain
-            if (this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
-
-                let prevBlock = await this.blockValidation.getBlockCallBack(this.height);
-
-                let prevBlockChainNew = await prevBlock.calculateNewChainHash();
-                if ( !prevBlockChainNew || !Buffer.isBuffer(prevBlockChainNew))
-                    throw {message: 'previous chain hash is not given'};
-
-                if (! BufferExtended.safeCompare(prevBlockChainNew, this.hashChain))
-                    throw {message: "block prevChainHash doesn't match ", prevChainHash: prevBlockChainNew.toString("hex"), hashChain: this.hashChain.toString("hex")};
-
-            }
-
 
         }
 
@@ -165,6 +150,19 @@ class InterfaceBlockchainBlock {
 
         }
 
+        if (! this.blockValidation.blockValidationType["skip-prev-hash-validation"] && this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
+
+            //validate hashChain
+            let prevBlockChainNew = await this.blockValidation.getChainHashCallback(this.height);
+
+            if ( !prevBlockChainNew || !Buffer.isBuffer(prevBlockChainNew))
+                throw {message: 'previous chain hash is not given'};
+
+            if (! BufferExtended.safeCompare(prevBlockChainNew, this.hashChain))
+                throw {message: "block prevChainHash doesn't match ", prevChainHash: prevBlockChainNew.toString("hex"), hashChain: this.hashChain.toString("hex")};
+
+        }
+
         await this.data.validateBlockData(this.height, this.blockValidation);
 
         return true;
@@ -177,16 +175,11 @@ class InterfaceBlockchainBlock {
 
             let prevDifficultyTarget = await this.blockValidation.getDifficultyCallback(this.height);
 
-            if (prevDifficultyTarget instanceof BigInteger)
-                prevDifficultyTarget = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(prevDifficultyTarget));
-
-            if ( prevDifficultyTarget === null || !Buffer.isBuffer(prevDifficultyTarget) )
+            if ( !prevDifficultyTarget || !Buffer.isBuffer(prevDifficultyTarget) )
                 throw {message: 'previousDifficultyTarget is not given'};
 
             if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
                 throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};
-
-
         }
 
 
@@ -216,12 +209,13 @@ class InterfaceBlockchainBlock {
         return {
             height: this.height,
             version: this.version,
-            hashPrev: (this.hashPrev !== null ? this.hashPrev.toString("hex") : ''),
-            hashChain: (this.hashChain !== null ? this.hashChain.toString("hex") : ''),
-            data: (this.data !== null ? this.data.toJSON() : ''),
+            hashPrev: this.hashPrev ? this.hashPrev.toString("hex") : '',
+            hashChain: this.hashChain ? this.hashChain.toString("hex") : '',
+            data: this.data ? this.data.toJSON() : '',
             nonce: this.nonce,
             timeStamp: this.timeStamp,
-            difficulty: (this.difficultyTarget !== null ? this.difficultyTarget.toString("hex") : ''),
+            difficulty: this.difficultyTarget ? this.difficultyTarget.toString("hex") : '',
+            newChainHash: this.newChainHash ? this.newChainHash.toString("hex") : '',
         }
 
     }
@@ -254,9 +248,7 @@ class InterfaceBlockchainBlock {
      * @returns {Promise<Buffer>}
      */
     computeHash(newNonce){
-
         return this.computeHashPOW(newNonce);
-
     }
 
     _getHashPOWData(newNonce){
@@ -345,7 +337,7 @@ class InterfaceBlockchainBlock {
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
             buffer = new Buffer(buffer, "hex");
 
-        if ( height !== undefined )  this.height = height||0;
+        if ( height )  this.height = height||0;
         if (reward ) this.reward = reward;
         else this.reward = BlockchainMiningReward.getReward(this.height);
 
@@ -381,6 +373,8 @@ class InterfaceBlockchainBlock {
             console.error("error deserializing a block  ", exception, buffer);
             throw exception;
         }
+
+        this.newChainHash = this.calculateNewChainHash();
 
         return offset;
 
@@ -522,8 +516,8 @@ class InterfaceBlockchainBlock {
         this.data.hashData = json.data.hashData;
 
         this.hashChain = json.hashChain;
-        this._hashPrev = json.hashPrev;
-        this._difficultyTargetPrev = json.difficultyTargetPrev;
+        this.hashPrev = json.hashPrev;
+        this.difficultyTargetPrev = json.difficultyTargetPrev;
 
         this.nonce = json.nonce;
 
@@ -554,24 +548,11 @@ class InterfaceBlockchainBlock {
      *
      */
     get workDone(){
-
         return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
-
-        // if (this._workDone !== undefined) return this._workDone;
-        //
-        // this._workDone = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( this.difficultyTargetPrev.toString("hex"), 16 ) );
-        //
-        // return this._workDone;
-
     }
 
     calculateNewChainHash(){
-
-        if (this.height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
-            return this.hash;
-        else
-            return this.hash;
-
+        return this.hash;
     }
 
 }

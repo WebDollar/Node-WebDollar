@@ -320,7 +320,7 @@ class InterfaceBlockchainFork {
         for (let i=0; i<this.forkBlocks.length-1; i++) {
 
             let block = await this.blockchain.getBlock(this.forkBlocks[i].height);
-            if (block && block.calculateNewChainHash().equals(this.forkBlocks[i].calculateNewChainHash())) {
+            if (block && block.newChainHash.equals(this.forkBlocks[i].newChainHash )) {
 
                 pos = i;
 

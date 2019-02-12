@@ -72,7 +72,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      * signature is not included to avoid attacks changing signatures or timestamp
      *
      */
-    async computeHashPOS( newTimestamp, posNewMinerAddress, balance){
+    async computeHashPOS( newTimestamp, posNewMinerAddress, balance ){
 
         let virtualBalance = balance;
 

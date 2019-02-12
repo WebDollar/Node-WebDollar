@@ -1,9 +1,9 @@
 import consts from "consts/const_global";
 
-import BlocksManager from "apps/Blocks-Manager"
-import DifficultyManager from "apps/Difficulty-Manager"
-import ChainHashManager from "apps/ChainHash-Manager"
-import HashManager from "apps/Hash-Manager"
+import BlockManager from "apps/Blocks-Manager"
+import BlockDifficultyManager from "apps/Difficulty-Manager"
+import BlockChainHashManager from "apps/ChainHash-Manager"
+import BlockHashManager from "apps/Hash-Manager"
 
 class LoadingManager{
 
@@ -12,21 +12,20 @@ class LoadingManager{
         this.blockchain = blockchain;
         this.savingManager = savingManager;
 
-        this._loadedBlocks = {};
-        this._loadedBlocksCount = 0;
-
-        this.difficultyManager = new DifficultyManager(blockchain, savingManager);
-        this.chainHashManager = new ChainHashManager(blockchain, savingManager);
-        this.blocksManager = new BlocksManager(blockchain, savingManager, this.difficultyManager, this.chainHashManager);
+        this.difficultyManager = new BlockDifficultyManager(blockchain, savingManager);
+        this.chainHashManager = new BlockChainHashManager(blockchain, savingManager);
+        this.blocksManager = new BlockManager(blockchain, savingManager, this.difficultyManager, this.chainHashManager);
+        this.hashManager = new BlockHashManager(blockchain, savingManager);
+        this.chainWork = new ChainWork(blockchain, savingManager);
 
     }
 
     async getBlockDifficulty(height){
-        return this.blockchain.db.get("blockDiff"+height);
+        return this.difficultyManager.getData(height);
     }
 
     async getBlockHash(height){
-        return this.blockchain.db.get("blockHash"+height);
+        return this.hashManager.getData(height);
     }
 
     async getBlockWork(height){
@@ -35,31 +34,8 @@ class LoadingManager{
     }
 
     async getBlock(height){
-
-        if ( this.savingManager._pendingBlocksList[height] )
-            return this.savingManager._pendingBlocksList[height][0].block;
-
-        if (height >= this.blockchain.blocks.length)
-            throw {message: "getBlock  invalid height", height: height};
-
-        if (this._loadedBlocks[height]){
-
-            this._loadedBlocks[height].lastTimeUsed = new Date().getTime();
-            return this._loadedBlocks[height];
-
-        }else
-            return this._loadBlock(height);
-
+        return this.blocksManager.getData(height);
     }
-
-    async _loadBlock(height){
-
-
-
-    }
-
-
-
 
 
 }

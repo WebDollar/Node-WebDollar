@@ -447,7 +447,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     await this.blockchain.sleep(15);
 
                 let existingBlock = await this.blockchain.getBlock(block.height);
-                if ( existingBlock && block.calculateNewChainHash().equals( existingBlock.calculateNewChainHash() ) )
+                if ( existingBlock && block.newChainHash.equals( existingBlock.newChainHash ) )
                     throw {message: "You gave me a block which I already have have the same block"};
 
                 let result;

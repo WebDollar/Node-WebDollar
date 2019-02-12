@@ -169,7 +169,7 @@ class InterfaceBlockchainProtocol {
                     block = this.blockchain.blocks[h];
                     if ( !block ) socket.node.sendRequest("head/chainHash", null);
 
-                    socket.node.sendRequest("head/chainHash/" + h, { hash: block.calculateNewChainHash() });
+                    socket.node.sendRequest("head/chainHash/" + h, { hash: block.newChainHash });
 
                 } catch (exception) {
 

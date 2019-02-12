@@ -1,6 +1,6 @@
 import MemoryManager from "./../Memory-Manager"
 
-class BlocksManager extends MemoryManager{
+class BlockManager extends MemoryManager{
 
     constructor(blockchain, savingManager, difficultyManager, chainHashManager, hashManager) {
 
@@ -48,4 +48,4 @@ class BlocksManager extends MemoryManager{
 
 }
 
-export default BlocksManager;
+export default BlockManager;
