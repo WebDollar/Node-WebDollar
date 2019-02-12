@@ -10,7 +10,7 @@ import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-
 import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
-import LoadingManager from "common/blockchain/utils/saving-manager/Loading-Manager"
+import LoadingManager from "common/blockchain/utils/loading-manager/Loading-Manager"
 import Log from "../../../utils/logging/Log";
 import NodeBlockchainPropagation from "../../../sockets/protocol/propagation/Node-Blockchain-Propagation";
 

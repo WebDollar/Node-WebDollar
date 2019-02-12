@@ -68,7 +68,6 @@ class InterfaceBlockchainBasic{
         return true;
     }
 
-
     toString(){
     }
 
