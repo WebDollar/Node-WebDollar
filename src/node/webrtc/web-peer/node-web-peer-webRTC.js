@@ -139,7 +139,7 @@ class NodeWebPeerRTC {
             this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
 
                 if (answer)
-                    this.initializePeer(["uuid"]);
+                    this.initializePeer({"uuid": true} );
                 else
                     this.peer.disconnect()
 

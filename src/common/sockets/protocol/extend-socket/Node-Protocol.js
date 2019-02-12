@@ -164,7 +164,7 @@ class NodeProtocol {
                 let found = false;
                 for (let j=0; j<exceptSockets.length; j++)
                     if(exceptSockets[j].node && exceptSockets[j].node.sckAddress )
-                        if (nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, ["uuid"] )) {
+                        if (nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, {"uuid":true} )) {
                             found = true;
                             break;
                         }

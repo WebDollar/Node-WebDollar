@@ -131,7 +131,7 @@ class NodeClient {
                     clearTimeout(timeout);
 
                     if (answer)
-                        await this.initializeSocket( ["ip", "uuid"], waitlist);
+                        await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
                     else
                         socket.disconnect();
 

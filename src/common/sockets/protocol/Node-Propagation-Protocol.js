@@ -35,7 +35,7 @@ class NodePropagationProtocol {
             let answer = await NodesWaitlist.addNewNodeToWaitlist( key, undefined, list[key].t, list[key].ct||NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER,  list[key].c, list[key].sock.node.level + 1, list[key].sock );
 
             //downloading the next elements
-            if ( list[key].next !== undefined && list[key].next > 0 )
+            if ( list[key].next && list[key].next > 0 )
                 list[key].sock.node.sendRequest( (nodeType === NODE_TYPE.NODE_TERMINAL ? "propagation/request-all-wait-list/full-nodes" : "propagation/request-all-wait-list/light-nodes"), { index: list[key].next, count: this.count(list[key].sock) });
 
             delete list[key];

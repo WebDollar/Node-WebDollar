@@ -118,9 +118,7 @@ class NodeServer {
                 if (typeof nodeConsensusType === "string") nodeConsensusType = parseInt(nodeConsensusType);
 
                 let nodeDomain = socket.request._query["domain"]||'';
-
-                if (nodeDomain.indexOf("my-ip:")>=0)
-                    nodeDomain = nodeDomain.replace("my-ip", socket.request.connection.remoteAddress);
+                nodeDomain = nodeDomain.replace("my-ip", socket.request.connection.remoteAddress);
 
                 let nodeUTC = socket.request._query["UTC"];
                 if (typeof nodeUTC === "string") nodeUTC = parseInt(nodeUTC);
@@ -222,7 +220,7 @@ class NodeServer {
 
                     socket.node.protocol.helloValidated = true;
 
-                    await this.initializeSocket(socket, ["uuid"]);
+                    await this.initializeSocket(socket, {"uuid": true});
 
                 } else {
 
