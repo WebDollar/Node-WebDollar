@@ -36,20 +36,6 @@ class MiniBlockchainAdvancedVirtualized extends MiniBlockchainAdvanced{
 
     }
 
-    async saveMiniBlockchain(){
-
-        if (process.env.BROWSER) return;
-
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
-
-        let answer = await MiniBlockchainAdvanced.prototype.saveMiniBlockchain.call(this, false );
-
-        //save proofs
-        answer = answer && await this.prover.provesCalculated._saveProvesCalculated();
-
-        global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
-    }
-
     async saveVirtualizedDificulties(){
 
         for (let i=0; i<this.blocks.length; i++)

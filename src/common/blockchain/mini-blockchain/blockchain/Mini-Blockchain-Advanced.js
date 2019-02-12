@@ -132,24 +132,33 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            let length = this.blocks.length;
-            let serialization = this.accountantTree.serializeMiniAccountant(true, );
+            if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
 
-            //avoid resaving the same blockchain
-            if (this._miniBlockchainSaveBlocks >= length) throw {message: "already saved"};
+                let length = this.blocks.length;
+                let serialization = this.accountantTree.serializeMiniAccountant(true, );
 
-            Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
+                //avoid resaving the same blockchain
+                if (this._miniBlockchainSaveBlocks >= length) throw {message: "already saved"};
 
-            console.info("accountant tree", this.accountantTree.root.hash.sha256.toString("hex"));
-            console.info("accountant tree", this.accountantTree.root.edges.length);
+                Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
 
-            if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
-                throw {message: "saveMiniAccountant couldn't be saved"};
+                console.info("accountant tree", this.accountantTree.root.hash.sha256.toString("hex"));
+                console.info("accountant tree", this.accountantTree.root.edges.length);
 
-            if ( !(await this.blocks.saveBlockchainLength(length)) )
-                throw {message: "save blockchain length couldn't be saved"};
+                if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
+                    throw {message: "saveMiniAccountant couldn't be saved"};
 
-            this._miniBlockchainSaveBlocks = length;
+                if ( !(await this.blocks.saveBlockchainLength(length)) )
+                    throw {message: "save blockchain length couldn't be saved"};
+
+                if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
+                    throw { message: "save proves calculated couldn't be saved" };
+
+                this._miniBlockchainSaveBlocks = length;
+
+
+            }) === false) throw {message: "Saving was not done"};
+
 
             Log.info('Accountant Tree Saved Successfully ' + length, Log.LOG_TYPE.SAVING_MANAGER);
 
