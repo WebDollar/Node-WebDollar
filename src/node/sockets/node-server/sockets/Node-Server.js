@@ -205,7 +205,7 @@ class NodeServer {
                     if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
-                    if (await socket.node.protocol.sendHello(["uuid","ip", "port"], false) === false){
+                    if (await socket.node.protocol.sendHello({ "uuid": true, "ip": true, "port": true}, false) === false){
 
                         socket.disconnect();
                         return false;

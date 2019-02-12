@@ -136,7 +136,7 @@ class NodeWebPeerRTC {
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 
-            this.peer.node.protocol.sendHello(["uuid"]).then( (answer)=>{
+            this.peer.node.protocol.sendHello({"uuid":true}).then( (answer)=>{
 
                 if (answer)
                     this.initializePeer({"uuid": true} );

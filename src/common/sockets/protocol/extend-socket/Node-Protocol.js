@@ -34,23 +34,22 @@ class NodeProtocol {
 
     processHello( response, validationDoubleConnectionsTypes ){
 
-        if (typeof response !== "object" || response === null || response === undefined) {
+        if (!response || typeof response !== "object" ) {
             console.error("No Hello");
             return false;
         }
 
-        if (response.uuid === undefined || response.version === undefined) {
+        if (!response.uuid || !response.version ) {
             console.error("hello received, but there is not uuid or version", response);
             return false;
         }
-
 
         if (response.version < Blockchain.versionCompatibility){
             console.log("hello received, VERSION is not right", response.version, Blockchain.versionCompatibility);
             return false;
         }
 
-        if ( [NODE_TYPE.NODE_TERMINAL, NODE_TYPE.NODE_WEB_PEER].indexOf( response.nodeType ) === -1 ){
+        if ( response.nodeType !== NODE_TYPE.NODE_TERMINAL && response.nodeType !== NODE_TYPE.NODE_WEB_PEER ){
             console.error("invalid node type", response);
             return false;
         }
@@ -68,14 +67,8 @@ class NodeProtocol {
         //check if it is a unique connection, add it to the list
         let connections = NodesList.countNodeSocketByAddress(this.node.sckAddress, "all");
 
-        for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
-
-            if (validationDoubleConnectionsTypes[i] === "uuid" && connections.countUUIDs !== 0 )
-                return false;
-            else if (validationDoubleConnectionsTypes[i] === "ip" && connections.countIPs > ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))
-                return false;
-
-        }
+        if (validationDoubleConnectionsTypes["uuid"] && connections.countUUIDs !== 0 ) return false;
+        if (validationDoubleConnectionsTypes["ip"] && connections.countIPs > ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS   ))  return false;
 
         console.log("RECEIVED HELLO NODE BACK", response.version);
 
@@ -102,11 +95,13 @@ class NodeProtocol {
 
             this.node.once("HelloNode", (data) => {
 
-                resolve(data);
                 clearInterval(interval);
-                clearTimeout(timeout)
+                clearTimeout(timeout);
+                resolve(data);
 
             });
+
+            this.node.protocol.justSendHello();
 
             interval = setInterval(async () => {
 
@@ -117,9 +112,9 @@ class NodeProtocol {
             this.node.protocol.justSendHello();
 
             timeout = setTimeout(() => {
-                resolve(false);
                 clearInterval(interval);
                 clearTimeout(timeout)
+                resolve(false);
             }, 10000);
 
         });

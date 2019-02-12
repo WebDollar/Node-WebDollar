@@ -89,7 +89,7 @@ class PoolsUtils {
 
             if (waitlistObject) {
 
-                if (waitlistObject && waitlistObject.nodeConsensusType !== NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
+                if (waitlistObject.nodeConsensusType !== NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
                     waitlistObject.nodeConsensusType = NODE_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER;
 
                 //check the nodes that matches the waitlists

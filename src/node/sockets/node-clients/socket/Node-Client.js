@@ -126,7 +126,7 @@ class NodeClient {
                     }, timeoutConnection);
 
 
-                    let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
+                    let answer = await socket.node.protocol.sendHello({"ip":true,"uuid":true});
 
                     clearTimeout(timeout);
 
