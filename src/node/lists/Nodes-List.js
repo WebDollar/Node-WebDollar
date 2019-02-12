@@ -25,7 +25,6 @@ class NodesList {
         this.emitter.setMaxListeners(2000);
 
         this.nodes = [];
-        this.nodesTotal = 0;
         this.consensusBlock = 0;
 
         this.countsNodeTypes = {

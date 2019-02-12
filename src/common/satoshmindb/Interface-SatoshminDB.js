@@ -83,12 +83,10 @@ class InterfaceSatoshminDB {
         try {
             let response = await this.db.get(key, {attachments: true});
 
-            if (response._attachments === undefined) {
+            if ( !response._attachments )
                 return response.value;
-            } else {
-                //get attachment
+            else //get attachment
                 return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
-            }
 
         } catch (Exception) {
 
@@ -158,9 +156,10 @@ class InterfaceSatoshminDB {
 
                     //if document not exist, create it and recall attachment
                     try {
-                        let response = this._createDocument(key, null);
 
+                        let response = this._createDocument(key, null);
                         return await this._saveDocumentAttachment(key, value);
+
                     } catch (exception) {
 
                         console.error('_saveDocumentAttachment raised an error for key ' + key, exception);
@@ -262,14 +261,14 @@ class InterfaceSatoshminDB {
 
             let answer = await this._save(key, value, timeout);
 
-            if (answer !== null)
+            if (answer)
                 return answer;
             else {
 
                 if (trials % 5 === 0) //it was observed that a restart
                     await this.restart();
 
-                await Utils.sleep(100);
+                await Utils.sleep(200);
             }
 
         }
@@ -331,7 +330,7 @@ class InterfaceSatoshminDB {
 
     close(){
 
-        if (this.db !== undefined && this.db !== null)
+        if (this.db)
             this.db.close();
 
     }
