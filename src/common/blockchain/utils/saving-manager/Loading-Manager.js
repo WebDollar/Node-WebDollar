@@ -48,12 +48,8 @@ class LoadingManager{
 
     async _loadBlock(height){
 
-        let validationType = this.blockchain.setFastLoadingValidationType(undefined);
-
-        let blockValidation = new InterfaceBlockchainBlockValidation( this.blockchain.getBlock.bind(this.blockchain), this.blockchain.getDifficultyTarget.bind(this.blockchain), this.blockchain.getTimeStamp.bind(this.blockchain), this.blockchain.getHashPrev.bind(this.blockchain), validationType );
-
         try {
-            let block = await this.blockchain.blockCreator.createEmptyBlock(height, blockValidation);
+            let block = await this.blockchain.blockCreator.createEmptyBlock( height );
 
             block.difficultyTargetPrev = this.getBlockDifficulty(height);
             block.difficultyTarget = this.getBlockDifficulty(height+1);
