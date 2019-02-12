@@ -25,8 +25,17 @@ class NodesList {
         this.emitter.setMaxListeners(2000);
 
         this.nodes = [];
-        this.nodesTotal = 0;
         this.consensusBlock = 0;
+
+        this.countsNodeTypes = {
+            0:0,
+            1:0,
+        };
+        this.countsNodeConnectionTypes = {
+            0:0,
+            1:0,
+            2:0,
+        };
 
         setInterval( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
 
@@ -113,29 +122,26 @@ class NodesList {
             let object = new NodesListObject(socket, connectionType, nodeType, nodeConsensusType,  NodesWaitlist.isAddressFallback(socket.node.sckAddress));
 
 
+            if (socket.node.protocol.nodeDomain  && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
 
-            if (socket.node.protocol.nodeDomain  && socket.node.protocol.nodeDomain !== '' && ( socket.node.protocol.nodeType === NODE_TYPE.NODE_TERMINAL || socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER )) {
-
-                if (socket.node.protocol.nodeDomain.indexOf("my-ip:")>=0)
-                    socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
-
-                if (socket.node.protocol.nodeDomain.indexOf("browser")===0)
-                    socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
+                socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("my-ip", socket.node.sckAddress.address);
+                socket.node.protocol.nodeDomain = socket.node.protocol.nodeDomain.replace("browser", socket.node.sckAddress.address);
 
                 await NodesWaitlist.addNewNodeToWaitlist(socket.node.protocol.nodeDomain, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
 
             }
 
-            if (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER ){ //add light waitlist
+            if (socket.node.protocol.nodeType === NODE_TYPE.NODE_WEB_PEER ) //add light waitlist
                 await NodesWaitlist.addNewNodeToWaitlist( socket.node.sckAddress, undefined, socket.node.protocol.nodeType, socket.node.protocol.nodeConsensusType, true, socket.node.level, socket, socket);
-            }
-
 
             GeoLocationLists.includeSocket(socket);
 
             await this.emitter.emit("nodes-list/connected", object);
 
             this.nodes.push(object);
+
+            this.countsNodeTypes[ socket.node.protocol.nodeType ]++;
+            this.countsNodeConnectionTypes[socket.node.protocol.connectionType]++;
 
             return true;
         }
@@ -148,10 +154,7 @@ class NodesList {
     //Removing socket from the list (the connection was terminated)
     async disconnectSocket(socket, connectionType = 'all'){
 
-        if (socket && !socket.hasOwnProperty("node") ) {
-
-            //console.error("Error - disconnectSocket rejected by invalid helloValidated");
-            //if (socket.hasOwnProperty("node")) console.log("hello validated value",socket.node.protocol.helloValidated);
+        if (socket && !socket.node) {
             socket.disconnect();
             return false;
         }
@@ -166,6 +169,9 @@ class NodesList {
                     console.error('deleting client socket '+ i +" "+ socket.node.sckAddress.toString());
 
                 let nodeToBeDeleted = this.nodes[i];
+
+                this.countsNodeTypes[ socket.node.protocol.nodeType ]--;
+                this.countsNodeConnectionTypes[socket.node.protocol.connectionType]--;
                 this.nodes.splice(i, 1);
 
                 await this.emitter.emit("nodes-list/disconnected", nodeToBeDeleted);
@@ -217,47 +223,29 @@ class NodesList {
     }
 
 
-    countNodesByConnectionType(connectionType = 'all', fallback){
+    countNodesByConnectionType( connectionType = 'all' ){
 
-        let count = 0;
+        if (connectionType === "all") return this.countsNodeConnectionTypes[0] + this.countsNodeConnectionTypes[1] + this.countsNodeConnectionTypes[2] ;
+        return this.countsNodeConnectionTypes[connectionType];
 
-        for (let i=0; i<this.nodes.length; i++) {
-
-            if (fallback  && this.nodes[i].isFallback !== fallback) continue;
-
-            if (Array.isArray(connectionType)) { //in case type is an Array
-                if (connectionType.indexOf(this.nodes[i].connectionType) >= 0)
-                    count++;
-            }
-            else if (connectionType === this.nodes[i].connectionType || connectionType === "all")
-                count++;
-        }
-
-        return count;
     }
 
     countNodesByType(nodeType = 'all'){
 
-        let count = 0;
+        if ( nodeType === "all") return this.countsNodeTypes[0] + this.countsNodeTypes[1];
+        return this.countsNodeTypes[nodeType];
 
-        for (let i=0; i<this.nodes.length; i++) {
-            if (Array.isArray(nodeType)) { //in case type is an Array
-                if (nodeType.indexOf(this.nodes[i].socket.node.protocol.nodeType) >= 0)
-                    count++;
-            }
-            else if (nodeType === this.nodes[i].socket.node.protocol.nodeType || nodeType === "all")
-                count++;
-        }
-
-        return count;
     }
 
 
     removeDisconnectedSockets(){
 
         for (let i=this.nodes.length-1; i>=0; i--)
-            if (this.nodes[i].socket.disconnected)
-                this.nodes.splice(i,1);
+            if (this.nodes[i].socket.disconnected) {
+                this.countsNodeTypes[ this.nodes[i].socket.node.protocol.nodeType ]--;
+                this.countsNodeConnectionTypes[this.nodes[i].socket.protocol.connectionType]--;
+                this.nodes.splice(i, 1);
+            }
 
         setTimeout( this.removeDisconnectedSockets.bind(this), 5000);
     }
@@ -302,7 +290,6 @@ class NodesList {
 
         for (let i=0; i<this.nodes.length; i++)
             this.nodes[i].socket.node.protocol.calculateLatency();
-
 
     }
 

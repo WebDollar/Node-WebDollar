@@ -126,12 +126,12 @@ class NodeClient {
                     }, timeoutConnection);
 
 
-                    let answer = await socket.node.protocol.sendHello(["ip","uuid"]);
+                    let answer = await socket.node.protocol.sendHello({"ip":true,"uuid":true});
 
                     clearTimeout(timeout);
 
                     if (answer)
-                        await this.initializeSocket( ["ip", "uuid"], waitlist);
+                        await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
                     else
                         socket.disconnect();
 

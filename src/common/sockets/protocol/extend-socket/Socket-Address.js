@@ -7,7 +7,7 @@ class SocketAddress {
 
     static checkIsSocketAddress(sckAddress){
 
-        if (typeof sckAddress !== 'object' || sckAddress === null) return false;
+        if (!sckAddress || typeof sckAddress !== 'object') return false;
 
         if (! (sckAddress.constructor.name === "SocketAddress" )) return false;
 
@@ -20,11 +20,8 @@ class SocketAddress {
     static createSocketAddress(address, port, uuid){
 
         //in case address is actually a Socket
-        if (typeof address === "object" && address !== null && address.hasOwnProperty("node") && address.node.hasOwnProperty("sckAddress"))
-            address = address.node.sckAddress;
-
-        if (typeof address === "object" && address !== null && address.hasOwnProperty("sckAddress"))
-            address = address.sckAddress;
+        if (address  && typeof address === "object" && address.node && address.node.sckAddress) address = address.node.sckAddress;
+        if (address && typeof address === "object" && address.sckAddress) address = address.sckAddress;
 
         if (SocketAddress.checkIsSocketAddress(address))
             return address;
@@ -35,17 +32,16 @@ class SocketAddress {
 
     constructor(address, port, uuid){
 
-        if (address === undefined) address = '';
-        if (port === undefined) port = consts.SETTINGS.NODE.PORT;
+        if ( !address ) address = '';
+        if ( !port ) port = consts.SETTINGS.NODE.PORT;
 
         try{
 
             if (address.indexOf("https://") >= 0){
                 address = address.replace("https://", "");
                 this.SSL = true;
-            } else
-            if (address.indexOf("http://") >= 0){
-                address = address.replace("http://","");
+            } else {
+                address = address.replace("http://", "");
             }
 
         }catch (exception){
@@ -83,7 +79,6 @@ class SocketAddress {
         }// it is a domain
 
 
-
         this.address = address; //always ipv6
 
         this.port = port;
@@ -107,35 +102,22 @@ class SocketAddress {
         return address;
     }
 
-    matchAddress(address, validationDoubleConnectionsTypes){
-
-        if (validationDoubleConnectionsTypes === undefined) validationDoubleConnectionsTypes = ["ip","uuid"]; // port
-        else
-        if (!Array.isArray(validationDoubleConnectionsTypes))
-            validationDoubleConnectionsTypes = [validationDoubleConnectionsTypes];
+    matchAddress(address, validationDoubleConnectionsTypes = {"ip": true, "uuid": true}){
 
         //maybe it is a socket
         let sckAddress = SocketAddress.createSocketAddress(address);
 
         //uuid validation
-        for (let i=0; i<validationDoubleConnectionsTypes.length; i++){
 
-            if (validationDoubleConnectionsTypes[i] === "uuid") {
-                if (this.uuid !== null && this.uuid !== undefined && this.uuid === sckAddress.uuid)
-                    return true;
-            }
-            if (validationDoubleConnectionsTypes[i] === "ip") {
+        if ( validationDoubleConnectionsTypes["uuid"])
+            return (this.uuid && this.uuid && this.uuid === sckAddress.uuid);
 
-                if (validationDoubleConnectionsTypes.indexOf("port") >= 0){
+        if ( validationDoubleConnectionsTypes["ip"] ) {
 
-                    if (this.address+":"+this.port === sckAddress.address+":"+sckAddress.port)
-                        return true;
-
-                    return false;
-
-                } else
-                if ( this.address === sckAddress.address ) return true;
-            }
+            if (validationDoubleConnectionsTypes["port"])
+                return (this.address + ":" + this.port === sckAddress.address + ":" + sckAddress.port);
+            else
+                return this.address === sckAddress.address;
         }
 
         return false;
@@ -168,10 +150,8 @@ class SocketAddress {
 
         let answer = await GeoHelper.getLocationFromAddress(this);
 
-        if (answer === null) this._geoLocationResolver(null);
-        else {
-            this._geoLocationResolver(answer);
-        }
+        if ( !answer ) this._geoLocationResolver(null);
+        else this._geoLocationResolver(answer);
 
         return this._geoLocation;
     }

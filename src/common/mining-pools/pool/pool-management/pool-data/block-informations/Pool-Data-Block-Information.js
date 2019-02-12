@@ -163,7 +163,7 @@ class PoolDataBlockInformation {
                 array.push(this.block.serializeBlock());
 
             } catch (exception){
-                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block !== null ? this.block.toJSON() : '');
+                Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block ? this.block.toJSON() : '');
                 console.log(exception);
 
             }
@@ -208,8 +208,8 @@ class PoolDataBlockInformation {
 
             offset = blockInformationMinerInstance.deserializeBlockInformationMinerInstance(buffer, offset, version);
 
-            if ( !blockInformationMinerInstance.minerInstance ||  (blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.isEqualTo(0) && blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.isEqualTo(0) ) )
-                this.blockInformationMinersInstances.slice( this.blockInformationMinersInstances.length-1 );
+            if ( !blockInformationMinerInstance.minerInstance || !blockInformationMinerInstance.miner  ||  (blockInformationMinerInstance.minerInstanceTotalDifficultyPOS.isEqualTo(0) && blockInformationMinerInstance.minerInstanceTotalDifficultyPOW.isEqualTo(0) ) )
+                this.blockInformationMinersInstances.splice( this.blockInformationMinersInstances.length-1 );
 
 
         }

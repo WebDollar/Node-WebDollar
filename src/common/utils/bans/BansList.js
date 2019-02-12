@@ -52,7 +52,7 @@ class BansList{
     findBan(sckAddress){
 
         for (let i = 0; i < this.bans.length; i++)
-            if (this.bans[i].sckAddress.matchAddress(sckAddress, ["uuid"]) )
+            if (this.bans[i].sckAddress.matchAddress(sckAddress, {"uuid": true} ) )
                 return i;
 
         return null;

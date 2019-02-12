@@ -29,11 +29,11 @@ class NodeSignalingClientProtocol {
 
             try{
 
-                if ( data.remoteUUID === undefined || data.remoteUUID === null)
+                if ( !data.remoteUUID )
                     throw {message: "remoteUUID was not specified"};
 
                 //search if the new protocol was already connected in the past
-                if ( NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"] ) !== null) //already connected in the past
+                if ( NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', {"uuid": true} ) !== null) //already connected in the past
                     throw {message: "Already connected"};
 
                 if ( SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
@@ -151,7 +151,7 @@ class NodeSignalingClientProtocol {
                     throw {message: "data.remoteUUID 2 was not specified"}
 
                 //search if the new protocol was already connected in the past
-                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', ["uuid"]) !== null) //already connected in the past
+                if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', {"uuid":true}) !== null) //already connected in the past
                     throw {message: "Already connected"};
 
                 if (SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID) !== null)

@@ -63,13 +63,12 @@ class NodesWaitlist {
 
 
         //avoid connecting to other nodes
-        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER && nodeType !== NODE_TYPE.NODE_WEB_PEER)
+        if ( Blockchain.MinerPoolManagement && Blockchain.MinerPoolManagement.minerPoolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER && nodeType !== NODE_TYPE.NODE_WEB_PEER)
             return {result:false, waitlist: null};
 
 
 
-        let sckAddresses = [];
-        let waitListFound = null;
+        let sckAddresses = [], waitListFound ;
 
         //let's determine the sckAddresses
         for (let i=0; i<addresses.length; i++){
@@ -146,7 +145,7 @@ class NodesWaitlist {
             if (waitListObject.nodeType === NODE_TYPE.NODE_TERMINAL)  list = this.waitListFullNodes;
             else  if (waitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) list = this.waitListLightNodes;
 
-            if ( socket !== undefined){
+            if ( socket ){
                 waitListObject.socket = socket;
                 waitListObject.connected = true;
             }
@@ -172,7 +171,7 @@ class NodesWaitlist {
 
         for (let i=0; i<list.length; i++)
             for (let j=0; j<list[i].sckAddresses.length; j++)
-                if (list[i].sckAddresses[j].matchAddress( sckAddress, ["ip","uuid", "port"]) ) //match also the port
+                if (list[i].sckAddresses[j].matchAddress( sckAddress, {"ip": true,"uuid": true, "port":true } ) ) //match also the port
                     return i;
 
         return -1;
@@ -212,7 +211,7 @@ class NodesWaitlist {
 
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 10000);
 
-                    if (response !== null && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
+                    if (response && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
                         this.waitListFullNodes[i].failsChecking = 0;
                         continue;
                     }
@@ -283,9 +282,8 @@ class NodesWaitlist {
 
     _sortList(list){
 
-        for (let i=0; i<list.length; i++){
+        for (let i=0; i<list.length; i++)
             list[i].score = list[i].sortingScore();
-        }
 
         list.sort(function(a, b) {
             return b.score - a.score;
@@ -315,7 +313,7 @@ class NodesWaitlist {
 
     _initializeNode(socket){
 
-        if (socket.node.protocol === undefined) return;
+        if ( !socket.node.protocol ) return;
 
         let answer = this._searchNodesWaitlist(socket.node.sckAddress, undefined, socket.node.protocol.nodeType);
 
