@@ -63,7 +63,7 @@ class NodeClient {
 
                 // in case the port is not included
 
-                if (port !== undefined && address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
+                if (port && address.indexOf(":") === -1 || address.indexOf(":") === (address.length-1) )  address += ":"+port;
 
                 //it is required in browser to use SSL
                 if (process.env.BROWSER && consts.SETTINGS.NODE.SSL )
@@ -104,7 +104,7 @@ class NodeClient {
                 }
                 this.socket = socket;
 
-                if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
+                if ( Blockchain.MinerPoolManagement  && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
                     throw {message: "You switched to pool"};
 
                 NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
@@ -177,7 +177,7 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if ( Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+        if ( Blockchain.MinerPoolManagement && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
             console.error("socket disconnected by not being minerPool");
             this.socket.disconnect();
             delete this.socket;
