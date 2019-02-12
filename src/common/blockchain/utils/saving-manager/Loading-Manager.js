@@ -81,14 +81,29 @@ class LoadingManager{
     _clearOldUnusedBlocks(){
 
         let date = new Date().getTime();
+
         for (let key in this.loadedBlocks)
             if ( date - this.loadedBlocks[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS) {
 
-                //check if it is not being saved by the Save Manager
+                //check if it is not 11being saved by the Save Manager
                 delete this.loadedBlocks[key];
                 this.loadedBlocksCount--;
 
             }
+
+        if (this.loadedBlocksCount > MAX_BLOCKS_MEMORY){
+
+            let array = Object.values(this.loadedBlocks);
+            array.sort(function(a, b) {
+                return a.lastTimeUsed - b.lastTimeUsed;
+            });
+
+            for (let i=MAX_BLOCKS_MEMORY; i < array.length; i++)
+                delete this.loadedBlocks[ array[i].height ];
+
+            this.loadedBlocksCount = MAX_BLOCKS_MEMORY;
+
+        }
 
         this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNUSED_BLOCKS_INTERVAL );
 

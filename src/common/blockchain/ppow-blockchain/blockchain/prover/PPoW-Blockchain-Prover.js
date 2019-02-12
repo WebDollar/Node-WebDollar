@@ -54,7 +54,6 @@ class PPoWBlockchainProver{
                     // //  α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
-
                     // // C[: −k]{B :}
                     for (let level = miu; level < 256; level++){
 
@@ -80,38 +79,12 @@ class PPoWBlockchainProver{
                     //TODO keep the superChain.blocks already sorted and insert it using binary search
 
                     superChain.blocks.sort(function(a,b){
-                        return a.height - b.height;
+                        return a - b;
                     });
-
-                    // //slow version
-                    // for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
-                    //     if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                    //         chain.blocks[i].getLevel() >= miu) {
-                    //
-                    //         superChain.push(chain.blocks[i]);
-                    //
-                    //         // π ← π ∪ α
-                    //         if ( underlyingChain.blocksIndex[ chain.blocks[i].height ] === undefined )
-                    //             underlyingChain.push(chain.blocks[i]);
-                    //
-                    //     }
-
-
-
-
-
-
-
-
-
-
-
-
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
-                        B = await superChain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m].height );
-
+                        B = await superChain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m] );
 
                     count ++;
                     if (count % 20 === 0)
