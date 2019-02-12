@@ -288,6 +288,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     //TODO should be disabled
                     await block.saveBlockDifficulty();
+                    await this.saveBlockHash();
 
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
