@@ -264,13 +264,13 @@ class Blockchain{
     //MINING POOLS SETTINGS
     async createMiningPools(){
 
-        if (this.PoolManagement === undefined)
+        if ( !this.PoolManagement )
             this.PoolManagement = new PoolManagement(this.blockchain, this.Wallet);
 
-        if (this.MinerPoolManagement === undefined)
+        if ( !this.MinerPoolManagement )
             this.MinerPoolManagement = new MinerPoolManagement(this.blockchain);
 
-        if (ServerPoolManagement !== undefined && this.ServerPoolManagement === undefined)
+        if ( ServerPoolManagement && !this.ServerPoolManagement )
             this.ServerPoolManagement = new ServerPoolManagement();
 
         this._onPoolsCreatedResolver(true);

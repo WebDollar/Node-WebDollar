@@ -82,11 +82,13 @@ class TransactionsDownloadManager{
         socket.invalidTransactions = 0;
 
         if( !this.replaceOldSocket(socket) ){
+
             this._socketsQueue[socket.node.sckAddress.uuid] = socket;
             this._socketsQueueLength++;
+
+            setTimeout( this._processSocket.bind(this,socket.node.sckAddress.uuid), 5000);
         }
 
-        setTimeout( this._processSocket.bind(this,socket.node.sckAddress.uuid), 5000);
     }
 
     removeSocket(socket){
@@ -222,7 +224,6 @@ class TransactionsDownloadManager{
 
                     //Select random socket for being processed
                     let randomSocketIndex = Math.floor( Math.random()*this._socketsQueueLength );
-                    randomSocketIndex = randomSocketIndex-1 >= 0 ? randomSocketIndex-1 : 0;
                     selectedSocket = Object.keys( this._socketsQueue )[ randomSocketIndex ];
 
                 }
@@ -238,7 +239,7 @@ class TransactionsDownloadManager{
 
         }
         else
-            setTimeout( this._processSocket.bind(this), 40*1000);
+            setTimeout( this._processSocket.bind(this, socketID), 40*1000);
 
     }
 
@@ -410,8 +411,8 @@ class TransactionsDownloadManager{
 
     _unsubscribeSocket(socket){
 
-        for (let txId in this._transactionsQueue)
-            if(typeof this._transactionsQueue[txId] !== "undefined" )
+        for (let txId of this._transactionsQueue)
+            if( this._transactionsQueue[txId] )
                 for( let i = this._transactionsQueue[txId].socket.length-1 ; i>=0; i--){
 
                     if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid )
@@ -432,7 +433,7 @@ class TransactionsDownloadManager{
         let found = false;
 
         for ( let txId in this._transactionsQueue )
-            if( typeof this._transactionsQueue[txId].socket !== "undefined" ){
+            if( this._transactionsQueue[txId].socket ){
                 for (let i = 0; i < this._transactionsQueue[txId].socket.length; i++)
                     if (this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid) {
                         this._transactionsQueue[txId].socket.splice(i, 1);

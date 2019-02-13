@@ -25,9 +25,9 @@ class InterfaceBlockchainTransactionsProtocol {
 
         StatusEvents.on('blockchain/status', async (data)=>{
 
-            if (data.message === "Blockchain Ready to Mine" && NodesList )
+            if (data.message === "Blockchain Ready to Mine" )
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket )
+                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket  && !NodesList.nodes[i].socket.node.protocol.transactionsInitializedProtocol)
                         this._initializeSocket(NodesList.nodes[i].socket)
 
         });
@@ -43,10 +43,13 @@ class InterfaceBlockchainTransactionsProtocol {
 
     _initializeSocket(socket){
 
+        if (socket.node.protocol.transactionsInitializedProtocol) return;
+
+        socket.node.protocol.transactionsInitializedProtocol = true;
+
         this.transactionsDownloadingManager.addSocket(socket);
 
-        if ( !Blockchain.MinerPoolManagement.minerPoolStarted )
-            this.initializeTransactionsPropagation(socket);
+        this.initializeTransactionsPropagation(socket);
 
     }
 
@@ -55,6 +58,8 @@ class InterfaceBlockchainTransactionsProtocol {
         socket.node.on("transactions/missing-nonce", async (response) =>{
 
             try {
+
+                if ( Blockchain.MinerPoolManagement.minerPoolStarted ) return;
 
                 let transaction;
 
@@ -87,6 +92,8 @@ class InterfaceBlockchainTransactionsProtocol {
         socket.node.on("transactions/missing-nonce/answer", async (response) =>{
 
             try {
+
+                if ( Blockchain.MinerPoolManagement.minerPoolStarted ) return;
 
                 if (!response.result) throw {message:"missing-nonce - Response is false"};
 
