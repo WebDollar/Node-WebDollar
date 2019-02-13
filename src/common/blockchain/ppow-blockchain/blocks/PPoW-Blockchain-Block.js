@@ -76,7 +76,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let blockLevel = 0;
         // interlink = interlink'
-        let prevBlock =  await this.blockValidation.getBlockCallBack( this.height );
+        let prevBlock =  await this.blockValidation.getBlockCallBack( this.height - 1 );
 
         if (prevBlock === BlockchainGenesis) blockLevel = 0;
         else
@@ -313,19 +313,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         }
 
-
-        return true;
-
-    }
-
-    async validateBlock(height){
-
-        let answer = await InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
-
-        if (!answer)
-            return answer;
-
-        await this.validateBlockInterlinks();
 
         return true;
 

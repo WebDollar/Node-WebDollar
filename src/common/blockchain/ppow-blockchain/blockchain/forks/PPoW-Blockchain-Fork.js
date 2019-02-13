@@ -21,7 +21,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
     destroyFork(){
 
         try {
-            if (this.blockchain === undefined) return; //already destroyed
+            if (!this.blockchain ) return; //already destroyed
 
             if (this._forkProofPiClone !== undefined && (this.blockchain.proofPi === undefined || this.blockchain.proofPi !== this._forkProofPiClone))
                 this._forkProofPiClone.destroyProof();
@@ -252,7 +252,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     getForkProofsPiBlock(height){
         
-        if (height <= 0) 
+        if (height < 0)
             return BlockchainGenesis; // based on genesis block
         else {
 
@@ -298,7 +298,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
 
-            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0)
+            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHash(this.forkStartingHeight + 1)) >= 0)
                 throw {message: "Your proof is worst than mine because you have the same block"};
 
         }
@@ -309,7 +309,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     _shouldTakeNewProof(){
 
-        if (this.blockchain.proofPi === undefined)
+        if (!this.blockchain.proofPi)
             return true;
 
         let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi );

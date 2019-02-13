@@ -15,7 +15,7 @@ class InterfaceBlockchainBlockTimestamp {
     getMedianTimestamp (height, blockValidation){
 
         let callback;
-        if (blockValidation !== undefined)  callback = blockValidation.getTimeStampCallback;
+        if (!blockValidation )  callback = blockValidation.getTimeStampCallback;
         else callback = this.blockchain.getTimeStamp;
 
         let medianTimestamp = 0;
@@ -26,7 +26,7 @@ class InterfaceBlockchainBlockTimestamp {
             no_blocks = 2;
 
         for (let i = height-1; i >= height - no_blocks; i--)
-            medianTimestamp += callback(i+1);
+            medianTimestamp += callback.call(this.blockchain, i);
 
         return medianTimestamp / no_blocks;
     }

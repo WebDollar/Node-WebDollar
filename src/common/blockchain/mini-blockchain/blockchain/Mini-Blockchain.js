@@ -53,8 +53,6 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (await block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType) === false)
                     throw {message: "Validate Transactions is wrong"};
 
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
                 if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
 
                     block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] = true;
@@ -65,13 +63,9 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
                     throw {message: "Process Block Data Transactions failed"};
 
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
             }
 
             let callbackDone = await callback();
-
-            if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
             if (callbackDone === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};

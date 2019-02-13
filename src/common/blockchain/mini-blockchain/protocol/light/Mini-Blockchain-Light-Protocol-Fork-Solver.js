@@ -184,7 +184,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
-            fork.forkPrevHashPrev = answer.hashPrev;
+            fork.forkPrevHash = answer.hash;
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
@@ -230,7 +230,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevAccountantTree = null;
             fork.forkPrevDifficultyTarget = null;
             fork.forkPrevTimeStamp = null;
-            fork.forkPrevHashPrev = null;
+            fork.forkPrevHash = null;
         }
 
         return inheritForkSolver.prototype._solveFork.call(this, fork);

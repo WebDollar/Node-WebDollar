@@ -37,7 +37,7 @@ class InterfaceBlockchainBlockCreator{
         args.unshift( this.blockchain, minerAddress, transactions, undefined, undefined );
         let data = new this.blockDataClass(...args);
 
-        return new this.blockClass( this.blockchain, blockValidation, 1, undefined, await blockValidation.getHashPrevCallback(height), await blockValidation.getDifficultyCallback(height),  await blockValidation.getChainHashCallback(height), undefined, 0, data, height, this.db);
+        return new this.blockClass( this.blockchain, blockValidation, 1, undefined, await blockValidation.getHashCallback(height-1), await blockValidation.getDifficultyCallback(height-1),  await blockValidation.getChainHashCallback(height-1), undefined, 0, data, height, this.db);
 
     }
 

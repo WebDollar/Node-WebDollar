@@ -20,7 +20,7 @@ class MemoryManager{
 
     _validateHeight(height){
         if (height >= this.blockchain.blocks.length)
-            throw {message: "getData  invalid height", height: height};11
+            throw {message: "getData  invalid height", height: height};
     }
 
     async getData(height){

@@ -118,7 +118,7 @@ class PPoWBlockchainProofBasic{
 
         let buffers = [];
         for (let i=0; i <this.blocks.length; i++)
-            buffers.push( await this.blockchain.getDifficultyTarget( this.blocks[i]+1 ) );
+            buffers.push( await this.blockchain.getDifficultyTarget( this.blocks[i] ) );
 
         let buffer = Buffer.concat(buffers);
 

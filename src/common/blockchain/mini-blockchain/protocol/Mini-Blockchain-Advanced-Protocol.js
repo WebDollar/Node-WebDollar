@@ -107,10 +107,10 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
 
                 let difficultyTarget = await this.blockchain.getDifficultyTarget(data.height);
                 let timestamp = this.blockchain.getTimeStamp(data.height);
-                let hashPrev = this.blockchain.getHashPrev(data.height);
+                let hashPrev = this.blockchain.getHash(data.height-1);
 
                 socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
-                    result: difficultyTarget !== null ? true : false,
+                    result: difficultyTarget ? true : false,
                     difficultyTarget: difficultyTarget,
                     timeStamp: timestamp,
                     hashPrev: hashPrev,

@@ -27,9 +27,9 @@ class BlockManager extends MemoryManager{
         try {
             let block = await this.blockchain.blockCreator.createEmptyBlock( height );
 
-            block.difficultyTargetPrev = this._difficultyManager.getData(height);
-            block.difficultyTarget = this._difficultyManager.getData(height+1);
-            block.hash = this._hashManager.getData(height+1);
+            block.difficultyTargetPrev = this._difficultyManager.getData(height-1);
+            block.difficultyTarget = this._difficultyManager.getData(height);
+            block.hash = this._hashManager.getData(height);
             block.chainHash = this._chainHashManager.getData(height);
 
             if (await block.loadBlock() === false)

@@ -382,10 +382,7 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
     }
 
-    getBlock(height){
-
-        if (height === undefined )
-            height = this.blocks.length;
+    getBlock(height = this.blocks.length){
 
         if (this.agent !== undefined && this.agent.light === true && height !== 0) {
 
@@ -400,22 +397,18 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         return MiniBlockchainAdvanced.prototype.getBlock.call(this, height);
     }
 
-    getDifficultyTarget(height){
+    getDifficultyTarget(height = this.blocks.length){
 
-        if (height === undefined )
-            height = this.blocks.length;
+        if (this.agent && this.agent.light === true && height !== 0) {
 
-        if (this.agent !== undefined && this.agent.light === true && height !== 0) {
-
-            if (this.lightPrevDifficultyTargets[height] !== undefined )
+            if (this.lightPrevDifficultyTargets[height]  )
                 return this.lightPrevDifficultyTargets[height];
         }
 
         return MiniBlockchainAdvanced.prototype.getDifficultyTarget.call(this, height);
     }
 
-    getTimeStamp(height){
-        if (height === undefined) height = this.blocks.length;
+    getTimeStamp(height = this.blocks.length){
 
         if (this.agent.light === true && height !== 0) {
             if ( this.lightPrevTimeStamps[height] !== undefined )
@@ -425,15 +418,13 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
         return MiniBlockchainAdvanced.prototype.getTimeStamp.call(this, height);
     }
 
-    getHashPrev(height){
-
-        if (height === undefined) height = this.blocks.length;
+    getHash(height = this.blocks.length){
 
         if (this.agent.light === true && height !== 0)
             if ( this.lightPrevHashPrevs[height] !== undefined )
                 return this.lightPrevHashPrevs[height];
 
-        return MiniBlockchainAdvanced.prototype.getHashPrev.call(this, height);
+        return MiniBlockchainAdvanced.prototype.getHash.call(this, height);
     }
 
 }

@@ -11,7 +11,6 @@ import Serialization from 'common/utils/Serialization';
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
-import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
 import InterfaceBlockchainHardForks from "./../blocks/hard-forks/Interface-Blockchain-Hard-Forks"
@@ -71,7 +70,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             block.blockValidation.getBlockCallBack = this.getBlock.bind(this);
             block.blockValidation.getDifficultyCallback = this.getDifficultyTarget.bind(this);
             block.blockValidation.getTimeStampCallback = this.getTimeStamp.bind(this);
-            block.blockValidation.getHashPrevCallback = this.getHashPrev.bind(this);
+            block.blockValidation.getHashCallback = this.getHash.bind(this);
 
         }
 
@@ -128,14 +127,11 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         // in case it is not a fork controlled blockchain
 
-        if (block.height === 0 ) {
-            //validate genesis11
+        if (block.height === 0 )
             BlockchainGenesis.validateGenesis(block);
-        }
 
         if ( !block.blockValidation )
             block.blockValidation = this.createBlockValidation();
-
 
         //validate difficulty & hash
         if (! (await block.validateBlock( block.height )))
@@ -144,10 +140,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         //recalculate next target difficulty
         if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
 
-            //console.log("block.difficultyTarget", prevDifficultyTarget.toString("hex"), prevTimeStamp, block.timeStamp, block.height);
-
             block.difficultyTarget = await block.blockValidation.getDifficulty( block.timeStamp, block.height );
-
             block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
 
         }
@@ -155,13 +148,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
-    async getBlock(height = this.blocks.length){
+    async getBlock(height = this.blocks.length-1){
 
-        if (height <= 0) return BlockchainGenesis;
+        if (height ===  -1) return BlockchainGenesis;
 
         if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length};
 
-        let block = await this.blocks.loadingManager.getBlock(height-1);
+        let block = await this.blocks.loadingManager.getBlock(height);
 
         if ( !block ) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
 
@@ -169,9 +162,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async getDifficultyTarget(height = this.blocks.length, POSRecalculation = true){
+    async getDifficultyTarget(height = this.blocks.length-1, POSRecalculation = true){
 
-        if (height <= 0) return BlockchainGenesis.difficultyTarget;
+        if (height === -1) return BlockchainGenesis.difficultyTarget;
 
         if (POSRecalculation && height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
@@ -183,46 +176,46 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
 
-        let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height-1);
+        let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height);
         if ( !difficulty ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
         return difficulty;
 
     }
 
-    async getTimeStamp(height = this.blocks.length){
+    async getTimeStamp(height = this.blocks.length-1){
 
-        if (height <= 0) return BlockchainGenesis.timeStamp;
+        if (height <= -1) return BlockchainGenesis.timeStamp;
 
         if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
 
-        let timeStamp = await this.blocks.loadingManager.getBlockTimestamp(height-1);
+        let timeStamp = await this.blocks.loadingManager.getBlockTimestamp(height);
         if ( !timeStamp ) throw {message: "getTimeStamp invalid height ", height: height};
 
         return timeStamp;
 
     }
 
-    async getHashPrev(height = this.blocks.length){
+    async getHash(height = this.blocks.length-1){
 
-        if (height <= 0) return BlockchainGenesis.hashPrev;
+        if (height  === -1) return BlockchainGenesis.hashPrev;
 
-        if (height > this.blocks.length ) throw {message: "getHashPrev invalid height", height: height};
+        if (height > this.blocks.length ) throw {message: "getHash invalid height", height: height};
 
-        let block = await this.blocks.loadingManager.getBlockHash(height-1);
-        if ( !block ) throw {message: "getHashPrev invalid height ", height: height};
+        let hash = await this.blocks.loadingManager.getBlockHash(height);
+        if ( !hash ) throw {message: "getHash invalid height ", height: height};
 
-        return block;
+        return hash;
 
     }
 
-    async getChainHash(height = this.blocks.length){
+    async getChainHash(height = this.blocks.length-1){
 
-        if (height <= 0) return BlockchainGenesis.hash;
+        if (height === -1) return BlockchainGenesis.hash;
 
         if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
 
-        let chainHash = await this.blocks.loadingManager.getBlockChainHash(height-1);
+        let chainHash = await this.blocks.loadingManager.getBlockChainHash(height);
         if ( !chainHash ) throw {message: "getChainHash invalid height ", height: height};
 
         return chainHash;
@@ -369,7 +362,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
     }
 
     createBlockValidation(){
-        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHashPrev.bind(this), this.getChainHash.bind(this), {} );
+        return new InterfaceBlockchainBlockValidation( this.getBlock.bind(this), this.getDifficultyTarget.bind(this), this.getTimeStamp.bind(this), this.getHash.bind(this), this.getChainHash.bind(this), {} );
     }
 
 

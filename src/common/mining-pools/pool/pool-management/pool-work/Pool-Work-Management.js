@@ -213,7 +213,7 @@ class PoolWorkManagement{
 
                         let serialization = prevBlock.serializeBlock();
                         block = await this.blockchain.blockCreator.createEmptyBlock(prevBlock.height, undefined );
-                        block.deserializeBlock( serialization, prevBlock.height, prevBlock.reward, await await this.blockchain.getDifficultyTarget( prevBlock.height ) );
+                        block.deserializeBlock( serialization, prevBlock.height, prevBlock.reward, await await this.blockchain.getDifficultyTarget( prevBlock.height - 1 ) );
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
 
