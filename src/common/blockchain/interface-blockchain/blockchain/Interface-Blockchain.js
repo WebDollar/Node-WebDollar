@@ -152,7 +152,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height ===  -1) return BlockchainGenesis;
 
-        if (height > this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length};
+        if (height >= this.blocks.length ) throw {message: "getBlock invalid height ", height:height, blocksLength: this.blocks.length};
 
         let block = await this.blocks.loadingManager.getBlock(height);
 
@@ -174,7 +174,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         }
 
-        if (height > this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
+        if (height >= this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
 
         let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height);
         if ( !difficulty ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
@@ -187,7 +187,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height <= -1) return BlockchainGenesis.timeStamp;
 
-        if (height > this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
+        if (height >= this.blocks.length ) throw {message: "getTimeStamp invalid height ", height: height};
 
         let timeStamp = await this.blocks.loadingManager.getBlockTimestamp(height);
         if ( !timeStamp ) throw {message: "getTimeStamp invalid height ", height: height};
@@ -200,7 +200,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height  === -1) return BlockchainGenesis.hashPrev;
 
-        if (height > this.blocks.length ) throw {message: "getHash invalid height", height: height};
+        if (height >= this.blocks.length ) throw {message: "getHash invalid height", height: height};
 
         let hash = await this.blocks.loadingManager.getBlockHash(height);
         if ( !hash ) throw {message: "getHash invalid height ", height: height};
@@ -213,7 +213,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height === -1) return BlockchainGenesis.hash;
 
-        if (height > this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
+        if (height >= this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
 
         let chainHash = await this.blocks.loadingManager.getBlockChainHash(height);
         if ( !chainHash ) throw {message: "getChainHash invalid height ", height: height};
