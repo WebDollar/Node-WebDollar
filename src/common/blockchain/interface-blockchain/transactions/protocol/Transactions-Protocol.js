@@ -289,7 +289,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         if (Blockchain.PoolManagement.poolStarted)
             for (let element of Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list)
-                exceptSockets.push(element.socket);
+                exceptSockets.push(element);
 
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
 
@@ -301,7 +301,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         if (Blockchain.PoolManagement.poolStarted)
             for (let element of Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list)
-                exceptSockets.push( element.socket );
+                exceptSockets.push( element );
 
         NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, exceptSockets );
         console.warn("I miss nonce", nonce, "for", addressBuffer);
