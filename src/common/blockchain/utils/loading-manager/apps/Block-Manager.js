@@ -27,10 +27,10 @@ class BlockManager extends MemoryManager{
         try {
             let block = await this.blockchain.blockCreator.createEmptyBlock( height );
 
-            block.difficultyTargetPrev = this._difficultyManager.getData(height-1);
-            block.difficultyTarget = this._difficultyManager.getData(height);
-            block.hash = this._hashManager.getData(height);
-            block.chainHash = this._chainHashManager.getData(height);
+            block.difficultyTargetPrev = await this._difficultyManager.getData(height-1);
+            block.difficultyTarget = await this._difficultyManager.getData(height);
+            block.hash = await this._hashManager.getData(height);
+            block.chainHash = await this._chainHashManager.getData(height);
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};

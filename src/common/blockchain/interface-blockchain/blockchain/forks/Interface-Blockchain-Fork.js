@@ -208,14 +208,11 @@ class InterfaceBlockchainFork {
 
     getForkBlock(height){
 
+        if (height ===  -1) return BlockchainGenesis; // based on genesis block
+
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height <= 0)
-            return BlockchainGenesis; // based on genesis block
-
-        if ( forkHeight === 0) return this.blockchain.getBlock(height);
-
-        if ( forkHeight > 0) return this.forkBlocks[forkHeight - 1]; // just the fork
+        if ( forkHeight >= 0) return this.forkBlocks[forkHeight]; // just the fork
         return this.blockchain.getBlock(height) // the blockchain
 
     }
@@ -223,14 +220,12 @@ class InterfaceBlockchainFork {
     // return the difficultly target for ForkBlock
     getForkDifficultyTarget(height, POSRecalculation = true){
 
+        if (height === -1) return BlockchainGenesis.difficultyTarget; // based on genesis block
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
 
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height === 0) return BlockchainGenesis.difficultyTarget; // based on genesis block
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
-
-        if ( forkHeight === 0)
-            return this.blockchain.getDifficultyTarget(height);
+        if ( forkHeight === -1) return this.blockchain.getDifficultyTarget(height);
 
         let heightPrePOS = height;
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
@@ -243,13 +238,7 @@ class InterfaceBlockchainFork {
         }
 
 
-        if ( forkHeight > 0) {
-
-            if ( forkHeight - 1 >= this.forkBlocks.length )
-                throw { message: "getForkDifficultyTarget FAILED: "+  forkHeight };
-
-            return this.forkBlocks[ forkHeight ].difficultyTarget; // just the fork
-        }
+        if ( forkHeight >= 0) return this.forkBlocks[ forkHeight ].difficultyTarget; // just the fork
 
         return this.blockchain.getDifficultyTarget(heightPrePOS, POSRecalculation) // the blockchain
 
@@ -257,36 +246,34 @@ class InterfaceBlockchainFork {
 
     getForkTimeStamp(height){
 
+        if (height <= -1) return BlockchainGenesis.timeStamp;
+
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height === 0) return BlockchainGenesis.timeStamp; // based on genesis block
-
-        if ( forkHeight === 0) return this.blockchain.getTimeStamp(height); // based on previous block from blockchain
-        if ( forkHeight > 0) return this.forkBlocks[forkHeight - 1].timeStamp; // just the fork
+        if ( forkHeight >= 0) return this.forkBlocks[forkHeight].timeStamp; // just the fork
 
         return this.blockchain.getTimeStamp(height) // the blockchain
 
     }
 
     getForkHash(height){
+
         let forkHeight = height - this.forkStartingHeight;
 
         if (height === -1) return BlockchainGenesis.hashPrev; // based on genesis block
 
-        if ( forkHeight === 0) return this.blockchain.getHash(height); // based on previous block from blockchain
-        if ( forkHeight > 0) return this.forkBlocks[forkHeight].hash; // just the fork
+        if ( forkHeight >= 0) return this.forkBlocks[forkHeight].hash; // just the fork
 
         return this.blockchain.getHash(height) // the blockchain
     }
 
     getForkChainHash(height){
 
+        if (height  === -1) return BlockchainGenesis.hashPrev;
+
         let forkHeight = height - this.forkStartingHeight;
 
-        if (height === 0) return BlockchainGenesis.hashPrev;
-
-        if ( forkHeight === 0) return this.blockchain.getChainHashCallback(height);
-        if (forkHeight > 0) return this.forkBlocks[forkHeight - 1].hashChain;
+        if (forkHeight >= 0) return this.forkBlocks[ forkHeight ].hashChain;
 
         return this.blockchain.getChainHash(height);
 
@@ -320,7 +307,7 @@ class InterfaceBlockchainFork {
         for (let i=0; i<this.forkBlocks.length-1; i++) {
 
             let block = await this.blockchain.getBlock(this.forkBlocks[i].height);
-            if (block && block.newChainHash.equals(this.forkBlocks[i].newChainHash )) {
+            if (block && block.hashChain.equals(this.forkBlocks[i].hashChain )) {
 
                 pos = i;
 

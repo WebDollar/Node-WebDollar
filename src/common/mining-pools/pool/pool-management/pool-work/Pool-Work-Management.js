@@ -79,7 +79,7 @@ class PoolWorkManagement{
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
-            m: this.blockchain.blocks.timestampBlocks.getMedianTimestamp( this.poolWork.lastBlock.height, this.poolWork.lastBlock.blockValidation),
+            m: await this.blockchain.blocks.timestampBlocks.getMedianTimestamp( this.poolWork.lastBlock.height, this.poolWork.lastBlock.blockValidation),
 
             start: isPOS ? 0 : this.poolWork.lastBlockNonce,
             end: isPOS ? 0 : (this.poolWork.lastBlockNonce + hashes),
@@ -195,13 +195,14 @@ class PoolWorkManagement{
                     prevBlock.nonce = work.nonce;
 
                     if (isPos) {
+
                         prevBlock.nonce = 0;
                         prevBlock.posSignature = work.pos.posSignature;
                         prevBlock.posMinerAddress = work.pos.posMinerAddress;
                         prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
                         prevBlock.timeStamp = work.pos.timestamp;
 
-                        prevBlock._validateBlockTimeStamp();
+                        await prevBlock._validateBlockTimeStamp();
 
                     }
 

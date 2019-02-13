@@ -40,29 +40,6 @@ class InterfaceBlockchainBlock {
 
         this.blockValidation = blockValidation;
 
-        if ( !timeStamp ) {
-
-            timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
-
-            if (!timeStamp)
-                timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
-
-            timeStamp += Math.floor( Math.random()*5   );
-
-            try {
-
-                this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
-
-            } catch (exception){
-                timeStamp = exception.medianTimestamp + 1;
-
-                this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
-            }
-
-
-            timeStamp = Math.ceil( timeStamp );
-        }
-
         this.timeStamp = timeStamp||null; //Current timestamp as seconds since 1970-01-01T00:00 UTC        - 4 bytes,
 
         if ( !data )
@@ -77,6 +54,32 @@ class InterfaceBlockchainBlock {
         this.db = db;
 
         this._socketPropagatedBy = undefined;
+
+    }
+
+    async getTimestampForMining(){
+
+        let timeStamp = this.blockchain.timestamp.networkAdjustedTime - BlockchainGenesis.timeStampOffset;
+
+        if (!timeStamp)
+            timeStamp = ( new Date().getTime() - BlockchainGenesis.timeStampOffset) / 1000;
+
+        timeStamp += Math.floor( Math.random()*5   );
+
+        try {
+
+            await this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
+
+        } catch (exception){
+            timeStamp = exception.medianTimestamp + 1;
+
+            await this.blockchain.blocks.timestampBlocks.validateMedianTimestamp( timeStamp, this.height, this.blockValidation );
+        }
+
+
+        timeStamp = Math.ceil( timeStamp );
+
+        return timeStamp
 
     }
 
@@ -109,7 +112,7 @@ class InterfaceBlockchainBlock {
 
         await this._validateTargetDifficulty();
 
-        this._validateBlockTimeStamp();
+        await this._validateBlockTimeStamp();
 
         if (this.reward !== BlockchainMiningReward.getReward(this.height) )
             throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getReward( this.height ) };
@@ -192,16 +195,17 @@ class InterfaceBlockchainBlock {
 
 
 
-    _validateBlockTimeStamp(){
+    async _validateBlockTimeStamp(){
 
         // BITCOIN: A timestamp is accepted as valid if it is greater than the median timestamp of previous 11 blocks, and less than the network-adjusted time + 2 hours.
 
         if ( ! this.blockValidation.blockValidationType['skip-validation-timestamp'] && this.height > consts.BLOCKCHAIN.TIMESTAMP.VALIDATION_NO_BLOCKS + 1 )
-            this.blockchain.blocks.timestampBlocks.validateMedianTimestamp(this.timeStamp, this.height, this.blockValidation);
+            await this.blockchain.blocks.timestampBlocks.validateMedianTimestamp(this.timeStamp, this.height, this.blockValidation);
 
         if (!this.blockValidation.blockValidationType["skip-validation-timestamp-network-adjusted-time"])
             this.blockchain.blocks.timestampBlocks.validateNetworkAdjustedTime(this.timeStamp, this.height);
 
+        return true;
     }
 
     toString(){

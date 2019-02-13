@@ -244,7 +244,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         return this.block.computeHash.apply(this.block, arguments);
     }
 
-    getMedianTimestamp(){
+    async getMedianTimestamp(){
         return this.blockchain.blocks.timestampBlocks.getMedianTimestamp(this.block.height, this.block.blockValidation);
     }
 
@@ -261,7 +261,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         else
             balance = this.blockchain.accountantTree.getBalance( whoIsMining );
 
-        let medianTimestamp = Math.ceil( this.getMedianTimestamp() );
+        let medianTimestamp = Math.ceil( await this.getMedianTimestamp() );
 
         //browser avoid asking for password
         if (process.env.BROWSER && await Blockchain.Wallet.isAddressEncrypted( whoIsMining) )
