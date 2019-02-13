@@ -68,6 +68,17 @@ class LoadingManager{
         return numBlocks;
     }
 
+
+    addBlockToLoaded(height, block){
+
+        this.blockDifficultyManager.addToLoaded(height, block.difficultyTarget);
+        this.blockHashManager.addToLoaded(height, block.hash);
+        this.blockChainHashManager.addToLoaded(height, block.chainHash);
+        this.blockTimestampManager.addToLoaded(height, block.timeStamp);
+        this.blockManager.addToLoaded(height, block);
+
+    }
+
 }
 
 export default LoadingManager;

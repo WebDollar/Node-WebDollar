@@ -23,9 +23,9 @@ else  inheritBlockchainBlock = InterfaceBlock;
 
 class MiniBlockchainBlock extends inheritBlockchainBlock {
 
-    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChain, difficultyTargetPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
+    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, difficultyTargetPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, difficultyTargetPrev, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, difficultyTargetPrev, timeStamp, nonce, data, height, db);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
@@ -275,12 +275,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
 
-    calculateNewChainHash(){
+    calculateChainHash(){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) )
             return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this._calculateSerializedBlock( true ) ));
         else
-            return InterfaceBlockchainBlock.prototype.calculateNewChainHash.call(this);
+            return InterfaceBlockchainBlock.prototype.calculateChainHash.call(this);
 
     }
 

@@ -79,7 +79,7 @@ class MemoryManager{
 
     addToLoaded(height, data){
 
-        this._loaded[height] = data = {
+        this._loaded[height] = {
             lastTimeUsed : new Date().getTime(),
             data: data,
         };

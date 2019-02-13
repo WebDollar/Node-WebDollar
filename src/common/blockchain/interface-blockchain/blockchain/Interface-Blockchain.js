@@ -333,7 +333,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             //TODO should be disabled
             await block.saveBlockDifficulty();
             await block.saveBlockHash();
-            await block.saveBlockNewChainHash();
+            await block.saveBlockChainHash();
             await block.saveBlockTimestamp();
             await block.saveChainWork();
 

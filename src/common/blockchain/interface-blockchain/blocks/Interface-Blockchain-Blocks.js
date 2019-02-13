@@ -54,7 +54,7 @@ class InterfaceBlockchainBlocks{
 
         } else {
 
-            this.loadingManager.blockManager.addToLoaded(block.height, block);
+            this.loadingManager.addBlockToLoaded(block.height, block);
 
         }
 
