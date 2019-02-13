@@ -27,7 +27,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (data.message === "Blockchain Ready to Mine" && NodesList )
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i] && NodesList.nodes[i].socket && NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)
+                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket )
                         this._initializeSocket(NodesList.nodes[i].socket)
 
         });
@@ -36,10 +36,8 @@ class InterfaceBlockchainTransactionsProtocol {
 
     _newSocketCreateProtocol(nodesListObject) {
 
-        let socket = nodesListObject.socket;
-
         if (this.blockchain.loaded)
-            this._initializeSocket(socket)
+            this._initializeSocket(nodesListObject.socket)
 
     }
 
@@ -47,7 +45,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
         this.transactionsDownloadingManager.addSocket(socket);
 
-        if (!this.blockchain.MinerPoolManagement || !this.blockchain.MinerPoolManagement.minerPoolStarted)
+        if ( !Blockchain.MinerPoolManagement.minerPoolStarted )
             this.initializeTransactionsPropagation(socket);
 
     }
