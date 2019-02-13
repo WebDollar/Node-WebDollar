@@ -27,7 +27,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (data.message === "Blockchain Ready to Mine" && NodesList )
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket )
+                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket  && !NodesList.nodes[i].socket.node.protocol.transactionsInitializedProtocol)
                         this._initializeSocket(NodesList.nodes[i].socket)
 
         });
@@ -42,6 +42,10 @@ class InterfaceBlockchainTransactionsProtocol {
     }
 
     _initializeSocket(socket){
+
+        if (socket.node.protocol.transactionsInitializedProtocol) return;
+
+        socket.node.protocol.transactionsInitializedProtocol = true;
 
         this.transactionsDownloadingManager.addSocket(socket);
 
