@@ -148,29 +148,20 @@ class NodeProtocol {
 
         for (let i=0; i < nodes.length; i++) {
 
-            let broadcast = false;
+            let broadcast = true;
 
-            if ( !exceptSockets ) broadcast = true;
-            else
-            if (Array.isArray(exceptSockets)){
-
-                //console.log("exceptSockets", exceptSockets);
-
-                let found = false;
+            if (exceptSockets && Array.isArray(exceptSockets))
                 for (let j=0; j<exceptSockets.length; j++)
                     if(exceptSockets[j].node && exceptSockets[j].node.sckAddress )
                         if (nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, {"uuid":true} )) {
-                            found = true;
+                            broadcast = false;
                             break;
                         }
 
-                if (!found)
-                    broadcast = true;
-            }
 
-            if (broadcast) {
+            if (broadcast)
                 nodes[i].socket.node.sendRequest(request, data);
-            }
+
         }
 
         return true;

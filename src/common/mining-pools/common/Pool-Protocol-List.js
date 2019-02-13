@@ -43,8 +43,10 @@ class PoolProtocolList{
     deleteElement(socket){
 
         for (let i=this.list.length-1; i>= 0; i--)
-            if (this.list[i] === socket)
-                this.list.splice(i,1);
+            if (this.list[i] === socket) {
+                this.list.splice(i, 1);
+                break;
+            }
 
     }
 

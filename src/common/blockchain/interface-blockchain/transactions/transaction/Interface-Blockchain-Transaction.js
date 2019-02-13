@@ -133,7 +133,11 @@ class InterfaceBlockchainTransaction{
     }
 
     get txId(){
-        return this._computeTxId();
+
+        if ( !this._txId )
+            this._txId = this._computeTxId();
+
+        return this._txId;
     }
 
     /**
@@ -291,10 +295,6 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    serializeTransactionId(){
-        return this.txId;
-    }
-
     deserializeTransaction(buffer, offset, returnTransaction=false){
 
         offset = offset || 0;
@@ -434,10 +434,14 @@ class InterfaceBlockchainTransaction{
 
     validateIdenticalAddresses(addresses){
 
-        for (let i=0; i<addresses.length; i++)
-            for (let j=i+1; j<addresses.length; j++)
-                if (BufferExtended.safeCompare ( addresses[i].unencodedAddress, addresses[j].unencodedAddress))
-                    throw {message: "address has identical inputs", address: InterfaceBlockchainAddressHelper.generateAddressWIF(addresses[i].unencodedAddress, false, true)};
+        let check = {};
+        for (let i=0; i < addresses.length; i++) {
+
+            let addr = addresses[i].unencodedAddress.toString("hex");
+            if (!check[addr]) check[addr] = true;
+            else  throw {message: "address has identical inputs", address: InterfaceBlockchainAddressHelper.generateAddressWIF(addresses[i].unencodedAddress, false, true)};
+
+        }
 
         return true;
     }

@@ -90,9 +90,8 @@ class TransactionsPendingQueue {
         //This is just for pool
         //TODO remove on light consensus
         if (this.blockchain.agent.light)
-            if( transaction.timeLock < this.blockchain.blocks.length-1 ){
+            if( transaction.timeLock < this.blockchain.blocks.length-1 )
                 throw {message: "transaction is too old"};
-            }
 
         let inserted = false;
 

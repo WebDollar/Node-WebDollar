@@ -21,38 +21,36 @@ class InterfaceBlockchainTransactionsProtocol {
 
         //if a new client || or || web peer is established then, I should register for accepting WebPeer connections
 
-        NodesList.emitter.on("nodes-list/connected", (result) => { this._newSocketCreateProtocol(result) } );
+        NodesList.emitter.on("nodes-list/connected", (result) => this._newSocketCreateProtocol(result) );
 
         StatusEvents.on('blockchain/status', async (data)=>{
 
-            if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
-                return false;
-
-            if (data.message === "Blockchain Ready to Mine" && NodesList !== undefined)
+            if (data.message === "Blockchain Ready to Mine" && NodesList )
                 for (let i=0; i < NodesList.nodes.length; i++)
-                    if (NodesList.nodes[i] !== undefined && NodesList.nodes[i].socket !== undefined && NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET)
-                        this.transactionsDownloadingManager.addSocket(NodesList.nodes[i].socket);
+                    if ( NodesList.nodes[i] && NodesList.nodes[i].socket )
+                        this._initializeSocket(NodesList.nodes[i].socket)
 
-
-        } );
+        });
 
     }
 
-    _newSocketCreateProtocol(nodesListObject){
-
-        let socket = nodesListObject.socket;
-
-        if (this.blockchain.MinerPoolManagement !== undefined && this.blockchain.MinerPoolManagement.minerPoolStarted)
-            return false;
-
-        this.initializeTransactionsPropagation(socket);
+    _newSocketCreateProtocol(nodesListObject) {
 
         if (this.blockchain.loaded)
-            this.transactionsDownloadingManager.addSocket(socket);
+            this._initializeSocket(nodesListObject.socket)
 
     }
 
-    async initializeTransactionsPropagation(socket){
+    _initializeSocket(socket){
+
+        this.transactionsDownloadingManager.addSocket(socket);
+
+        if ( !Blockchain.MinerPoolManagement.minerPoolStarted )
+            this.initializeTransactionsPropagation(socket);
+
+    }
+
+    initializeTransactionsPropagation(socket){
 
         socket.node.on("transactions/missing-nonce", async (response) =>{
 
@@ -181,11 +179,11 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                if (typeof response !== "object") return false;
+                if (!response ) return false;
 
                 if (response.format !== "json")  response.format = "buffer";
 
-                if (response.ids === undefined || response.ids === null || !Array.isArray ( response.ids) ) return false;
+                if (!response.ids || !Array.isArray ( response.ids) ) return false;
 
                 let list = [];
 
@@ -231,13 +229,13 @@ class InterfaceBlockchainTransactionsProtocol {
 
         if (start >= max) return false;
 
-        if (typeof socket === "undefined") return false;
+        if (! socket ) return false;
 
         try{
 
             let answer = await socket.node.sendRequestWaitOnce("transactions/get-pending-transactions-ids", {format: "buffer", start: start, count: count}, 'answer', 12*1000);
 
-            if (answer === null || answer === undefined || answer.result !== true || answer.transactions === null && !Array.isArray(answer.transactions)) return false;
+            if (!answer || answer.result !== true || !answer.transactions || !Array.isArray(answer.transactions)) return false;
 
             for (let i=0; i<answer.transactions.length; i++)
                 this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
@@ -258,7 +256,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
     async downloadTransaction(socket, txId){
 
-        if (typeof socket === "undefined") return false;
+        if (!socket ) return false;
 
         try {
 
@@ -267,7 +265,7 @@ class InterfaceBlockchainTransactionsProtocol {
                 ids: [txId],
             }, "answer", 3000);
 
-            if (answerTransactions === null || answerTransactions === undefined || answerTransactions.result !== true || answerTransactions.transactions === null && !Array.isArray(answerTransactions.transactions)) {
+            if (!answerTransactions || !answerTransactions.result || !answerTransactions.transactions || !Array.isArray(answerTransactions.transactions)) {
                 console.warn("Transaction", txId.toString('hex') ,"was not sent");
                 return false;
             }
@@ -287,21 +285,25 @@ class InterfaceBlockchainTransactionsProtocol {
 
     propagateNewPendingTransaction(transaction, exceptSockets = []){
 
-        if (!Array.isArray(exceptSockets) )
-            exceptSockets = [exceptSockets];
+        if (!Array.isArray(exceptSockets) ) exceptSockets = [exceptSockets];
 
         if (Blockchain.PoolManagement.poolStarted)
-            Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list.forEach( (element)=>{
+            for (let element of Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list)
                 exceptSockets.push(element);
-            });
-
 
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
 
     }
 
-    propagateNewMissingNonce(addressBuffer,nonce){
-        NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, undefined );
+    propagateNewMissingNonce(addressBuffer,nonce, exceptSockets){
+
+        if (!Array.isArray(exceptSockets) ) exceptSockets = [exceptSockets];
+
+        if (Blockchain.PoolManagement.poolStarted)
+            for (let element of Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list)
+                exceptSockets.push( element );
+
+        NodeProtocol.broadcastRequest( "transactions/missing-nonce", { buffer: addressBuffer, nonce: nonce }, undefined, exceptSockets );
         console.warn("I miss nonce", nonce, "for", addressBuffer);
     }
 

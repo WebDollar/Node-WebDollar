@@ -354,6 +354,11 @@ class NodeServer {
 
     }
 
+    close(){
+        if (this.nodeServer)
+            this.nodeServer.close();
+    }
+
 }
 
 export default new NodeServer();

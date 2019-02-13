@@ -1,4 +1,5 @@
 import global from "consts/global";
+
 import NodesList from 'node/lists/Nodes-List'
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecting'
@@ -33,12 +34,13 @@ export default async (Blockchain) => {
             NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
         }
 
-        if (NodeExpress !== undefined)
-            NodeExpress.app.close();
+        if (NodeExpress )
+            NodeExpress.close();
 
-        if (NodeServer !== undefined && NodeServer.nodeServer !== null)
-            NodeServer.nodeServer.close();
+        if (NodeServer )
+            NodeServer.close();
 
+        console.warn("Node Express and Server closed")
     } catch (exception){
 
     }
