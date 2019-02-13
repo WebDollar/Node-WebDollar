@@ -186,7 +186,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height-1);
         if ( !difficulty ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
 
-        return difficultyTarget;
+        return difficulty;
 
     }
 
@@ -212,7 +212,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         let block = await this.blocks.loadingManager.getBlockHash(height-1);
         if ( !block ) throw {message: "getHashPrev invalid height ", height: height};
 
-        return block.hash;
+        return block;
 
     }
 

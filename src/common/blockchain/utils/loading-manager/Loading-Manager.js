@@ -73,7 +73,7 @@ class LoadingManager{
 
         this.blockDifficultyManager.addToLoaded(height, block.difficultyTarget);
         this.blockHashManager.addToLoaded(height, block.hash);
-        this.blockChainHashManager.addToLoaded(height, block.chainHash);
+        this.blockChainHashManager.addToLoaded(height, block.hashChain);
         this.blockTimestampManager.addToLoaded(height, block.timeStamp);
         this.blockManager.addToLoaded(height, block);
 
