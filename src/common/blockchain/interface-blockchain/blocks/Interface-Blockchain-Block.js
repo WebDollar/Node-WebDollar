@@ -398,9 +398,7 @@ class InterfaceBlockchainBlock {
 
     async saveChainWork(){
 
-        let buffer = await this.db.get("chainWork"+this.height-1 );
-        let chainWork = Serialization.deserializeBigInteger(buffer);
-
+        let chainWork = await this.blockchain.blocks.loadingManager.getChainWork(this.height-1);
         chainWork = chainWork.plus( this.workDone);
 
         return this.db.save("chainWork"+this.height, Serialization.serializeBigInteger( chainWork ) )

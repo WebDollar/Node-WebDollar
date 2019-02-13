@@ -282,13 +282,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     let block = await this._loadBlock( index, undefined, revertActions);
 
-                    //TODO should be disabled
-                    await block.saveBlockDifficulty();
-                    await block.saveBlockHash();
-                    await block.saveBlockNewChainHash();
-                    await block.saveBlockTimestamp();
-                    await block.saveChainWork();
-
                     if (index > 0 && index % 50000 === 0)
                         await this.db.restart();
 
@@ -336,6 +329,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};
+
+            //TODO should be disabled
+            await block.saveBlockDifficulty();
+            await block.saveBlockHash();
+            await block.saveBlockNewChainHash();
+            await block.saveBlockTimestamp();
+            await block.saveChainWork();
 
             //it will include the block, but it will not ask to save, because it was already saved before
 
