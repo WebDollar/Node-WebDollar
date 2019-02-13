@@ -133,7 +133,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
 
-                    if (forkFound !== null && forkFound !== fork) {
+                    if (forkFound && forkFound !== fork) {
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
                         forkFound.pushHeaders( fork.forkHeaders ); //this lead to a new fork
@@ -146,7 +146,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     fork.pushHeader(answer.hash);
 
-                    if (await this.blockchain.getChainHash(i+1).equals(answer.hash)){
+                    let chainHash = await this.blockchain.getChainHash(i);
+                    if ( chainHash.equals(answer.hash)){
 
                         binarySearchResult = {
                             position: (i === currentBlockchainLength-1)  ? currentBlockchainLength :  i+1,
@@ -215,9 +216,8 @@ class InterfaceBlockchainProtocolForkSolver{
                     forkChainLength = Math.min(forkChainLength, this.blockchain.blocks.length + consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD);
                 }
 
-                if ( (forkChainLength - binarySearchResult.position) >= consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP){
+                if ( (forkChainLength - binarySearchResult.position) >= consts.SETTINGS.PARAMS.CONNECTIONS.FORKS.MAXIMUM_BLOCKS_TO_DOWNLOAD_TO_USE_SLEEP)
                     fork.downloadBlocksSleep = true;
-                }
 
                 fork.forkStartingHeight = binarySearchResult.position;
                 fork.forkStartingHeightDownloading  = binarySearchResult.position;
@@ -228,8 +228,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 if ( fork.forkStartingHeight > fork.forkChainLength-1 )
                     throw {message: "FORK is empty"};
 
-                console.info("immutability ");
-                fork.validateForkImmutability();
+                await fork.validateForkImmutability();
 
                 console.info("initialize fork");
                 await fork.initializeFork(); //download the requirements and make it ready

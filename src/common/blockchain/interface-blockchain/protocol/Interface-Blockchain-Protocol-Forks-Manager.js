@@ -74,7 +74,7 @@ class InterfaceBlockchainProtocolForksManager {
 
                 socket.node.protocol.blocks = forkChainLength;
 
-                if (answer.fork !== undefined)
+                if ( !answer.fork )
                     return answer.fork.forkPromise;
             }
 
