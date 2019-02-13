@@ -150,8 +150,7 @@ class NodeProtocol {
 
             let broadcast = true;
 
-            if (exceptSockets && Array.isArray(exceptSockets)){
-
+            if (exceptSockets && Array.isArray(exceptSockets))
                 for (let j=0; j<exceptSockets.length; j++)
                     if(exceptSockets[j].node && exceptSockets[j].node.sckAddress )
                         if (nodes[i].socket.node.sckAddress.matchAddress(exceptSockets[j].node.sckAddress, {"uuid":true} )) {
@@ -159,11 +158,10 @@ class NodeProtocol {
                             break;
                         }
 
-            }
 
-            if (broadcast) {
+            if (broadcast)
                 nodes[i].socket.node.sendRequest(request, data);
-            }
+
         }
 
         return true;
