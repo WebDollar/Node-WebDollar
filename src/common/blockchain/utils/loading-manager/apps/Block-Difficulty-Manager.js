@@ -13,8 +13,8 @@ class BlockDifficultyManager extends MemoryManager{
 
     async getData(height) {
 
-        if (this.savingManager._pendingBlocksList[height])
-            return this.savingManager._pendingBlocksList[height][0].targetDifficulty;
+        if (this.savingManager._pendingBlocks[height])
+            return this.savingManager._pendingBlocks[height].targetDifficulty;
 
         return MemoryManager.prototype.getData.call(this, height);
 

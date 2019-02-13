@@ -16,4 +16,4 @@ class ChainWorkManager extends MemoryManager{
 
 }
 
-export default ChainWorkManager;
+export default ChainWorkManager;11

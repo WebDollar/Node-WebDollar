@@ -8,8 +8,8 @@ class BlockHashManager extends MemoryManager{
 
     async getData(height) {
 
-        if (this.savingManager._pendingBlocksList[height])
-            return this.savingManager._pendingBlocksList[height][0].timeStamp;
+        if (this.savingManager._pendingBlocks[height])
+            return this.savingManager._pendingBlocks[height].timeStamp;
 
         return MemoryManager.prototype.getData.call(this, height);
     }

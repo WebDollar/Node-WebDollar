@@ -4,6 +4,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import Log from 'common/utils/logging/Log';
 
 const SAVING_MANAGER_INTERVAL = 5000;
+const MAX_BLOCKS_MEMORY = 1000;
 
 class SavingManager{
 
@@ -11,7 +12,8 @@ class SavingManager{
 
         this.blockchain = blockchain;
 
-        this._pendingBlocksList = {};
+        this._pendingBlocks = {};
+        this._pendingBlocksCount = 0;
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
@@ -29,31 +31,10 @@ class SavingManager{
         if ( !height )
             height = block.height;
 
-        if ( !this._pendingBlocksList[height] ) {
+        if (!this._pendingBlocks)
+            this._pendingBlocksCount++;
 
-            this._pendingBlocksList[height] = [{
-                saving: false,
-                block: block,
-            }];
-
-        } else {
-
-
-            for (let i=0; i<this._pendingBlocksList[height].length; i++)
-                if (!this._pendingBlocksList[height][i].saving){       //not saved
-                    this._pendingBlocksList[height][i].saving = false;
-                    this._pendingBlocksList[height][i].block = block;
-                    return true;
-                }
-
-            this._pendingBlocksList[height].push({
-                saving: false,
-                block: block,
-            });
-
-        }
-
-
+        this._pendingBlocks[height] = block;
 
     }
 
@@ -61,63 +42,38 @@ class SavingManager{
 
         if (process.env.BROWSER) return;
 
-        for (let key in this._pendingBlocksList){
+        let block;
+        for (let key in this._pendingBlocks){
 
-            let blocks = this._pendingBlocksList[key];
+            block = this._pendingBlocks[key];
+            this._pendingBlocks[key] = undefined;
+            delete this._pendingBlocks[key];
 
-            if ( !blocks || blocks.length === 0 ){
-                this._pendingBlocksList[key] = undefined;
-                delete this._pendingBlocksList[key];
-                continue;
-            }
+            this._pendingBlocksCount--;
 
-            let done = false;
+            try {
 
-            for (let i=0; i<blocks.length; i++){
+                if (block.height % 5000 === 0)
+                    await this.blockchain.db.restart();
 
-                let block = blocks[i];
+                await block.saveBlock();
 
-                //already deleted
-                if (!block.block || !block.block.blockchain ){
-                    blocks.splice(i,1);
-                    i--;
-                    continue;
-                }
+            } catch (exception){
 
-                try {
-
-                    block.saving = true;
-
-                    if (block.block.height % 5000 === 0)
-                        await this.blockchain.db.restart();
-
-                    await block.saveBlock();
-
-                } catch (exception){
-
-                    Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
-
-                }
-
-                //saving Accountant Tree
-                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0)
-                    await this.saveBlockchain();
-
-                block.saving = false;
-
-
-                done = true;
-                blocks.splice(i, 1);
-                break;
+                Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             }
 
-            if (done)
-                return key;
+            //saving Accountant Tree
+            if (block.height === this.blockchain.blocks.length-1 && block.height % (100 + this._factor ) === 0)
+                await this.saveBlockchain();
+
+            block.saving = false;
 
         }
 
-        return null;
+        return block;
+
     }
 
     async saveBlockchain(){
@@ -126,8 +82,20 @@ class SavingManager{
 
     async _saveManager(){
 
+        let count = 1;
+
+        if (this._pendingBlocksCount > MAX_BLOCKS_MEMORY )
+            count = this._pendingBlocksCount - MAX_BLOCKS_MEMORY;
+
         try{
-            await this._saveNextBlock();
+            for (let i=0; i < count; i++) {
+
+                await this._saveNextBlock();
+
+                if (i > 0 && i % 50 === 0)
+                    await this.blockchain.sleep(1000);
+
+            }
         } catch (exception){
 
         }
