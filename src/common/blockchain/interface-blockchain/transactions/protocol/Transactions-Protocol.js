@@ -64,7 +64,7 @@ class InterfaceBlockchainTransactionsProtocol {
                 let transaction;
 
                 if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
-                if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
+                if ( typeof response.nonce !== "number" ) throw {message: "missing-nonce - nonce is not a number", response};
 
                 if (response.nonce > this.blockchain.accountantTree.getAccountNonce(response.buffer)){
 
