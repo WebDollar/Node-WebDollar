@@ -82,9 +82,12 @@ class InterfaceBlockchainFork {
 
     async _validateChainWork(){
 
-        let chainWorkFirst = await this.blockchain.getChainWork(this.forkStartingHeight);
-        let chainWorkEnd = await this.blockchain.getChainWork(this.blockchain.blocks.length-1);
-        let chainWork = chainWorkEnd.minus(chainWorkFirst);
+        let chainWork = 0;
+        if (this.forkStartingHeight < this.blockchain.blocks.length) {
+            let chainWorkFirst = await this.blockchain.blocks.loadingManager.getChainWork(this.forkStartingHeight);
+            let chainWorkEnd = await this.blockchain.blocks.loadingManager.getChainWork(this.blockchain.blocks.length - 1);
+            chainWork = chainWorkEnd.minus(chainWorkFirst);
+        }
 
         let forkWork = new BigInteger(0);
         for (let i=0; i< this.forkBlocks.length; i++ )

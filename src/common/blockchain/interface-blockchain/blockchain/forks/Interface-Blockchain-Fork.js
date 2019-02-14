@@ -204,7 +204,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                             await this.blockchain.sleep(2);
 
 
-                        if (! (await this.saveIncludeBlock(index, revertActions, false, false)) )
+                        if ( await this.saveIncludeBlock(index, revertActions, false, false) === false)
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
                         forkBlock.socketPropagatedBy = this.socketsFirst;
