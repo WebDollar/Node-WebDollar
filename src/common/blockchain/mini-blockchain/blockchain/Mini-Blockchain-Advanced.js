@@ -48,15 +48,22 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             if ( await this.blocks.readBlockchainLength() === false)
                 throw "load blockchain simple";
 
+            Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("                              Blockchain Virtualized " + this.blocks.length, Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
+            Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
+
+            //to continue slow loading uncomment the following command
+            await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
+
         } catch (exception){
 
             //let's force to load a simple blockchain
 
-            Log.error("Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER);
-
             this.accountantTree.clear();
 
-            Log.error("Loading Blockchain Exception Couldn't load the last K blocks", Log.LOG_TYPE.SAVING_MANAGER, exception);
+            Log.error("Virtualzied Blockchain couldn't be loaded", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             if (exception === "load blockchain simple")
                 await this.inheritBlockchain.prototype._loadBlockchain.call(this);
@@ -85,7 +92,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
                 Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
 
-                console.info("accountant tree", this.accountantTree.root.hash.sha256.toString("hex"));
+                console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
                 console.info("accountant tree", this.accountantTree.root.edges.length);
 
                 if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))

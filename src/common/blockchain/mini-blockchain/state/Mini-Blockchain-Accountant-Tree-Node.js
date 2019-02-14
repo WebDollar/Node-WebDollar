@@ -14,10 +14,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         super(root, parent, edges);
 
         //console.log("value", value);
-        this.hash = { sha256: new Buffer(32) };
+        this.hash = new Buffer(32);
         this.total = 0;
 
-        if (value !== undefined && value !== null) {
+        if ( value ) {
 
             value.balances = value.balances||[];
 
@@ -175,12 +175,10 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     serializeNodeData( includeEdges, includeHashes ){
 
         try {
-            let hash;
 
-            hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.call(this, includeHashes);
+            let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.call(this, includeHashes);
 
-            if (hash === null)
-                hash = new Buffer(0);
+            if ( !hash ) hash = new Buffer(0);
 
             let dataBuffer = new Buffer(0);
 

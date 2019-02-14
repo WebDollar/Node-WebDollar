@@ -186,7 +186,7 @@ class InterfaceRadixTree extends InterfaceTree {
             searchResult = this.search(input);
 
             //console.log("searchResult", searchResult)
-            if (searchResult.node === undefined || searchResult.node === null)
+            if ( !searchResult.node )
                 return false;
 
         } else {
@@ -424,7 +424,7 @@ class InterfaceRadixTree extends InterfaceTree {
         let searchResult = this.search(input);
 
         // nothing to update
-        if ( searchResult.node === undefined || searchResult.node === null)
+        if ( !searchResult.node )
             return false;
 
         if (!searchResult.node.isLeaf())

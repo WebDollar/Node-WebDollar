@@ -169,7 +169,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                 //show information about Transactions Hash
                 if (consts.DEBUG) {
 
-                    Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.sha256.toString("hex"));
+                    Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.toString("hex"));
 
                     for (let forkBlock of this.forkBlocks) {
 

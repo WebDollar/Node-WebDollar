@@ -99,7 +99,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 balance = Blockchain.blockchain.accountantTree.getBalance( whoIsMining );
 
             //reward already included in the new balance
-            if ( Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree )  && balance !== null) {
+            if ( Blockchain.blockchain.accountantTree.root.hash.equals( this.data.hashAccountantTree )  && balance !== null) {
 
                 if ( whoIsReceivingMoney .equals( whoIsMining )) { //in case it was sent to the minerAddress
 

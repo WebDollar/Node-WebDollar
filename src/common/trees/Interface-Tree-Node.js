@@ -49,13 +49,13 @@ class InterfaceTreeNode {
     }
 
     serializeNodeData(){
-        let buffer = [];
+        let buffers = [];
 
-        if ( this.value !== undefined && Buffer.isBuffer(this.value) ) {
-            buffer.push(Serialization.serializeNumber2Bytes(this.value.length));
-            buffer.push( this.value );
+        if ( this.value && Buffer.isBuffer(this.value) ) {
+            buffers.push(Serialization.serializeNumber2Bytes(this.value.length));
+            buffers.push( this.value );
         } else
-            buffer.push (new Buffer(2));
+            buffers.push ( new Buffer(2) );
 
         return Buffer.concat(buffer);
     }
@@ -68,26 +68,20 @@ class InterfaceTreeNode {
             if (includeEdges) {
 
                 buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
-                for (let i = 0; i < this.edges.length; i++) {
-
+                for (let i = 0; i < this.edges.length; i++)
                     buffer.push(this.edges[i].serializeEdge())
-
-                }
 
             }
 
             return Buffer.concat(buffer);
 
         } catch (exception){
-            console.log("Error serializing TreeNode", exception)
+            console.log("Error serializing TreeNode", exception);
             throw exception;
         }
     }
 
-    deserializeNodeData(buffer, offset){
-
-        offset = offset || 0;
-
+    deserializeNodeData(buffer, offset=0){
 
         let valueLength = Serialization.deserializeNumber2Bytes( buffer, offset );
         offset += 2;
@@ -143,13 +137,10 @@ class InterfaceTreeNode {
 
     validateTreeNode(){
 
-        if ( this === undefined || this === null)
-            throw {message: 'Tree Validation Errror. Node is null'};
-
         for (let i = 0; i < this.edges.length; i++) {
 
-            if (  this.edges[i].targetNode === undefined || this.edges[i].targetNode === null )
-                throw {message: 'Edge target node is Null', node: this, edge: this.edges[i], edgeIndex:i}
+            if (  !this.edges[i].targetNode  )
+                throw {message: 'Edge target node is Null', node: this, edge: this.edges[i], edgeIndex:i};
 
             if (this.edges[i].targetNode.parent !== this)
                 throw {message:'Edge target node parent is different that current node', node:this};

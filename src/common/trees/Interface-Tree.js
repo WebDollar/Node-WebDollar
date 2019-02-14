@@ -26,7 +26,7 @@ class InterfaceTree{
 
     validateRoot(){
 
-        if (this.root === undefined || this.root === null)
+        if ( !this.root )
             throw {message: "root is invalid"};
 
         return this.root.validateCompleteTreeNode.apply(this.root, arguments);
@@ -39,8 +39,7 @@ class InterfaceTree{
         if (!Buffer.isBuffer(data))
             data = WebDollarCryptoData.createWebDollarCryptoData(data).buffer
 
-        if (parent === null || parent === undefined)
-            parent = this.root;
+        if ( !parent) parent = this.root;
 
         let node = this.root.createNewNode( parent,  [], data )
         parent.edgesPush( this.root.createNewEdge( node ) );
@@ -60,7 +59,7 @@ class InterfaceTree{
         let searchResult = this.search(value);
 
         //console.log("searchResult", searchResult)
-        if (searchResult.node === undefined || searchResult.node === null)
+        if ( !searchResult.node )
             return false;
 
         let node = searchResult.node;
@@ -103,7 +102,7 @@ class InterfaceTree{
 
         if (deleted) {
 
-            if (nodeParent === null ||  nodeParent === undefined)
+            if ( !nodeParent )
                 nodeParent = this.root;
 
             nodeParent._changedNode(nodeParent)
@@ -122,10 +121,10 @@ class InterfaceTree{
      */
     search(value, node){
 
-        if ( value === undefined || value === null)
+        if ( !value )
             return null;
 
-        if ( node === undefined || node === null)
+        if ( !node )
             node = this.root;
 
         if (!Buffer.isBuffer(value))
@@ -238,29 +237,30 @@ class InterfaceTree{
             let data = [];
             let hasHashses = false;
 
-            result[i].forEach( (node, index) => {
+            for (let node of result[i]){
 
-                let value = node.value === null  ? 'null' : node.value
-                let sum = node.sum === null  ? 'null' : node.sum
+                let value = node.value === null  ? 'null' : node.value;
+                let sum = node.sum === null  ? 'null' : node.sum;
                 let edges = [];
                 let hash = null;
 
-                node.edges.forEach ((edge, index)=>{
+                for (let edge of node.edges){
                     edges.push(  edge.label  !== undefined ? edge.label.toString() : '' )
-                });
+                }
 
-                if ( node.hash !== undefined)
+                if ( node.hash )
                     hash = node.hash;
 
                 let dataObject = {id: node.id, parentId: (node.parent !== null ? node.parent.id : -666), value: value, sum: sum, edges: edges};
 
-                if (hash !== null){
+                if (hash){
                     dataObject.hash = hash;
                     hasHashses = true;
                 }
 
                 data.push( dataObject );
-            });
+
+            }
 
 
             let dataString = "values { ";
@@ -314,7 +314,7 @@ class InterfaceTree{
             if ( hasHashses ) {
                 dataString += "} hashes { ";
                 data.forEach((element) => {
-                    dataString += element.hash.sha256.toString("hex") + " | ";
+                    dataString += element.hash.toString("hex") + " | ";
                 });
             }
 
@@ -338,7 +338,7 @@ class InterfaceTree{
         this.root.destroyNode();
         this.createRoot();
 
-        if (buffer.length === 1 || buffer.length === 0) return true; // nothing to deserialize
+        if (buffer.length <= 1 ) return true; // nothing to deserialize
         return this.root.deserializeNode(buffer, offset, true, includeHashes);
     }
 
@@ -352,20 +352,20 @@ class InterfaceTree{
 
     async saveTree(key, includeHashes, serialization, timeout){
 
-        if (serialization === undefined || serialization === null)
+        if ( !serialization)
             serialization = this._serializeTree(includeHashes);
 
         return await this.db.save(key, serialization, timeout);
     }
 
-    async loadTree(key, buffer, offset, includeHashes){
+    async loadTree(key, buffer, offset=0, includeHashes){
 
-        if (buffer === undefined)
+        if (!buffer )
             buffer = await this.db.get(key);
 
         if (! Buffer.isBuffer(buffer) ) throw {message: "InterfaceTree - buffer is not Buffer"};
 
-        return this._deserializeTree(buffer, offset||0, includeHashes);
+        return this._deserializeTree(buffer, offset, includeHashes);
     }
 
     matches(tree){

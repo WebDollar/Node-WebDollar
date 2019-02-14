@@ -35,6 +35,8 @@ class NodeBlockchainPropagation{
 
     propagateBlock(block, socketsAvoidBroadcast){
 
+        return;
+
         //verifiy if I am propagating a better block
         if (this._blockPropagating !== undefined && this._blockPropagating === block) return;
 

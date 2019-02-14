@@ -65,7 +65,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
     }
 
     calculateAccountantTreeHashBlockData(){
-        return this.blockchain.accountantTree.root.hash.sha256;
+        return this.blockchain.accountantTree.root.hash;
     }
 
     computeAccountantTreeHashBlockData(){

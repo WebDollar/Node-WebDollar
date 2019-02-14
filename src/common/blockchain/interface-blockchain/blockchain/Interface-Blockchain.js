@@ -243,14 +243,16 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         return true;
     }
 
-    async _loadBlockchain( ){
+    async _loadBlockchain( startingPoint = 0, numBlocks){
 
         if (process.env.BROWSER)
             return true;
 
-        let numBlocks = await this.blocks.loadingManager.readBlockchainLength();
-        await this.blocks.clearBlocks();
-        this.accountantTree.clear();
+        if (!numBlocks) {
+            numBlocks = await this.blocks.loadingManager.readBlockchainLength();
+            await this.blocks.clearBlocks();
+            this.accountantTree.clear();
+        }
 
         global.INTERFACE_BLOCKCHAIN_LOADING = true;
 
@@ -264,7 +266,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             try {
 
-                for ( index = 0; index < numBlocks; ++index ) {
+                for ( index = startingPoint; index < numBlocks; ++index ) {
 
                     let block = await this._loadBlock( index, undefined, revertActions);
 
@@ -328,7 +330,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions, false) ) {
 
                 if ( index % 100 === 0)
-                    console.warn("blockchain l11oaded successfully index ", index);
+                    console.warn("blockchain loaded successfully index ", index);
 
             }
             else {

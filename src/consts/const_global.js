@@ -8,7 +8,7 @@ const BigInteger = require('big-integer');
 
 let consts = {
 
-    DEBUG: true,
+    DEBUG: false,
     OPEN_SERVER: true,
 
 };
@@ -69,7 +69,7 @@ consts.BLOCKCHAIN = {
         WALLET_RECOVERY: 153060,
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
-        TRANSACTIONS_OPTIMIZATION: 153060,
+        TRANSACTIONS_OPTIMIZATION: 153065,
 
         DIFFICULTY_TIME_BIGGER: 153060,
         DIFFICULTY_REMOVED_CONDITION: 161990,
@@ -277,7 +277,7 @@ consts.SETTINGS = {
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 80, //port
+        PORT: 8080, //port
         MINER_POOL_PORT: 8086, //port
 
     },

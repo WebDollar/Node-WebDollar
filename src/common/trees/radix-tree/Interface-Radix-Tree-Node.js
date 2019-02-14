@@ -18,23 +18,23 @@ class InterfaceRadixTreeNode extends InterfaceTreeNode{
     serializeNode(includeEdges){
 
         try {
-            let buffer = [];
+            let buffers = [];
 
-            buffer.push( this.serializeNodeData.apply(this, arguments) );
+            buffers.push( this.serializeNodeData.apply(this, arguments) );
 
             if (includeEdges) {
 
-                buffer.push(Serialization.serializeNumber2Bytes(this.edges.length));
+                buffers.push(Serialization.serializeNumber2Bytes(this.edges.length));
 
                 for (let i = 0; i < this.edges.length; i++) {
-                    buffer.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
-                    buffer.push(this.edges[i].label);
-                    buffer.push(this.edges[i].targetNode.serializeNode.apply(this.edges[i].targetNode, arguments));
+                    buffers.push(Serialization.serializeNumber1Byte(this.edges[i].label.length));
+                    buffers.push(this.edges[i].label);
+                    buffers.push(this.edges[i].targetNode.serializeNode.apply(this.edges[i].targetNode, arguments));
                 }
 
             }
 
-            return Buffer.concat(buffer);
+            return Buffer.concat(buffers);
 
         } catch (exception){
             console.log("Error serializing InterfaceRadixTreeNode", exception)
