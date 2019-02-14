@@ -28,33 +28,6 @@ class InterfaceBlockchainFork {
 
     }
 
-    async destroyFork(){
-
-        try {
-
-            for (let i = 0; i < this.forkBlocks.length; i++)
-                if (this.forkBlocks[i] && (await this.blockchain.getBlock(this.forkBlocks[i].height)) !== this.forkBlocks[i]) {
-
-                    this.forkBlocks[i] = undefined;
-                }
-
-            this.forkBlocks = [];
-
-            this.blockchain = undefined;
-
-            this.headers = [];
-            this.sockets = [];
-            this.forkPromise = [];
-            this._blocksCopy = [];
-            this._forkPromiseResolver = undefined;
-            this.forkPromise = undefined;
-
-        } catch (exception){
-            Log.error("destroy fork raised an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS,  exception);
-        }
-
-    }
-
     /**
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */

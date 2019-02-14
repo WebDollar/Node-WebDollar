@@ -253,9 +253,7 @@ class InterfaceBlockchainProtocol {
 
             let data = await socket.node.sendRequestWaitOnce("head/last-block", undefined, "a");
 
-            if (data === null) return false;
-
-            await this.blockchain.sleep(15+Math.random()*20);
+            if ( !data ) return false;
 
             return await this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p, data.W);
 

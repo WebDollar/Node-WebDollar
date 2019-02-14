@@ -30,7 +30,7 @@ class InterfaceBlockchainProtocolForksManager {
             if (forkChainStartingPoint < 0) throw "Incorrect2 newChainStartingPoint";
             if (forkChainStartingPoint > this.blockchain.blocks.length) throw {message: "Incorrect3 newChainStartingPoint", newChainStartingPoint:forkChainStartingPoint, blocks: this.blockchain.blocks.length};
 
-            if (forkChainWork !== undefined)
+            if (forkChainWork )
                 forkChainWork = Serialization.deserializeBigInteger(forkChainWork);
             else
                 forkChainWork = new BigInteger(0);

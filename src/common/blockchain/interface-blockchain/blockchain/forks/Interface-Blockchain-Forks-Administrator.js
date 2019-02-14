@@ -30,12 +30,8 @@ class InterfaceBlockchainForksAdministrator {
                             break;
                         }
 
-                    if (this.forks[i].sockets.length === 0 && !this.forks[i].forkIsSaving ) {
-
-                        this.forks[i].destroyFork();
+                    if (this.forks[i].sockets.length === 0 && !this.forks[i].forkIsSaving )
                         this.forks.splice(i, 1);
-
-                    }
                 }
 
         });
@@ -176,17 +172,11 @@ class InterfaceBlockchainForksAdministrator {
 
     deleteFork(fork){
 
-        if (fork === undefined || fork === null)
-            return false;
+        if (!fork ) return false;
 
         for (let i=this.forks.length-1; i>=0; i--)
-            if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork) {
-
-                if (this.forks[i] !== undefined && this.forks[i] !== null)
-                    this.forks[i].destroyFork();
-
+            if ( !this.forks[i] || this.forks[i] === fork || this.forks[i].forkId === fork)
                 this.forks.splice(i, 1);
-            }
 
         return false;
     }
