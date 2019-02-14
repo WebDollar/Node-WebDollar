@@ -173,7 +173,7 @@ class InterfaceBlockchainTransaction{
         if (blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
 
         //there are 2 blocks that include two types of transactions
-        if (blockHeight !== 153065 && blockHeight !== 154939  && blockHeight !== 163636 && blockHeight !== 165207 ){
+        if (blockHeight !== 153065 && blockHeight !== 154939  && blockHeight !== 163636 && blockHeight !== 165207 && blockHeight !== 185767 && blockHeight !== 185769 ){
 
             if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
             if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};

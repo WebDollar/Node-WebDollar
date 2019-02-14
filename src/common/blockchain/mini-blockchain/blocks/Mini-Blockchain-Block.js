@@ -129,7 +129,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--) {
 
-                    let block = await this.blockValidation.getBlockCallBack(i + 1);
+                    let block = await this.blockValidation.getBlockCallBack( i );
 
                     if ( !block ) continue;
 

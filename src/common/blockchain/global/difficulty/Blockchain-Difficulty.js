@@ -143,9 +143,6 @@ class BlockchainDifficulty{
         how_much_it_took_to_mine_X_Blocks += blockTimestamp - await getTimeStampCallback(blockNumber-1);
         let how_much_it_should_have_taken_X_Blocks = (blockNumber-firstBlock+1) * consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK;
 
-        console.log("block ",blockNumber," timestamp ", blockTimestamp, " time ", blockTimestamp - await getTimeStampCallback(blockNumber-1) );
-        console.log("how_much_it_took_to_mine_X_Blocks ",how_much_it_took_to_mine_X_Blocks  );
-
         let ratio = new BigNumber(how_much_it_took_to_mine_X_Blocks).dividedBy(how_much_it_should_have_taken_X_Blocks);
 
         let min = 2;

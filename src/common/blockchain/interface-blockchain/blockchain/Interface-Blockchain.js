@@ -152,7 +152,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         let block = await this.blocks.loadingManager.getBlock(height);
 
-        if ( !block ) throw {message:"getBlock invalid height", height:height, blocksLength: this.blocks.length};
+        if ( !block ) throw {message:"getBlock invalid data height", height:height, blocksLength: this.blocks.length};
 
         return block;
 
