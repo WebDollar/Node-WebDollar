@@ -411,7 +411,7 @@ class TransactionsDownloadManager{
 
     _unsubscribeSocket(socket){
 
-        for (let txId of this._transactionsQueue)
+        for (let txId in this._transactionsQueue)
             if( this._transactionsQueue[txId] )
                 for( let i = this._transactionsQueue[txId].socket.length-1 ; i>=0; i--){
 
