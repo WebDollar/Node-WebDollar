@@ -158,7 +158,7 @@ class InterfaceBlockchainBlocks{
 
         this._length = newValue;
 
-        this.chainWork = await this.loadingManager.getChainWork(newValue );
+        this.chainWork = await this.loadingManager.getChainWork( newValue - 1 );
         this.chainWorkSerialized = Serialization.serializeBigInteger( this.chainWork );
     }
 
