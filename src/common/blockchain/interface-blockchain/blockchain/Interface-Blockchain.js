@@ -138,12 +138,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             throw {message: 'block validation failed'};
 
         //recalculate next target difficulty
-        if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ){
-
-            block.difficultyTarget = await block.blockValidation.getDifficulty( block.timeStamp, block.height );
-            block.difficultyTarget = Serialization.convertBigNumber(block.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
-
-        }
+        if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] )
+            await block.calculateDifficultyTarget();
 
         return true;
     }
@@ -177,7 +173,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height >= this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
 
         let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height);
-        if ( !difficulty ) throw {message:"getDifficultyTarget invalid height", height:height, blocksLength: this.blocks.length};
+        if ( !difficulty ) throw {message:"getDifficultyTarget invalid", height:height, blocksLength: this.blocks.length};
 
         return difficulty;
 

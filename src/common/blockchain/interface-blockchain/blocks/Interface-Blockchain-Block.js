@@ -385,6 +385,11 @@ class InterfaceBlockchainBlock {
 
     }
 
+    async calculateDifficultyTarget(){
+        this.difficultyTarget = await this.blockValidation.getDifficulty( this.timeStamp, this.height );
+        this.difficultyTarget = Serialization.convertBigNumber(this.difficultyTarget, consts.BLOCKCHAIN.BLOCKS_POW_LENGTH);
+    }
+
     async saveBlockDifficulty(){
         return this.db.save("blockDiff" + this.height, this.difficultyTarget);
     }
@@ -476,6 +481,9 @@ class InterfaceBlockchainBlock {
 
             this.deserializeBlock(buffer, this.height, undefined);
 
+            if (!this.difficultyTarget)
+                await this.calculateDifficultyTarget();
+
             return true;
         }
         catch(exception) {
@@ -489,7 +497,7 @@ class InterfaceBlockchainBlock {
         let key = "block" + this.height;
 
         try{
-            return (await this.db.remove(key));
+            return  this.db.remove(key);
         }
         catch(exception) {
             return 'ERROR on REMOVE block: ' + exception;

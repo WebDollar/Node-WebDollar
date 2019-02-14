@@ -47,6 +47,7 @@ class SavingManager{
         for (let key in this._pendingBlocks){
 
             block = this._pendingBlocks[key];
+            if (block instanceof Promise) continue;
 
             //remove the block for saving
             this._pendingBlocks[key] = undefined;
@@ -142,7 +143,7 @@ class SavingManager{
 
             answer = await this._saveNextBlock();
 
-            if (answer && answer % 100 === 0) {
+            if (answer && answer.height % 100 === 0) {
 
                 Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer);
                 await this.blockchain.sleep(10);
