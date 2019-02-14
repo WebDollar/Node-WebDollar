@@ -406,7 +406,6 @@ consts.SETTINGS = {
 
     },
     GEO_IP_ENABLED: true,
-    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -534,7 +533,7 @@ if ( consts.DEBUG === true ) {
     consts.SETTINGS.NODE.PORT = 2024;
 
     FallBackNodesList.nodes = [{
-        //"addr": ["http://testnet2.hoste.ro:8001"],
+        "addr": ["http://testnet2.hoste.ro:8001"],
         "addr": ["http://86.126.138.61:2024"],
     }];
 
