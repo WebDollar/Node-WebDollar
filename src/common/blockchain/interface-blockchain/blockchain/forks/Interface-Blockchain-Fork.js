@@ -360,7 +360,7 @@ class InterfaceBlockchainFork {
 
         let success;
 
-        if (this.blockchain === undefined) success = false ; //fork was already destroyed
+        if (!this.blockchain ) success = false ; //fork was already destroyed
         else
             success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
@@ -379,7 +379,7 @@ class InterfaceBlockchainFork {
                 try {
 
                     //making a copy of the current blockchain
-                    this.preForkClone();
+                    await this.preForkClone();
 
                 } catch (exception){
                     Log.error("preForkBefore raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
@@ -396,7 +396,7 @@ class InterfaceBlockchainFork {
 
                     Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
-                    revertActions.revertOperations('', "all");
+                    await revertActions.revertOperations('', "all");
                     this._blocksCopy = []; //We didn't use them so far
 
                     try {
@@ -466,8 +466,6 @@ class InterfaceBlockchainFork {
 
                     await this.blockchain.saveBlockchain( this.forkStartingHeight );
 
-                    if (!this.downloadBlocksSleep) await this.sleep(2);
-
                     Log.log("FORK STATUS SUCCESS5: "+forkedSuccessfully+ " position "+this.forkStartingHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
 
                 } catch (exception){
@@ -488,7 +486,7 @@ class InterfaceBlockchainFork {
                     //revert the last K block
 
                     try {
-                        revertActions.revertOperations('', "all");
+                        await revertActions.revertOperations('', "all");
                     } catch (exception){
                         Log.error("revertOptions raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
                     }
@@ -546,7 +544,7 @@ class InterfaceBlockchainFork {
             if (success) {
 
                 //successfully, let's delete the backup blocks
-                this._deleteBackupBlocks();
+                await this._deleteBackupBlocks();
 
                 //propagate last block
                 NodeBlockchainPropagation.propagateBlock( await this.blockchain.getBlock(this.blockchain.blocks.length - 1), this.sockets);
@@ -674,18 +672,7 @@ class InterfaceBlockchainFork {
     }
 
     async _deleteBackupBlocks(){
-
-
-        for (let i = 0; i < this._blocksCopy.length; i++) {
-
-            let block = await this.blockchain.getBlock(this._blocksCopy[i].height);
-            if (this._blocksCopy[i] && block !== this._blocksCopy[i])
-                this._blocksCopy[i] = undefined;
-
-        }
-
         this._blocksCopy = [];
-
     }
 
     printException(exception){

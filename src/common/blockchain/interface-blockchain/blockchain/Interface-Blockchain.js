@@ -222,7 +222,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
     }
 
-    async saveBlockchain(startingHeight, endingHeight){
+    async saveBlockchain(startingHeight = this.blocks.blocksStartingPoint, endingHeight = this.blocks.length){
 
         if (process.env.BROWSER)
             return true;
@@ -230,9 +230,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         //save the number of blocks
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
-
-        if (startingHeight === undefined) startingHeight = this.blocks.blocksStartingPoint;
-        if (endingHeight === undefined) endingHeight = this.blocks.length;
 
         for (let i = startingHeight; i < endingHeight; i++ ) {
 

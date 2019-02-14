@@ -16,7 +16,7 @@ class BlockManager extends MemoryManager{
     async getData(height) {
 
         if (this.savingManager._pendingBlocks[height])
-            return this.savingManager._pendingBlocks[height].block;
+            return this.savingManager._pendingBlocks[height];
 
         return MemoryManager.prototype.getData.call(this, height);
 

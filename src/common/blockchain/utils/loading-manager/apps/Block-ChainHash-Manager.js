@@ -14,7 +14,7 @@ class BlockChainHashManager extends MemoryManager{
     async getData(height) {
 
         if (this.savingManager._pendingBlocks[height])
-            return this.savingManager._pendingBlocks[height].block;
+            return this.savingManager._pendingBlocks[height].hashChain;
 
         return MemoryManager.prototype.getData.call(this, height);
 
