@@ -40,7 +40,6 @@ class MinerPoolMining extends InheritedPoolMining {
             resolved: true,
             poolSock1et: undefined,
 
-            blocks: [],
         };
 
         NodesList.emitter.on("nodes-list/disconnected", ( nodesListObject ) => {
@@ -124,8 +123,6 @@ class MinerPoolMining extends InheritedPoolMining {
         if (BlockchainGenesis.isPoSActivated(work.h))
             block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
 
-        this._miningWork.blocks.push(block);
-
         this._miningWork.block = block;
         this._miningWork.blockSerialized = work.block;
 
@@ -168,14 +165,6 @@ class MinerPoolMining extends InheritedPoolMining {
             else {
 
                 try {
-
-                    //except the last block
-                    if (this.block){
-                        for ( let i=this._miningWork.blocks.length-2; i >= 0; i-- )
-                            if ( this._miningWork.blocks[i].height  < this.block.height  )
-                                this._miningWork.blocks.splice(i, 1);
-
-                    }
 
                     let timeInitial = new Date().getTime();
 
