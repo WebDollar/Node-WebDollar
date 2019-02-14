@@ -31,7 +31,7 @@ class SavingManager{
         if ( !height )
             height = block.height;
 
-        if (!this._pendingBlocks)
+        if (!this._pendingBlocks[height])
             this._pendingBlocksCount++;
 
         this._pendingBlocks[height] = block;
@@ -65,10 +65,11 @@ class SavingManager{
             }
 
             //saving Accountant Tree
-            if (block.height === this.blockchain.blocks.length-1 && block.height % (100 + this._factor ) === 0)
+            if (block.height === this.blockchain.blocks.length-1 && block.height % (500 + this._factor ) === 0)
                 await this.saveBlockchain();
 
             block.saving = false;
+            break;
 
         }
 
