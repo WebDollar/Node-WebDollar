@@ -256,7 +256,7 @@ class InterfaceBlockchainBlock {
      * @param newNonce
      * @returns {Promise<Buffer>}
      */
-    computeHash(newNonce){
+    async computeHash(newNonce){
         return this.computeHashPOW(newNonce);
     }
 
@@ -269,17 +269,15 @@ class InterfaceBlockchainBlock {
         ]);
     }
 
+    // hash is hashPow ( block header + nonce )
     async computeHashPOW(newNonce){
 
         try {
 
-            // hash is hashPow ( block header + nonce )
-
-            return await WebDollarCrypto.hashPOW( this._getHashPOWData(newNonce) );
+            return WebDollarCrypto.hashPOW( this._getHashPOWData(newNonce) );
 
         } catch (exception){
             console.error("Error computeHash", exception);
-            //return Buffer.from( consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER);
             throw exception;
         }
 
@@ -315,12 +313,12 @@ class InterfaceBlockchainBlock {
 
     }
 
-    serializeBlock( requestHeader = false ){
+    async serializeBlock( requestHeader = false ){
 
         // serialize block is ( hash + nonce + header )
 
         if (!Buffer.isBuffer(this.hash) || this.hash.length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
-            this.hash = this.computeHash();
+            this.hash = await this.computeHash();
 
         let data = this._calculateSerializedBlock(requestHeader);
 

@@ -123,17 +123,17 @@ class InterfaceBlockchainProtocolForkSolver{
             if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
                 for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
 
-                    if (i === forkChainLength-1 && forkLastChainHash && forkLastChainHash ) {
+                    if (i === forkChainLength-1 && forkLastChainHash ) {
                         answer = { hash: forkLastChainHash };
                     } else {
                         answer = await socket.node.sendRequestWaitOnce( "head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-                        if (!answer || !answer.hash )
-                            continue;
+                        if (!answer || !answer.hash ) continue;
                     }
 
                     forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
 
                     if (forkFound && forkFound !== fork) {
+
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
                         forkFound.pushHeaders( fork.forkHeaders ); //this lead to a new fork
@@ -156,7 +156,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
                         break;
-
                     }
 
                 }

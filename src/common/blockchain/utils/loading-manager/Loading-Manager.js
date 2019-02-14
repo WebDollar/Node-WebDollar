@@ -77,11 +77,24 @@ class LoadingManager{
         this.blockTimestampManager.addToLoaded(height, block.timeStamp);
         this.blockManager.addToLoaded(height, block);
 
-        let newChainWork = await this.getChainWork(block.height-1 );
+        let newChainWork = await this.getChainWork(height-1 );
         newChainWork = newChainWork.plus( block.workDone );
 
         this.chainWorkManager.addToLoaded(height, newChainWork);
 
+    }
+
+    async deleteBlock(height, block){
+        this.blockDifficultyManager.deleteLoaded(height, block.difficultyTarget);
+        this.blockHashManager.deleteLoaded(height, block.hash);
+        this.blockChainHashManager.deleteLoaded(height, block.hashChain);
+        this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
+        this.blockManager.deleteLoaded(height, block);
+
+        let newChainWork = await this.getChainWork(height-1 );
+        newChainWork = newChainWork.plus( block.workDone );
+
+        this.chainWorkManager.deleteLoaded(height, newChainWork);
     }
 
 }

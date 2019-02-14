@@ -54,7 +54,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
 
-    computeHash(){
+    async computeHash(){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) )
             return this.computeHashPOS.apply(this, arguments);

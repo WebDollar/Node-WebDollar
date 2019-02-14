@@ -92,6 +92,14 @@ class MemoryManager{
 
     }
 
+    deleteLoaded(height, data){
+
+        if (this._loaded[height] && this._loaded.equals( data ))
+            delete this._loaded[height];
+
+
+    }
+
 }
 
 export default MemoryManager;

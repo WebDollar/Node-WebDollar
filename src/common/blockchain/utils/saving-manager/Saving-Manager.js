@@ -46,23 +46,34 @@ class SavingManager{
         for (let key in this._pendingBlocks){
 
             block = this._pendingBlocks[key];
+
+            //remove the block for saving
             this._pendingBlocks[key] = undefined;
             delete this._pendingBlocks[key];
 
-            this._pendingBlocksCount--;
+            //mark a promise to the save to enable loading to wait until it is saved
+            let resolver;
+            this._pendingBlocks[key ] = new Promise( resolve=> resolver = resolve );
+
+            await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
 
             try {
 
+                await block.saveBlock();
+
                 if (block.height % 5000 === 0)
                     await this.blockchain.db.restart();
-
-                await block.saveBlock();
 
             } catch (exception){
 
                 Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             }
+
+            this._pendingBlocksCount--;
+
+            //propagate block in case loadingManager was using this block
+            await resolver(block);
 
             //saving Accountant Tree
             if (block.height === this.blockchain.blocks.length-1 && block.height % (500 + this._factor ) === 0)
