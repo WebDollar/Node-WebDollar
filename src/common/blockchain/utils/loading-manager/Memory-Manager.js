@@ -1,3 +1,7 @@
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+
+const BigInteger = require('big-integer');
+
 const CLEAR_OLD_UNUSED_BLOCKS_INTERVAL = 30*1000;
 const CLEAR_OLD_UNUSED_BLOCKS = 5*60*1000;
 const MAX_BLOCKS_MEMORY = 1000;
@@ -94,8 +98,24 @@ class MemoryManager{
 
     deleteLoaded(height, data){
 
-        if (this._loaded[height] && this._loaded.equals( data ))
-            delete this._loaded[height];
+        if (this._loaded[height]){
+
+            let oldData = this._loaded[height].data;
+
+            if (Buffer.isBuffer(oldData)){
+                if ( !data.equals(oldData) ) delete this._loaded[height];
+            } else
+            if (oldData instanceof BigInteger  ){
+                if (!data.equals(oldData)) delete this._loaded[height];
+            } else
+            if (typeof oldData === "number" ){
+                if (data !== oldData) delete this._loaded[height];
+            }
+            if ( typeof oldData  === "object" ) {
+                if (data !== oldData ) delete this._loaded[height];
+            }
+
+        }
 
 
     }

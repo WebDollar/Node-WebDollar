@@ -1,6 +1,7 @@
+import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
+
 import global from "consts/global"
 import consts from 'consts/const_global'
-import Blockchain from "main-blockchain/Blockchain";
 import Log from 'common/utils/logging/Log';
 
 const SAVING_MANAGER_INTERVAL = 5000;
@@ -53,7 +54,7 @@ class SavingManager{
 
             //mark a promise to the save to enable loading to wait until it is saved
             let resolver;
-            this._pendingBlocks[key ] = new Promise( resolve=> resolver = resolve );
+            this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
 
             await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
 
@@ -74,6 +75,10 @@ class SavingManager{
 
             //propagate block in case loadingManager was using this block
             await resolver(block);
+
+            //no new object, just the promise
+            if ( this._pendingBlocks[ key ] instanceof Promise)
+                delete this._pendingBlocks[ key ] ;
 
             //saving Accountant Tree
             if (block.height === this.blockchain.blocks.length-1 && block.height % (500 + this._factor ) === 0)

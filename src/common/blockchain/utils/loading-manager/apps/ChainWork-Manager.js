@@ -11,7 +11,7 @@ class ChainWorkManager extends MemoryManager{
             return BigInteger(0);
 
         if (this.savingManager._pendingBlocks[height])
-            return this.savingManager._pendingBlocks[height].getChainWork( );
+            return (await this.savingManager._pendingBlocks[height]).getChainWork( );
 
         let buffer = await this.blockchain.db.get("chainWork"+height);
         return Serialization.deserializeBigInteger(buffer);
