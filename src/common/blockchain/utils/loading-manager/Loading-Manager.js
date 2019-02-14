@@ -69,13 +69,18 @@ class LoadingManager{
     }
 
 
-    addBlockToLoaded(height, block){
+    async addBlockToLoaded(height, block){
 
         this.blockDifficultyManager.addToLoaded(height, block.difficultyTarget);
         this.blockHashManager.addToLoaded(height, block.hash);
         this.blockChainHashManager.addToLoaded(height, block.hashChain);
         this.blockTimestampManager.addToLoaded(height, block.timeStamp);
         this.blockManager.addToLoaded(height, block);
+
+        let newChainWork = await this.getChainWork(block.height-1 );
+        newChainWork = newChainWork.plus( block.workDone );
+
+        this.chainWorkManager.addToLoaded(height, newChainWork);
 
     }
 

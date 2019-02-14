@@ -20,7 +20,6 @@ class PPoWBlockchain extends InterfaceBlockchain {
 
         await block.updateInterlink();
 
-
         if ( !block.blockValidation.blockValidationType["skip-calculating-block-nipopow-level"]) {
             this.prover.provesCalculated.updateBlock(block);
             block._provesClculatedInserted = true;

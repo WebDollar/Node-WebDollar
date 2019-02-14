@@ -221,16 +221,16 @@ class InterfaceBlockchainFork {
     getForkDifficultyTarget(height, POSRecalculation = true){
 
         if (height === -1) return BlockchainGenesis.difficultyTarget; // based on genesis block
-        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return BlockchainGenesis.difficultyTargetPOS;
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1) return BlockchainGenesis.difficultyTargetPOS;
 
         let forkHeight = height - this.forkStartingHeight;
 
         let heightPrePOS = height;
-        if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) {
+        if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1) {
 
             //calculating the virtualization of the POS
-            if (height % 30 === 0) height = height - 10;  //first POS, get the last proof of Stake
-            else if (height % 30 === 20) height = height - 20; //first POW, get the last proof of Work
+            if (height % 30 === 29) height = height - 10;  //first POS, get the last proof of Stake
+            else if (height % 30 === 19) height = height - 20; //first POW, get the last proof of Work
 
             forkHeight = height - this.forkStartingHeight;
         }
@@ -304,12 +304,16 @@ class InterfaceBlockchainFork {
         let pos = -1;
         for (let i=0; i<this.forkBlocks.length-1; i++) {
 
+            if (this.forkBlocks[i].height > this.blockchain.blocks.length-1)
+                break;
+
             let block = await this.blockchain.getBlock(this.forkBlocks[i].height);
-            if (block && block.hashChain.equals(this.forkBlocks[i].hashChain )) {
+            if (block && block.hashChain.equals(this.forkBlocks[i].hashChain)) {
 
                 pos = i;
 
             } else break;
+
         }
 
         if (pos >= 0){
@@ -433,7 +437,7 @@ class InterfaceBlockchainFork {
                 let index;
                 try {
 
-                    for (index = 0; index < this.forkBlocks.length && (Blockchain.MinerPoolManagement === undefined || !Blockchain.MinerPoolManagement.minerPoolStarted); index++) {
+                    for (index = 0; index < this.forkBlocks.length && (!Blockchain.MinerPoolManagement || !Blockchain.MinerPoolManagement.minerPoolStarted); index++) {
 
                         StatusEvents.emit( "agent/status", { message: "Synchronizing - Including Block", blockHeight: this.forkBlocks[index].height, blockHeightMax: this.forkChainLength } );
 

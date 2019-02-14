@@ -272,6 +272,15 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         } else
             return inheritBlockchainBlock.prototype._deserializeBlock.call(this, buffer, offset);
+
+    }
+
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation, onlyHeader ) {
+
+        offset = inheritBlockchainBlock.prototype.deserializeBlock.apply(this, arguments);
+
+        this.hashChain = this.calculateChainHash();
+
     }
 
 

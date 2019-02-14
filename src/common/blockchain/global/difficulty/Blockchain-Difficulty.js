@@ -21,7 +21,7 @@ class BlockchainDifficulty{
 
         let prevBlockDifficulty = await getDifficultyCallback( blockNumber -1, true );
         if (consts.DEBUG)
-            console.log("prevBlockDifficulty", blockNumber, BlockchainGenesis.isPoSActivated(blockNumber) ? "POS" :  "POW",  prevBlockDifficulty.toString("hex"));
+            console.log("prevBlockDifficulty", blockNumber-1, BlockchainGenesis.isPoSActivated(blockNumber-1) ? "POS" :  "POW",  prevBlockDifficulty.toString("hex"));
 
         if (Buffer.isBuffer(prevBlockDifficulty)) prevBlockDifficulty = new BigNumber("0x"+prevBlockDifficulty.toString("hex")); else
         if (typeof prevBlockDifficulty === "string") prevBlockDifficulty = new BigNumber(prevBlockDifficulty); // it must be hex

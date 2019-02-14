@@ -157,7 +157,7 @@ class InterfaceBlockchainBlock {
         if (! this.blockValidation.blockValidationType["skip-prev-hash-validation"] && this.height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION){
 
             //validate hashChainPrev
-            let prevBlockChainHash = await this.blockValidation.getChainHashCallback(this.height);
+            let prevBlockChainHash = await this.blockValidation.getChainHashCallback(this.height-1);
 
             if ( !prevBlockChainHash || !Buffer.isBuffer(prevBlockChainHash))
                 throw {message: 'previous chain hash is not given'};
@@ -383,8 +383,6 @@ class InterfaceBlockchainBlock {
             throw exception;
         }
 
-        this.hashChain = this.calculateChainHash();
-
         return offset;
 
     }
@@ -405,12 +403,17 @@ class InterfaceBlockchainBlock {
         return this.db.save("blockTimestamp" + this.height, this.timeStamp);
     }
 
-    async saveChainWork(){
+    async getChainWork(){
 
         let chainWork = await this.blockchain.blocks.loadingManager.getChainWork(this.height-1);
         chainWork = chainWork.plus( this.workDone);
 
-        return this.db.save("chainWork"+this.height, Serialization.serializeBigInteger( chainWork ) )
+        return chainWork;
+    }
+
+    async saveChainWork(){
+
+        return this.db.save("chainWork"+this.height, Serialization.serializeBigInteger( await this.getChainWork() ) )
     }
 
     async saveBlock(){
