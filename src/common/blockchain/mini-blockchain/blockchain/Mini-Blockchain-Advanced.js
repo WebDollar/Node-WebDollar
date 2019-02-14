@@ -3,8 +3,6 @@ import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
 import Log from 'common/utils/logging/Log';
-import GZip from "common/utils/GZip";
-import Blockchain from "src/main-blockchain/Blockchain";
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -12,8 +10,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         super(agent);
 
-        this.lightAccountantTreeSerializations = {};
-
+        this._miniBlockchainSaveBlocks = 0;
     }
 
     getSerializedAccountantTree(height, gzipped = false){
@@ -26,11 +23,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             let data =  emptyAccountantTree.serializeMiniAccountant();
             emptyAccountantTree.destroyTree();
             return data;
-        }
-
-        if ( Buffer.isBuffer(this.lightAccountantTreeSerializations[height]) ){
-
-            return this.lightAccountantTreeSerializations[height];
         }
 
         // else I need to compute it, by removing n-1..n
@@ -124,10 +116,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
 
     }
-
-
-
-
 
 }
 

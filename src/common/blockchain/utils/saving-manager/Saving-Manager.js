@@ -145,7 +145,7 @@ class SavingManager{
 
             if (answer && answer.height % 100 === 0) {
 
-                Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer);
+                Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer.height);
                 await this.blockchain.sleep(10);
             }
 
