@@ -145,7 +145,7 @@ class PPoWBlockchainProver{
             return false;
 
         if ( this.proofPi )
-            this.proofPi.destroyProof();
+            this.proofPi = undefined;
 
         console.info("Creating proof: ", this.blockchain.blocks.length);
 

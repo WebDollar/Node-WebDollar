@@ -19,13 +19,6 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    destroyProof(){
-
-        this.blocks = [];
-        this.blockchain = undefined;
-
-    }
-
     async getProofHeaders(starting, length){
 
         let list = [];
