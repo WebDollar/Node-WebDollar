@@ -82,19 +82,15 @@ class InterfaceBlockchainFork {
 
     async _validateChainWork(){
 
-        let chainWork = new BigInteger(0);
-        for (let i = this.forkStartingHeight; i<this.blockchain.blocks.length; i++) {
-            let block = await this.blockchain.getBlock(i);
-            chainWork = chainWork.plus( block.workDone);
-        }
+        let chainWorkFirst = await this.blockchain.getChainWork(this.forkStartingHeight);
+        let chainWorkEnd = await this.blockchain.getChainWork(this.blockchain.blocks.length-1);
+        let chainWork = chainWorkEnd.minus(chainWorkFirst);
 
         let forkWork = new BigInteger(0);
         for (let i=0; i< this.forkBlocks.length; i++ )
             forkWork = forkWork.plus( this.forkBlocks[i].workDone );
 
-        let factor = 1;
-
-        if ( forkWork.lesser( chainWork.multiply(factor) ) )
+        if ( forkWork.lesser( chainWork  ) )
             throw {message: "forkWork is less than chainWork", forkWork: forkWork.toString(), chainWork: chainWork.toString() };
 
     }
@@ -201,12 +197,9 @@ class InterfaceBlockchainFork {
             if (this.forkBlocks[i].height > this.blockchain.blocks.length-1)
                 break;
 
-            let block = await this.blockchain.getBlock(this.forkBlocks[i].height);
-            if (block && block.hashChain.equals(this.forkBlocks[i].hashChain)) {
-
-                pos = i;
-
-            } else break;
+            let hashChain = await this.blockchain.getChainHash( this.forkBlocks[i].height );
+            if ( hashChain && hashChain.equals(this.forkBlocks[i].hashChain)) pos = i;
+            else break;
 
         }
 
@@ -215,15 +208,10 @@ class InterfaceBlockchainFork {
             this.forkStartingHeight = this.forkBlocks[pos].height;
             this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
 
-            for (let j=0; j<=pos; j++)
-                this.forkBlocks[j] = undefined;
-
-
             this.forkBlocks.splice(0, pos);
         }
 
-        if (this.forkBlocks.length !== 0) return true;
-        else return false;
+        return this.forkBlocks.length !== 0;
 
     }
 
