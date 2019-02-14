@@ -76,7 +76,7 @@ class LoadingManager{
         this.blockChainHashManager.addToLoaded(height, block.hashChain);
         this.blockTimestampManager.addToLoaded(height, block.timeStamp);
         this.blockManager.addToLoaded(height, block);
-        this.chainWorkManager.addToLoaded(height, block.getChainWork() );
+        this.chainWorkManager.addToLoaded(height, await block.getChainWork() );
 
     }
 
@@ -86,7 +86,7 @@ class LoadingManager{
         this.blockChainHashManager.deleteLoaded(height, block.hashChain);
         this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
         this.blockManager.deleteLoaded(height, block);
-        this.chainWorkManager.deleteLoaded(height, block.getChainWork() );
+        this.chainWorkManager.deleteLoaded(height, await block.getChainWork() );
     }
 
 }

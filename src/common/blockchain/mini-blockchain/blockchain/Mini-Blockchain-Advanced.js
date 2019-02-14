@@ -55,7 +55,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
 
             //to continue slow loading uncomment the following command
-            await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
+            //await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
 
         } catch (exception){
 

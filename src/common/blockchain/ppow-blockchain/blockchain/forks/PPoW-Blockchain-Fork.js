@@ -47,7 +47,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 proofPiData = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi/hash", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                if (proofPiData === null || proofPiData === undefined)
+                if (!proofPiData )
                     BansList.addBan(socket, 10000, "proofPiFailed");
                 else {
                     this.sockets[0] = socket;

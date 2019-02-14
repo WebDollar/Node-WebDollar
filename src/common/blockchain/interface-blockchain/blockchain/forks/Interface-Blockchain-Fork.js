@@ -7,6 +7,7 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import Blockchain from "main-blockchain/Blockchain"
 import Log from 'common/utils/logging/Log';
 import InterfaceBlockchainForkBasic from "./Interface-Blockchain-Fork-Basic"
+import Utils from "common/utils/helpers/Utils";
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -121,7 +122,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     return false;
                 }
 
-                if (this.downloadBlocksSleep) await this.sleep(30);
+                if (this.downloadBlocksSleep) await Utils.sleep(30);
 
                 try {
 
@@ -133,7 +134,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     return false;
                 }
 
-                if (this.downloadBlocksSleep) await this.sleep(20);
+                if (this.downloadBlocksSleep) await Utils.sleep(20);
 
                 try {
 
@@ -155,7 +156,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     return false;
                 }
 
-                if (this.downloadBlocksSleep) await this.sleep(20);
+                if (this.downloadBlocksSleep) await Utils.sleep(20);
 
                 await this.blockchain.blocks.spliceBlocks(this.forkStartingHeight, false, false);
 
@@ -237,7 +238,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     } catch (exception){
                         Log.error("revertOptions raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
                     }
-                    await this.sleep(30);
+                    await Utils.sleep(30);
 
                     try {
                         //reverting back to the clones, especially light settings
@@ -246,18 +247,18 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                         Log.error("revertFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception );
                     }
 
-                    await this.sleep(30);
+                    await Utils.sleep(30);
 
                 }
 
                 await this.postForkTransactions(forkedSuccessfully);
 
-                if (this.downloadBlocksSleep) await this.sleep(30);
+                if (this.downloadBlocksSleep) await Utils.sleep(30);
 
                 this.postFork(forkedSuccessfully);
 
                 if (this.downloadAllBlocks){
-                    await this.sleep(30);
+                    await Utils.sleep(30);
                     Blockchain.synchronizeBlockchain();
                 }
 
@@ -299,14 +300,14 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                 if (this.downloadAllBlocks) {
 
-                    await this.sleep(100);
+                    await Utils.sleep(100);
 
                     this.blockchain.agent.protocol.askBlockchain(this.getSocket());
 
                 }
 
             } catch (exception){
-                Log.error("saveFork - saving the fork returned an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
+                Log.error("saveFork - saving the fork returned an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, excption);
             }
 
         }
