@@ -2,14 +2,9 @@ import MemoryManager from "./../Memory-Manager"
 
 class BlockManager extends MemoryManager{
 
-    constructor(blockchain, savingManager, difficultyManager, chainHashManager, hashManager) {
+    constructor(blockchain, savingManager, loadingManager) {
 
-        super(blockchain, savingManager );
-
-        this._difficultyManager = difficultyManager;
-        this._chainHashManager = chainHashManager;
-        this._hashManager = hashManager;
-        this._chainHashManager = chainHashManager;
+        super(blockchain, savingManager, loadingManager);
 
     }
 
@@ -27,10 +22,10 @@ class BlockManager extends MemoryManager{
         try {
             let block = await this.blockchain.blockCreator.createEmptyBlock( height );
 
-            block.difficultyTargetPrev = await this._difficultyManager.getData(height-1);
-            block.difficultyTarget = await this._difficultyManager.getData(height);
-            block.hash = await this._hashManager.getData(height);
-            block.chainHash = await this._chainHashManager.getData(height);
+            block.difficultyTargetPrev = await this.blockchain.getDifficultyTarget(height-1);
+            block.difficultyTarget = await this.blockchain.getDifficultyTarget(height);
+            block.hash = await this.blockchain.getHash(height);
+            block.chainHash = await this.blockchain.getChainHash(height);
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};

@@ -126,40 +126,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
     }
 
 
-    async saveBlockchainTerminated(){
 
-        Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
-
-        if (this.agent === undefined || !this.agent.consensus)
-            return false;
-
-        await MiniBlockchain.prototype.saveBlockchainTerminated.call(this);
-
-        if (process.env.BROWSER)
-            return true;
-
-        if (this.blocks.length === 0) return false;
-
-
-        let answer = false;
-
-        try {
-
-            Log.info('Saving Accountant Tree', Log.LOG_TYPE.SAVING_MANAGER);
-
-            await this.saveMiniBlockchain( );
-
-            Log.info('Saving Ended', Log.LOG_TYPE.SAVING_MANAGER);
-
-            answer = true;
-        } catch (exception){
-            Log.error("Couldn't save MiniBlockchain", Log.LOG_TYPE.SAVING_MANAGER, exception);
-
-        }
-
-        return answer;
-
-    }
 
 
 }

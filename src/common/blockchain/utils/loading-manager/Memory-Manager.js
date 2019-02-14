@@ -8,10 +8,12 @@ const MAX_BLOCKS_MEMORY = 1000;
 
 class MemoryManager{
 
-    constructor(blockchain, savingManager, maxData = MAX_BLOCKS_MEMORY){
+    constructor(blockchain, savingManager, loadingManager, maxData = MAX_BLOCKS_MEMORY){
 
         this.blockchain = blockchain;
+
         this.savingManager = savingManager;
+        this.loadingManager = loadingManager;
 
         this._loaded = {};
         this._loadedCount = 0;

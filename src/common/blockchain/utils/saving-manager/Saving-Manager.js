@@ -109,6 +109,8 @@ class SavingManager{
 
             for (let i=0; i < count; i++) {
 
+                if (this._isBeingSavedAll) return;
+
                 await this._saveNextBlock();
 
                 if (i > 0 && i % 50 === 0)
@@ -126,10 +128,11 @@ class SavingManager{
     async saveAllBlocks(){
 
         if (this._isBeingSavedAll) return;
-
         this._isBeingSavedAll = true;
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
+
+        Log.info("Saving Manager - Saving All Blocks started", Log.LOG_TYPE.SAVING_MANAGER);
 
         let answer = 1;
 
@@ -146,6 +149,10 @@ class SavingManager{
             }
 
         }
+
+        await this.saveBlockchain();
+
+        Log.info("Saving Manager - Saving All Blocks finished", Log.LOG_TYPE.SAVING_MANAGER);
 
         global.INTERFACE_BLOCKCHAIN_SAVED = true;
 

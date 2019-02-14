@@ -15,14 +15,14 @@ class LoadingManager{
         this.blockchain = blockchain;
         this.savingManager = savingManager;
 
-        this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager);
-        this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager);
-        this.blockHashManager = new BlockHashManager(blockchain, savingManager);
-        this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager);
+        this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager, this);
+        this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager, this);
+        this.blockHashManager = new BlockHashManager(blockchain, savingManager, this);
+        this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager, this);
 
-        this.blockManager = new BlockManager(blockchain, savingManager, this.blockDifficultyManager, this.blockChainHashManager, this.blockHashManager);
+        this.blockManager = new BlockManager(blockchain, savingManager, this);
 
-        this.chainWorkManager = new ChainWorkManager(blockchain, savingManager);
+        this.chainWorkManager = new ChainWorkManager(blockchain, savingManager, this);
 
     }
 
