@@ -84,10 +84,12 @@ class SavingManager{
 
         let count = 1;
 
-        if (this._pendingBlocksCount > MAX_BLOCKS_MEMORY )
-            count = this._pendingBlocksCount - MAX_BLOCKS_MEMORY;
 
         try{
+
+            if (this._pendingBlocksCount > MAX_BLOCKS_MEMORY )
+                count = this._pendingBlocksCount - MAX_BLOCKS_MEMORY;
+
             for (let i=0; i < count; i++) {
 
                 await this._saveNextBlock();
@@ -97,7 +99,7 @@ class SavingManager{
 
             }
         } catch (exception){
-
+            console.error("SavingManager _clearOldUnusedBlocks raised an error", exception);
         }
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );

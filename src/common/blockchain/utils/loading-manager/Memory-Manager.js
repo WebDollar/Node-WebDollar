@@ -50,27 +50,33 @@ class MemoryManager{
 
         let date = new Date().getTime();
 
-        for (let key in this._loaded)
-            if ( date - this._loaded[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS) {
+        try{
 
-                //check if it is not 11being saved by the Save Manager
-                delete this._loaded[key];
-                this._loadedCount--;
+            for (let key in this._loaded)
+                if ( date - this._loaded[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS) {
+
+                    //check if it is not 11being saved by the Save Manager
+                    delete this._loaded[key];
+                    this._loadedCount--;
+
+                }
+
+            if (this._loadedCount > this._maxData){
+
+                let array = Object.values(this._loaded);
+                array.sort(function(a, b) {
+                    return a.lastTimeUsed - b.lastTimeUsed;
+                });
+
+                for (let i=this._maxData; i < array.length; i++)
+                    delete this._loaded[ array[i].height ];
+
+                this._loadedCount -= this._maxData;
 
             }
 
-        if (this._loadedCount > this._maxData){
-
-            let array = Object.values(this._loaded);
-            array.sort(function(a, b) {
-                return a.lastTimeUsed - b.lastTimeUsed;
-            });
-
-            for (let i=this._maxData; i < array.length; i++)
-                delete this._loaded[ array[i].height ];
-
-            this._loadedCount = this._maxData;
-
+        } catch (exception){
+            console.error("MemoryManager _clearOldUnusedBlocks raised an error", exception);
         }
 
         this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNUSED_BLOCKS_INTERVAL );
