@@ -130,7 +130,7 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-    async _SerializationProves(){
+    async _serializationProves(){
 
         let array = [];
 
@@ -151,14 +151,14 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-    async _DeserializationProves(Buffer, offset = 0) {
+    async _deserializationProves(buffer, offset = 0) {
 
-        let levelsLength = Serialization.deserializeNumber2Bytes(Buffer, offset);
+        let levelsLength = Serialization.deserializeNumber2Bytes(buffer, offset);
         offset += 2;
 
         for (let i = -1; i < levelsLength; i++) {
 
-            let currentLevelLength = Serialization.deserializeNumber3Bytes(Buffer, offset);
+            let currentLevelLength = Serialization.deserializeNumber3Bytes(buffer, offset);
             offset += 3;
 
             if (currentLevelLength !== 0) {
@@ -166,12 +166,15 @@ class PPoWBlockchainProvesCalculated{
                 for (let j = 0; j < currentLevelLength; j++) {
 
                     this.levels[i][j] = {};
-                    // let deserializeResult = Serialization.deserializeHashOptimized(Buffer,offset);
+                    // let deserializeResult = Serialization.deserializeHashOptimized(buffer,offset);
                     // this.levels[i][j].hash = deserializeResult.hash;
                     // offset = deserializeResult.offset;
 
-                    this.levels[i][j] = Serialization.deserializeNumber4Bytes(Buffer,offset);
+                    let height = Serialization.deserializeNumber4Bytes(buffer,offset);
                     offset += 4;
+
+                    this.levels[i][j] = height;
+                    this.allBlocks[height] = j;
 
                 }
 
@@ -184,7 +187,7 @@ class PPoWBlockchainProvesCalculated{
     async _saveProvesCalculated(key = this.blockchain._blockchainFileName+"_proves_calculated"){
 
 
-        let buffer = await this._SerializationProves();
+        let buffer = await this._serializationProves();
 
         console.log("Save proof creator "+key);
 
@@ -205,7 +208,7 @@ class PPoWBlockchainProvesCalculated{
                 return false;
             }
 
-            await this._DeserializationProves(buffer);
+            await this._deserializationProves(buffer);
 
             return true;
 

@@ -27,8 +27,6 @@ class PPoWBlockchainProver{
 
     async _createProofPi(chain){
 
-        return;
-
         //B ← C[0]
         let B = await chain.getBlock(0);
 
@@ -52,11 +50,11 @@ class PPoWBlockchainProver{
             if (chainLength - consts.POPOW_PARAMS.k >= 0)
                 for (let miu = C.interlink.length; miu >= 0; --miu) {
 
-                    // //  α ← C[: −k]{B :}↑µ
-                    // //  α is superChain
+                    // α ← C[: −k]{B :}↑µ
+                    // α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
-                    // // C[: −k]{B :}
+                    // C[: −k]{B :}
                     for (let level = miu; level < 256; level++){
 
                         //C[: −k] ↑µ
@@ -84,10 +82,10 @@ class PPoWBlockchainProver{
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
-                        B = await superChain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m] );
+                        B = await this.blockchain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m] );
 
                     count ++;
-                    if (count % 20 === 0)
+                    if (count % 100 === 0)
                         await this.blockchain.sleep(5);
 
                 }

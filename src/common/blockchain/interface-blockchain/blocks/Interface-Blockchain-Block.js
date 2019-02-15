@@ -520,7 +520,7 @@ class InterfaceBlockchainBlock {
             version: this.version,
             height: this.height,
             hash: this.hash,
-            hashChain: this.hashChainNew,
+            hashChain: this.hashChain,
             hashPrev: this.hashPrev,
             hashChainPrev: this.hashChainPrev,
             data: {
