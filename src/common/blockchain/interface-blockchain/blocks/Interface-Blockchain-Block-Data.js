@@ -26,7 +26,7 @@ class InterfaceBlockchainBlockData {
 
         this.minerAddress = minerAddress;
 
-        this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions);
+        this.transactions = new InterfaceBlockchainBlockDataTransactions(this, transactions, hashTransactions, blockchain.db);
 
         this.hashData = hashData;
 

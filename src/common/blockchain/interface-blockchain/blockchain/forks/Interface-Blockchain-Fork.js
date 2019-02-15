@@ -265,25 +265,25 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
     }
 
-    postForkTransactions(forkedSuccessfully, oldBlocks){
+    async postForkTransactions(forkedSuccessfully, oldBlocks){
 
         //move the transactions to pending
         if (forkedSuccessfully) {
 
             // remove transactions and place them in the queue
             for (let block of oldBlocks)
-                block.data.transactions.unconfirmTransactions();
+                await block.data.transactions.unconfirmTransactions();
 
             for (let block of this.forkBlocks)
-                block.data.transactions.confirmTransactions();
+                await block.data.transactions.confirmTransactions();
 
         } else {
 
             for (let block of this.forkBlocks)
-                block.data.transactions.unconfirmTransactions();
+                await block.data.transactions.unconfirmTransactions();
 
             for (let block of oldBlocks)
-                block.data.transactions.confirmTransactions();
+                await block.data.transactions.confirmTransactions();
 
         }
 

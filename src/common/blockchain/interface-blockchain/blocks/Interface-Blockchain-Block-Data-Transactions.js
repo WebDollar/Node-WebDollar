@@ -8,9 +8,10 @@ import Log from 'common/utils/logging/Log';
 
 class InterfaceBlockchainBlockDataTransactions {
 
-    constructor(blockData, transactions, hashTransactions){
+    constructor(blockData, transactions, hashTransactions, db){
 
         this.blockData = blockData;
+        this.db = db;
 
         this.transactions = transactions||[];
 
@@ -24,22 +25,54 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    confirmTransactions(){
+    async saveVirtualizedTxId(txId){
 
-        this.transactions.forEach((transaction) => {
+        try{
+
+            this.db.save("transactionID-"+txId, txId );
+
+        }
+        catch(err) {
+            return 'ERROR on saving TxId: '+txId+':' + err;
+        }
+
+    }
+
+    async deleteVirtualizedTxId(txId){
+
+        let answer;
+
+        try{
+
+            answer = await this.db.remove("transactionID-"+txId);
+            return answer;
+
+        }
+        catch(err) {
+            return 'ERROR on saving TxId '+txId+':' + err;
+        }
+
+    }
+
+    async confirmTransactions(){
+
+        await this.transactions.forEach(async (transaction) => {
+
+            await this.saveVirtualizedTxId(transaction.txId.toString('hex'));
             transaction.confirmed = true;
             // this.blockData.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
         });
 
     }
 
-    unconfirmTransactions(){
+    async unconfirmTransactions(){
 
-        this.transactions.forEach((transaction) => {
+        await this.transactions.forEach(async (transaction) => {
 
             transaction.confirmed = false;
 
             try {
+                await this.deleteVirtualizedTxId(transaction.txId.toString('hex'));
                 this.blockData.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, "all");
             }
             catch (exception) {

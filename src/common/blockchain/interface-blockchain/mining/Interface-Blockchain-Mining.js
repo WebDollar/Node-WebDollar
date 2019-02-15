@@ -202,7 +202,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 
                     //confirming transactions
-                    block.data.transactions.confirmTransactions();
+                    await block.data.transactions.confirmTransactions();
 
                     StatusEvents.emit("blockchain/new-blocks", { });
 
