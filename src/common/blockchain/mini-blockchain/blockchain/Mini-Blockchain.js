@@ -36,6 +36,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
 
+        if (!revertActions) revertActions = new RevertActions( this  );
+
         revertActions.push( { name: "breakpoint" } );
 
         let revertException = false;
@@ -74,27 +76,23 @@ class MiniBlockchain extends  inheritBlockchain{
             console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block.height, ex, block ? block.toJSON() : '' );
         }
 
+        let result = true;
         try{
 
             //revert back the database
             if (revertException || revertAutomatically){
-
                 await revertActions.revertOperations();
                 if (revertException) return false;
             }
 
-
         } catch (exception){
 
             console.log("MiniBlockchain Reverting Error raised an exception", exception);
-            revertActions.clearUntilBreakpoint();
-
-            return false;
+            result = false;
         }
 
         revertActions.clearUntilBreakpoint();
-
-        return true;
+        return result;
 
     }
 
@@ -112,11 +110,9 @@ class MiniBlockchain extends  inheritBlockchain{
 
         if (await this.simulateNewBlock( args[0], false, args[4],
 
-                async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs );
-                }
+                async ()=>  await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs )
 
-            , args[5] )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+            , args[5] ) ===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         return true;
     }

@@ -285,7 +285,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         StatusEvents.emit( "agent/status", {message: "Collecting Blockchain", blockHeight: fork.forkStartingHeight } );
 
-        if ( !fork || typeof fork !== "object" )
+        if ( !fork )
             throw {message: 'fork is null'};
 
         let nextBlockHeight = fork.forkStartingHeightDownloading;

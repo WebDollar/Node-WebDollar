@@ -6,7 +6,6 @@ class MiniBlockchainBlocks extends InterfaceBlockchainBlocks{
     async spliceBlocks(after, showUpdate = true, revertActions){
 
         let oldLength = this.length ;
-        await InterfaceBlockchainBlocks.prototype.spliceBlocks.apply(this, arguments);
 
         if (!revertActions)
             revertActions = new RevertActions( this.blockchain );
@@ -31,15 +30,15 @@ class MiniBlockchainBlocks extends InterfaceBlockchainBlocks{
                 // remove reward
                 this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, undefined, showUpdate);
 
+                revertActions.push({
+                    name: "block-removed",
+                    height: this.length-1,
+                    data: block,
+                });
+
             }
 
-        for (let i=removedBlocks.length-1; i >= 0; i--)
-            revertActions.push({
-                name: "block-removed",
-                height: this.length-1,
-                data: removedBlocks[i],
-            });
-
+        await InterfaceBlockchainBlocks.prototype.spliceBlocks.apply(this, arguments);
 
         return removedBlocks;
 

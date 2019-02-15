@@ -253,8 +253,6 @@ class PoolWorkManagement{
 
                     }
 
-                    revertActions.destroyRevertActions();
-
                 }
 
 

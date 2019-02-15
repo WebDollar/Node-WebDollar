@@ -57,15 +57,11 @@ class MiniBlockchainLight extends  MiniBlockchainAdvanced{
 
             if ( await this.simulateNewBlock(block, false, revertActions,
 
-                    async () => {
+                async () =>  await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate)
 
-                        return await this.inheritBlockchain.prototype.includeBlockchainBlock.call( this, block, resetMining, "all", saveBlock, revertActions, showUpdate);
+                    , showUpdate)
 
-                    },
-
-                    showUpdate) === false
-
-            ) throw {message: "Error Including Blockchain Light Block"};
+                === false) throw {message: "Error Including Blockchain Light Block"};
 
             if (saveBlock )
                 NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)

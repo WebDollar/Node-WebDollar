@@ -23,10 +23,6 @@ class MiniBlockchainFork extends inheritFork{
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
-    revertFork(){
-        return inheritFork.prototype.revertFork.call(this);
-    }
-
 
 }
 

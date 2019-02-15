@@ -258,8 +258,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         if (this.blockchain.agent.light )
             this.blockchain.proofPi = this._forkProofPiClone;
 
-        return InterfaceBlockchainFork.prototype.revertFork.call(this);
-
     }
 
     _isProofBetter(LCA){

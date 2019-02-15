@@ -8,6 +8,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import Log from 'common/utils/logging/Log';
 import InterfaceBlockchainForkBasic from "./Interface-Blockchain-Fork-Basic"
 import Utils from "common/utils/helpers/Utils";
+import InterfaceBlockchainForkTests from "./tests/Interface-Blockchain-Fork-Tests"
 
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
@@ -137,6 +138,8 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                 let forkedSuccessfully = true;
 
+                Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.toString("hex"));
+
                 try {
 
                     //making a copy of the current blockchain
@@ -152,6 +155,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     //show information about Transactions Hash
                     if (consts.DEBUG) this._showDebugInfo();
 
+                    //InterfaceBlockchainForkTests.test1(this);
+                    //InterfaceBlockchainForkTests.test2(this);
+                    //InterfaceBlockchainForkTests.test3(this);
+
                     for (let index = 0; index < this.forkBlocks.length; index++) {
 
                         let forkBlock = this.forkBlocks[index];
@@ -162,6 +169,8 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                         if ( await this.saveIncludeBlock(index, revertActions, false, false) === false)
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
+
+                        revertActions.push( {name: "block-added", height: forkBlock.height } );
 
                         if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
                             forkBlock.blockValidation.blockValidationType['skip-sleep'] = true;
@@ -185,13 +194,18 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                 } catch (exception) {
 
+                    forkedSuccessfully = false;
+
                     Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
                     await revertActions.revertOperations('', "all");
+
+                    //other revert settings
                     await this.revertFork();
 
-                    return false;
                 }
+
+                Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.toString("hex"));
 
                 return forkedSuccessfully;
 
@@ -212,8 +226,6 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
         // it was done successfully
         Log.info("FORK SOLVER SUCCESS: " + success, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
-
-        revertActions.destroyRevertActions();
 
         Blockchain.blockchain.accountantTree.emitBalancesChanges();
         Blockchain.blockchain.blocks.recalculateNetworkHashRate();
@@ -298,6 +310,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
         return true;
     }
+
 
 
 }
