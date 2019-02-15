@@ -38,6 +38,9 @@ class InterfaceBlockchainBlocks{
         this.savingManager = new SavingManager(this.blockchain);
         this.loadingManager = new LoadingManager(this.blockchain, this.savingManager);
 
+        this.last = undefined;
+        this.first = undefined;
+
     }
 
     async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
@@ -92,16 +95,6 @@ class InterfaceBlockchainBlocks{
         //full node
         return this.length;
 
-    }
-
-    // aka head
-    get last() {
-        return this.loadingManager.getBlock(this.length - 1);
-    }
-
-    // aka tail
-    get first() {
-        return this.loadingManager.getBlock( this.blocksStartingPoint );
     }
 
     async recalculateNetworkHashRate(){
@@ -160,6 +153,8 @@ class InterfaceBlockchainBlocks{
 
         this.chainWork = await this.loadingManager.getChainWork( newValue - 1 );
         this.chainWorkSerialized = Serialization.serializeBigInteger( this.chainWork );
+
+        this.last = await this.loadingManager.getBlock( newValue - 1);
     }
 
     get length(){
