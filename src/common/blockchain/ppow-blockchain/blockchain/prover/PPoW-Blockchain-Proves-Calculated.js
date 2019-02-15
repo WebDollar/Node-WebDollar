@@ -192,16 +192,13 @@ class PPoWBlockchainProvesCalculated{
 
     }
 
-    async _loadProvesCalculated(key){
-
-        if (key === undefined)
-            key = this.blockchain._blockchainFileName+"_proves_calculated";
+    async _loadProvesCalculated(key = this.blockchain._blockchainFileName+"_proves_calculated"){
 
         console.log("Load proof creator "+key);
 
         try{
 
-            let buffer = await this.db.get(key, 12000);
+            let buffer = await this.db.get(key, 20000, 20, true);
 
             if ( !buffer || !Buffer.isBuffer(buffer)) {
                 console.error("Proof for key "+key+" was not found");

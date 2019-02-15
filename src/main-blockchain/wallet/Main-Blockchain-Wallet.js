@@ -152,11 +152,11 @@ class MainBlockchainWallet {
 
         }, 20*1000 );
 
-        let buffer = await this.db.get(this.walletFileName, 30*1000, true);
+        let buffer = await this.db.get(this.walletFileName, 100000, 20,true);
 
         clearTimeout(timeout);
 
-        if ( buffer === null || buffer === undefined)
+        if ( !buffer )
             return false;
 
         try {

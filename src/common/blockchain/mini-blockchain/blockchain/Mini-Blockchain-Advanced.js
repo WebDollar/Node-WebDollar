@@ -87,8 +87,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 let length = this.blocks.length;
                 let serialization = this.accountantTree.serializeMiniAccountant(true, );
 
-                //avoid resaving the same blockchain
-                if (this._miniBlockchainSaveBlocks >= length) throw {message: "already saved"};
+                //avoid re saving the same blockchain
+                if (this._miniBlockchainSaveBlocks >= length) return false;
 
                 Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
 

@@ -257,75 +257,92 @@ class InterfaceSatoshminDB {
 
     async save(key, value, timeout, trials = 10){
 
-        for (let i = 0; i < trials; i++){
+        if (!trials) trials = 1;
 
-            let answer = await this._save(key, value, timeout);
+        let i=0;
+        while ( i < trials){
 
-            if (answer)
-                return answer;
-            else {
+            let out = await this._save(key, value, timeout);
+            if (out)
+                return out;
 
-                if (trials % 5 === 0) //it was observed that a restart
-                    await this.restart();
+            if (i > 0 && i % 5 === 0 )
+                await this.restart();
 
-                await Utils.sleep(200);
-            }
-
+            i++;
         }
 
         return null;
     }
 
-    get(key, timeout=7000, freeze=false) {
+    _get(key, timeout, freeze){
 
-        return new Promise((resolve)=>{
+        return new Promise( resolve => {
 
             //timeout, max 10 seconds to load the database
             let timeoutInterval = setTimeout(()=>{
 
                 console.error("SatoshminDB Get failed !!", key);
-
-                if (freeze === true ) return;
-
+                if ( freeze ) return;
                 resolve(null);
+
             }, timeout);
 
 
-
-            this._getDocument(key).then((answer)=>{
+            this._getDocument(key).then( answer =>{
 
                 clearTimeout(timeoutInterval);
-                resolve(answer);
+                resolve({result: answer } );
 
-            }).catch((exception)=>{
+            }).catch(exception => {
 
                 clearTimeout(timeoutInterval);
                 console.error("db.get error " + key, exception);
 
-                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
+                StatusEvents.emit("blockchain/logs", { message: "IndexedDB Error", reason: exception.reason.toString() });
 
-                if (freeze === true ) return;
-
+                if (freeze ) return;
                 resolve(null);
+
             });
 
         })
 
+    }
+
+    async get(key, timeout=7000, trials = 20, freeze=false) {
+
+        if ( !trials ) trials = 1;
+
+        let i = 0;
+        while (i < trials) {
+
+            let out = await this._get(key, timeout, freeze);
+            if (out)
+                return out.result;
+
+            if (i > 0 && i % 5 === 0 )
+                await this.restart();
+
+            i++;
+        }
+
+        return null;
 
     }
 
     async remove(key) {
         try {
-            let result = await this._deleteDocument(key);
-            return result;
+            return await this._deleteDocument(key);
         } catch (exception) {
+
             console.error("db.remove error " + key, exception);
 
             if (exception.status === 500)
                 StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
-            return null;
         }
+        return null;
     }
 
     close(){

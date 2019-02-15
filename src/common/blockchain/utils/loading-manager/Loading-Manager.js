@@ -1,5 +1,7 @@
 import consts from "consts/const_global";
 
+import BlockBufferManager from "./apps/buffers/Block-Buffer-Manager"
+import BlockHeaderBufferManager from "./apps/buffers/Block-Header-Buffer-Manager"
 import BlockManager from "./apps/Block-Manager"
 import BlockDifficultyManager from "./apps/Block-Difficulty-Manager"
 import BlockChainHashManager from "./apps/Block-ChainHash-Manager"
@@ -15,15 +17,26 @@ class LoadingManager{
         this.blockchain = blockchain;
         this.savingManager = savingManager;
 
-        this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager, this);
-        this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager, this);
-        this.blockHashManager = new BlockHashManager(blockchain, savingManager, this);
-        this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager, this);
+        this.blockBufferManager = new BlockBufferManager(blockchain, savingManager, this, 100 );
+        this.blockHeaderBufferManager = new BlockHeaderBufferManager(blockchain, savingManager, this, 100 );
 
-        this.blockManager = new BlockManager(blockchain, savingManager, this);
+        this.blockDifficultyManager = new BlockDifficultyManager(blockchain, savingManager, this, 2000);
+        this.blockChainHashManager = new BlockChainHashManager(blockchain, savingManager, this, 2000);
+        this.blockHashManager = new BlockHashManager(blockchain, savingManager, this, 2000);
+        this.blockTimestampManager = new BlockTimestampManager(blockchain, savingManager, this, 2000);
 
-        this.chainWorkManager = new ChainWorkManager(blockchain, savingManager, this);
+        this.blockManager = new BlockManager(blockchain, savingManager, this, 1000);
 
+        this.chainWorkManager = new ChainWorkManager(blockchain, savingManager, this, 2000);
+
+    }
+
+    async getBlockBuffer(height){
+        return this.blockBufferManager.getData(height);
+    }
+
+    async getBlockHeaderBuffer(height){
+        return this.blockHeaderBufferManager.getData(height);
     }
 
     async getBlockTimestamp(height){
@@ -58,7 +71,7 @@ class LoadingManager{
 
     async readBlockchainLength(){
 
-        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 20000, 1000000);
+        let numBlocks = await this.blockchain.db.get( this.blockchain._blockchainFileName, 20000, 20);
 
         if ( !numBlocks ) {
             Log.error("Error reading the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
@@ -71,20 +84,13 @@ class LoadingManager{
 
     async addBlockToLoaded(height, block){
 
-        this.blockDifficultyManager.addToLoaded(height, block.difficultyTarget);
-        this.blockHashManager.addToLoaded(height, block.hash);
-        this.blockChainHashManager.addToLoaded(height, block.hashChain);
-        this.blockTimestampManager.addToLoaded(height, block.timeStamp);
         this.blockManager.addToLoaded(height, block);
         this.chainWorkManager.addToLoaded(height, await block.getChainWork() );
 
     }
 
     async deleteBlock(height, block){
-        this.blockDifficultyManager.deleteLoaded(height, block.difficultyTarget);
-        this.blockHashManager.deleteLoaded(height, block.hash);
-        this.blockChainHashManager.deleteLoaded(height, block.hashChain);
-        this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
+
         this.blockManager.deleteLoaded(height, block);
         this.chainWorkManager.deleteLoaded(height, await block.getChainWork() );
     }

@@ -112,7 +112,7 @@ class ServerPoolData {
 
         try{
 
-            let buffer = await this._db.get("ServersPoolList", 60000, true);
+            let buffer = await this._db.get("ServersPoolList", 60000, undefined, true);
 
             if (buffer === null) return true; //nothing to load
 

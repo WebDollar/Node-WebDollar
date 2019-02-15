@@ -11,6 +11,9 @@ class BlockHashManager extends MemoryManager{
         if (this.savingManager._pendingBlocks[height])
             return (await this.savingManager._pendingBlocks[height]).hash;
 
+        if (this.loadingManager.blockManager._loaded[height])
+            return (await this.loadingManager.getBlock(height)).hash;
+
         return MemoryManager.prototype.getData.call(this, height);
     }
 

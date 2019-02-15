@@ -2,12 +2,6 @@ import MemoryManager from "./../Memory-Manager"
 
 class BlockManager extends MemoryManager{
 
-    constructor(blockchain, savingManager, loadingManager) {
-
-        super(blockchain, savingManager, loadingManager);
-
-    }
-
     async getData(height) {
 
         if (this.savingManager._pendingBlocks[height])

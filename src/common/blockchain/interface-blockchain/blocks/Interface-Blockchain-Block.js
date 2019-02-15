@@ -462,17 +462,7 @@ class InterfaceBlockchainBlock {
 
         try{
 
-            let buffer;
-
-            let trials = 0;
-            while (trials < 50){
-
-                trials ++;
-                buffer = await this.db.get(key, 7000);
-
-                if ( buffer )
-                    break;
-            }
+            let buffer = await this.db.get(key, 7000);
 
             if ( !buffer ) {
                 console.error("block "+this.height+" was not found "+ key);

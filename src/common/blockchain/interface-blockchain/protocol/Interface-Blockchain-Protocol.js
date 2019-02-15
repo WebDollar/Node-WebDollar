@@ -205,27 +205,20 @@ class InterfaceBlockchainProtocol {
 
                 try {
 
-                    if (typeof data.height !== 'number')
-                        throw {message: "data.height is not defined"};
-
+                    if (typeof data.height !== 'number') throw {message: "data.height is not defined"};
                     if (this.blockchain.blocks.length <= data.height)
                         throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
 
-                    let block = await this.blockchain.getBlock(data.height);
-
-                    if (block === undefined)
-                        throw {message: "block is empty", height: data.height};
-
-                    await this.blockchain.sleep( 15 + Math.random() * 20 );
+                    let serialization = await ( data.onlyHeader ? this.blockchain.blocks.loadingManager.getBlockHeaderBuffer(height) : this.blockchain.blocks.loadingManager.getBlockBuffer(height)  );
+                    if ( !serialization ) throw {message: "block is empty", height: data.height};
 
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
                         result: true,
-                        block: block.serializeBlock(data.onlyHeader || false)
-                    });
+                        block: serialization,
+                    })
 
                 } catch (exception) {
 
-                    console.error("Socket Error - blockchain/blocks/request-block-by-height ", exception);
                     socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
                         result: false,
                         message: exception,

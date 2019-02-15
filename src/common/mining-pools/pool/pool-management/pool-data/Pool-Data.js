@@ -209,7 +209,7 @@ class PoolData {
 
             this.miners = [];
 
-            let buffer = await this._db.get("minersList_0",  60000, true);
+            let buffer = await this._db.get("minersList_0",  60000, 20, true);
             if (buffer){
 
                 let numMiners = Serialization.deserializeNumber4Bytes(buffer, 0);
@@ -217,7 +217,7 @@ class PoolData {
                 let i = 0, index = 1;
                 while (i < numMiners) {
 
-                    buffer = await this._db.get("minersList_" + index, 60000, true);
+                    buffer = await this._db.get("minersList_" + index, 60000, 20, true);
 
                     try {
                         
@@ -237,7 +237,7 @@ class PoolData {
 
             } else {
 
-                buffer = await this._db.get("minersList",  60000, true);
+                buffer = await this._db.get("minersList",  60000, 20, true);
                 let offset = 0;
 
                 if (buffer) {
@@ -361,14 +361,14 @@ class PoolData {
 
         try{
 
-            let buffer = await this._db.get("blocksInformation_0", 60000, true);
+            let buffer = await this._db.get("blocksInformation_0", 60000, 20,true);
             if (buffer){
 
                     let numBlocksInformation = Serialization.deserializeNumber4Bytes(buffer, 0,);
 
                     for (let i=0; i < numBlocksInformation; i++){
 
-                        buffer = await this._db.get("blocksInformation_"+(i+1), 60000, true);
+                        buffer = await this._db.get("blocksInformation_"+(i+1), 60000,  20,true);
                         let response = await this._deserializeBlockInformation(buffer, 0, 1);
                         if ( !response )
                             throw 'Unable to load miners from DB'
@@ -376,7 +376,7 @@ class PoolData {
 
             } else {
 
-                buffer = await this._db.get("blocksInformation", 60000, true);
+                buffer = await this._db.get("blocksInformation", 60000,  undefined,true);
                 let offset = 0;
 
                 if (buffer) {
