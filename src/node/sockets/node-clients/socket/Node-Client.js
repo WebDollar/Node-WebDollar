@@ -71,7 +71,7 @@ class NodeClient {
 
                 console.log("connecting... to:                ", address);
 
-                let socket = null;
+                let socket;
                 try {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
@@ -100,7 +100,6 @@ class NodeClient {
                 }  catch (Exception){
                     console.error("Error Connecting Node to ", address," ", Exception);
                     resolve(false);
-                    return false;
                 }
                 this.socket = socket;
 
@@ -130,10 +129,8 @@ class NodeClient {
 
                     clearTimeout(timeout);
 
-                    if (answer)
-                        await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
-                    else
-                        socket.disconnect();
+                    if (answer) await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
+                    else socket.disconnect();
 
                     resolve(answer);
 
@@ -143,16 +140,16 @@ class NodeClient {
 
                     //console.log("Client error connecting", address, response);
                     await NodesList.disconnectSocket(this.socket);
-
                     resolve(false);
+
                 });
 
                 socket.once("connect_failed", async (response) =>{
 
                     //console.log("Client error connecting (connect_failed) ", address, response);
                     await NodesList.disconnectSocket(this.socket);
-
                     resolve(false);
+
                 });
 
                 socket.connect();
@@ -177,16 +174,14 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
-        if ( Blockchain.MinerPoolManagement && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
+        if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
             console.error("socket disconnected by not being minerPool");
             this.socket.disconnect();
-            delete this.socket;
             return false;
         }
 
-        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, waitlist.nodeConsensusType,  validationDoubleConnectionsTypes) === false){
+        if (await NodesList.registerUniqueSocket(this.socket, CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET, this.socket.node.protocol.nodeType, waitlist.nodeConsensusType,  validationDoubleConnectionsTypes) === false)
             return false;
-        }
 
         waitlist.socketConnected(this.socket);
 
@@ -197,8 +192,8 @@ class NodeClient {
             //disconnect over the time, so it was connected before
 
             try {
-                console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
 
+                console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
                 await NodesList.disconnectSocket(this.socket);
 
             } catch (exception){

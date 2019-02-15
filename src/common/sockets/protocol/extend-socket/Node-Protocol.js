@@ -103,17 +103,9 @@ class NodeProtocol {
 
             this.node.protocol.justSendHello();
 
-            interval = setInterval(async () => {
-
-                this.node.protocol.justSendHello();
-
-            }, 3000);
-
-            this.node.protocol.justSendHello();
-
             timeout = setTimeout(() => {
                 clearInterval(interval);
-                clearTimeout(timeout)
+                clearTimeout(timeout);
                 resolve(false);
             }, 10000);
 
