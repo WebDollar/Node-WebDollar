@@ -223,8 +223,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (process.env.BROWSER)
             return true;
 
-        //save the number of blocks
-
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
         for (let i = startingHeight; i < endingHeight; i++ ) {

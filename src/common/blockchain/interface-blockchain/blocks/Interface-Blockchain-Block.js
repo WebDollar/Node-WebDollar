@@ -136,7 +136,7 @@ class InterfaceBlockchainBlock {
                 throw {message: 'previous hash is not given'};
 
             if (! BufferExtended.safeCompare(previousHash, this.hashPrev))
-                throw {message: "block prevHash doesn't match ", prevHash: previousHash.toString("hex"), hashPrev: this.hashPrev.toString("hex")};
+                throw {message: "block prevHash doesn't match ", hashPrev: previousHash.toString("hex"), blockHashPrev: this.hashPrev.toString("hex")};
 
 
         }

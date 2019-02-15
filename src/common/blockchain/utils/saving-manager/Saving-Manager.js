@@ -21,14 +21,11 @@ class SavingManager{
     }
 
 
-    addBlockToSave(block, height){
+    addBlockToSave(block, height = block.height){
 
         if (process.env.BROWSER) return;
 
         if ( !block ) return false;
-
-        if ( !height )
-            height = block.height;
 
         if (!this._pendingBlocks[height])
             this._pendingBlocksCount++;

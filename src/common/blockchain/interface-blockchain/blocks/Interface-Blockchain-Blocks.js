@@ -54,7 +54,7 @@ class InterfaceBlockchainBlocks{
 
         } else {
 
-            await this.loadingManager.addBlockToLoaded(block.height, block);
+            await this.loadingManager.addBlockToLoaded(block);
 
         }
 
