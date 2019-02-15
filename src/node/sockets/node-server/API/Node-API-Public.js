@@ -14,9 +14,9 @@ class NodeAPIPublic{
 
     info(){
 
-        let lastBlock = Blockchain.blockchain.blocks.last;
+        let lastBlock = await Blockchain.blockchain.blocks.last;
 
-        if (lastBlock === undefined){
+        if ( !lastBlock ){
             return {
                 message: "lastBlock is undefined",
                 length: Blockchain.blockchain.blocks.length,
