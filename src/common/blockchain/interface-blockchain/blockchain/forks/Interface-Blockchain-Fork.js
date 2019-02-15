@@ -120,6 +120,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
         let revertActions = new RevertActions(this.blockchain);
         revertActions.push({action: "breakpoint"});
 
+        //mark the forkBlocks to avoid deletion
+        for (let forkBlock of this.forkBlocks )
+            forkBlock.isForkBlock = true;
+
         let success = false;
 
         if (this.blockchain )
@@ -237,6 +241,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
             }
 
         }
+
+        //mark the forkBlocks to resume deletion
+        for (let forkBlock of this.forkBlocks)
+            forkBlock.isForkBlock = false;
 
         return success;
     }

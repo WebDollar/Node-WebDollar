@@ -36,7 +36,11 @@ class BlockManager extends MemoryManager{
 
     }
 
+    _validateDataForRemoval(block){
 
+        return !block.data.isForkBlock;
+
+    }
 
 }
 

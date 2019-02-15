@@ -57,13 +57,11 @@ class MemoryManager{
         try{
 
             for (let key in this._loaded)
-                if ( date - this._loaded[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS) {
-
-                    //check if it is not 11being saved by the Save Manager
-                    delete this._loaded[key];
-                    this._loadedCount--;
-
-                }
+                if ( date - this._loaded[key].lastTimeUsed > CLEAR_OLD_UNUSED_BLOCKS)
+                    if (this._validateDataForRemoval( this._loaded[key] )) {
+                        delete this._loaded[key];
+                        this._loadedCount--;
+                    }
 
             if (this._loadedCount > this._maxData){
 
@@ -73,9 +71,10 @@ class MemoryManager{
                 array.sort((a, b) =>  b.lastTimeUsed - a.lastTimeUsed );
 
                 for (let i=this._maxData; i < array.length; i++)
-                    delete this._loaded[ array[i].height ];
-
-                this._loadedCount -= this._maxData;
+                    if (this._validateDataForRemoval( array[i] )) {
+                        delete this._loaded[array[i].height];
+                        this._loadedCount--;
+                    }
 
             }
 
@@ -85,6 +84,10 @@ class MemoryManager{
 
         this._intervalClearOldUnsuedBlocks = setTimeout( this._clearOldUnusedBlocks.bind(this), CLEAR_OLD_UNUSED_BLOCKS_INTERVAL );
 
+    }
+
+    _validateDataForRemoval(data){
+        return true;
     }
 
     addToLoaded(height, data){
