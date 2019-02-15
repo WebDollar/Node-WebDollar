@@ -219,9 +219,15 @@ class PoolData {
 
                     buffer = await this._db.get("minersList_" + index, 60000, true);
 
-                    let response = this._deserializeMiners( buffer, 0, Math.min( 100, numMiners - i ) );
-                    if ( !response )
-                        throw 'Unable to load miners from DB'
+                    try {
+                        
+                        let response = this._deserializeMiners(buffer, 0, Math.min(100, numMiners - i));
+                        if (!response)
+                            throw 'Unable to load miners from DB'
+
+                    } catch (exception){
+
+                    }
 
                     i += 100;
                     index++;
@@ -463,12 +469,12 @@ class PoolData {
 
     async _loadPoolData(){
 
-        let answer = await this._loadMinersList();
-        answer = answer && await this._loadBlockInformations();
+        let answer1 = await this._loadMinersList();
+        let answer2 = await this._loadBlockInformations();
 
         this._clearEmptyMiners();
 
-        return answer;
+        return answer1 && answer2;
     }
 
     /**
