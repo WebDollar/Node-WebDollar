@@ -179,6 +179,8 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                         forkBlock.socketPropagatedBy = this.socketsFirst;
 
+                        if (forkBlock.height % 50 === 0)
+                            Log.log("FORK PROCESSING: "+index, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
                     }
 
                     console.warn("Saving Fork. Starting from ", this.forkStartingHeight, this.blockchain.blocks.length);
@@ -240,7 +242,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
             try {
 
                 //propagate last block
-                NodeBlockchainPropagation.propagateBlock( await this.blockchain.getBlock(this.blockchain.blocks.length - 1), this.sockets);
+                NodeBlockchainPropagation.propagateBlock( await this.blockchain.blocks.last, this.sockets);
 
                 if (this.downloadAllBlocks) {
 
