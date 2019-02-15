@@ -35,6 +35,11 @@ class RevertActions {
 
                     action.block.blockValidation.blockValidationType["skip-validation-transactions-from-values"] = !action.value;
                 }
+                else if (action.name === "block-removed"  && (actionName === '' || actionName === action.name) ) {
+
+                    await this.blockchain.includeBlockchainBlock( action.data, false, "all", false, undefined, false );
+
+                }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
 
                     await this.blockchain.blocks.spliceBlocks(action.height, true);

@@ -53,7 +53,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
-        if (revertActions !== undefined) revertActions.push({
+        if (revertActions ) revertActions.push({
             name: "revert-updateAccount",
             address: address,
             value: value,
@@ -105,7 +105,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce += nonceChange;
 
-        if (revertActions !== undefined) revertActions.push({
+        if (revertActions ) revertActions.push({
             name: "revert-updateAccountNonce",
             address: address,
             nonceChange: nonceChange,

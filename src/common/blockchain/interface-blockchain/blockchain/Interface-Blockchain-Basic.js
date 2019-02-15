@@ -23,8 +23,6 @@ class InterfaceBlockchainBasic{
 
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
 
-        this.blocks = new InterfaceBlockchainBlocks(this, this.db);
-
         this.mining = undefined;
 
         this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
@@ -44,6 +42,7 @@ class InterfaceBlockchainBasic{
     }
 
     _createBlockchainElements(){
+        this.blocks = new InterfaceBlockchainBlocks(this, this.db);
         this.transactions = new InterfaceBlockchainTransactions( this);
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
     }

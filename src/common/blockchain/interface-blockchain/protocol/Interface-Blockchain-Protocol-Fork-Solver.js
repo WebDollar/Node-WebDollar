@@ -302,7 +302,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             totalIterations++;
 
-            if(totalIterations >= 1000){
+            if (totalIterations >= 1000){
                 console.error("MAX iterations on downloading block")
                 break;
             }

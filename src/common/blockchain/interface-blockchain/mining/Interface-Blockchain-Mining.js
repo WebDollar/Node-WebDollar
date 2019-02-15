@@ -81,7 +81,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         } catch (Exception){
             console.error("Error processBlocksSempahoreCallback ", Exception, nextBlock ? nextBlock.toJSON() : '');
-            revertActions.revertOperations();
+            await revertActions.revertOperations();
         }
 
         revertActions.destroyRevertActions();
@@ -218,7 +218,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 } catch (exception){
                     console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);
-                    revertActions.revertOperations();
+                    await revertActions.revertOperations();
                 }
                 revertActions.destroyRevertActions();
 

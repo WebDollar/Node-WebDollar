@@ -8,7 +8,7 @@ import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockch
 import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions"
 import global from "consts/global"
-
+import MiniBlockchainBlocks from "./../blocks/Mini-Blockchain-Blocks"
 let inheritBlockchain;
 
 if (consts.POPOW_PARAMS.ACTIVATED)
@@ -29,6 +29,7 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
     _createBlockchainElements(){
+        this.blocks = new MiniBlockchainBlocks(this, this.db);
         this.transactions = new MiniBlockchainTransactions(this);
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
@@ -42,7 +43,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
 
-            if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
+            if ( !block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] ) {
 
                 //updating reward
                 let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
@@ -65,9 +66,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
             }
 
-            let callbackDone = await callback();
-
-            if (callbackDone === false)
+            if (await callback() === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
 
         } catch (ex){
@@ -80,11 +79,8 @@ class MiniBlockchain extends  inheritBlockchain{
             //revert back the database
             if (revertException || revertAutomatically){
 
-                revertActions.revertOperations();
-
-                if (revertException)
-                    return false;
-
+                await revertActions.revertOperations();
+                if (revertException) return false;
             }
 
 
@@ -130,11 +126,6 @@ class MiniBlockchain extends  inheritBlockchain{
     getBalances(address){
         return this.accountantTree.getBalances(address);
     }
-
-
-
-
-
 
 
 

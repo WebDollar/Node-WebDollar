@@ -175,20 +175,16 @@ class InterfaceBlockchainBlock {
 
     async _validateTargetDifficulty(){
 
-        if (!this.blockValidation.blockValidationType['skip-target-difficulty-validation']){
+        let prevDifficultyTarget = await this.blockValidation.getDifficultyCallback(this.height-1);
 
-            let prevDifficultyTarget = await this.blockValidation.getDifficultyCallback(this.height-1);
+        if ( !prevDifficultyTarget || !Buffer.isBuffer(prevDifficultyTarget) )
+            throw {message: 'previousDifficultyTarget is not given'};
 
-            if ( !prevDifficultyTarget || !Buffer.isBuffer(prevDifficultyTarget) )
-                throw {message: 'previousDifficultyTarget is not given'};
+        if (! this.difficultyTargetPrev.equals( prevDifficultyTarget ) )
+            throw {message: 'previousDifficultyTarget is invalid'};
 
-            if (! this.difficultyTargetPrev.equals( prevDifficultyTarget ) )
-                throw {message: 'previousDifficultyTarget is invalid'};
-
-            if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
-                throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};
-        }
-
+        if (! (this.hash.compare( prevDifficultyTarget ) <= 0))
+            throw {message: "block doesn't match the difficulty target is not ", hash:this.hash, prevDifficultyTarget: prevDifficultyTarget};
 
         return true;
     }

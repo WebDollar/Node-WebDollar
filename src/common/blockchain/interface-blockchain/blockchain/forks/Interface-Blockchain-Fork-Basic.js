@@ -13,7 +13,6 @@ class InterfaceBlockchainFork {
 
     constructor (){
 
-        this._blocksCopy = [];
         this.forkIsSaving = false;
 
         this.downloadBlocksSleep = false;
@@ -54,7 +53,6 @@ class InterfaceBlockchainFork {
             this._forkPromiseResolver = resolve;
         });
 
-        this._blocksCopy = [];
     }
 
 
@@ -187,6 +185,8 @@ class InterfaceBlockchainFork {
 
         if (height !== this.forkChainLength-1)
             validationType["skip-calculating-proofs"] = true;
+
+        validationType["skip-recalculating-hash-rate"] = true;
 
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }

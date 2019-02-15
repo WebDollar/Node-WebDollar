@@ -248,7 +248,7 @@ class PoolWorkManagement{
                     } catch (exception){
 
                         console.error("PoolWork include raised an exception", exception);
-                        revertActions.revertOperations();
+                        await revertActions.revertOperations();
 
 
                     }

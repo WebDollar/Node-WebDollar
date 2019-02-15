@@ -13,23 +13,6 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
         this._miniBlockchainSaveBlocks = 0;
     }
 
-    getSerializedAccountantTree(height, gzipped = false){
-
-        if (height < 0)
-            height = -1;
-
-        if (height === -1){
-            let emptyAccountantTree = new MiniBlockchainAccountantTree(this.db);
-            let data =  emptyAccountantTree.serializeMiniAccountant();
-            emptyAccountantTree.destroyTree();
-            return data;
-        }
-
-        // else I need to compute it, by removing n-1..n
-        throw {message: "not computed ", height:height};
-
-    }
-
     async _loadBlockchain(){
 
         if (process.env.BROWSER)
