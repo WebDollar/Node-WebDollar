@@ -72,9 +72,7 @@ class PoolStatistics{
         for (let i = 0; i < this._poolHashesLast.length; i++)
             array.push(this._poolHashesLast[i]);
 
-        array.sort(function (a, b) {
-            return a - b;
-        });
+        array.sort((a, b) =>  a - b );
 
         this.poolHashes = array[Math.floor(array.length / 4)];
 

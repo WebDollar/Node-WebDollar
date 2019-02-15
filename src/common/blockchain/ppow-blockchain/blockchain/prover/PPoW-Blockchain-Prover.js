@@ -78,9 +78,7 @@ class PPoWBlockchainProver{
 
                     //TODO keep the superChain.blocks already sorted and insert it using binary search
 
-                    superChain.blocks.sort(function(a,b){
-                        return a - b;
-                    });
+                    superChain.blocks.sort( (a,b) => a - b );
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
@@ -103,9 +101,7 @@ class PPoWBlockchainProver{
 
         if (underlyingChain ) {
 
-            underlyingChain.blocks.sort(function(a, b) {
-                return a - b;
-            });
+            underlyingChain.blocks.sort( (a, b) => a - b );
 
             await underlyingChain.calculateProofHash();
             await underlyingChain.calculateProofSerialized();

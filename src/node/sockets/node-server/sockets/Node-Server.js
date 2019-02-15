@@ -99,13 +99,12 @@ class NodeServer {
                 if (!this.loaded) return;
 
                 if (socket.request._query["msg"] !== "HelloNode"){
-                    console.error("No Hello Msg");
+                    if (Math.random() < 0.05) console.error("No Hello Msg");
                     return socket.disconnect();
                 }
 
                 if (!socket.request._query["version"] || socket.request._query["version"] < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-                    if (Math.random() < 0.05)
-                        console.error("version is invalid", socket.request._query["version"]);
+                    if (Math.random() < 0.05) console.error("version is invalid", socket.request._query["version"]);
                     return socket.disconnect();
                 }
 

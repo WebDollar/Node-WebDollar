@@ -249,9 +249,7 @@ class NodesWaitlist {
         for (let i=0; i<list.length; i++)
             list[i].score = list[i].sortingScore();
 
-        list.sort(function(a, b) {
-            return b.score - a.score;
-        });
+        list.sort(  (a, b) =>  b.score - a.score );
 
     }
 

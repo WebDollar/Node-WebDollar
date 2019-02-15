@@ -442,9 +442,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         if (this === this.root){ //root, let's process it
 
-            list.sort(function(a, b) {
-                return b.balance - a.balance;
-            });
+            list.sort( (a, b) => b.balance - a.balance );
 
             if ( countOnly !== undefined )
                 list = list.splice(0, countOnly);

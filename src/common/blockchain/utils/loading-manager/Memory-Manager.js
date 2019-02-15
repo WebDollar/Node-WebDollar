@@ -1,5 +1,3 @@
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-
 const BigInteger = require('big-integer');
 
 const CLEAR_OLD_UNUSED_BLOCKS_INTERVAL = 30*1000;
@@ -70,9 +68,9 @@ class MemoryManager{
             if (this._loadedCount > this._maxData){
 
                 let array = Object.values(this._loaded);
-                array.sort(function(a, b) {
-                    return a.lastTimeUsed - b.lastTimeUsed;
-                });
+
+                //revert order
+                array.sort((a, b) =>  b.lastTimeUsed - a.lastTimeUsed );
 
                 for (let i=this._maxData; i < array.length; i++)
                     delete this._loaded[ array[i].height ];
