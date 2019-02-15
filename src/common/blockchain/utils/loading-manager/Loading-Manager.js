@@ -55,11 +55,6 @@ class LoadingManager{
         return this.blockChainHashManager.getData(height);
     }
 
-    async getBlockWork(height){
-        let prevDifficulty = await this.getBlockDifficulty(height );
-        return consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BIG_INTEGER.divide( new BigInteger( prevDifficulty.toString("hex"), 16 ) );
-    }
-
     async getBlock(height){
         return this.blockManager.getData(height);
     }
@@ -94,6 +89,12 @@ class LoadingManager{
     async deleteBlock(height, block){
 
         this.blockManager.deleteLoaded(height, block);
+        this.blockHashManager.deleteLoaded(height, block.hash);
+        this.blockDifficultyManager.deleteLoaded(height, block.targetDifficulty);
+        this.blockChainHashManager.deleteLoaded(height, block.hashChain);
+        this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
+        this.blockBufferManager.deleteLoaded(height, block.serializeBlock(false ));
+        this.blockHeaderBufferManager.deleteLoaded(height, block.serializeBlock(true ));
         this.chainWorkManager.deleteLoaded(height, await block.getChainWork() );
     }
 
