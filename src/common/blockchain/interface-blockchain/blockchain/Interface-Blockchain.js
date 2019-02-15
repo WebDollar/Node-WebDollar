@@ -71,6 +71,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             block.blockValidation.getDifficultyCallback = this.getDifficultyTarget.bind(this);
             block.blockValidation.getTimeStampCallback = this.getTimeStamp.bind(this);
             block.blockValidation.getHashCallback = this.getHash.bind(this);
+            block.blockValidation.getChainHashCallback = this.getChainHash.bind(this);
 
         }
 

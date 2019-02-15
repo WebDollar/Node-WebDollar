@@ -55,10 +55,6 @@ class InterfaceBlockchainBlocks{
 
             NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
 
-        } else {
-
-            await this.loadingManager.addBlockToLoaded(block);
-
         }
 
         await this.setLength( this.length + 1 );
