@@ -1,5 +1,3 @@
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-
 import global from "consts/global"
 import consts from 'consts/const_global'
 import Log from 'common/utils/logging/Log';
