@@ -90,7 +90,7 @@ class LoadingManager{
 
         this.blockManager.deleteLoaded(height, block);
         this.blockHashManager.deleteLoaded(height, block.hash);
-        this.blockDifficultyManager.deleteLoaded(height, block.targetDifficulty);
+        this.blockDifficultyManager.deleteLoaded(height, block.difficultyTarget);
         this.blockChainHashManager.deleteLoaded(height, block.hashChain);
         this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
         this.blockBufferManager.deleteLoaded(height, block.serializeBlock(false ));
