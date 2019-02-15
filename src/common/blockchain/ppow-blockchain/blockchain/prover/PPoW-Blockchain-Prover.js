@@ -27,6 +27,8 @@ class PPoWBlockchainProver{
 
     async _createProofPi(chain){
 
+        return;
+        
         //B ← C[0]
         let B = await chain.getBlock(0);
 
