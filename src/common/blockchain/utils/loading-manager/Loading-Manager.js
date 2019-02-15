@@ -82,7 +82,6 @@ class LoadingManager{
         let height = block.height;
 
         this.blockManager.addToLoaded(height, block);
-        this.chainWorkManager.addToLoaded(height, await block.getChainWork() );
 
     }
 
