@@ -411,7 +411,7 @@ class TransactionsDownloadManager{
     _unsubscribeSocket(socket){
 
         for (let txId in this._transactionsQueue)
-            if(typeof this._transactionsQueue[txId] !== "undefined" )
+            if( this._transactionsQueue[txId] )
                 for( let i = this._transactionsQueue[txId].socket.length-1 ; i>=0; i--){
 
                     if ( this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid )
@@ -432,7 +432,7 @@ class TransactionsDownloadManager{
         let found = false;
 
         for ( let txId in this._transactionsQueue )
-            if( typeof this._transactionsQueue[txId].socket !== "undefined" ){
+            if( this._transactionsQueue[txId].socket ){
                 for (let i = 0; i < this._transactionsQueue[txId].socket.length; i++)
                     if (this._transactionsQueue[txId].socket[i].node.sckAddress.uuid === socket.node.sckAddress.uuid) {
                         this._transactionsQueue[txId].socket.splice(i, 1);
