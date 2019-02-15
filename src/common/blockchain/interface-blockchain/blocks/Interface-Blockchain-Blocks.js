@@ -45,9 +45,6 @@ class InterfaceBlockchainBlocks{
 
     async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
 
-        if (showUpdate)
-            this.emitBlockCountChanged();
-
         if (saveBlock) {
 
             this.savingManager.addBlockToSave(block);
@@ -62,6 +59,8 @@ class InterfaceBlockchainBlocks{
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
+        if (showUpdate)
+            this.emitBlockCountChanged();
 
     }
 
