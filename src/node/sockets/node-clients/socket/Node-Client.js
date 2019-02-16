@@ -105,17 +105,15 @@ class NodeClient {
                 NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
 
                 socket.once("connect", async ( response ) =>{
-
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
                     console.warn("Client connected to " + socket.node.sckAddress.address);
-
                 });
 
 
                 socket.once("HelloNode", async (data) => {
 
                     if (data) {
-                        await this.socket.node.protocol.processHello(data, {"ip":true,"uuid":true});
+                        await socket.node.protocol.processHello(data, {"ip":true,"uuid":true});
                         await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
                         resolve(true);
                     } else
