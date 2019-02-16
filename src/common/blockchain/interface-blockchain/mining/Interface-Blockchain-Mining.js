@@ -270,6 +270,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 10000 : 1000 );
 
+            console.warn("Not enough funds to mine POS. It is required "+consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT + " WEBD to mine POS");
+
             this.block.timeStamp = medianTimestamp;
             let posSignature = await this.block._signPOSSignature();
 
