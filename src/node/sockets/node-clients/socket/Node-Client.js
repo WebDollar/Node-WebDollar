@@ -96,7 +96,7 @@ class NodeClient {
 
                 }  catch (Exception){
                     console.error("Error Connecting Node to ", address," ", Exception);
-                    resolve(false);
+                    return resolve(false);
                 }
 
                 if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)

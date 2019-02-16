@@ -83,40 +83,6 @@ class NodeProtocol {
         return true;
     }
 
-    async sendHello ( validationDoubleConnectionsTypes, process = true ) {
-
-        // Waiting for Protocol Confirmation
-
-        if (this.connected === false) return false;
-
-        let response = await new Promise( (resolve)=> {
-
-            let interval, timeout;
-
-            this.node.once("HelloNode", (data) => {
-
-                clearInterval(interval);
-                clearTimeout(timeout);
-                resolve(data);
-
-            });
-
-            this.node.protocol.justSendHello();
-
-            timeout = setTimeout(() => {
-                clearInterval(interval);
-                clearTimeout(timeout);
-                resolve(false);
-            }, 10000);
-
-        });
-
-        if (!process)
-            return true;
-
-        return this.node.protocol.processHello( response, validationDoubleConnectionsTypes );
-
-    }
 
 
     /**

@@ -127,8 +127,6 @@ class NodeWebPeerRTC {
             console.log('WEBRTC PEER CONNECTED', this.peer);
 
             let remoteData = this.processDescription(this.peer.remoteDescription);
-
-
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
@@ -136,17 +134,16 @@ class NodeWebPeerRTC {
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 
-            this.peer.node.protocol.sendHello({"uuid":true}).then( (answer)=>{
-
-                if (answer)
-                    this.initializePeer({"uuid": true} );
-                else
-                    this.peer.disconnect()
-
-            });
-
         });
 
+        this.peer.once("HelloNode", async (data) => {
+
+            if (data) {
+                await this.socket.node.protocol.processHello(data, {"ip":true,"uuid":true});
+                await this.initializePeer({"uuid": true} );
+            } else
+                this.peer.disconnect()
+        });
 
         this.peer.on('data', (data) => {
             console.log('data: ' , data)
