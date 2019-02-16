@@ -207,13 +207,14 @@ class NodeServer {
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
                     socket.node.protocol.justSendHello();
+
                     socket.node.protocol.processHello({
                         version: nodeVersion,
                         uuid: nodeUUID,
                         nodeType: nodeType,
                         domain: nodeDomain,
                         UTC: nodeUTC,
-                    });
+                    }, { "uuid": true, "ip": true, "port": true} );
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;
