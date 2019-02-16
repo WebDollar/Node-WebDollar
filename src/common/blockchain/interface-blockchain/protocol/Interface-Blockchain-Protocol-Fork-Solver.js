@@ -302,8 +302,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             totalIterations++;
 
-            if (totalIterations >= 1000){
-                console.error("MAX iterations on downloading block")
+            if (totalIterations >= 2000){
+                console.error("MAX iterations on downloading block");
                 break;
             }
 
@@ -322,8 +322,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let answer;
 
             let howManyBlocks = Math.min( fork.forkChainLength - (fork.forkStartingHeight + fork.forkBlocks.length), consts.SETTINGS.PARAMS.CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER);
-            let downloadingList = [];
-            let trialsList = {};
+            let downloadingList = {}, trialsList = {};
             let alreadyDownloaded = 0;
             let resolved = false;
 
@@ -332,74 +331,73 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 let downloadingBlock = async (index)=>{
 
-                    this.curentIterationsDownloaded++;
+                    try{
 
-                    if ( trialsList[index] > 5 || global.TERMINATED) {
+                        if ( trialsList[index] > 10 || global.TERMINATED) {
 
-                        if (!resolved) {
-                            resolved = true;
-                            resolve(false);
-                        }
-
-                        return;
-                    }
-
-                    socketIndex++;
-                    if ( trialsList[index] === undefined ) trialsList[index] = 0;
-                    trialsList[index] ++ ;
-
-                    let socket = fork.getForkSocket(socketIndex);
-
-                    if ( !socket ) {
-
-                        await this.blockchain.sleep(5);
-
-                        if (!resolved)
-                            downloadingBlock(index);
-
-                        return;
-                    }
-
-                    let waitingTime = socket.latency === 0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : ( socket.latency + Math.random()*2000 );
-
-                    answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+index}, nextBlockHeight+index,  Math.min( waitingTime, consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY)  );
-                    downloadingList[index] = answer;
-
-                    answer.then( (result)=>{
-
-                        if ( !result ) {
-
-                            downloadingList[index] = undefined;
-                            socket.latency += Math.random()*1500;
-
-                            if (!resolved)
-                                downloadingBlock(index);
-
-                        }
-                        else {
-
-                            alreadyDownloaded++;
-                            downloadingList[index] = result;
-
-                            if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
+                            if (!resolved) {
                                 resolved = true;
-                                resolve(true);
+                                resolve(false);
                             }
 
+                            return false;
                         }
 
-                    }).catch( (exception)=>{
+                        socketIndex++;
+                        if ( !trialsList[index]  ) trialsList[index] = 0;
+                        trialsList[index] ++ ;
 
-                        if (!resolved)
-                            downloadingBlock(index);
+                        let socket = fork.getForkSocket(socketIndex);
 
-                    });
+                        if ( !socket ) {
+
+                            //try again
+                            if (!resolved) return downloadingBlock(index);
+                            return;
+
+                        }
+
+                        let waitingTime = socket.latency === 0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : ( socket.latency + Math.random()*2000 );
+
+                        answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+index}, nextBlockHeight+index,  Math.min( waitingTime, consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY)  );
+                        downloadingList[index] = answer;
+
+                        answer.then( result=>{
+
+                            if ( !result ) {
+
+                                downloadingList[index] = undefined;
+                                socket.latency += Math.random()*1500;
+
+                                if (!resolved) return downloadingBlock(index);
+
+                            }
+                            else if (!downloadingList[index]) {
+
+                                alreadyDownloaded++;
+                                downloadingList[index] = result;
+
+                                if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
+                                    resolved = true;
+                                    resolve(true);
+                                }
+
+                            }
+
+                        }).catch( (exception)=>{
+
+                            if (!resolved) return downloadingBlock(index);
+
+                        });
+
+                    } catch (exception){
+                        if (!resolved) return downloadingBlock(index);
+                    }
+
+
                 };
 
                 console.info("Downloading Blocks...", howManyBlocks);
-
-                for (let i=0; i < howManyBlocks; i++)
-                    trialsList[i] = 0;
 
                 for (let i=0; i < howManyBlocks; i++)
                     if ( !downloadingList[i] )
@@ -407,13 +405,6 @@ class InterfaceBlockchainProtocolForkSolver{
 
 
             });
-
-            if(this.curentIterationsDownloaded >= 1000){
-
-                console.error("MAX iterations on downloading block")
-                this.curentIterationsDownloaded = 0;
-
-            }
 
             try {
                 await finished;

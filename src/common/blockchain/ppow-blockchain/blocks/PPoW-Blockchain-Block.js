@@ -129,7 +129,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
             level--;
 
-
         }
 
         return true;
