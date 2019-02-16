@@ -125,7 +125,7 @@ class PoolDataBlockInformation {
 
     }
 
-    serializeBlockInformation(){
+    async serializeBlockInformation(){
 
         let buffers = [
 
@@ -153,14 +153,14 @@ class PoolDataBlockInformation {
 
         let array=[];
         //serialize block
-        if (this.block && this.block.blockchain ) {
+        if (this.block && this.block ) {
 
             try {
 
                 array.push(Serialization.serializeNumber4Bytes( this.block.height ));
                 array.push( this.block.difficultyTargetPrev );
 
-                array.push(this.block.serializeBlock());
+                array.push( await this.block.serializeBlock()) ;
 
             } catch (exception){
                 Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block ? this.block.toJSON() : '');

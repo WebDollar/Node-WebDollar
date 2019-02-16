@@ -303,12 +303,17 @@ class PoolData {
 
         let lists = [ Serialization.serializeNumber4Bytes(this.blocksInfo.length) ];
 
+        let i=0;
         for (let blockInfo of this.blocksInfo){
 
-            lists.push( blockInfo.serializeBlockInformation() );
+            i++;
+
+            lists.push(  await blockInfo.serializeBlockInformation() );
 
             if ( blockInfo.blockInformationMinersInstances.length > 100)
-                await this.poolManagement.blockchain.sleep(500);
+                await this.poolManagement.blockchain.sleep(200);
+
+            console.info("Saving Block Info", i)
 
         }
 
