@@ -11,8 +11,6 @@ import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class NodesStats {
 
-    // socket : null,
-
     constructor(){
 
         this._timeStart = new Date().getTime();
@@ -98,6 +96,8 @@ class NodesStats {
 
         console.log("waitlist full node ", NodesWaitlist.waitListFullNodes.length);
         console.log("waitlist light node ", NodesWaitlist.waitListLightNodes.length);
+
+        BansList.listBans();
 
     }
 
