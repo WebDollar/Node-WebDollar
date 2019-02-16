@@ -161,11 +161,11 @@ class Blockchain{
 
     async startMining(){
         if (process.env.START_MINING || this._startMiningNextTimeSynchronized)
-            this.Mining.startMining();
+            return this.Mining.startMining();
     }
 
     async startMiningInstantly(){
-        this.Mining.startMining();
+        return this.Mining.startMining();
     }
 
 
@@ -175,7 +175,7 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        if ( !this.synchronized ) return;
+        if ( this.synchronized === false) return;
 
         this.synchronized = false;
         console.warn("################### RESYNCHRONIZATION STARTED ##########");

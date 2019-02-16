@@ -41,7 +41,7 @@ class InterfaceBlockchainBlockCreator{
 
     }
 
-    createBlockNew(minerAddress, blockValidation, transactions){
+    async createBlockNew(minerAddress, blockValidation, transactions){
 
         if (!blockValidation )
             blockValidation = this.blockchain.createBlockValidation();

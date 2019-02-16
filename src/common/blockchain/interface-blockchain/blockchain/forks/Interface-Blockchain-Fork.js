@@ -250,7 +250,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                 }
 
             } catch (exception){
-                Log.error("saveFork - saving the fork returned an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, excption);
+                Log.error("saveFork - saving the fork returned an exception", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
             }
 
         }

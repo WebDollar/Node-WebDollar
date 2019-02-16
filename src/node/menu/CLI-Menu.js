@@ -448,11 +448,7 @@ class CLI {
 
 
 
-        await this._callCallbackBlockchainSync( undefined, async ()=>{
-
-            await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
-
-        }, async ()=>{
+        await this._callCallbackBlockchainSync( undefined, () => Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false), async ()=>{
 
             if (instantly)
                 await Blockchain.startMiningInstantly();
@@ -634,31 +630,25 @@ class CLI {
 
             await Blockchain.createBlockchain("full-node", callbackBeforeBlockchainLoaded, async () => {
 
-                if (typeof callbackBeforeServerInitialization === "function")
-                    await callbackBeforeServerInitialization();
+                if (callbackBeforeServerInitialization ) await callbackBeforeServerInitialization();
 
                 await Node.NodeServer.startServer();
 
                 await Node.NodeClientsService.startService();
 
-                if (typeof callbackAfterServerInitialization === "function")
-                    await callbackAfterServerInitialization();
+                if ( callbackAfterServerInitialization ) await callbackAfterServerInitialization();
 
             }, afterSynchronizationCallback, synchronize );
 
         } else {
 
-            if (typeof callbackBeforeBlockchainLoaded === "function")
-                await callbackBeforeBlockchainLoaded();
+            if (callbackBeforeBlockchainLoaded ) await callbackBeforeBlockchainLoaded();
 
-            if (typeof callbackBeforeServerInitialization === "function")
-                await callbackBeforeServerInitialization();
+            if (callbackBeforeServerInitialization ) await callbackBeforeServerInitialization();
 
-            if (typeof callbackAfterServerInitialization === "function")
-                await callbackAfterServerInitialization();
+            if (callbackAfterServerInitialization ) await callbackAfterServerInitialization();
 
-            if (typeof afterSynchronizationCallback === "function")
-                await afterSynchronizationCallback();
+            if (afterSynchronizationCallback ) await afterSynchronizationCallback();
 
         }
 
