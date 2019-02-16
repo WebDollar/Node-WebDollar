@@ -21,14 +21,11 @@ class SavingManager{
     }
 
 
-    addBlockToSave(block, height){
+    addBlockToSave(block, height = block.height){
 
         if (process.env.BROWSER) return;
 
         if ( !block ) return false;
-
-        if ( !height )
-            height = block.height;
 
         if (!this._pendingBlocks[height])
             this._pendingBlocksCount++;
@@ -46,6 +43,9 @@ class SavingManager{
 
             block = this._pendingBlocks[key];
             if (block instanceof Promise) continue;
+
+            //it is a forkBlock, it is skipped
+            if (block.isForkBlock) continue;
 
             //remove the block for saving
             this._pendingBlocks[key] = undefined;

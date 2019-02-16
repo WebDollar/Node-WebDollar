@@ -21,7 +21,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
         let list = [];
 
         for (let i = 0; i < this.blocks.length; ++i)
-            if (miu <= this.blocks[i].level)
+            if (miu <= this.blockchain.prover.provesCalculated.allBlocks[ this.blocks[i] ] )
                 list.push(this.blocks[i]);
 
         return new PPowBlockchainProofPi(this.blockchain, list);
@@ -35,7 +35,7 @@ class PPowBlockchainProofPi extends PPoWBlockchainProofBasic{
         let list = [];
 
         for (let i = 0; i < this.blocks.length; ++i)
-            if (this.blocks[i].level <= miu)
+            if ( this.blockchain.prover.provesCalculated.allBlocks[ this.blocks[i] ]  <= miu)
                 list.push(this.blocks[i]);
 
         return new PPowBlockchainProofPi(this.blockchain, list);

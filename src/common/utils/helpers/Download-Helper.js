@@ -22,17 +22,17 @@ class DownloadHelper{
                 timeout: timeout
             });
 
-            if (typeof data === 'object') return data;
+            if ( data ) return data;
 
-            return null;
         }
         catch(exception){
 
             if (consts.DEBUG)
                 console.error("DownloadHelper::downloadFile ERROR downloading list: ", address );
 
-            return null;
         }
+
+        return null;
     }
 
     async downloadMultipleFiles(addresses, timeout = 5000){
@@ -40,35 +40,20 @@ class DownloadHelper{
         if (!Array.isArray(addresses))
             addresses = [addresses];
 
-        return new Promise((resolve)=>{
+        return new Promise(async (resolve) =>{
 
-            let timeoutId = setTimeout(()=>{
+            let list = [];
 
-                if (resolve !== undefined) {
-                    let callback = resolve;
-                    resolve = undefined;
-                    callback(null);
-                }
+            for (let i=0; i<addresses.length; i++) {
 
-            }, timeout + 1000 );
-
-            for (let i=0; i<addresses.length; i++){
-
-                this.downloadFile(addresses[i], timeout ).then((answer)=>{
-
-                    if (answer !== null && resolve !== undefined){
-
-                        clearTimeout(timeoutId);
-
-                        let callback = resolve;
-                        resolve = undefined;
-                        callback(answer);
-
-                    }
-
-                })
+                let answer = await this.downloadFile(addresses[i], timeout);
+                if (answer)
+                    list.push(answer);
 
             }
+
+            if (list.length === 0) return resolve() ;
+            return resolve(list);
 
         })
 

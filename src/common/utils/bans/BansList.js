@@ -13,29 +13,28 @@ class BansList{
 
         });
 
-        setInterval( this._listBans.bind(this), 20*1000  )
+        this._intervalRemove = setInterval( this._removeEmptyBans.bind(this), 10*1000  );
 
     }
 
     isBanned(sckAddress){
 
         let ban = this.getBan(sckAddress);
-        if (ban === null)
-            return false;
+        if ( !ban ) return false;
 
         return ban.isBanned(sckAddress);
     }
 
     addBan(sckAddress, banTime = 10000, banReason){
 
-        if (sckAddress === undefined || sckAddress === null) return false;
+        if ( !sckAddress ) return false;
 
-        if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("node")) sckAddress = sckAddress.node.sckAddress;
-        if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("sckAddress")) sckAddress = sckAddress.node.sckAddress;
+        if ( sckAddress  && sckAddress.node) sckAddress = sckAddress.node.sckAddress;
+        if ( sckAddress  && sckAddress.sckAddress ) sckAddress = sckAddress.node.sckAddress;
 
         let ban = this.getBan(sckAddress);
 
-        if (ban === null) {
+        if ( !ban ) {
 
             ban = new BanObject(sckAddress);
             this.bans.push(ban);
@@ -43,8 +42,6 @@ class BansList{
         }
 
         ban.increaseBanTrials(banTime, banReason);
-
-        this._removeEmptyBans();
 
         return ban;
     }
@@ -61,7 +58,7 @@ class BansList{
     getBan(sckAddress){
 
         let index = this.findBan(sckAddress);
-        if (index !== null)
+        if ( index )
             return this.bans[index];
 
         return null;
@@ -70,21 +67,19 @@ class BansList{
     deleteBan(sckAddress){
 
         let ban = this.getBan(sckAddress);
-
-        if (ban !== null)
-            ban.upLiftBan();
+        if ( ban ) ban.upLiftBan();
 
     }
 
     _removeEmptyBans(){
 
         for (let i=this.bans.length-1; i>=0; i--)
-            if (this.bans[i].sckAddress === undefined || !this.bans[i].isBanned() )
+            if ( !this.bans[i].sckAddress || !this.bans[i].isBanned() )
                 this.bans.splice(i,1)
 
     }
 
-    _listBans(){
+    listBans(){
         
         if (this.bans.length > 0)
             console.info("BANNNNNNNNNNNNNNS");

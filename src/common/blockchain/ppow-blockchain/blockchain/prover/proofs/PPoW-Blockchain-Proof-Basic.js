@@ -156,11 +156,11 @@ class PPoWBlockchainProofBasic{
 
     push(block){
 
-        if (this.blocksIndex[block.height] === block)
+        if (this.blocksIndex[block] === block)
             return;
 
         this.blocks.push(block);
-        this.blocksIndex[block.height] = block;
+        this.blocksIndex[block] = block;
 
     }
 

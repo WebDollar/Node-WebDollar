@@ -175,7 +175,7 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        if (this.synchronized === false) return;
+        if ( !this.synchronized ) return;
 
         this.synchronized = false;
         console.warn("################### RESYNCHRONIZATION STARTED ##########");

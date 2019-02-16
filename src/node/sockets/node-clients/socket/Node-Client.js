@@ -49,16 +49,13 @@ class NodeClient {
 
         return new Promise( async (resolve) => {
 
-            let timeoutConnection = 8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? Math.random()*10*1000 : 0 );
             let timeoutTotal =  8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
 
-            try
-            {
+            try {
 
                 if ( address.length < 3 ){
                     console.log("rejecting address... invalid ",address);
-                    resolve(false);
-                    return false;
+                    return resolve(false);
                 }
 
                 // in case the port is not included
@@ -69,13 +66,13 @@ class NodeClient {
                 if (process.env.BROWSER && consts.SETTINGS.NODE.SSL )
                     SSL = true;
 
-                console.log("connecting... to:                ", address);
+                console.log("connecting to...                ", address);
 
                 let socket;
                 try {
 
                     // params described in the documentation https://socket.io/docs/client-api#manager
-                    socket = io( address, {
+                    this.socket = socket = io( address, {
 
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
                         maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
@@ -99,55 +96,41 @@ class NodeClient {
 
                 }  catch (Exception){
                     console.error("Error Connecting Node to ", address," ", Exception);
-                    resolve(false);
+                    return resolve(false);
                 }
-                this.socket = socket;
 
-                if ( Blockchain.MinerPoolManagement  && Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
+                if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
                     throw {message: "You switched to pool"};
 
                 NodePropagationProtocol.initializeNodesSimpleWaitlist(socket);
 
                 socket.once("connect", async ( response ) =>{
-
-                    //Connection Established
-
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
-
                     console.warn("Client connected to " + socket.node.sckAddress.address);
+                });
 
-                    let timeout = setTimeout(()=>{
 
-                        console.error("Disconnected for timeout hello");
-                        socket.disconnect();
+                socket.once("HelloNode", async (data) => {
+
+                    if (data) {
+                        await socket.node.protocol.processHello(data, {"ip":true,"uuid":true});
+                        await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
+                        resolve(true);
+                    } else
                         resolve(false);
-
-                    }, timeoutConnection);
-
-
-                    let answer = await socket.node.protocol.sendHello({"ip":true,"uuid":true});
-
-                    clearTimeout(timeout);
-
-                    if (answer) await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
-                    else socket.disconnect();
-
-                    resolve(answer);
 
                 });
 
-                socket.once("connect_error", async (response) =>{
+                socket.once("connect_error", response =>{
 
                     //console.log("Client error connecting", address, response);
-                    await NodesList.disconnectSocket(this.socket);
                     resolve(false);
 
                 });
 
-                socket.once("connect_failed", async (response) =>{
+                socket.once("connect_failed", response =>{
 
                     //console.log("Client error connecting (connect_failed) ", address, response);
-                    await NodesList.disconnectSocket(this.socket);
                     resolve(false);
 
                 });
@@ -176,7 +159,6 @@ class NodeClient {
 
         if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
             console.error("socket disconnected by not being minerPool");
-            this.socket.disconnect();
             return false;
         }
 
@@ -191,16 +173,8 @@ class NodeClient {
 
             //disconnect over the time, so it was connected before
 
-            try {
-
-                console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
-                await NodesList.disconnectSocket(this.socket);
-
-            } catch (exception){
-
-            }
-
-            delete this.socket;
+            console.warn("Client disconnected ", this.socket.node.sckAddress.getAddress(true));
+            await NodesList.disconnectSocket(this.socket);
 
         });
 
