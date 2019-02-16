@@ -44,6 +44,9 @@ class SavingManager{
             block = this._pendingBlocks[key];
             if (block instanceof Promise) continue;
 
+            //it is a forkBlock, it is skipped
+            if (block.isForkBlock) continue;
+
             //remove the block for saving
             this._pendingBlocks[key] = undefined;
             delete this._pendingBlocks[key];
