@@ -30,7 +30,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             answer = await socket.node.sendRequestWaitOnce("head/chainHash", mid, mid, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer && answer.hash) ? answer.hash.toString("hex") : 'no remote hash', "my chain hash", this.blockchain.getChainHash( mid + 1 ).toString("hex" ) );
+            console.log("_discoverForkBinarySearch", initialLeft, "left", left, "right ", right, (answer && answer.hash) ? answer.hash.toString("hex") : 'no remote hash', "my chain hash",  (await this.blockchain.getChainHash(mid )).toString("hex" ) );
 
             if (left < 0 || !answer || !Buffer.isBuffer(answer.hash) ) // timeout
                 return {position: null, header: answer };
@@ -39,7 +39,7 @@ class InterfaceBlockchainProtocolForkSolver{
             if (left >= right) {
 
                 //it the block actually is the same
-                if (answer.hash.equals( this.blockchain.getChainHash( mid + 2 ) ) )
+                if (answer.hash.equals(  await this.blockchain.getChainHash(mid ) ) )
                     return {position: mid, header: answer.hash };
                 else {
 
@@ -51,7 +51,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         if ( !answer || !Buffer.isBuffer(answer.hash))
                             return {position: null, header: answer }; // timeout
 
-                        if (answer.hash.equals( this.blockchain.getChainHash(mid -1 + 2 ) ) ) // it is a match
+                        if (answer.hash.equals( await this.blockchain.getChainHash(mid -1 ) ) ) // it is a match
                             return {position: mid-1, header: answer.hash };
 
                     }
@@ -61,14 +61,12 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
-            //console.log("it is comparing", answer.hash.toString("hex"), this.blockchain.getChainHash(mid + 1).toString("hex"));
-
             //was not not found, search left because it must be there
-            if (! answer.hash.equals( this.blockchain.getChainHash(mid + 2)  ) )
+            if (! answer.hash.equals( await this.blockchain.getChainHash(mid )  ) )
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there
-                return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
+            return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
 
         } catch (exception){
 
@@ -120,23 +118,28 @@ class InterfaceBlockchainProtocolForkSolver{
             //veify last n elements
             const count = 6;
 
-            if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  )
-                for (let i = currentBlockchainLength-1; i >= currentBlockchainLength-1-count; i--){
+            if ( currentBlockchainLength >= count && ( forkChainLength >= currentBlockchainLength ||  (this.blockchain.agent.light && forkProof) )  ) {
 
-                    if (i === forkChainLength-1 && forkLastChainHash ) {
-                        answer = { hash: forkLastChainHash };
+                let errors = 0;
+                for (let i = currentBlockchainLength - 1; i >= currentBlockchainLength - 1 - count && errors < 3; i--) {
+
+                    if (i === forkChainLength - 1 && forkLastChainHash) {
+                        answer = {hash: forkLastChainHash};
                     } else {
-                        answer = await socket.node.sendRequestWaitOnce( "head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
-                        if (!answer || !answer.hash ) continue;
+                        answer = await socket.node.sendRequestWaitOnce("head/chainHash", i, i, consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
+                        if (!answer || !answer.hash){
+                            errors++;
+                            continue;
+                        }
                     }
 
-                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader( answer.hash );
+                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
 
                     if (forkFound && forkFound !== fork) {
 
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
-                        forkFound.pushHeaders( fork.forkHeaders ); //this lead to a new fork
+                        forkFound.pushHeaders(fork.forkHeaders); //this lead to a new fork
                         forkFound.pushSocket(socket, forkProof);
 
                         this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
@@ -147,10 +150,10 @@ class InterfaceBlockchainProtocolForkSolver{
                     fork.pushHeader(answer.hash);
 
                     let chainHash = await this.blockchain.getChainHash(i);
-                    if ( chainHash.equals(answer.hash)){
+                    if (chainHash.equals(answer.hash)) {
 
                         binarySearchResult = {
-                            position: (i === currentBlockchainLength-1)  ? currentBlockchainLength :  i+1,
+                            position: (i === currentBlockchainLength - 1) ? currentBlockchainLength : i + 1,
                             header: answer.hash,
                         };
 
@@ -159,6 +162,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     }
 
                 }
+            }
 
 
             // in case it was you solved previously && there is something in the blockchain
@@ -182,7 +186,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
 
-                if ( forkFound !== null && forkFound !== fork ){
+                if ( forkFound  && forkFound !== fork ){
 
                     if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
 

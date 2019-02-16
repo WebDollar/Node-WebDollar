@@ -107,8 +107,10 @@ class NodeServer {
                     if (Math.random() < 0.05) console.error("version is invalid", socket.request._query["version"]);
                     return socket.disconnect();
                 }
-
                 if ( socket.request._query["uuid"] === consts.SETTINGS.UUID ) return false;
+
+                let nodeVersion = socket.request._query["version"];
+                let nodeUUID = socket.request._query["uuid"];
 
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
@@ -205,6 +207,13 @@ class NodeServer {
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
                     socket.node.protocol.justSendHello();
+                    socket.node.protocol.processHello({
+                        version: nodeVersion,
+                        uuid: nodeUUID,
+                        nodeType: nodeType,
+                        domain: nodeDomain,
+                        UTC: nodeUTC,
+                    });
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;

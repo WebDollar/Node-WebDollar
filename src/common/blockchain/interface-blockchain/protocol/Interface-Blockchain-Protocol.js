@@ -156,10 +156,8 @@ class InterfaceBlockchainProtocol {
                     // height
                     await this.blockchain.sleep(15 + Math.random() * 20);
 
-                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
-                        socket.node.sendRequest("head/chainHash", null);
-                        return;
-                    }
+                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
+                        return socket.node.sendRequest("head/chainHash", null);
 
                     let chainHash = await this.blockchain.blocks.getChainHashCallback( h );
                     socket.node.sendRequest("head/chainHash/" + h, { hash: chainHash });
