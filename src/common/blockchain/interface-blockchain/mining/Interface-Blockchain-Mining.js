@@ -49,9 +49,9 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
 
-            nextBlock = this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
+            nextBlock = await this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
-            nextBlock.timeStamp = nextBlock.getTimestampForMining();
+            nextBlock.timeStamp = await nextBlock.getTimestampForMining();
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             await nextBlock.updateInterlink();
 
@@ -98,7 +98,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 let difficulty = await this.blockchain.getDifficultyTarget();
 
-                if (difficulty === undefined || difficulty === null)
+                if ( !difficulty )
                     throw {message: 'difficulty not specified'};
 
                 if (difficulty instanceof BigInteger)
@@ -106,7 +106,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (!Buffer.isBuffer(nextBlock)) {
 
-                    if (nextBlock === undefined || nextBlock === null)
+                    if ( !nextBlock)
                         throw {message: "block is undefined"};
 
                     nextBlock._computeBlockHeaderPrefix( true ); //calculate the Block Header Prefix
@@ -213,8 +213,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
             } else
             if (!answer.result)
-                if(showLogsOnlyOnce)
-                    console.error( "block ", block.height ," was not mined...");
+                console.error( "block ", block.height ," was not mined...");
 
             if (this.reset) { // it was reset
                 this.reset = false;
@@ -270,6 +269,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         if ( !balance || balance < consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT * WebDollarCoins.WEBD ){
 
             await this.blockchain.sleep( Blockchain.MinerPoolManagement.minerPoolStarted ? 10000 : 1000 );
+
+            console.warn("Not enough funds to mine POS. It is required "+consts.BLOCKCHAIN.POS.MINIMUM_AMOUNT + " WEBD to mine POS");
 
             this.block.timeStamp = medianTimestamp;
             let posSignature = await this.block._signPOSSignature();
