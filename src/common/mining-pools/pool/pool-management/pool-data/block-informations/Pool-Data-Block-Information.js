@@ -300,7 +300,7 @@ class PoolDataBlockInformation {
 
     async calculateTargetDifficulty(){
 
-        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ await this.poolManagement.blockchain.getDifficultyTarget().toString("hex") ) );
+        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ (await this.poolManagement.blockchain.getDifficultyTarget()).toString("hex") ) );
 
     }
 

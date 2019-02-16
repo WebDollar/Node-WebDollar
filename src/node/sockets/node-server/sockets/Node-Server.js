@@ -200,6 +200,15 @@ class NodeServer {
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
+                    if (await socket.node.protocol.processHello({
+                        version: nodeVersion,
+                        uuid: nodeUUID,
+                        nodeType: nodeType,
+                        domain: nodeDomain,
+                        UTC: nodeUTC,
+                    }, { "uuid": true, "ip": true, "port": true} ) === false)
+                        return socket.disconnect();
+
                     if ( Math.random() < 0.3)
                         console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
 
@@ -207,14 +216,6 @@ class NodeServer {
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
                     socket.node.protocol.justSendHello();
-
-                    socket.node.protocol.processHello({
-                        version: nodeVersion,
-                        uuid: nodeUUID,
-                        nodeType: nodeType,
-                        domain: nodeDomain,
-                        UTC: nodeUTC,
-                    }, { "uuid": true, "ip": true, "port": true} );
 
                     socket.node.protocol.nodeType = nodeType;
                     socket.node.protocol.nodeUTC = nodeUTC;

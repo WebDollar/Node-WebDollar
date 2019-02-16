@@ -300,16 +300,9 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        let totalIterations = 0;
+        let fails = 0;
 
         while (( fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED  ) {
-
-            totalIterations++;
-
-            if (totalIterations >= 2000){
-                console.error("MAX iterations on downloading block");
-                break;
-            }
 
             //let socketListOptimized = fork.sockets.sort((a,b) => {return (a.latency > b.latency) ? 1 : ((b.latency > a.latency ) ? -1 : 0);} );
 
@@ -364,7 +357,6 @@ class InterfaceBlockchainProtocolForkSolver{
                         let waitingTime = socket.latency === 0 ? consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY : ( socket.latency + Math.random()*2000 );
 
                         answer = socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", {height: nextBlockHeight+index}, nextBlockHeight+index,  Math.min( waitingTime, consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY)  );
-                        downloadingList[index] = answer;
 
                         answer.then( result=>{
 
@@ -423,7 +415,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation;
             let block;
 
-            for(let i=0; i<downloadingList.length; i++){
+            for (let i=0; i < howManyBlocks; i++){
 
                 if ( !downloadingList[i])
                     throw {message: "block never received "+ nextBlockHeight};
