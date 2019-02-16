@@ -184,9 +184,6 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                     }
 
                     console.warn("Saving Fork. Starting from ", this.forkStartingHeight, this.blockchain.blocks.length);
-                    for (let forkBlock of this.forkBlocks)
-                        this.blockchain.blocks.savingManager.addBlockToSave( forkBlock );
-
                     Log.log("FORK STATUS SUCCESS5: "+forkedSuccessfully+ " position "+this.forkStartingHeight, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
 
                     await this.postForkTransactions(forkedSuccessfully, oldBlocks);

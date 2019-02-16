@@ -45,14 +45,10 @@ class InterfaceBlockchainBlocks{
 
     async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
 
-        if (saveBlock) {
+        this.savingManager.addBlockToSave(block);
+        await this.emitBlockInserted(block);
 
-            this.savingManager.addBlockToSave(block);
-            await this.emitBlockInserted(block);
-
-            NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast)
-
-        }
+        NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast);
 
         await this.setLength( this.length + 1 );
 
