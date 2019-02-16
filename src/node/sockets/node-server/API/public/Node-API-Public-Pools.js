@@ -4,7 +4,6 @@ import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
 import Blockchain from "main-blockchain/Blockchain";
 import BufferExtended from "common/utils/BufferExtended";
 import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-const JSON = require('circular-json');
 
 class NodeAPIPublicPools {
 
