@@ -8,7 +8,10 @@ class ChainWorkManager extends MemoryManager{
     async _loadData(height){
 
         let buffer = await this.blockchain.db.get("chainWork"+height);
-        return Serialization.deserializeBigInteger(buffer);
+        if (buffer)
+            return Serialization.deserializeBigInteger(buffer);
+
+        return (await this.loadingManager.getBlock( height-1 )).getChainWork();
 
     }
 
