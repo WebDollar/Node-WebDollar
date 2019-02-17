@@ -22,7 +22,7 @@ class InterfaceBlockchainTransactionsEvents{
         for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
 
             let block = await this.blockchain.getBlock(i);
-            if (block === undefined) continue;
+            if ( !block ) continue;
 
             for (let i=0; i<block.data.transactions.transactions.length; i++){
                 if ( block.data.transactions.transactions[i].txId.equals(txId))
@@ -51,7 +51,7 @@ class InterfaceBlockchainTransactionsEvents{
         for (let i=Math.max(startingPoint, this.blockchain.blocks.endingPosition-1-maxBlockCount); i<this.blockchain.blocks.endingPosition; i++){
 
             let block = await this.blockchain.getBlock(i);
-            if (block === undefined) continue;
+            if ( !block ) continue;
 
             block.data.transactions.transactions.forEach((transaction)=>{
 

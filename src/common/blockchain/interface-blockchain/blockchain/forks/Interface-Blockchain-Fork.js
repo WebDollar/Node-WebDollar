@@ -167,7 +167,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                         forkBlock.blockValidation = this._createBlockValidation_BlockchainValidation( forkBlock.height , index);
 
-                        if ( await this.saveIncludeBlock(index, revertActions, false, false) === false)
+                        if ( await this.saveIncludeBlock(index, revertActions,  false) === false)
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
                         revertActions.push( {name: "block-added", height: forkBlock.height } );
@@ -302,9 +302,9 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
     }
 
-    async saveIncludeBlock(index, revertActions, saveBlock = false, showUpdate = false){
+    async saveIncludeBlock(index, revertActions,  showUpdate = false){
 
-        if ( await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", saveBlock, revertActions, showUpdate) === false) {
+        if ( await this.blockchain.includeBlockchainBlock( this.forkBlocks[index], false, "all", true, revertActions, showUpdate) === false) {
             Log.error("fork couldn't be included in main Blockchain " + index, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
             return false;
         }

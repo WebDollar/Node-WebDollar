@@ -218,7 +218,7 @@ class PoolWorkManagement{
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
 
-                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(async () => {
+                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
 
                                 //returning false, because a new fork was changed in the mean while
                                 if (this.blockchain.blocks.length !== block.height)
