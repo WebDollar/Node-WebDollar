@@ -169,13 +169,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let i = this.blockchain.blocks.length-1;
                 let count = 0;
 
-                while ( !consts.DEBUG && i >= 0 && (await this.blockchain.getBlock(i)).data.minerAddress.equals( this.unencodedMinerAddress ) ){
+                while ( !consts.DEBUG && i >= 0 &&  (await this.blockchain.getBlock(i)) .data.minerAddress.equals( this.unencodedMinerAddress  )){
 
                     count ++;
                     i--;
 
                     if (count >= consts.MINING_POOL.MINING.MAXIMUM_BLOCKS_TO_MINE_BEFORE_ERROR){
-
                         StatusEvents.emit("blockchain/logs", {message: "You mined way too many blocks"});
                         break;
                     }
@@ -186,7 +185,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 try {
 
-                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
 
                             block.hash = answer.hash;
                             block.nonce = answer.nonce;
@@ -198,6 +197,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
 
                         }) === false) throw {message: "Mining2 returned false"};
+
+                    revertActions.push( {name: "block-added", height: block.height } );
 
                     NodeBlockchainPropagation.propagateLastBlockFast( block );
 

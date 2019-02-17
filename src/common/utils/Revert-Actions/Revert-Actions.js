@@ -37,7 +37,7 @@ class RevertActions {
                 }
                 else if (action.name === "block-removed"  && (actionName === '' || actionName === action.name) ) {
 
-                    await this.blockchain.includeBlockchainBlock( action.data, false, "all", false, undefined, false );
+                    await this.blockchain.includeBlockchainBlock( action.data, false, "all", true, undefined, false );
 
                 }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
