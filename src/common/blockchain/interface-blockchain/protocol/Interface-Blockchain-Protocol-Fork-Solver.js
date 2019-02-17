@@ -113,7 +113,10 @@ class InterfaceBlockchainProtocolForkSolver{
             let answer = this.blockchain.forksAdministrator.findFork(socket, forkLastChainHash, forkProof);
             if ( answer ) return answer;
 
-            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, undefined, [ forkLastChainHash ], false );
+            let forkChainHash = {};
+            forkChainHash[ forkLastChainHash.toString("hex") ] = true;
+
+            fork = await this.blockchain.forksAdministrator.createNewFork( socket, undefined, undefined, undefined, undefined, forkChainHash, false );
 
             //veify last n elements
             const count = 6;
@@ -133,13 +136,16 @@ class InterfaceBlockchainProtocolForkSolver{
                         }
                     }
 
-                    forkFound = this.blockchain.forksAdministrator._findForkyByHeader(answer.hash);
+                    forkFound = this.blockchain.forksAdministrator.findForkyByChainHash(answer.hash);
 
                     if (forkFound && forkFound !== fork) {
 
                         if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by n-2");
 
-                        forkFound.pushHeaders(fork.forkHeaders); //this lead to a new fork
+                        //this lead to a new fork
+                        for (let key in fork.forkChainHashes)
+                            forkFound.forkChainHashes[key] = true;
+
                         forkFound.pushSocket(socket, forkProof);
 
                         this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
@@ -147,7 +153,7 @@ class InterfaceBlockchainProtocolForkSolver{
                         return {result: true, fork: forkFound};
                     }
 
-                    fork.pushHeader(answer.hash);
+                    fork.forkChainHashes [ answer.hash.toString("hex") ] = true;
 
                     let chainHash = await this.blockchain.getChainHash(i);
                     if (chainHash.equals(answer.hash)) {
@@ -184,13 +190,13 @@ class InterfaceBlockchainProtocolForkSolver{
                 if (binarySearchResult.position === null)
                     throw {message: "connection dropped discoverForkBinarySearch"};
 
-                forkFound = this.blockchain.forksAdministrator._findForkyByHeader(binarySearchResult.header);
+                forkFound = this.blockchain.forksAdministrator.findForkyByChainHash(binarySearchResult.header);
 
                 if ( forkFound  && forkFound !== fork ){
 
                     if (Math.random() < 0.01) console.error("discoverAndProcessFork - fork already found by hash after binary search");
 
-                    forkFound.pushHeader( forkLastChainHash );
+                    forkFound.forkChainHashes [ forkLastChainHash.toString("hex") ] = true;
                     forkFound.pushSocket( socket, forkProof );
 
                     this.blockchain.forksAdministrator.deleteFork(fork); //destroy fork
@@ -198,7 +204,7 @@ class InterfaceBlockchainProtocolForkSolver{
                     return {result: true, fork: forkFound};
                 }
 
-                fork.pushHeader(binarySearchResult.header);
+                fork.forkChainHashes[binarySearchResult.header.toString("hex")] = true;
 
             }
 
@@ -468,7 +474,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                 }
 
-                fork.forkHeaders.push(block.hash);
+                fork.forkChainHashes[block.hash.toString("hex")]  = true;
 
                 //if the block was included correctly
                 if (result){

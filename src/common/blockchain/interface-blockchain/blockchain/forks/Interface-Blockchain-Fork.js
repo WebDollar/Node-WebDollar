@@ -21,6 +21,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
             throw {message: "includeForkBlock failed for ", height:block.height};
 
         this.forkBlocks.push(block);
+        this.forkChainHashes[block.hash.toString("hex")] = true;
 
         return true;
     }

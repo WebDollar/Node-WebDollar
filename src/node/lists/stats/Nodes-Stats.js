@@ -57,8 +57,6 @@ class NodesStats {
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
         console.log(" browsers: ", this.statsBrowsers, " terminal: ", this.statsTerminal);
 
-        BansList.listBans();
-
         let string1 = "";
         let clients = NodesList.getNodesByConnectionType(CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET);
         for (let i=0; i<Math.min( clients.length, 50); i++)

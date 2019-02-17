@@ -90,7 +90,7 @@ class BansList{
             let timeLeft  = (this._bans[i].banTimestamp + this._bans[i].banTime) - new Date().getTime() ;
 
             if (timeLeft > 0)
-                console.warn("Address", this._bans[i].sckAddress.toString(),
+                console.warn(this._bans[i].sckAddress.toString(),
                     "banTime", this._bans[i].banTime,
                     "timeLeft", timeLeft ,
                     "messages", this._bans[i].banReasons);

@@ -272,8 +272,15 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
 
-            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHash(this.forkStartingHeight + 1)) >= 0)
+            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length ) {
+
+                //TODO FIX THIS
+                // let chainHash = this.blockchain.getChainHash(this.forkStartingHeight );
+                //     if (this.forkChainHashes[chainHash.toString("hex")])
+                // && this.forkHeaders[0].compare() >= 0
+
                 throw {message: "Your proof is worst than mine because you have the same block"};
+            }
 
         }
 
