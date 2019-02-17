@@ -362,20 +362,27 @@ class InterfaceBlockchainProtocolForkSolver{
 
                             if ( !result ) {
 
-                                downloadingList[index] = undefined;
-                                socket.latency += Math.random()*1500;
-
+                                socket.latency += Math.floor( Math.random()*1500 );
                                 if (!resolved) return downloadingBlock(index);
 
                             }
-                            else if (!downloadingList[index]) {
+                            else {
 
-                                alreadyDownloaded++;
-                                downloadingList[index] = result;
+                                //no answer, let's try again
+                                if (!result.result){
 
-                                if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
-                                    resolved = true;
-                                    resolve(true);
+                                    if (!resolved) return downloadingBlock(index);
+
+                                } else if (!downloadingList[index]){
+
+                                    alreadyDownloaded++;
+                                    downloadingList[index] = result;
+
+                                    if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
+                                        resolved = true;
+                                        resolve(true);
+                                    }
+
                                 }
 
                             }
