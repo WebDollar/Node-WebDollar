@@ -28,19 +28,16 @@ export default async (Blockchain) => {
     console.log("Closing Express");
     try {
 
-        let NodeExpress, NodeServer;
         if (!process.env.BROWSER) {
-            NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
-            NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+            let NodeExpress = require('node/sockets/node-server/express/Node-Express').default;
+            let NodeServer = require('node/sockets/node-server/sockets/Node-Server').default;
+
+            NodeExpress.close();
+            NodeServer.close();
         }
 
-        if (NodeExpress )
-            NodeExpress.close();
-
-        if (NodeServer )
-            NodeServer.close();
-
         console.warn("Node Express and Server closed")
+
     } catch (exception){
 
     }
@@ -59,7 +56,6 @@ export default async (Blockchain) => {
             global.SEMAPHORE_PROCESS_DONE &&
             global.MINIBLOCKCHAIN_LIGHT_SAVED &&
             global.MINIBLOCKCHAIN_ADVANCED_SAVED &&
-            global.MINIBLOCKCHAIN_SAVED &&
             global.INTERFACE_BLOCKCHAIN_SAVED &&
             global.POOL_SAVED ) {
 

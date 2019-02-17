@@ -1,6 +1,7 @@
 import global from "consts/global"
 import consts from 'consts/const_global'
 import Log from 'common/utils/logging/Log';
+import Utils from "common/utils/helpers/Utils";
 
 const SAVING_MANAGER_INTERVAL = 5000;
 const MAX_BLOCKS_MEMORY = 1000;
@@ -128,6 +129,7 @@ class SavingManager{
 
         if (this._isBeingSavedAll) return;
         this._isBeingSavedAll = true;
+        clearTimeout( this._timeoutSaveManager );
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
@@ -135,9 +137,14 @@ class SavingManager{
 
         let answer = 1;
 
-        while (answer ){
+        while ( this.blockchain.semaphoreProcessing._list.length > 0 )
+            await Utils.sleep(500);
 
-            clearTimeout( this._timeoutSaveManager );
+        await Utils.sleep(1000);
+
+        Log.info("Saving Manager - No more forks", Log.LOG_TYPE.SAVING_MANAGER);
+
+        while ( this._pendingBlocksCount > 0 ){
 
             answer = await this._saveNextBlock();
 

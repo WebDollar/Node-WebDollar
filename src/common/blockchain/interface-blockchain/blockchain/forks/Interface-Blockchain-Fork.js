@@ -106,8 +106,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
      */
     async saveFork(){
 
-        if (global.TERMINATED)
-            return false;
+        if (global.TERMINATED) return false;
 
         this.forkIsSaving = true; //marking it saved because we want to avoid the forksAdministrator to delete it
 
@@ -126,11 +125,15 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
         if (this.blockchain )
             success = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
+                if (global.TERMINATED) return true;
+
                 if ( await this._validateFork(false, false) === false )
                     return Log.error("validateFork was not passed", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
                 if (await this.deleteAlreadyIncludedBlocks() === false)
                     return Log.error("deleteAlreadyIncludedBlocks blocks no longer exist", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+
+                if (global.TERMINATED) return false;
 
                 //mark the forkBlocks to avoid deletion
                 for (let forkBlock of this.forkBlocks )
