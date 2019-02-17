@@ -39,7 +39,6 @@ class InterfaceBlockchainFork {
         this.forkReady = false;
 
         this.forkStartingHeight = forkStartingHeight||0;
-        this.forkStartingHeightDownloading = forkStartingHeight||0;
 
         this.forkChainStartingPoint = forkChainStartingPoint;
         this.forkChainLength = forkChainLength||0;
@@ -209,7 +208,6 @@ class InterfaceBlockchainFork {
         if (pos >= 0){
 
             this.forkStartingHeight = this.forkBlocks[pos].height;
-            this.forkStartingHeightDownloading = this.forkBlocks[pos].height;
 
             this.forkBlocks.splice(0, pos);
         }
@@ -320,7 +318,6 @@ class InterfaceBlockchainFork {
 
         return {
             forkReady: this.forkReady,
-            forkStartingHeightDownloading: this.forkStartingHeightDownloading,
             forkChainStartingPoint: this.forkChainStartingPoint,
             forkChainLength: this.forkChainLength,
             forkBlocks: this.forkBlocks.length,

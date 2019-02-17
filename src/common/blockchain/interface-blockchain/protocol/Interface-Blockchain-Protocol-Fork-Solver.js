@@ -223,7 +223,6 @@ class InterfaceBlockchainProtocolForkSolver{
                     fork.downloadBlocksSleep = true;
 
                 fork.forkStartingHeight = binarySearchResult.position;
-                fork.forkStartingHeightDownloading  = binarySearchResult.position;
                 fork.forkChainStartingPoint = forkChainStartingPoint;
                 fork.forkChainLength = forkChainLength;
                 fork.forkChainWork = forkChainWork;
@@ -292,7 +291,7 @@ class InterfaceBlockchainProtocolForkSolver{
         if ( !fork )
             throw {message: 'fork is null'};
 
-        let nextBlockHeight = fork.forkStartingHeightDownloading;
+        let nextBlockHeight = fork.forkStartingHeight;
 
         //maybe it was deleted before
         if (fork.sockets.length === 0 || !fork.forkReady)
@@ -300,8 +299,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         console.log(" < fork.forkChainLength", fork.forkChainLength, "fork.forkBlocks.length", fork.forkBlocks.length);
 
-        let fails = 0;
-
+        let blocksAlreadyHave = 0;
         while (( fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED  ) {
 
             //let socketListOptimized = fork.sockets.sort((a,b) => {return (a.latency > b.latency) ? 1 : ((b.latency > a.latency ) ? -1 : 0);} );
@@ -422,7 +420,6 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation;
             let block;
 
-            let blocksAlreadyHave = 0;
             for (let i=0; i < howManyBlocks; i++){
 
                 if ( !downloadingList[i])
@@ -448,9 +445,14 @@ class InterfaceBlockchainProtocolForkSolver{
                             throw {message: "You gave me a block which I already have the same block"};
 
                         blocksAlreadyHave += 1;
+
+                        if (fork.forkStartingHeight === nextBlockHeight) {
+                            nextBlockHeight++;
+                            fork.forkStartingHeight++;
+                        }
+
                         continue;
                     }
-
                 }
 
                 let result;
