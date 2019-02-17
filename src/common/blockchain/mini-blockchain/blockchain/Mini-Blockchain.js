@@ -36,6 +36,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
 
+        if (!block) throw {message: "block is undefined"};
+
         if (!revertActions) revertActions = new RevertActions( this  );
 
         revertActions.push( { name: "breakpoint" } );
