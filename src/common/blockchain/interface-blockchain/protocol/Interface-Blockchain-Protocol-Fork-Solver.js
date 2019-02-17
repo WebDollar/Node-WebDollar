@@ -448,9 +448,10 @@ class InterfaceBlockchainProtocolForkSolver{
                             throw {message: "You gave me a block which I already have the same block"};
 
                         blocksAlreadyHave += 1;
+                        nextBlockHeight++;
+                        
                         continue;
                     }
-
                 }
 
                 let result;
