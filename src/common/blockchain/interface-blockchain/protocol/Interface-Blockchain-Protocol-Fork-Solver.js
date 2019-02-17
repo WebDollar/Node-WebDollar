@@ -415,6 +415,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation;
             let block;
 
+            let blocksAlreadyHave = 0;
             for (let i=0; i < howManyBlocks; i++){
 
                 if ( !downloadingList[i])
@@ -434,8 +435,14 @@ class InterfaceBlockchainProtocolForkSolver{
                 if ( this.blockchain.blocks.length > block.height) {
 
                     let hashChain = await this.blockchain.getChainHash( block.height );
-                    if (hashChain.equals( block.hashChain ))
-                        throw {message: "You gave me a block which I already have have the same block"};
+                    if (hashChain.equals( block.hashChain )) {
+
+                        if (blocksAlreadyHave > 10)
+                            throw {message: "You gave me a block which I already have the same block"};
+
+                        blocksAlreadyHave += 1;
+                        continue;
+                    }
 
                 }
 
