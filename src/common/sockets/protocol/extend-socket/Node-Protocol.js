@@ -44,7 +44,7 @@ class NodeProtocol {
             return false;
         }
 
-        if ( ["1.210.2","1.210.3"].includes( response.version ) ) return false;
+        if ( ["1.210.2","1.210.3","1.203.2"].includes( response.version ) ) return false;
 
         if (response.version < Blockchain.versionCompatibility){
             console.log("hello received, VERSION is not right", response.version, Blockchain.versionCompatibility);
