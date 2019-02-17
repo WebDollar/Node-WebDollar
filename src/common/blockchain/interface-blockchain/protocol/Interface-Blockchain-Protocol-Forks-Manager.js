@@ -137,7 +137,7 @@ class InterfaceBlockchainProtocolForksManager {
                     if (bIncludeBan) {
                         let socket = bestFork.getSocket();
                         console.warn("NEW BAN", socket ? socket.node.sckAddress.toString() : '', exception.message);
-                        BansList.addBan(bestFork.getSocket(), 60000, exception.message);
+                        BansList.addBan(bestFork.getSocket(), 180000, exception.message);
                     }
 
                 } catch (exception){

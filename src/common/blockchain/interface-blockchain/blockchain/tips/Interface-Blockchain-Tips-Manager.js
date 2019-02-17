@@ -92,7 +92,7 @@ class InterfaceBlockchainProtocolTipsManager {
                 socket.node.protocol.sendLastBlock();
 
             if (forkChainLength < this.blockchain.blocks.length - 50)
-                BansList.addBan(socket, 5000, "Your blockchain is way smaller than mine. "+forkChainLength+" / "+this.blockchain.blocks.length );
+                BansList.addBan(socket, 30000, "Your blockchain is way smaller than mine. "+forkChainLength+" / "+this.blockchain.blocks.length );
 
             throw "Your blockchain is smaller than mine";
 
