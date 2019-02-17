@@ -154,12 +154,10 @@ class InterfaceBlockchainProtocol {
                 try {
 
                     // height
-                    await this.blockchain.sleep(15 + Math.random() * 20);
-
                     if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
                         return socket.node.sendRequest("head/chainHash", null);
 
-                    let chainHash = await this.blockchain.blocks.getChainHashCallback( h );
+                    let chainHash = await this.blockchain.getChainHash( h );
                     socket.node.sendRequest("head/chainHash/" + h, { hash: chainHash });
 
                 } catch (exception) {
@@ -174,17 +172,12 @@ class InterfaceBlockchainProtocol {
 
                     // height
 
-                    await this.blockchain.sleep(15 + Math.random() * 20);
+                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
+                        return socket.node.sendRequest("head/hash", null);
 
-                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h) {
-                        socket.node.sendRequest("head/hash", null);
-                        return;
-                    }
+                    let hash = await this.blockchain.getHash(h);
 
-                    let block = await this.blockchain.getBlock(h);
-                    if (block === undefined) socket.node.sendRequest("head/hash", null);
-
-                    socket.node.sendRequest("head/hash/" + h, { hash: block.hash });
+                    socket.node.sendRequest("head/hash/" + h, { hash: hash });
 
                 } catch (exception) {
 
