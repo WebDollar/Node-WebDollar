@@ -8,18 +8,16 @@ import consts from 'consts/const_global';
 import global from 'consts/global';
 
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-import Serialization from 'common/utils/Serialization';
 
 import InterfaceBlockchainMiningBasic from "./Interface-Blockchain-Mining-Basic";
 
-import AdvancedMessages from "node/menu/Advanced-Messages";
 import StatusEvents from "common/events/Status-Events";
 
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 
-import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import Blockchain from "src/main-blockchain/Blockchain";
+import Utils from "common/utils/helpers/Utils"
 
 class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
@@ -95,6 +93,12 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             try {
 
                 let nextBlock = await this.getNextBlock(showLogsOnlyOnce);
+
+                if (!nextBlock){
+                    console.warn("nextBlock couldn't be created");
+                    await Utils.sleep(1000);
+                    continue;
+                }
 
                 if (!Buffer.isBuffer(nextBlock)) {
 
@@ -198,6 +202,10 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                     await block.data.transactions.confirmTransactions();
 
                     StatusEvents.emit("blockchain/new-blocks", { });
+
+                    console.warn( "----------------------------------------------------------------------------");
+                    console.warn( "Block mined successfully");
+                    console.warn( "----------------------------------------------------------------------------");
 
                 } catch (exception){
                     console.error("Mining processBlocksSempahoreCallback raised an error ",block.height, exception);

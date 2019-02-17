@@ -36,6 +36,8 @@ class MiniBlockchain extends  inheritBlockchain{
 
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
 
+        if (!block) throw {message: "block is undefined"};
+
         if (!revertActions) revertActions = new RevertActions( this  );
 
         revertActions.push( { name: "breakpoint" } );
@@ -73,7 +75,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (ex){
             revertException = true;
-            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block ? block.height : -1, ex, block ? block.toJSON() : '' );
+            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", ex, block ? block.height : -1, ex, block ? block.toJSON() : '' );
         }
 
         let result = true;

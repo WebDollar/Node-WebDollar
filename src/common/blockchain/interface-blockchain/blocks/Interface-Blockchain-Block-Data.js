@@ -21,8 +21,7 @@ class InterfaceBlockchainBlockData {
 
         this._minerAddress = undefined;
 
-        if (minerAddress === undefined)
-            minerAddress = BlockchainGenesis.address;
+        if ( !minerAddress ) minerAddress = BlockchainGenesis.address;
 
         this.minerAddress = minerAddress;
 
@@ -30,8 +29,7 @@ class InterfaceBlockchainBlockData {
 
         this.hashData = hashData;
 
-        if (hashData === undefined || hashData === null)
-            this.computeHashBlockData();
+        if ( !hashData ) this.computeHashBlockData();
 
     }
 
@@ -40,7 +38,7 @@ class InterfaceBlockchainBlockData {
         if (!Buffer.isBuffer(this.minerAddress) || this.minerAddress.length !==  consts.ADDRESSES.ADDRESS.LENGTH )
             throw {message: 'data.minerAddress is empty'};
 
-        if (this.hashData === undefined || this.hashData === null || !Buffer.isBuffer(this.hashData))
+        if ( !this.hashData || !Buffer.isBuffer(this.hashData))
             throw {message: 'hashData is empty'};
 
         //validate hash
@@ -146,7 +144,7 @@ class InterfaceBlockchainBlockData {
 
         let result = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(minerAddressWIF);
 
-        if (result === null)
+        if (!result )
             throw {message: "Miner address is not a valid WIF", address: minerAddressWIF};
 
         this._minerAddress = result;

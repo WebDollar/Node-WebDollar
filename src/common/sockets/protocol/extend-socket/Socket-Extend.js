@@ -25,8 +25,7 @@ class SocketExtend{
         socket.node.on = (name, callback ) => {
             socket.on(name, (data)=>{
 
-                if (global.TERMINATED)
-                    return;
+                if (global.TERMINATED) return;
 
                 SocketProtocol._processBufferArray(data);
 
@@ -37,8 +36,7 @@ class SocketExtend{
         socket.node.once = (name, callback ) => {
             socket.once(name, (data)=>{
 
-                if (global.TERMINATED)
-                    return;
+                if (global.TERMINATED) return;
 
                 SocketProtocol._processBufferArray(data);
 

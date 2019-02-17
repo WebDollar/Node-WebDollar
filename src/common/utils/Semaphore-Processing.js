@@ -43,10 +43,11 @@ class SemaphoreProcessing{
             }
 
             try {
+
                 let resolver = this._list[0].resolver;
                 this._list.splice(0, 1);
 
-                resolver(answer);
+                await resolver(answer);
 
             } catch (ex){
                 console.error("error processingSemaphoreList RESOLVER !!!!!!!!!!!!!!!!!!!!!!!!", ex);
