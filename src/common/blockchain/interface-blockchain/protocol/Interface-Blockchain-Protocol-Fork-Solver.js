@@ -265,7 +265,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (bIncludeBan) {
                 console.warn("BANNNNNNNNNNNNNNNNN", socket.node.sckAddress.toString(), exception.message);
-                BansList.addBan(socket, 60000, exception.message);
+                BansList.addBan(socket, 180000, exception.message);
             }
 
             await this.blockchain.sleep(10);
@@ -362,20 +362,27 @@ class InterfaceBlockchainProtocolForkSolver{
 
                             if ( !result ) {
 
-                                downloadingList[index] = undefined;
-                                socket.latency += Math.random()*1500;
-
+                                socket.latency += Math.floor( Math.random()*1500 );
                                 if (!resolved) return downloadingBlock(index);
 
                             }
-                            else if (!downloadingList[index]) {
+                            else {
 
-                                alreadyDownloaded++;
-                                downloadingList[index] = result;
+                                //no answer, let's try again
+                                if (!result.result){
 
-                                if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
-                                    resolved = true;
-                                    resolve(true);
+                                    if (!resolved) return downloadingBlock(index);
+
+                                } else if (!downloadingList[index]){
+
+                                    alreadyDownloaded++;
+                                    downloadingList[index] = result;
+
+                                    if ( ((alreadyDownloaded === howManyBlocks) || global.TERMINATED) && !resolved) {
+                                        resolved = true;
+                                        resolve(true);
+                                    }
+
                                 }
 
                             }
@@ -415,6 +422,7 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation;
             let block;
 
+            let blocksAlreadyHave = 0;
             for (let i=0; i < howManyBlocks; i++){
 
                 if ( !downloadingList[i])
@@ -434,8 +442,14 @@ class InterfaceBlockchainProtocolForkSolver{
                 if ( this.blockchain.blocks.length > block.height) {
 
                     let hashChain = await this.blockchain.getChainHash( block.height );
-                    if (hashChain.equals( block.hashChain ))
-                        throw {message: "You gave me a block which I already have have the same block"};
+                    if (hashChain.equals( block.hashChain )) {
+
+                        if (blocksAlreadyHave > 10)
+                            throw {message: "You gave me a block which I already have the same block"};
+
+                        blocksAlreadyHave += 1;
+                        continue;
+                    }
 
                 }
 
