@@ -302,6 +302,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
         let fails = 0;
 
+        let blocksAlreadyHave = 0;
         while (( fork.forkStartingHeight + fork.forkBlocks.length < fork.forkChainLength) && !global.TERMINATED  ) {
 
             //let socketListOptimized = fork.sockets.sort((a,b) => {return (a.latency > b.latency) ? 1 : ((b.latency > a.latency ) ? -1 : 0);} );
@@ -422,7 +423,6 @@ class InterfaceBlockchainProtocolForkSolver{
             let blockValidation;
             let block;
 
-            let blocksAlreadyHave = 0;
             for (let i=0; i < howManyBlocks; i++){
 
                 if ( !downloadingList[i])
