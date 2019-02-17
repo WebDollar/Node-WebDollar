@@ -107,8 +107,10 @@ class NodeServer {
                     if (Math.random() < 0.05) console.error("version is invalid", socket.request._query["version"]);
                     return socket.disconnect();
                 }
-
                 if ( socket.request._query["uuid"] === consts.SETTINGS.UUID ) return false;
+
+                let nodeVersion = socket.request._query["version"];
+                let nodeUUID = socket.request._query["uuid"];
 
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
@@ -197,6 +199,15 @@ class NodeServer {
                 if ( connections.countUUIDs === 0 && connections.countIPs < ( Blockchain.isPoolActivated ? consts.MINING_POOL.CONNECTIONS.NO_OF_IDENTICAL_IPS : consts.SETTINGS.PARAMS.CONNECTIONS.NO_OF_IDENTICAL_IPS )){
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
+
+                    if (await socket.node.protocol.processHello({
+                        version: nodeVersion,
+                        uuid: nodeUUID,
+                        nodeType: nodeType,
+                        domain: nodeDomain,
+                        UTC: nodeUTC,
+                    }, { "uuid": true, "ip": true, "port": true} ) === false)
+                        return socket.disconnect();
 
                     if ( Math.random() < 0.3)
                         console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
