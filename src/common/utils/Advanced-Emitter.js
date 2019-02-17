@@ -17,12 +17,14 @@ class AdvancedEmitter{
 
     emit(){
 
+        let answer;
         try{
-            this._emitter.emit.apply(this, arguments);
+            answer = this._emitter.emit.apply(this, arguments);
         } catch (exception){
             console.error("Emit raised an error", exception);
         }
 
+        return answer;
     }
 
     on(a, call){
