@@ -20,8 +20,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     async initializeFork(){
 
-        if (this.blockchain === undefined) return false;
-
         if ( this.blockchain.agent.light ) {
             if (! (await this._downloadProof()))
                 return false;
@@ -60,7 +58,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
+            if (this.blockchain.proofPi && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
                 if (this.forkChainWork.greater(this.blockchain.blocks.chainWork)){
                     this.forkProofPi = this.blockchain.proofPi;
@@ -124,7 +122,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             }
 
             let offset = 0;
-            while(offset!=buffer.length){
+            while(offset!==buffer.length){
 
                 let result = this.forkProofPi.deserializeProof(buffer, offset);
 
@@ -182,9 +180,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         if (!this.blockchain.agent.light)
             return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
-        if (this.forkProofPi === undefined) throw {message: "Proof is invalid being null"};
+        if (!this.forkProofPi ) throw {message: "Proof is invalid being null"};
 
-        if ( this.blockchain.proofPi !== undefined ) {
+        if ( this.blockchain.proofPi ) {
 
             if (this._isProofBetter())
                 return true;

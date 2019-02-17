@@ -29,8 +29,8 @@ class BansList{
 
         if ( !sckAddress ) return false;
 
-        if ( sckAddress  && sckAddress.node) sckAddress = sckAddress.node.sckAddress;
-        if ( sckAddress  && sckAddress.sckAddress ) sckAddress = sckAddress.node.sckAddress;
+        if ( sckAddress  && sckAddress.node) sckAddress = sckAddress.node;
+        if ( sckAddress  && sckAddress.sckAddress ) sckAddress = sckAddress.sckAddress;
 
         let ban = this.getBan(sckAddress);
 
