@@ -96,14 +96,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 let nextBlock = await this.getNextBlock(showLogsOnlyOnce);
 
-                let difficulty = await this.blockchain.getDifficultyTarget();
-
-                if ( !difficulty )
-                    throw {message: 'difficulty not specified'};
-
-                if (difficulty instanceof BigInteger)
-                    difficulty = Serialization.serializeToFixedBuffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH, Serialization.serializeBigInteger(difficulty));
-
                 if (!Buffer.isBuffer(nextBlock)) {
 
                     if ( !nextBlock)
@@ -116,7 +108,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 let start = Math.floor( Math.random() * 3700000000 );
                 let end = 0xFFFFFFFF;
 
-                await this.mineBlock(nextBlock, difficulty, start, end, nextBlock.height, showLogsOnlyOnce);
+                await this.mineBlock(nextBlock, nextBlock.difficultyTargetPrev, start, end, nextBlock.height, showLogsOnlyOnce);
 
 
             } catch (exception){

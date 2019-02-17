@@ -73,7 +73,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         } catch (ex){
             revertException = true;
-            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block.height, ex, block ? block.toJSON() : '' );
+            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block ? block.height : -1, ex, block ? block.toJSON() : '' );
         }
 
         let result = true;
@@ -110,7 +110,7 @@ class MiniBlockchain extends  inheritBlockchain{
 
         if (await this.simulateNewBlock( args[0], false, args[4],
 
-                async ()=>  await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs )
+                 ()=>  inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs )
 
             , args[5] ) ===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
