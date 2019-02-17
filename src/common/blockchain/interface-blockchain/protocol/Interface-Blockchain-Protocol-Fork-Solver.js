@@ -204,7 +204,8 @@ class InterfaceBlockchainProtocolForkSolver{
                     return {result: true, fork: forkFound};
                 }
 
-                fork.forkChainHashes[binarySearchResult.header.toString("hex")] = true;
+                if (binarySearchResult.header)
+                    fork.forkChainHashes[binarySearchResult.header.toString("hex")] = true;
 
             }
 

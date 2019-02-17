@@ -204,6 +204,7 @@ class NodeServer {
                         version: nodeVersion,
                         uuid: nodeUUID,
                         nodeType: nodeType,
+                        nodeConsensusType: nodeConsensusType,
                         domain: nodeDomain,
                         UTC: nodeUTC,
                     }, { "uuid": true, "ip": true, "port": true} ) === false)
