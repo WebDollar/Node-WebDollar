@@ -1,11 +1,10 @@
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class MinerPoolStatistics{
 
     constructor(minerPoolManagement){
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this.minerPoolManagement = minerPoolManagement;
 

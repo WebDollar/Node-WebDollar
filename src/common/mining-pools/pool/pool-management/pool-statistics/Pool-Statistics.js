@@ -1,15 +1,14 @@
-const EventEmitter = require('events');
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Log from 'common/utils/logging/Log';
 import NodesList from 'node/lists/Nodes-List'
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class PoolStatistics{
 
     constructor(poolManagement, databaseName){
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this.poolManagement = poolManagement;
 

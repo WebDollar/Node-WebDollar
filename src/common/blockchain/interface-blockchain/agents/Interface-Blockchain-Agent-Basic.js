@@ -1,9 +1,9 @@
-const EventEmitter = require('events');
 import AGENT_STATUS from "./Agent-Status";
 import consts from 'consts/const_global'
 import Blockchain from "main-blockchain/Blockchain"
 import NanoWalletProtocol from "./Nano/Nano-Wallet-Protocol"
 import NodesList from 'node/lists/Nodes-List';
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_BROWSER = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 4;
 const TIME_TO_RESYNCHRONIZE_IN_CASE_NO_NEW_BLOCKS_WERE_RECEIVED_TERMINAL = consts.BLOCKCHAIN.DIFFICULTY.TIME_PER_BLOCK * 1000 * 8;
@@ -18,8 +18,7 @@ class InterfaceBlockchainAgentBasic {
 
         this.blockchain = blockchain;
 
-        this._eventEmitter = new EventEmitter();
-        this._eventEmitter.setMaxListeners(100);
+        this._eventEmitter = new AdvancedEmitter(100);
 
         this._eventEmitter.on("agent/synchronized",(data)=>{
 
