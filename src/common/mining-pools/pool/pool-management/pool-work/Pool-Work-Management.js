@@ -231,7 +231,7 @@ class PoolWorkManagement{
                         NodeBlockchainPropagation.propagateLastBlockFast(block);
 
                         //confirming transactions
-                        await block.data.transactions.confirmTransactions();
+                        await block.data.transactions.confirmTransactions(block.height);
 
 
                         try {

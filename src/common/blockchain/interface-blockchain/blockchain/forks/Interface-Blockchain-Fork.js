@@ -278,7 +278,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                 await block.data.transactions.unconfirmTransactions();
 
             for (let block of this.forkBlocks)
-                await block.data.transactions.confirmTransactions();
+                await block.data.transactions.confirmTransactions(block.height);
 
         } else {
 
@@ -286,7 +286,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                 await block.data.transactions.unconfirmTransactions();
 
             for (let block of oldBlocks)
-                await block.data.transactions.confirmTransactions();
+                await block.data.transactions.confirmTransactions(block.height);
 
         }
 

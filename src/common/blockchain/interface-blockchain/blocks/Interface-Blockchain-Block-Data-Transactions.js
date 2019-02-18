@@ -41,11 +41,11 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    async saveVirtualizedTxId(txId){
+    async saveVirtualizedTxId(txId,blockHeight){
 
         try{
 
-            await this.db.save("transactionID-"+txId, true );
+            await this.db.save("transactionID-"+txId, blockHeight );
 
         }
         catch(err) {
@@ -70,11 +70,11 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    async confirmTransactions(){
+    async confirmTransactions(blockHeight){
 
         await this.transactions.forEach(async (transaction) => {
 
-            await this.saveVirtualizedTxId(transaction.txId.toString('hex'));
+            await this.saveVirtualizedTxId(transaction.txId.toString('hex'),blockHeight);
             transaction.confirmed = true;
             // this.blockData.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
         });

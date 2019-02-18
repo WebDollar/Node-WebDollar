@@ -437,7 +437,7 @@ class InterfaceBlockchainBlock {
                 answer = answer && await this.saveBlockTimestamp();
                 answer = answer && await this.saveChainWork();
 
-                await this.data.transactions.confirmTransactions();
+                await this.data.transactions.confirmTransactions(this.height);
             }
             catch (exception){
                 console.error('ERROR on SAVE block: ',  exception);
