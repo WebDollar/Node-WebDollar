@@ -11,7 +11,7 @@ class ChainWorkManager extends MemoryManager{
         if (buffer)
             return Serialization.deserializeBigInteger(buffer);
 
-        return (await this.loadingManager.getBlock( height-1 )).getChainWork();
+        return (await this.loadingManager.getBlock( height )).getChainWork();
 
     }
 
