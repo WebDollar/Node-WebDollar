@@ -224,6 +224,9 @@ class PoolWorkManagement{
                                 if (this.blockchain.blocks.length !== block.height)
                                     throw {message: "pool: block is already too old for processing"};
 
+                                //calculate blockHashChain
+                                block.hashChain = block.calculateChainHash();
+
                                 return this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
 
                             }) === false) throw {message: "Mining2 returned false"};
