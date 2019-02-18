@@ -536,6 +536,7 @@ if ( consts.DEBUG === true ) {
         "addr": ["http://86.126.138.61:2024"],
     }];
 
+
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
