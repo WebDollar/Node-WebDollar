@@ -17,7 +17,7 @@ class SavingManager{
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
-        this._factor = Math.floor( Math.random()*10 );
+        this._factor = Math.floor( Math.random()*20 );
 
     }
 
@@ -81,7 +81,7 @@ class SavingManager{
                 delete this._pendingBlocks[ key ] ;
 
             //saving Accountant Tree
-            if (block.height === this.blockchain.blocks.length-1 && block.height % (500 + this._factor ) === 0)
+            if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
                 await this.saveBlockchain();
 
             block.saving = false;
