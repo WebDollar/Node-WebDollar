@@ -83,11 +83,7 @@ class MinerPoolProtocol extends PoolProtocolList{
                 if (!answer)
                     throw {message: "send hello is not working"};
 
-                socket.on("mining-pool/hello-pool/again",async (data)=>{
-
-                    await this._sendPoolHello(socket);
-
-                });
+                socket.on("mining-pool/hello-pool/again", (data) => this._sendPoolHello(socket) );
             }
 
         } catch (exception){

@@ -112,12 +112,19 @@ class NodeClient {
 
                 socket.once("HelloNode", async (data) => {
 
-                    if (data) {
-                        if (await socket.node.protocol.processHello(data, {"ip":true,"uuid":true}))
-                            await this.initializeSocket( {"ip": true, "uuid": true}, waitlist);
-                        resolve(true);
-                    } else
-                        resolve(false);
+                    try{
+
+                        if (data) {
+                            if (await socket.node.protocol.processHello(data, {"ip":true,"uuid":true})) {
+                                await this.initializeSocket({"ip": true, "uuid": true}, waitlist);
+                                resolve(true);
+                            }
+                        } else
+                            resolve(false);
+
+                    } catch (exception){
+
+                    }
 
                 });
 

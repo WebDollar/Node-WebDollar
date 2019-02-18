@@ -22,7 +22,7 @@ class SocketExtend{
 
         socket.node.getSocket = () => socket ;
 
-        socket.node.on = (name, callback ) => {
+        socket.node.on = (name, callback ) =>
             socket.on(name, (data)=>{
 
                 if (global.TERMINATED) return;
@@ -30,10 +30,9 @@ class SocketExtend{
                 SocketProtocol._processBufferArray(data);
 
                 return callback(data);
-            })
-        } ;
+            });
 
-        socket.node.once = (name, callback ) => {
+        socket.node.once = (name, callback ) =>
             socket.once(name, (data)=>{
 
                 if (global.TERMINATED) return;
@@ -41,8 +40,8 @@ class SocketExtend{
                 SocketProtocol._processBufferArray(data);
 
                 return callback(data);
-            })
-        } ;
+            });
+
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         if (socket.webRTC)

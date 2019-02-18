@@ -53,8 +53,6 @@ class InterfaceBlockchainBlock {
 
         this.db = db;
 
-        this._socketPropagatedBy = undefined;
-
     }
 
     async getTimestampForMining(){
@@ -555,19 +553,6 @@ class InterfaceBlockchainBlock {
 
     }
 
-    get socketPropagatedBy(){
-        return this._socketPropagatedBy;
-    }
-
-    set socketPropagatedBy(socket){
-
-        this._socketPropagatedBy = socket;
-
-        socket.on("disconnect",()=>{
-            this._socketPropagatedBy = undefined;
-        });
-
-    }
 
     /**
      *

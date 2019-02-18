@@ -97,10 +97,15 @@ class NodePropagationProtocol {
 
         socket.on("propagation/simple-waitlist-nodes", async ( data, callback )=>{
 
+            try{
 
-            await this._processNodesList(data, socket);
+                await this._processNodesList(data, socket);
 
-            callback("received",{ });
+                callback("received",{ });
+
+            } catch (exception){
+
+            }
 
         });
 
@@ -198,7 +203,7 @@ class NodePropagationProtocol {
 
     initializeNodesPropagation(socket){
 
-        socket.on("propagation/nodes", async data => { await this._processNodesList(data, socket )}, );
+        socket.on("propagation/nodes",  data => this._processNodesList(data, socket ) );
 
         socket.node.on("propagation/request-all-wait-list/full-nodes", response =>{
 
