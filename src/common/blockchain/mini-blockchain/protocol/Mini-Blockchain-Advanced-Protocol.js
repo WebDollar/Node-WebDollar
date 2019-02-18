@@ -16,39 +16,25 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
          */
         socket.node.on("get/blockchain/light/get-light-settings", async (data)=>{
 
-            try{
+            if (data.height === undefined)
+                data.height = -1;
 
-                if (data.height === undefined)
-                    data.height = -1;
+            if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
+            if (data.height < 0) throw {message: "height is not valid"};
 
-                if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
-                if (data.height < 0) throw {message: "height is not valid"};
+            if (this.blockchain.blocks.length < data.height)
+                throw {message: "height is not valid"};
 
-                if (this.blockchain.blocks.length < data.height)
-                    throw {message: "height is not valid"};
+            let difficultyTarget = await this.blockchain.getDifficultyTarget(data.height);
+            let timestamp = this.blockchain.getTimeStamp(data.height);
+            let hashPrev = this.blockchain.getHash(data.height-1);
 
-                let difficultyTarget = await this.blockchain.getDifficultyTarget(data.height);
-                let timestamp = this.blockchain.getTimeStamp(data.height);
-                let hashPrev = this.blockchain.getHash(data.height-1);
-
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
-                    result: difficultyTarget ? true : false,
-                    difficultyTarget: difficultyTarget,
-                    timeStamp: timestamp,
-                    hashPrev: hashPrev,
-                });
-
-
-            } catch (exception){
-
-                console.error("Socket Error - get/blockchain/light/get-light-settings", exception, data);
-
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
-                    result: false,
-                    message: exception
-                });
-
-            }
+            socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
+                result: difficultyTarget ? true : false,
+                difficultyTarget: difficultyTarget,
+                timeStamp: timestamp,
+                hashPrev: hashPrev,
+            });
 
         });
 

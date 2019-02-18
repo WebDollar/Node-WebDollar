@@ -209,7 +209,7 @@ class NodePropagationProtocol {
 
             let answer = this._getWaitlist( response, NodesWaitlist.waitListFullNodes );
 
-            if (answer !== null && answer.list.length > 0)
+            if (answer && answer.list.length > 0)
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: answer.list, next: answer.next});
 
         });
@@ -218,7 +218,7 @@ class NodePropagationProtocol {
 
             let answer = this._getWaitlist( response, NodesWaitlist.waitListLightNodes );
 
-            if (answer !== null && answer.list.length > 0)
+            if (answer && answer.list.length > 0)
                 socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: answer.list, next: answer.next});
 
         });

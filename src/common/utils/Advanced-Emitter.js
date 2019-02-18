@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+import consts from "consts/const_global";
 
 class AdvancedEmitter{
 
@@ -21,7 +22,8 @@ class AdvancedEmitter{
         try{
             answer = this._emitter.emit.apply(this, arguments);
         } catch (exception){
-            console.error("Emit raised an error", exception);
+            if (consts.DEBUG)
+                console.error("Emit raised an error", exception);
         }
 
         return answer;
@@ -29,14 +31,28 @@ class AdvancedEmitter{
 
     on(a, call){
 
-        this._emitter.on(a, call);
+        this._emitter.on(a, (...args)=>{
+            try{
+                call(...args);
+            }catch(exception){
+                if (consts.DEBUG)
+                    console.error("On raised an error", exception);
+            }
+        });
 
         return ()=> this._emitter.removeListener(a, call);
     }
 
     once(a, call){
 
-        this._emitter.once(a, call);
+        this._emitter.once(a, (...args)=>{
+            try{
+                call(...args);
+            }catch(exception){
+                if (consts.DEBUG)
+                    console.error("Once raised an error", exception);
+            }
+        });
 
         return () => this._emitter.removeListener(a, call);
     }
