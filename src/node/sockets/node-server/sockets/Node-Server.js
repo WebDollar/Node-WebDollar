@@ -1,5 +1,6 @@
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
+import Utils from "common/utils/helpers/Utils";
 
 const io = require('socket.io');
 
@@ -207,8 +208,9 @@ class NodeServer {
                         nodeConsensusType: nodeConsensusType,
                         domain: nodeDomain,
                         UTC: nodeUTC,
-                    }, { "uuid": true, "ip": true, "port": true} ) === false)
+                    }, { "uuid": true, "ip": true, "port": true} ) === false) {
                         return socket.disconnect();
+                    }
 
                     if ( Math.random() < 0.3)
                         console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
@@ -216,13 +218,7 @@ class NodeServer {
                     if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
-                    socket.node.protocol.justSendHello();
-
-                    socket.node.protocol.nodeType = nodeType;
-                    socket.node.protocol.nodeUTC = nodeUTC;
-                    socket.node.protocol.nodeDomain = nodeDomain;
-
-                    socket.node.protocol.nodeConsensusType = nodeConsensusType || NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
+                    await socket.node.protocol.justSendHello();
 
                     socket.node.protocol.helloValidated = true;
 

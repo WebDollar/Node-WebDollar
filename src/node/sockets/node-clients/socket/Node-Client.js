@@ -135,6 +135,10 @@ class NodeClient {
 
                 });
 
+                socket.on("disconnect", ()=>{
+                   resolve(false);
+                });
+
                 socket.connect();
 
             }

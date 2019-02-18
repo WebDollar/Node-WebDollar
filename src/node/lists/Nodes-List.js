@@ -155,7 +155,8 @@ class NodesList {
     async disconnectSocket(socket, connectionType = 'all'){
 
         if (socket && !socket.node) {
-            socket.disconnect();
+            if (socket.connected)
+                socket.disconnect();
             return false;
         }
 

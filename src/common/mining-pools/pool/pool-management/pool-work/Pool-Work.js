@@ -72,7 +72,7 @@ class PoolWork {
 
             try{
 
-                this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
+                this.lastBlockSerialization = await this.lastBlock.serializeBlock(true );
 
             } catch (exception){
 

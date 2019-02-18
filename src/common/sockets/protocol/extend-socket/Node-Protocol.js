@@ -22,7 +22,7 @@ class NodeProtocol {
 
     async justSendHello(){
 
-        this.node.sendRequest("HelloNode", {
+        return this.node.sendRequest("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
