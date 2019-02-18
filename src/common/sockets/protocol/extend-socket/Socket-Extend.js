@@ -25,21 +25,32 @@ class SocketExtend{
         socket.node.on = (name, callback ) =>
             socket.on(name, (data)=>{
 
-                if (global.TERMINATED) return;
+                try{
 
-                SocketProtocol._processBufferArray(data);
+                    if (global.TERMINATED) return;
 
-                return callback(data);
+                    SocketProtocol._processBufferArray(data);
+
+                    return callback(data);
+
+                }catch(exception){
+
+                }
+
             });
 
         socket.node.once = (name, callback ) =>
             socket.once(name, (data)=>{
 
-                if (global.TERMINATED) return;
+                try{
+                    if (global.TERMINATED) return;
 
-                SocketProtocol._processBufferArray(data);
+                    SocketProtocol._processBufferArray(data);
 
-                return callback(data);
+                    return callback(data);
+                }catch(exception){
+
+                }
             });
 
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);

@@ -51,50 +51,42 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
             if (!this.serverPoolManagement.serverPoolStarted) return; //meanwhile it was suspended
 
+            if (!Buffer.isBuffer(data.pool) || data.pool.length < 10) throw { message: "poolPublicKey is not correct" };
+            if (!Buffer.isBuffer(data.message) || data.message.length !== 32) throw { message: "poolMessage is not correct" };
+
+            if (!Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw { message: "poolMiner is not correct" };
+
+            if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
+            let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
+            if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
+
+            //find the pool by poolPublicKey
+
+            let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+
+            if (socketPool === null)
+                throw {message: "pool was not found in the serverPool"};
+
+            data.suffix = Math.random().toString();
+            let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/hello-pool", data, "answer/"+data.suffix );
+
+            if (answer === null) throw {message: "Pool didn't answer"};
+
             try {
 
-                if (!Buffer.isBuffer(data.pool) || data.pool.length < 10) throw { message: "poolPublicKey is not correct" };
-                if (!Buffer.isBuffer(data.message) || data.message.length !== 32) throw { message: "poolMessage is not correct" };
+                let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer", answer, "confirmation");
 
-                if (!Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw { message: "poolMiner is not correct" };
+                if (confirmation === null) throw {message: "confirmation is null"};
 
-                if ( typeof data.minerAddress !== "string" ) throw { message: "minerAddress is not correct" };
-                let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( data.minerAddress );
-                if (unencodedAddress === null) throw { message: "minerAddress is not correct" };
+                if (confirmation.result ) {
 
-                //find the pool by poolPublicKey
+                    confirmation.sckAddress = socket.node.sckAddress.address;
+                    socketPool.node.sendRequest("mining-pool/hello-pool/answer/"+data.suffix+"/confirmation", confirmation);
 
-                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
-
-                if (socketPool === null)
-                    throw {message: "pool was not found in the serverPool"};
-
-                data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/hello-pool", data, "answer/"+data.suffix );
-
-                if (answer === null) throw {message: "Pool didn't answer"};
-
-                try {
-
-                    let confirmation = await socket.node.sendRequestWaitOnce("mining-pool/hello-pool/answer", answer, "confirmation");
-
-                    if (confirmation === null) throw {message: "confirmation is null"};
-
-                    if (confirmation.result ) {
-
-                        confirmation.sckAddress = socket.node.sckAddress.address;
-                        socketPool.node.sendRequest("mining-pool/hello-pool/answer/"+data.suffix+"/confirmation", confirmation);
-
-                        this._addConnectedMiner(socket, data.pool, socketPool);
-                        return true;
-                    }
-                } catch (exception){
-
+                    this._addConnectedMiner(socket, data.pool, socketPool);
+                    return true;
                 }
-
             } catch (exception){
-
-                socket.node.sendRequest("mining-pool/hello-pool"+"/answer", {result: false, message: exception.message} );
 
             }
 
@@ -104,51 +96,38 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
         socket.node.on("mining-pool/get-work", async (data) => {
 
-            try {
+            if (!Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+            if (!Buffer.isBuffer(data.pool) || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
-                if (!Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if (!Buffer.isBuffer(data.pool) || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+            let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
 
-                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+            if (socketPool === null)
+                throw {message: "pool was not found in the serverPool"};
 
-                if (socketPool === null)
-                    throw {message: "pool was not found in the serverPool"};
+            data.suffix = Math.random().toString();
+            let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix, 6000 );
 
-                data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/get-work", data, "answer/"+data.suffix, 6000 );
+            if (answer === null) throw {message: "there is a problem with the pool"};
 
-                if (answer === null) throw {message: "there is a problem with the pool"};
-
-                socket.node.sendRequest("mining-pool/get-work/answer", answer );
-
-            } catch (exception){
-                socket.node.sendRequest("mining-pool/get-work/answer", {result: false, message: exception.message } );
-            }
+            socket.node.sendRequest("mining-pool/get-work/answer", answer );
 
         });
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
-            try {
+            if ( !data || !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+            if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
-                if ( !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+            let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+            if ( !socketPool ) throw {message: "pool was not found in the serverPool"};
 
-                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+            data.suffix = Math.random().toString();
+            let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
 
-                if (socketPool === null)
-                    throw {message: "pool was not found in the serverPool"};
+            if (answer === null) throw {message: "there is a problem with the pool"};
 
-                data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
+            socket.node.sendRequest("mining-pool/work-done/answer", answer );
 
-                if (answer === null) throw {message: "there is a problem with the pool"};
-
-                socket.node.sendRequest("mining-pool/work-done/answer", answer );
-
-            } catch (exception){
-                socket.node.sendRequest("mining-pool/work-done/answer", {result: false, message: exception.message } );
-            }
 
         });
 

@@ -104,9 +104,10 @@ class InterfaceBlockchainProtocol {
 
         // sending the last block using the protocol
         if (this.acceptBlockHeaders)
-            socket.node.on("head/last-block",  ()=>{
 
-                if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last !== undefined) {
+            try{
+
+                if (this.blockchain.blocks.length > 0 && this.blockchain.blocks.last ) {
                     socket.node.sendRequest("head/last-block/a", {
                         l: this.blockchain.blocks.length,
                         h: this.blockchain.blocks.last.hash,
@@ -116,34 +117,30 @@ class InterfaceBlockchainProtocol {
                     } );
                 }
 
-            });
+            } catch (exception){
+
+            }
 
         if (this.acceptBlockHeaders)
             socket.node.on("head/new-block", async (data) => {
 
-                try {
+                /*
+                    h hash
+                    l chainLength
+                    s chainStartingPoint
+                    p hasProof (boolean)
+                    W WorkChain
 
-                    /*
-                        h hash
-                        l chainLength
-                        s chainStartingPoint
-                        p hasProof (boolean)
-                        W WorkChain
+                 */
 
-                     */
+                if ( !data|| (data.l < 0) || ( data.s >= data.l )) return;
 
-                    if (data === null || (data.l < 0) || ( data.s >= data.l )) return;
+                if ( Math.random() < 0.1 )
+                    console.log("newForkTip", data.l );
 
-                    if ( Math.random() < 0.1 )
-                        console.log("newForkTip", data.l );
+                await this.blockchain.sleep(15+Math.random()*20);
 
-                    await this.blockchain.sleep(15+Math.random()*20);
-
-                    this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p, data.W);
-
-                } catch (exception){
-
-                }
+                this.forksManager.newForkTip(socket, data.l, data.s, data.h, data.p, data.W);
 
             });
 
@@ -151,37 +148,26 @@ class InterfaceBlockchainProtocol {
 
             socket.node.on("head/chainHash", async (h) => {
 
-                try {
+                // height
+                if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
+                    return socket.node.sendRequest("head/chainHash", null);
 
-                    // height
-                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
-                        return socket.node.sendRequest("head/chainHash", null);
+                let chainHash = await this.blockchain.getChainHash( h );
+                socket.node.sendRequest("head/chainHash/" + h, { hash: chainHash });
 
-                    let chainHash = await this.blockchain.getChainHash( h );
-                    socket.node.sendRequest("head/chainHash/" + h, { hash: chainHash });
-
-                } catch (exception) {
-
-                }
 
             });
 
             socket.node.on("head/hash", async (h) => {
 
-                try {
+                // height
 
-                    // height
+                if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
+                    return socket.node.sendRequest("head/hash", null);
 
-                    if (typeof h !== 'number' || this.blockchain.blocks.length <= h)
-                        return socket.node.sendRequest("head/hash", null);
+                let hash = await this.blockchain.getHash(h);
 
-                    let hash = await this.blockchain.getHash(h);
-
-                    socket.node.sendRequest("head/hash/" + h, { hash: hash });
-
-                } catch (exception) {
-
-                }
+                socket.node.sendRequest("head/hash/" + h, { hash: hash });
 
             });
         }
@@ -194,29 +180,18 @@ class InterfaceBlockchainProtocol {
                 // data.height
                 // data.onlyHeader
 
-                try {
 
-                    if (typeof data.height !== 'number') throw {message: "data.height is not defined"};
-                    if (this.blockchain.blocks.length <= data.height)
-                        throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
+                if (typeof data.height !== 'number') throw {message: "data.height is not defined"};
+                if (this.blockchain.blocks.length <= data.height)
+                    throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
 
-                    let serialization = await ( data.onlyHeader ? this.blockchain.blocks.loadingManager.getBlockHeaderBuffer(height) : this.blockchain.blocks.loadingManager.getBlockBuffer(height)  );
-                    if ( !serialization ) throw {message: "block is empty", height: data.height};
+                let serialization = await ( data.onlyHeader ? this.blockchain.blocks.loadingManager.getBlockHeaderBuffer(height) : this.blockchain.blocks.loadingManager.getBlockBuffer(height)  );
+                if ( !serialization ) throw {message: "block is empty", height: data.height};
 
-                    socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
-                        result: true,
-                        block: serialization,
-                    })
-
-                } catch (exception) {
-
-                    socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + data.height || 0, {
-                        result: false,
-                        message: exception,
-                    });
-
-                }
-
+                socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {
+                    result: true,
+                    block: serialization,
+                })
 
             });
 
