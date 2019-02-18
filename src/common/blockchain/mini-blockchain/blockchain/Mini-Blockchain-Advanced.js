@@ -37,7 +37,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
             Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
 
+            //
             //to continue slow loading uncomment the following command
+            //this will enable to index the entire blockchain
+            //
             //await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
 
         } catch (exception){
