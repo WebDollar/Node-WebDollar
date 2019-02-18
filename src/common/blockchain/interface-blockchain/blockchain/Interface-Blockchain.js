@@ -210,10 +210,12 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (height === -1) return BlockchainGenesis.hash;
 
-        if (height >= this.blocks.length ) throw {message: "getChainHash invalid height", height: height};
+        if (height >= this.blocks.length )
+            throw {message: "getChainHash invalid height", height: height};
 
         let chainHash = await this.blocks.loadingManager.getBlockChainHash(height);
-        if ( !chainHash ) throw {message: "getChainHash invalid height ", height: height};
+        if ( !chainHash )
+            throw {message: "getChainHash invalid height ", height: height};
 
         return chainHash;
 
@@ -317,13 +319,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};
 
-            //TODO should be disabled
-            await block.saveBlockDifficulty();
-            await block.saveBlockHash();
-            await block.saveBlockChainHash();
-            await block.saveBlockTimestamp();
-            await block.saveChainWork();
-
             //it will include the block, but it will not ask to save, because it was already saved before
 
             if (await this.includeBlockchainBlock( block, undefined, "all", false, revertActions, false) ) {
@@ -343,6 +338,17 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
             throw exception;
         }
+
+        //TODO should be disabled
+        await block.saveBlockDifficulty();
+        await block.saveBlockHash();
+        await block.saveBlockChainHash();
+        await block.saveBlockTimestamp();
+        await block.saveChainWork();
+
+        for(let transaction in block.data.transactions)
+            await block.transactions.saveVirtualizedTxId(transaction.txId,index);
+
 
         return block;
     }
