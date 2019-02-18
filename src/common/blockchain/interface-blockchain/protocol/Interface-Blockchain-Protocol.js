@@ -185,7 +185,7 @@ class InterfaceBlockchainProtocol {
                 if (this.blockchain.blocks.length <= data.height)
                     throw {message: "data.height is higher than I have ", blockchainLength:this.blockchain.blocks.length, clientHeight:data.height};
 
-                let serialization = await ( data.onlyHeader ? this.blockchain.blocks.loadingManager.getBlockHeaderBuffer(height) : this.blockchain.blocks.loadingManager.getBlockBuffer(height)  );
+                let serialization = await ( data.onlyHeader ? this.blockchain.blocks.loadingManager.getBlockHeaderBuffer( data.height) : this.blockchain.blocks.loadingManager.getBlockBuffer( data.height)  );
                 if ( !serialization ) throw {message: "block is empty", height: data.height};
 
                 socket.node.sendRequest("blockchain/blocks/request-block-by-height/" + (data.height || 0), {

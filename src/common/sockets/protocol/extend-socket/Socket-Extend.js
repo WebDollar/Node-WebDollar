@@ -5,7 +5,7 @@ import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/clien
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import SocketProtocol from "./Socket-Protocol"
 import global from "consts/global"
-
+import consts from "consts/const_global";
 // Extending Socket / Simple Peer
 
 class SocketExtend{
@@ -23,33 +23,39 @@ class SocketExtend{
         socket.node.getSocket = () => socket ;
 
         socket.node.on = (name, callback ) =>
-            socket.on(name, (data)=>{
+            socket.on(name, async (data)=>{
+
+                if (global.TERMINATED) return;
 
                 try{
 
-                    if (global.TERMINATED) return;
-
                     SocketProtocol._processBufferArray(data);
 
-                    return callback(data);
+                    let answer = await callback(data);
+                    return answer;
 
                 }catch(exception){
-
+                    if (consts.DEBUG)
+                        console.log("socket.on raised an error", exception);
                 }
 
             });
 
         socket.node.once = (name, callback ) =>
-            socket.once(name, (data)=>{
+            socket.once(name, async (data)=>{
+
+                if (global.TERMINATED) return;
 
                 try{
-                    if (global.TERMINATED) return;
 
                     SocketProtocol._processBufferArray(data);
 
-                    return callback(data);
-                }catch(exception){
+                    let answer = await callback(data);
+                    return answer;
 
+                }catch(exception){
+                    if (consts.DEBUG)
+                        console.log("socket.on raised an error", exception);
                 }
             });
 
