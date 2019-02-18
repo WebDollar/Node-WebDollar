@@ -45,7 +45,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
         try{
 
-            await this.db.save("transactionID-"+txId, blockHeight );
+            if(!this.checkVirtualizedTxId(txId))
+                await this.db.save("transactionID-"+txId, blockHeight );
 
         }
         catch(err) {
