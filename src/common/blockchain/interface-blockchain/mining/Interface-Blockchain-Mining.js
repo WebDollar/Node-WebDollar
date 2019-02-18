@@ -53,8 +53,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             await nextBlock.updateInterlink();
 
-            nextBlock.data.transactions.markBlockDataTransactionsToBeInPending();
-
         } catch (Exception){
             console.error("Error creating next block ", Exception, nextBlock);
         }
@@ -183,12 +181,15 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                     if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
 
-                            block.hash = answer.hash;
-                            block.nonce = answer.nonce;
-
                             //returning false, because a new fork was changed in the mean while
                             if (this.blockchain.blocks.length !== block.height)
                                 return false;
+
+                            block.hash = answer.hash;
+                            block.nonce = answer.nonce;
+
+                            //calculate blockHashChain
+                            block.hashChain = block.calculateChainHash();
 
                             return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
 

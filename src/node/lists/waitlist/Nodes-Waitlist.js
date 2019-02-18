@@ -9,8 +9,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
-
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class NodesWaitlist {
 
@@ -20,8 +19,7 @@ class NodesWaitlist {
 
         this.NodesWaitlistObject = NodesWaitlistObject;
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this.waitListFullNodes = [];
         this.waitListLightNodes = [];

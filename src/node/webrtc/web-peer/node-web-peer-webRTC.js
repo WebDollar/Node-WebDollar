@@ -5,7 +5,7 @@
 
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
@@ -62,8 +62,7 @@ class NodeWebPeerRTC {
 
         this.peer = null;
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(20);
+        this.emitter = new AdvancedEmitter(20);
 
         this._messages = [];
 

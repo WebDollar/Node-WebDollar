@@ -5,7 +5,7 @@ import consts from "consts/const_global"
 const uuid = require('uuid');
 import  Utils from "common/utils/helpers/Utils"
 
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 import Blockchain from "main-blockchain/Blockchain"
 
 import Log from 'common/utils/logging/Log';
@@ -25,8 +25,7 @@ class ProcessWorker{
 
         this._child = undefined;
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this._is_batching = false;
         this._path = '';

@@ -16,7 +16,6 @@ class InterfaceBlockchainBlockDataTransactions {
         this.transactions = transactions||[];
 
         // transactionsLoaded
-        // pendingTransactionsWereIncluded
 
         if (hashTransactions === undefined)
             hashTransactions = this.calculateHashTransactions();
@@ -99,22 +98,6 @@ class InterfaceBlockchainBlockDataTransactions {
         });
 
     }
-
-    markBlockDataTransactionsToBeInPending(){
-
-        if (this.pendingTransactionsWereIncluded)
-            return;
-
-        for (let i=0; i<this.transactions.length; i++) {
-            if ( !this.transactions[i].pendingTransactionsIncluded ) this.transactions[i].pendingTransactionsIncluded = 0;
-            this.transactions[i].pendingTransactionsIncluded++;
-        }
-
-        this.pendingTransactionsWereIncluded = true;
-
-    }
-
-
 
     async validateTransactions(blockHeight, blockValidationType){
 
