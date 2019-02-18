@@ -53,8 +53,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
             await nextBlock.updateInterlink();
 
-            nextBlock.data.transactions.markBlockDataTransactionsToBeInPending();
-
         } catch (Exception){
             console.error("Error creating next block ", Exception, nextBlock);
         }
