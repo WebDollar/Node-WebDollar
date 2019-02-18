@@ -24,7 +24,7 @@ class InterfaceBlockchainFork {
      * initializeConstructor is used to initialize the constructor dynamically using .apply method externally passing the arguments
      */
 
-    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, forkReady = false){
+    initializeConstructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, forkChainHashes = {}, forkReady = false){
 
         this.blockchain = blockchain;
 
@@ -45,8 +45,7 @@ class InterfaceBlockchainFork {
         this.forkBlocks = [];
         this.forkChainWork = forkChainWork;
 
-        if (!Array.isArray(headers)) headers = [headers];
-        this.forkHeaders = headers;
+        this.forkChainHashes = forkChainHashes;
 
         this.forkPromise = new Promise ((resolve)=>{
             this._forkPromiseResolver = resolve;
@@ -294,26 +293,6 @@ class InterfaceBlockchainFork {
 
     }
 
-    pushHeaders(hashes){
-
-        for (let i=0; i<hashes.length; i++)
-            this.pushHeader(hashes[i]);
-
-    }
-
-    pushHeader(hash){
-
-        if ( !hash ) return;
-
-        for (let i=0; i<this.forkHeaders.length; i++)
-            if (this.forkHeaders[i].equals( hash ) )
-                return;
-
-        this.forkHeaders.push(hash);
-
-    }
-
-
     toJSON(){
 
         return {
@@ -321,7 +300,7 @@ class InterfaceBlockchainFork {
             forkChainStartingPoint: this.forkChainStartingPoint,
             forkChainLength: this.forkChainLength,
             forkBlocks: this.forkBlocks.length,
-            forkHeaders: this.forkHeaders,
+            forkChainHashes: this.forkChainHashes,
         }
 
     }

@@ -41,7 +41,7 @@ class InterfaceBlockchainForksAdministrator {
 
     findFork(socket, hash, forkProof){
 
-        let forkFound = this._findForkyByHeader(hash);
+        let forkFound = this.findForkyByChainHash(hash);
         if ( forkFound ) {
 
             if (Math.random() < 0.001)
@@ -66,17 +66,18 @@ class InterfaceBlockchainForksAdministrator {
 
     }
 
-    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready){
+    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, forkChainHashes, ready){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
         let fork = this.findForkBySockets(sockets);
         if ( fork ) return fork;
 
-        fork = this.findForkByHeaders(headers);
-        if ( fork ) return fork;
+        for (let key in forkChainHashes)
+            if (this.findForkyByChainHash(key))
+                return fork;
 
-        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready );
+        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, forkChainHashes, ready );
 
         this.forks.push(fork);
 
@@ -115,36 +116,17 @@ class InterfaceBlockchainForksAdministrator {
      * @param header
      * @returns {*}
      */
-    findForkByHeaders(headers){
 
-        if (!headers ) return null;
-
-        if (Array.isArray(headers))
-            for (let i=0; i<headers.length; i++) {
-
-                let fork = this._findForkyByHeader(headers[i]);
-                if (fork )
-                    return fork;
-            }
-        else
-            return this._findForkyByHeader(headers);
-
-        return null;
-
-    }
-
-    _findForkyByHeader(header){
+    findForkyByChainHash(header){
 
         if ( !header )
             return null;
 
-        for (let fork of this.forks)
-            for (let j=0; j<fork.forkHeaders.length; j++)
-                if (fork.forkHeaders[j] && Buffer.isBuffer(fork.forkHeaders[j])) {
+        if (Buffer.isBuffer(header))
+            header = header.toString("hex");
 
-                    if (fork.forkHeaders[j].equals(header))
-                        return fork;
-                }
+        for (let fork of this.forks)
+            if (fork.forkChainHashes[header]) return fork;
 
         return null;
 

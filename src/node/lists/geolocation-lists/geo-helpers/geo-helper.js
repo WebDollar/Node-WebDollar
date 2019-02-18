@@ -61,9 +61,9 @@ class GeoHelper {
 
             let data = await DownloadHelper.downloadMultipleFiles( list, 20000 );
 
-            if (data.length === 1) data = data[0];
-
             if (data){
+
+                if (data.length === 1) data = data[0];
 
                 //console.log("location data", address, data);
 

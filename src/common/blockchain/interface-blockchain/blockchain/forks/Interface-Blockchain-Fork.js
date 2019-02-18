@@ -21,6 +21,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
             throw {message: "includeForkBlock failed for ", height:block.height};
 
         this.forkBlocks.push(block);
+        this.forkChainHashes[block.hash.toString("hex")] = true;
 
         return true;
     }
@@ -179,8 +180,6 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                             forkBlock.blockValidation.blockValidationType['skip-sleep'] = true;
                         else
                             await this.blockchain.sleep(2);
-
-                        forkBlock.socketPropagatedBy = this.socketsFirst;
 
                         if (forkBlock.height % 50 === 0)
                             Log.log("FORK PROCESSING: "+index, Log.LOG_TYPE.BLOCKCHAIN_FORKS, );
