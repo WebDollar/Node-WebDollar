@@ -1,3 +1,4 @@
+/* eslint-disable */
 const BigInteger = require('big-integer');
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
@@ -392,6 +393,10 @@ class InterfaceBlockchainBlock {
         return this.db.save("blockHash" + this.height, this.hash);
     }
 
+    async saveBlockHashInversed() {
+        return this.db.save('blockHashInversed' + this.hash.toString('hex'), this.height);
+    }
+
     async saveBlockChainHash(){
         return this.db.save("blockChainHash" + this.height, this.hashChain);
     }
@@ -433,6 +438,7 @@ class InterfaceBlockchainBlock {
                 answer = answer && await this.db.save(key, bufferValue);
                 answer = answer && await this.saveBlockDifficulty();
                 answer = answer && await this.saveBlockHash();
+                answer = answer && await this.saveBlockHashInversed();
                 answer = answer && await this.saveBlockChainHash();
                 answer = answer && await this.saveBlockTimestamp();
                 answer = answer && await this.saveChainWork();

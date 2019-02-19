@@ -18,7 +18,7 @@ class BlockRepository
      * @param {string|int}mBlockNumber
      * @return {InterfaceBlockchainBlock|null}
      */
-    findByNumberOrTag(mBlockNumber) {
+    async findByNumberOrTag(mBlockNumber) {
         switch(mBlockNumber)
         {
             case 'latest':
@@ -36,9 +36,12 @@ class BlockRepository
             return null;
         }
 
-        const oBlock = this._oBlockchain.blocks[mBlockNumber];
-
-        return typeof oBlock === 'undefined' ? null : oBlock;
+        try {
+            return await this._oBlockchain.getBlock(mBlockNumber);
+        }
+        catch (e) {
+            return null;
+        }
     }
 
     /**
@@ -46,7 +49,7 @@ class BlockRepository
      * @param {int|string} mEndingNumber
      * @return {InterfaceBlockchainBlock[]|Array}
      */
-    findByRange(mStartingNumber, mEndingNumber) {
+    async findByRange(mStartingNumber, mEndingNumber) {
         let aBlocks = [];
 
         switch(mEndingNumber)
@@ -74,14 +77,14 @@ class BlockRepository
 
         for (let i = mStartingNumber; i <= mEndingNumber; i++)
         {
-            let oBlock = this.findByNumberOrTag(i);
+            let oBlock = await this.findByNumberOrTag(i);
 
             if (oBlock === null)
             {
                 throw new Error('Block "' + i + '" was not found');
             }
 
-            aBlocks.push(this.findByNumberOrTag(i));
+            aBlocks.push(await this.findByNumberOrTag(i));
 
             if (aBlocks.length === this._oConfig.limit)
             {
@@ -96,7 +99,7 @@ class BlockRepository
      * @param {Array|int[]}aBlockNumbers
      * @return {InterfaceBlockchainBlock[]|Array}
      */
-    findByNumbers(aBlockNumbers) {
+    async findByNumbers(aBlockNumbers) {
         let aBlocks = [];
 
         if (isArray(aBlockNumbers) === false)
@@ -108,7 +111,7 @@ class BlockRepository
 
         for (const nBlockNumber of aBlockNumbers)
         {
-            aBlocks.push(this.findByNumberOrTag(nBlockNumber));
+            aBlocks.push(await this.findByNumberOrTag(nBlockNumber));
 
             if (aBlocks.length === this._oConfig.limit)
             {
@@ -146,26 +149,11 @@ class BlockRepository
     }
 
     /**
-     * @FIXME This method is very very slow as it iterates over the whole blockchain. Use it with caution
      * @param {string} sHash
      * @return {InterfaceBlockchainBlock|null}
      */
-    findByHash(sHash) {
-        throw new Error('Find By Hash is not supported. Block hash: ' + sHash);
-
-        //@FIXME Find a better way, other than iterating over the whole blockchain
-
-        // const aBlockNumbers = Array.apply(null, {length: this._oBlockchain.blocks.last.height}).map(Number.call, Number);
-        //
-        // for (const nBlockNumber of aBlockNumbers)
-        // {
-        //     if (sHash === this._oBlockchain.blocks[nBlockNumber].hash.toString('hex'))
-        //     {
-        //         return this._oBlockchain.blocks[nBlockNumber];
-        //     }
-        // }
-        //
-        // return null;
+    async findByHash(sHash) {
+        return await this._oBlockchain.getBlockByHash(sHash);
     }
 }
 

@@ -14,13 +14,13 @@ class GetBlockTransactionCountByNumber extends RpcMethod
         this._oTransactionRepository = oTransactionRepository;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         if (args.length !== 1)
         {
             throw new Error('Params must contain exactly one entry, the block number/TAG');
         }
 
-        return this._oTransactionRepository.countByBlockNumber(args[0]);
+        return await this._oTransactionRepository.countByBlockNumber(args[0]);
     }
 }
 
