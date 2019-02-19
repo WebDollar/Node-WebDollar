@@ -13,30 +13,34 @@ class InterfaceSatoshminDB {
 
     constructor(databaseName = consts.DATABASE_NAMES.DEFAULT_DATABASE) {
 
-        this.dbName = databaseName;
-        this._start();
+        this._dbName = databaseName;
+        this._beingRestarted = false;
 
+        this._start();
     }
 
     _start(){
 
         try {
-            this.db = new pounchdb(this.dbName, {revs_limit: 1});
+            this.db = new pounchdb(this._dbName, {revs_limit: 1});
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
 
     }
 
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     async restart(){
 
+        if ( this._beingRestarted )
+            return await Utils.sleep ( 1500);
+
+        this._beingRestarted = true;
+
         this.close();
-        await this.sleep(1500);
+        await Utils.sleep(1500);
         this._start();
+
+        this._beingRestarted = false;
 
     }
 
@@ -50,7 +54,7 @@ class InterfaceSatoshminDB {
             return true;
         } catch (err) {
             if (err.status === 409)
-                return await this._updateDocument(key, value);
+                return this._updateDocument(key, value);
             else {
                 console.error("_createDocument raised exception", key, err);
                 throw err;
@@ -208,7 +212,7 @@ class InterfaceSatoshminDB {
         try {
             let doc = await this.db.get(key);
 
-            let result = await this.db.removeAttachment(doc._id, this.dbName, doc._rev);
+            let result = await this.db.removeAttachment(doc._id, this._dbName, doc._rev);
 
             return true;
 
@@ -221,8 +225,7 @@ class InterfaceSatoshminDB {
     async _deleteDocumentAttachmentIfExist(key) {
 
         try {
-            let value = await this._getDocument(key);
-            return await this._deleteDocumentAttachment(key);
+            return this._deleteDocumentAttachment(key);
         } catch (err) {
             console.error("_deleteDocumentAttachmentIfExist raised an error", err);
             return false;
@@ -255,7 +258,7 @@ class InterfaceSatoshminDB {
         })
     }
 
-    async save(key, value, timeout, trials = 10){
+    async save( key, value, timeout, trials = 10){
 
         if (!trials) trials = 1;
 
