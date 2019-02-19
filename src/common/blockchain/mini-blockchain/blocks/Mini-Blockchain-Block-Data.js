@@ -24,7 +24,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             this.computeAccountantTreeHashBlockData();
 
         //recalculate hashData
-        if (hashData === undefined || hashData === null)
+        if ( !hashData )
             this.computeHashBlockData();
 
     }

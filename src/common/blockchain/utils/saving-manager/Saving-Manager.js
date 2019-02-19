@@ -137,8 +137,10 @@ class SavingManager{
 
         let answer = 1;
 
-        while ( this.blockchain.semaphoreProcessing._list.length > 0 )
-            await Utils.sleep(500);
+        while ( this.blockchain.semaphoreProcessing._list.length > 0 ) {
+            await Utils.sleep(2000);
+            Log.info("Saving Manager - Waiting for Forks to be resolved...", Log.LOG_TYPE.SAVING_MANAGER);
+        }
 
         await Utils.sleep(1000);
 

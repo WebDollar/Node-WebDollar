@@ -36,12 +36,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     updateBalanceToken(value, tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+        if ( !tokenId ) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
-        if (this.balances === undefined || this.balances === null)
+        if ( !this.balances )
             throw {message: 'balances is null', amount: value, tokenId: tokenId };
 
         if (!Buffer.isBuffer(tokenId))
@@ -62,7 +62,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             }
 
 
-        if (result === undefined && tokenId !== null){
+        if ( !result && tokenId ){
 
             this.balances.push ({
                 id: tokenId,
@@ -72,7 +72,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
             result = this.balances[this.balances.length-1];
         }
 
-        if ( result === undefined)
+        if ( !result )
             throw { message: 'token is empty',  amount: value, tokenId: tokenId };
 
         if ( result.amount < 0 )
@@ -95,7 +95,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
     getBalance(tokenId){
 
-        if (tokenId === undefined  || tokenId === '' || tokenId === null) {
+        if ( !tokenId ) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
@@ -103,7 +103,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         if (!Buffer.isBuffer(tokenId))
             tokenId = BufferExtended.fromBase(tokenId);
 
-        if (this.balances !== undefined)
+        if (this.balances )
             for (let i = 0; i < this.balances.length; i++)
                 if ( BufferExtended.safeCompare(this.balances[i].id, tokenId) )
                     return this.balances[i].amount;
@@ -131,7 +131,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         let balances = this.getBalances();
 
-        if (balances === null) return false;
+        if ( !balances ) return false;
 
         if (Object.keys(balances).length === 0 && balances.constructor === Object)
             return false;
@@ -144,14 +144,12 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
         let result = false;
 
-        if (this.balances !== undefined)
-            for (let i = this.balances.length - 1; i >= 0; i--) {
-
-                if (this.balances[i] === null || this.balances[i] === undefined || this.balances[i].amount === 0) {
+        if (this.balances )
+            for (let i = this.balances.length - 1; i >= 0; i--)
+                if ( !this.balances[i] || this.balances[i].amount === 0) {
                     this.balances.splice(i, 1);
                     result = true;
                 }
-            }
 
         return true;
 
@@ -444,7 +442,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             list.sort( (a, b) => b.balance - a.balance );
 
-            if ( countOnly !== undefined )
+            if ( countOnly  )
                 list = list.splice(0, countOnly);
 
             for (let i=list.length-1; i>=0; i--) {
