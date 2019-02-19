@@ -20,8 +20,6 @@ class WebDollarCryptoData {
 
     static createWebDollarCryptoData(object, forceToCreate){
 
-        //console.log("createWebDollarCryptoData",object);
-
         //if it s WebDollarCryptoData, then return it
         if (WebDollarCryptoData.isWebDollarCryptoData(object)){
 

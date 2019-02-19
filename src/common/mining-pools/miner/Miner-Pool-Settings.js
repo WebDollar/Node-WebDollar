@@ -89,7 +89,7 @@ class MinerPoolSettings {
         if (newValue === null || newValue === this._poolURL) return;
 
         let data = PoolsUtils.extractPoolURL(newValue);
-        if (data === null) throw {message: "poolURL is invalid"};
+        if ( !data ) throw {message: "poolURL is invalid"};
 
         this.poolName = data.poolName;
         this.poolFee = data.poolFee;

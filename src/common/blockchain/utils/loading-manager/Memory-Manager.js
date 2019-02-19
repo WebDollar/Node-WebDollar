@@ -105,6 +105,9 @@ class MemoryManager{
 
             let oldData = this._loaded[height].data;
 
+            if (!oldData){
+                delete this._loaded[height];
+            } else
             if (Buffer.isBuffer(oldData)){
                 if ( !data.equals(oldData) ) delete this._loaded[height];
             } else

@@ -150,7 +150,7 @@ class TransactionsPendingQueue {
 
         }
 
-        if ( inserted === false){
+        if ( !inserted ){
             this._addNewTransaction(undefined,transaction);
             this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
         }
@@ -322,7 +322,7 @@ class TransactionsPendingQueue {
 
             }
 
-            if(removeThis)
+            if (removeThis)
                 this.removePendingTransaction(tx, i);
             else
                 console.log(tx.txId.toString('hex'),"------- GOOD tx");

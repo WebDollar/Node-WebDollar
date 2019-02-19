@@ -32,7 +32,7 @@ class InterfaceBlockchainTransactionTo{
 
         for (let i = 0; i < addresses.length; i++) {
 
-            if (addresses[i].unencodedAddress !== undefined) {
+            if (addresses[i].unencodedAddress ) {
 
                 if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
                     addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
@@ -40,7 +40,7 @@ class InterfaceBlockchainTransactionTo{
                 addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);
 
             } else
-            if (addresses[i].address !== undefined){ //maybe address
+            if (addresses[i].address ){ //maybe address
                 addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].address);
             }
 
@@ -56,12 +56,12 @@ class InterfaceBlockchainTransactionTo{
 
         let addresses = [];
 
-        this.addresses.forEach((address)=>{
+        for (let address of this.addresses){
             addresses.push({
                 address: BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(address.unencodedAddress)),
                 amount: address.amount.toString(),
             })
-        });
+        }
 
         return {
             addresses: addresses,
@@ -79,9 +79,12 @@ class InterfaceBlockchainTransactionTo{
 
         if (this.addresses.length  >= 256) throw {message:"Too many inputs. Max 256"};
 
-        this.addresses.forEach ( (toObject, index) =>{
+        let index = -1;
+        for (let toObject of this.addresses ){
 
-            if (!toObject.unencodedAddress || toObject.unencodedAddress === null || !Buffer.isBuffer(toObject.unencodedAddress))
+            index++;
+
+            if (!toObject.unencodedAddress || !Buffer.isBuffer(toObject.unencodedAddress))
                 throw {message: 'To.Object Address is not specified', address: toObject, index:index} ;
 
             if (!WebDollarCoins.validateCoinsNumber(toObject.amount))
@@ -95,7 +98,7 @@ class InterfaceBlockchainTransactionTo{
                     throw {message: "To.Object Address is included in the input and it should not be included in output ", address: toObject}
 
 
-        });
+        }
 
         //Validate to.currency
 

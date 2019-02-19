@@ -87,6 +87,8 @@ class LoadingManager{
 
     async deleteBlock(height, block){
 
+        if (block instanceof Promise) block = await block;
+
         this.blockManager.deleteLoaded(height, block);
         this.blockHashManager.deleteLoaded(height, block.hash);
         this.blockDifficultyManager.deleteLoaded(height, block.difficultyTarget);

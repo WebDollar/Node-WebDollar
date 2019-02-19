@@ -160,20 +160,22 @@ class NodesWaitlist {
     }
     async _deleteObsoleteFullNodesWaitlist(){
 
-        for (let i=this.waitListFullNodes.length-1; i>=0; i--)
+        for (let i=this.waitListFullNodes.length-1; i>=0; i--) {
+            if (!this.waitListFullNodes[i])
+                this.waitListFullNodes.splice(i, 1);
+            else
             if (!this.waitListFullNodes[i].isFallback) {
 
                 try {
 
-                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
+                    if ((Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted) && [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf(this.waitListFullNodes[i].nodeConsensusType) >= 0) continue;
 
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 10000);
 
                     if (response && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
                         this.waitListFullNodes[i].failsChecking = 0;
                         continue;
-                    }
-                    else {
+                    } else {
                         this.waitListFullNodes[i].failsChecking++;
 
                         if (this.waitListFullNodes[i].failsChecking >= 5)
@@ -181,12 +183,13 @@ class NodesWaitlist {
 
                     }
 
-                } catch (exception){
+                } catch (exception) {
 
                 }
 
-                await Blockchain.blockchain.sleep( 500 + Math.floor( Math.random()*2000) );
+                await Blockchain.blockchain.sleep(500 + Math.floor(Math.random() * 2000));
             }
+        }
 
         setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
