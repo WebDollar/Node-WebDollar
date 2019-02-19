@@ -1,3 +1,4 @@
+/* eslint-disable */
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
@@ -157,6 +158,22 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         return block;
 
+    }
+
+    async getBlockByHash(sHash) {
+        try {
+            const nBlockNumber = await this.blocks.db.get('blockHashInversed' + sHash);
+
+            if (typeof nBlockNumber === 'number') {
+                return await this.getBlock(nBlockNumber);
+            }
+
+            return null;
+
+        }
+        catch (e) {
+            return null;
+        }
     }
 
     async getDifficultyTarget(height = this.blocks.length-1, POSRecalculation = true){
@@ -342,13 +359,14 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         //TODO should be disabled
         await block.saveBlockDifficulty();
         await block.saveBlockHash();
+        await block.saveBlockHashInversed();
         await block.saveBlockChainHash();
         await block.saveBlockTimestamp();
         await block.saveChainWork();
 
-        for(let transaction in block.data.transactions)
-            await block.transactions.saveVirtualizedTxId(transaction.txId,index);
-
+        for (const transaction of block.data.transactions.transactions) {
+            await block.data.transactions.saveVirtualizedTxId(transaction.txId.toString('hex'), index);
+        }
 
         return block;
     }

@@ -17,7 +17,7 @@ class GetBlockByHash extends RpcMethod
         this._oBlockTransformer = oBlockTransformer;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         if (args.length < 1)
         {
             throw new Error('Params must contain at least one entry, the block hash');
@@ -28,7 +28,7 @@ class GetBlockByHash extends RpcMethod
             processHardForks   : args[2] || undefined
         };
 
-        const oBlock = this._oBlockRepository.findByHash(args[0]);
+        const oBlock = await this._oBlockRepository.findByHash(args[0]);
 
         if (oBlock === null)
         {

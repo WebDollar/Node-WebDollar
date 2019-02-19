@@ -48,7 +48,6 @@ class TransactionTransformer
             aTransaction.timestamp_raw   = nBlockTimestampRaw;
             aTransaction.createdAtUTC    = oBlockTimestampUTC;
             aTransaction.block_id        = oBlock.height;
-
         }
 
         oTransaction.from.addresses.forEach((oAddress) => {
