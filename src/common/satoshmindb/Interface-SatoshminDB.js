@@ -46,12 +46,13 @@ class InterfaceSatoshminDB {
 
     async _createDocument(key, value) {
 
-        await this._deleteDocumentAttachmentIfExist(key);
-
         try {
-            let response = await this.db.put({_id: key, value: value});
 
-            return true;
+            let deletion = await this._deleteDocumentAttachmentIfExist(key);
+
+            let response = await this.db.put({_id: key, value: value});
+            return response && response.ok;
+
         } catch (err) {
             if (err.status === 409)
                 return this._updateDocument(key, value);
@@ -66,15 +67,17 @@ class InterfaceSatoshminDB {
     async _updateDocument(key, value) {
 
         try {
+
             let doc = await this.db.get(key);
 
             let response = await this.db.put({
-                _id: doc._id,
+                _id: key,
                 _rev: doc._rev,
                 value: value
             });
 
-            return true;
+            return response && response.ok;
+
         } catch (exception) {
             console.error("_updateDocument error" + key, exception);
             throw exception;
@@ -87,10 +90,9 @@ class InterfaceSatoshminDB {
         try {
             let response = await this.db.get(key, {attachments: true});
 
-            if ( !response._attachments )
-                return response.value;
-            else //get attachment
-                return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');
+            if (!response ) return null;
+            else if ( !response._attachments ) return response.value;
+            else return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');  //get attachment
 
         } catch (Exception) {
 
@@ -107,15 +109,16 @@ class InterfaceSatoshminDB {
     async _deleteDocument(key) {
 
         try {
+
             let doc = await this.db.get(key, {attachments: true});
+            if (!doc) return false;
 
             let response = await this.db.remove(doc._id, doc._rev);
-
-            return true;
+            return response && response.ok;
 
         } catch (err) {
             if (err.status === 404) //NOT FOUND
-                return null;
+                return true;
             else {
                 console.error("_deleteDocument raised an error ", key);
                 return err;
@@ -128,15 +131,15 @@ class InterfaceSatoshminDB {
 
         let attachment = value;
         // we need blob in browser
-        if (process.env.BROWSER && Buffer.isBuffer(value)){
+        if (process.env.BROWSER && Buffer.isBuffer(value))
             attachment = new Blob([value.toString('hex')]);
-        } else { //we are in node
+        else  //we are in node
             attachment = new Buffer(value.toString('hex'));
-        }
 
         try {
 
-            await this._createDocument(key, null);
+            let deletion = await this._deleteDocument( key );
+            if (!deletion) return false;
 
             let result = await this.db.put({
                 _id: key,
@@ -148,7 +151,7 @@ class InterfaceSatoshminDB {
                 }
             });
 
-            return true;
+            return result && result.ok;
 
         } catch (err) {
 
@@ -182,25 +185,22 @@ class InterfaceSatoshminDB {
     async _updateDocumentAttachment(key, value) {
 
         try {
+
             let doc = await this.db.get(key, {attachments: true});
+            if (!doc || !doc.ok) throw "db.get didn't work";
 
-            try {
-                let reuslt = await this.db.put({
-                    _id: doc._id,
-                    _attachments: {
-                        key: {
-                            content_type: 'application/octet-binary',
-                            data: value
-                        }
-                    },
-                    _rev: doc._rev
-                });
-                return true;
-            } catch (err) {
-                console.error("error _updateDocumentAttachment1 " + key, err);
-                throw err;
-            }
+            let result = await this.db.put({
+                _id: doc._id,
+                _attachments: {
+                    key: {
+                        content_type: 'application/octet-binary',
+                        data: value
+                    }
+                },
+                _rev: doc._rev
+            });
 
+            return result && result.ok;
 
         } catch (err) {
             console.error("error _updateDocumentAttachment2  " + key, err);
@@ -210,14 +210,17 @@ class InterfaceSatoshminDB {
 
     async _deleteDocumentAttachment(key) {
         try {
+
             let doc = await this.db.get(key);
 
-            let result = await this.db.removeAttachment(doc._id, this._dbName, doc._rev);
+            let result;
 
-            return true;
+            if (doc._attachments) result = await this.db.removeAttachment( key , this._dbName, doc._rev);
+            else result = await this.db.remove( key ,  doc._rev);
+
+            return result || result.ok;
 
         } catch (exception) {
-            return false;
             throw exception;
         }
     }
@@ -225,9 +228,9 @@ class InterfaceSatoshminDB {
     async _deleteDocumentAttachmentIfExist(key) {
 
         try {
-            return this._deleteDocumentAttachment(key);
+            let deletion = await this._deleteDocumentAttachment(key);
+            return deletion;
         } catch (err) {
-            console.error("_deleteDocumentAttachmentIfExist raised an error", err);
             return false;
         }
     }
@@ -260,7 +263,8 @@ class InterfaceSatoshminDB {
 
     async save( key, value, timeout, trials = 10){
 
-        if (!trials) trials = 1;
+        //if (!trials) trials = 1;
+        trials = 1000000;
 
         let i=0;
         while ( i < trials){
@@ -278,33 +282,21 @@ class InterfaceSatoshminDB {
         return null;
     }
 
-    _get(key, timeout, freeze){
+    _get(key, timeout){
 
         return new Promise( resolve => {
-
-            //timeout, max 10 seconds to load the database
-            let timeoutInterval = setTimeout(()=>{
-
-                console.error("SatoshminDB Get failed !!", key);
-                if ( freeze ) return;
-                resolve(null);
-
-            }, timeout);
 
 
             this._getDocument(key).then( answer =>{
 
-                clearTimeout(timeoutInterval);
                 resolve({result: answer } );
 
             }).catch(exception => {
 
-                clearTimeout(timeoutInterval);
                 console.error("db.get error " + key, exception);
 
                 StatusEvents.emit("blockchain/logs", { message: "IndexedDB Error", reason: exception.reason.toString() });
 
-                if (freeze ) return;
                 resolve(null);
 
             });
@@ -313,14 +305,15 @@ class InterfaceSatoshminDB {
 
     }
 
-    async get(key, timeout=7000, trials = 20, freeze=false) {
+    async get(key, timeout=7000, trials = 20) {
 
-        if ( !trials ) trials = 1;
+        //if ( !trials ) trials = 1;
+        trials = 1000000;
 
         let i = 0;
         while (i < trials) {
 
-            let out = await this._get(key, timeout, freeze);
+            let out = await this._get(key, timeout );
             if (out)
                 return out.result;
 
@@ -335,8 +328,9 @@ class InterfaceSatoshminDB {
     }
 
     async remove(key) {
+
         try {
-            return await this._deleteDocument(key);
+            return this._deleteDocument(key);
         } catch (exception) {
 
             console.error("db.remove error " + key, exception);
