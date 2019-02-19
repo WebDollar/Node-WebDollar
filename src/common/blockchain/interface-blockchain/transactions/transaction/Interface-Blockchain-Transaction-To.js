@@ -21,11 +21,10 @@ class InterfaceBlockchainTransactionTo{
 
     setTo(addresses){
 
-        if (addresses === undefined) return false;
+        if ( !addresses ) return false;
 
-        if (typeof addresses === "object" && addresses.hasOwnProperty("addresses")) {
+        if (addresses && typeof addresses === "object" && addresses.addresses)
             addresses = addresses.addresses;
-        }
 
         if (!Array.isArray(addresses))
             addresses = [addresses];
@@ -34,7 +33,7 @@ class InterfaceBlockchainTransactionTo{
 
             if (addresses[i].unencodedAddress ) {
 
-                if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.hasOwnProperty("unencodedAddress"))
+                if (typeof addresses[i].unencodedAddress === "object" && addresses[i].unencodedAddress.unencodedAddress)
                     addresses[i].unencodedAddress = addresses[i].unencodedAddress.unencodedAddress;
 
                 addresses[i].unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addresses[i].unencodedAddress);

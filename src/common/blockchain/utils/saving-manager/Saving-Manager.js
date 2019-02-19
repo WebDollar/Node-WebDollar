@@ -48,10 +48,6 @@ class SavingManager{
             //it is a forkBlock, it is skipped
             if (block.isForkBlock) continue;
 
-            //remove the block for saving
-            this._pendingBlocks[key] = undefined;
-            delete this._pendingBlocks[key];
-
             //mark a promise to the save to enable loading to wait until it is saved
             let resolver;
             this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
