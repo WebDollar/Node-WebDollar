@@ -94,8 +94,8 @@ class LoadingManager{
         this.blockDifficultyManager.deleteLoaded(height, block.difficultyTarget);
         this.blockChainHashManager.deleteLoaded(height, block.hashChain);
         this.blockTimestampManager.deleteLoaded(height, block.timeStamp);
-        this.blockBufferManager.deleteLoaded(height, block.serializeBlock(false ));
-        this.blockHeaderBufferManager.deleteLoaded(height, block.serializeBlock(true ));
+        this.blockBufferManager.deleteLoaded(height, await block.serializeBlock(false ));
+        this.blockHeaderBufferManager.deleteLoaded(height, await block.serializeBlock(true ));
         this.chainWorkManager.deleteLoaded(height, await block.getChainWork() );
     }
 
