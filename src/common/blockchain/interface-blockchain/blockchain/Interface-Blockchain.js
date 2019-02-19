@@ -277,6 +277,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                 }
 
+                console.info("Loading Complete");
+
                 await this.blocks.savingManager.saveBlockchain();
 
                 await this.db.restart();
