@@ -48,7 +48,7 @@ class InterfaceBlockchainTransactionFrom {
 
         if ( !addresses ) return false;
 
-        if (addresses && typeof addresses === "object" && !currencyTokenId && addresses.addresses && addresses.currencyTokenId) {
+        if (addresses && typeof addresses === "object" && !currencyTokenId && addresses.addresses && addresses.hasOwnProperty("currencyTokenId")) {
             addresses = addresses.addresses;
             currencyTokenId = addresses.currencyTokenId;
         }
@@ -59,7 +59,7 @@ class InterfaceBlockchainTransactionFrom {
         //console.log("addresses", addresses);
         for (let fromObject of addresses){
 
-            //console.log("Eroarea apare in setFrom, step 1", fromObject);
+            console.log("Eroarea apare in setFrom, step 1", fromObject);
 
             if (fromObject.unencodedAddress ) {
 
