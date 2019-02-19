@@ -15,14 +15,12 @@ class GetBlockTransactionCountByHash extends RpcMethod
         this._oTransactionRepository = oTransactionRepository;
     }
 
-    getHandler(args) {
-        throw new Error('GetBlockTransactionCountByHash method is not supported');
-        // if (args.length !== 1)
-        // {
-        //     throw new Error('Params must contain exactly one entry, the block hash');
-        // }
-        //
-        // return this._oTransactionRepository.countByBlockHash(args[0]);
+    async getHandler(args) {
+        if (args.length !== 1) {
+            throw new Error('Params must contain exactly one entry, the block hash');
+        }
+
+        return await this._oTransactionRepository.countByBlockHash(args[0]);
     }
 }
 export default GetBlockTransactionCountByHash;

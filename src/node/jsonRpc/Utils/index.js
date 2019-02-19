@@ -7,7 +7,7 @@ import TransactionRepository from './TransactionRepository';
 import TransactionTransformer from './TransactionTransformer';
 
 const oBlockRepository        = new BlockRepository(Blockchain.blockchain);
-const oTransactionRepository  = new TransactionRepository(oBlockRepository, Blockchain.Transactions.pendingQueue);
+const oTransactionRepository  = new TransactionRepository(oBlockRepository, Blockchain.Transactions.pendingQueue, Blockchain.blockchain);
 const oTransactionTransformer = new TransactionTransformer();
 const oBlockTransformer       = new BlockTransformer(BlockDataHardForksProcessor, oTransactionTransformer);
 const oAddressBalanceProvider = new AddressBalanceProvider(Blockchain.blockchain.accountantTree);

@@ -12,7 +12,7 @@ class GetBlocksByRange extends RpcMethod
         this._oBlockTransformer = oBlockTransformer;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         const oTransformOptions = {
             includeTransactions: args[1] || undefined,
             processHardForks   : args[2] || undefined
@@ -23,7 +23,7 @@ class GetBlocksByRange extends RpcMethod
             throw new Error('First parameter must be an Array containing the starting and the ending block numbers');
         }
 
-        const aBlocks          = this._oBlockRepository.findByRange(args[0][0], args[0][1]);
+        const aBlocks          = await this._oBlockRepository.findByRange(args[0][0], args[0][1]);
         let aTransformedBlocks = [];
 
         for (const oBlock of aBlocks)
