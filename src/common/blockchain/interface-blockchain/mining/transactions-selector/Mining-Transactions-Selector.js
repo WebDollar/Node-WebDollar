@@ -14,12 +14,23 @@ class MiningTransactionsSelector{
 
     async validateTransactionId(txId){
 
-        let response = await this.blockchain.transactions.checkVirtualizedTxId(txId);
+        if (typeof txId === "string") txId = Buffer.from(txId, "hex");
 
-        if(response)
-            return false;
-        else
-            return true;
+        //Verify if was included in last blocks
+        for(let i=Math.max(this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint ); i<this.blockchain.blocks.length; i++)
+            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( txId ) >= 0 )
+                return false;
+
+        return true;
+
+        //TODO replace with the below code after saving Manager
+        //
+        // let response = await this.blockchain.transactions.checkVirtualizedTxId(txId);
+        //
+        // if(response)
+        //     return false;
+        // else
+        //     return true;
 
     }
 
