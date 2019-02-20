@@ -32,7 +32,7 @@ class Syncing extends RpcMethod
         }
 
         return {
-            currentBlock  : this._oBlockchain.last.height,
+            currentBlock  : this._oBlockchain.blocks.last.height,
             isSynchronized: isSynchronized,
             secondsBehind : nSecondsBehind < 0 ? 0 : nSecondsBehind / 1000,
         };
