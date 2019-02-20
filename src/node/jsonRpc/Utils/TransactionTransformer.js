@@ -1,13 +1,13 @@
-import BlockchainGenesis from './../../../common/blockchain/global/Blockchain-Genesis';
-import WebDollarCoins from './../../../common/utils/coins/WebDollar-Coins';
-import BufferExtended from './../../../common/utils/BufferExtended';
+import BlockchainGenesis                from './../../../common/blockchain/global/Blockchain-Genesis';
+import WebDollarCoins                   from './../../../common/utils/coins/WebDollar-Coins';
+import BufferExtended                   from './../../../common/utils/BufferExtended';
 import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 class TransactionTransformer
 {
     /**
      * @param {InterfaceBlockchainTransaction} oTransaction
-     * @param {InterfaceBlockchainBlock|null} oBlock
+     * @param {InterfaceBlockchainBlock|null}  oBlock
      * @param {int} i
      * @return Object
      */
@@ -16,28 +16,31 @@ class TransactionTransformer
         const nOutputSum = oTransaction.to.calculateOutputSum();
 
         let aTransaction = {
-            trx_id         : oTransaction.txId.toString('hex'),
-            version        : oTransaction.version,
-            nonce          : oTransaction.nonce,
-            index          : i,
-            time_lock      : oTransaction.timeLock,
-            from_length    : oTransaction.from.addresses.length,
-            to_length      : oTransaction.to.addresses.length,
-            fee            : oTransaction.fee / WebDollarCoins.WEBD,
-            fee_raw        : oTransaction.fee,
-            timestamp      : null,
-            timestamp_UTC  : null,
-            timestamp_block: null,
-            timestamp_raw  : null,
-            createdAtUTC   : null,
-            block_id       : null,
-            from           : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
-            to             : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
-            isConfirmed    : oTransaction.confirmed
+            trx_id          : oTransaction.txId.toString('hex'),
+            version         : oTransaction.version,
+            nonce           : oTransaction.nonce,
+            index           : i,
+            time_lock       : oTransaction.timeLock,
+            from_length     : oTransaction.from.addresses.length,
+            to_length       : oTransaction.to.addresses.length,
+            fee             : oTransaction.fee / WebDollarCoins.WEBD,
+            fee_raw         : oTransaction.fee,
+            amount          : nInputSum / WebDollarCoins.WEBD,
+            amount_raw      : nInputSum,
+            total_amount    : nInputSum / WebDollarCoins.WEBD + oTransaction.fee / WebDollarCoins.WEBD,
+            total_amount_raw: nInputSum + oTransaction.fee,
+            timestamp       : null,
+            timestamp_UTC   : null,
+            timestamp_block : null,
+            timestamp_raw   : null,
+            createdAtUTC    : null,
+            block_id        : null,
+            from            : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
+            to              : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
+            isConfirmed     : false,
         };
 
-        if (oBlock !== null)
-        {
+        if (oBlock !== null) {
             const nBlockTimestampRaw = oBlock.timeStamp;
             const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
             const oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
@@ -48,7 +51,7 @@ class TransactionTransformer
             aTransaction.timestamp_raw   = nBlockTimestampRaw;
             aTransaction.createdAtUTC    = oBlockTimestampUTC;
             aTransaction.block_id        = oBlock.height;
-
+            aTransaction.isConfirmed     = true;
         }
 
         oTransaction.from.addresses.forEach((oAddress) => {
