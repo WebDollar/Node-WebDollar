@@ -60,6 +60,9 @@ class InterfaceBlockchainTransactionFrom {
         for (let fromObject of addresses){
 
             console.log("Eroarea apare in setFrom, step 1", fromObject);
+            if (fromObject === undefined){
+                console.log("Eroarea apare in setFrom, step 1!", fromObject);
+            }
 
             if (fromObject.unencodedAddress ) {
 

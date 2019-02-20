@@ -14,9 +14,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
         this.transactions = transactions||[];
 
-        // transactionsLoaded
-
-        if (hashTransactions === undefined)
+        if ( !hashTransactions )
             hashTransactions = this.calculateHashTransactions();
 
         this.hashTransactions = hashTransactions;
@@ -158,6 +156,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
             for (let i = 0; i < length; i++) {
 
+                //console.log( i );
+
                 let answer = this.blockData.blockchain.transactions._createTransactionFromBuffer(buffer, offset);
 
                 let transaction = answer.transaction;
@@ -166,7 +166,6 @@ class InterfaceBlockchainBlockDataTransactions {
                 this.transactions.push(transaction);
             }
 
-            this.transactionsLoaded = true;
         }
 
         return offset;
