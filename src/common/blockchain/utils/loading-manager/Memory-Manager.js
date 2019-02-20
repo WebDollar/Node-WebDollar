@@ -65,7 +65,14 @@ class MemoryManager{
 
             if (this._loadedCount > this._maxData){
 
-                let array = Object.values(this._loaded);
+                let array = [];
+
+                for (let height in this._loaded)
+                    array.push({
+                        height: Number.parseInt(height),
+                        data: this._loaded[height].data,
+                        lastTimeUsed: this._loaded[height].lastTimeUsed,
+                    });
 
                 //revert order
                 array.sort((a, b) =>  b.lastTimeUsed - a.lastTimeUsed );

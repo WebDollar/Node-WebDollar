@@ -508,7 +508,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
     async _deserializeForkBlock( fork, blockData, blockHeight, validationBlock){
 
-        let block = undefined;
+        let block;
 
         try {
 
