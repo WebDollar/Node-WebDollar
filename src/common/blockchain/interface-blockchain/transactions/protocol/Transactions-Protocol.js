@@ -101,7 +101,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 if ( !Buffer.isBuffer(response.buffer)) throw {message: "Transaction Id is invalid"};
 
-                this.transactionsDownloadingManager._createTransaction(response.buffer,socket);
+                await this.transactionsDownloadingManager._createTransaction(response.buffer,socket);
 
             } catch (exception){
 

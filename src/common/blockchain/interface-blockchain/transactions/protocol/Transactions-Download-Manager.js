@@ -290,7 +290,7 @@ class TransactionsDownloadManager{
                                 if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
                                     found = true;
-                                    wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, socket);
+                                    wasAdded = await this._createTransaction(this._transactionsQueue[txId].buffer, socket);
 
                                     //If tx was not added into pending queue increase socket invalidTransactions
                                     if (!wasAdded) {

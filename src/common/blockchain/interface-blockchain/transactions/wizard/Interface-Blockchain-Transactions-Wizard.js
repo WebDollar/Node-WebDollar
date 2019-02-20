@@ -122,7 +122,7 @@ class InterfaceBlockchainTransactionsWizard{
             };
 
 
-            transaction = this.transactions._createTransaction(
+            transaction = await this.transactions._createTransaction(
 
                 from, //from
                 to, //to
