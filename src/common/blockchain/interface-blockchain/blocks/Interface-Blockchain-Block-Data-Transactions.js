@@ -13,11 +13,8 @@ class InterfaceBlockchainBlockDataTransactions {
         this.db           = db;
         this.transactions = transactions || [];
 
-        // transactionsLoaded
-
-        if (typeof hashTransactions === 'undefined') {
+        if ( !hashTransactions )
             hashTransactions = this.calculateHashTransactions();
-        }
 
         this.hashTransactions = hashTransactions;
     }

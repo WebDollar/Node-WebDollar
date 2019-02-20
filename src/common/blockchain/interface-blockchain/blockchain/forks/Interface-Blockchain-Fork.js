@@ -52,7 +52,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
             if (this.forkStartingHeight <= this.blockchain.blocks.length - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH){
                 //verify if there were only a few people mining in my last 30 blocks
 
-                let addresses = [];
+                let addresses = {}, addressesCount = 0;
 
                 for (let i=this.forkStartingHeight; i<this.blockchain.blocks.length; i++){
 
@@ -60,17 +60,12 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                     if ( block.data.minerAddress.equals(this.blockchain.mining.unencodedMinerAddress)) continue;
 
-                    let found = false;
-                    for (let j=0; j<addresses.length; j++)
-                        if (addresses[j].equals(block.data.minerAddress)){
-                            found = true;
-                            break;
-                        }
+                    if ( !addresses[ block.data.minerAddress.toString("hex") ]){
+                        addresses[block.data.minerAddress.toString("hex")] = true;
+                        addressesCount++;
+                    }
 
-                    if (!found)
-                        addresses.push( block.data.minerAddress);
-
-                    if (!consts.DEBUG && addresses.length >= 1)  //in my fork, there were also other miners, and not just me
+                    if (!consts.DEBUG && addressesCount >= 1)  //in my fork, there were also other miners, and not just me
                         throw {message: "Validate for Immutability failed"};
                     else
                         return true; //there were just 3 miners, probably it is my own fork...
