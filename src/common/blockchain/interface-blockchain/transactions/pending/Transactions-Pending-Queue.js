@@ -21,7 +21,7 @@ class TransactionsPendingQueue {
 
         StatusEvents.on("blockchain/blocks-count-changed", async (data)=>{
             if ( NodesList.isConsensus(this.blockchain.blocks.length))
-                this._removeOldTransactions();
+                await this._removeOldTransactions();
         });
 
     }
@@ -45,7 +45,7 @@ class TransactionsPendingQueue {
 
     }
 
-    includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
+    async includePendingTransaction (transaction, exceptSockets, avoidValidation = false){
 
         if ( this.findPendingTransaction(transaction.txId)  )
             return false;
@@ -60,7 +60,7 @@ class TransactionsPendingQueue {
             if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
                 return false;
 
-        this._insertPendingTransaction(transaction,exceptSockets);
+        await this._insertPendingTransaction(transaction,exceptSockets);
 
         return true;
 
@@ -82,9 +82,9 @@ class TransactionsPendingQueue {
 
     }
 
-    _insertPendingTransaction(transaction,exceptSockets){
+    async _insertPendingTransaction(transaction,exceptSockets){
 
-        if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+        if (await !this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
             throw {message: "Transsaction validation failed"}
 
         //This is just for pool
@@ -277,7 +277,7 @@ class TransactionsPendingQueue {
         }
     }
 
-    _removeOldTransactions (){
+    async _removeOldTransactions (){
 
         for (let i=this.listArray.length-1; i >= 0; i--) {
 
@@ -292,7 +292,7 @@ class TransactionsPendingQueue {
                     removeThis = true;
                 }
                 else
-                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress) && this.blockchain.mining.miningTransactionSelector.validateTransactionId( tx.txId )){
+                if (tx.from.addresses[0].unencodedAddress.equals(this.blockchain.mining.unencodedMinerAddress) && await this.blockchain.mining.miningTransactionSelector.validateTransactionId( tx.txId )){
                     console.log(tx.txId.toString('hex'),"is mine");
                     continue;
                 }
@@ -304,7 +304,7 @@ class TransactionsPendingQueue {
                     removeThis=true;
                 }
                 else
-                if (!this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) {
+                if (await !this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) {
                     console.log(tx.txId.toString('hex'),"not valid anymore");
                     removeThis=true;
                 }

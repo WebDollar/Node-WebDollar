@@ -88,7 +88,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if (!response.result) throw {message:"missing-nonce - Response is false"};
 
-            this.transactionsDownloadingManager.addTransaction(socket, response.transaction, true );
+            await this.transactionsDownloadingManager.addTransaction(socket, response.transaction, true );
 
 
         });
@@ -116,7 +116,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
             if ( !Buffer.isBuffer(data.txId)) throw {message: "Transaction buffer is invalid"};
 
-            this.transactionsDownloadingManager.addTransaction(socket, data.txId );
+            await this.transactionsDownloadingManager.addTransaction(socket, data.txId );
 
         } );
 
@@ -204,7 +204,7 @@ class InterfaceBlockchainTransactionsProtocol {
             if (!answer || answer.result !== true || !answer.transactions || !Array.isArray(answer.transactions)) return false;
 
             for (let i=0; i<answer.transactions.length; i++)
-                this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
+                await this.transactionsDownloadingManager.addTransaction( socket, answer.transactions[ i ] );
 
             if (start + count < answer.length)
                 return await this.downloadTransactions(socket, start+count, count, max);

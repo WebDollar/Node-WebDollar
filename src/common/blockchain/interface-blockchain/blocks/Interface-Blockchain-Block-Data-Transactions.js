@@ -21,6 +21,8 @@ class InterfaceBlockchainBlockDataTransactions {
 
     async checkVirtualizedTxId(txId) {
 
+        if( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
+
         try {
             let answer = await this.db.get('transactionID-' + txId);
 
@@ -71,7 +73,7 @@ class InterfaceBlockchainBlockDataTransactions {
 
             try {
                 await this.deleteVirtualizedTxId(transaction.txId.toString('hex'));
-                this.blockData.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, 'all');
+                await this.blockData.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, 'all');
             }
             catch (exception) {
                 Log.warn('Transaction Was Rejected to be Added to the Pending Queue ', Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON());

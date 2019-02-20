@@ -45,7 +45,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
         try {
 
-            nextTransactions = this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
+            nextTransactions = await this.miningTransactionSelector.selectNextTransactions(this.miningFeePerByte,showLogsOnlyOnce);
 
             nextBlock = await this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
