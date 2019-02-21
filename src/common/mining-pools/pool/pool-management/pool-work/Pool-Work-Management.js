@@ -68,7 +68,7 @@ class PoolWorkManagement{
             balances = [];
 
             for (let i=0; i < minerInstance.addresses.length; i++)
-                balances.push(this._getMinerBalance( minerInstance.addresses[i] ));
+                balances.push( await this._getMinerBalance( minerInstance.addresses[i] ));
 
         }
 
@@ -135,7 +135,7 @@ class PoolWorkManagement{
             if ( isPos ) {
 
                 work.nonce = 0;
-                work.pos.balance = this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
+                work.pos.balance = await this._getMinerBalance(work.pos.posMinerAddress, prevBlock );
                 args = [  work.pos.timestamp, work.pos.posMinerAddress, work.pos.balance ];
 
             } else {
@@ -335,7 +335,7 @@ class PoolWorkManagement{
     }
 
 
-    _getMinerBalance(address, prevBlock){
+    async _getMinerBalance(address, prevBlock){
 
         prevBlock = prevBlock || this.poolWork.lastBlock;
 
@@ -346,7 +346,7 @@ class PoolWorkManagement{
         //console.log("2 Before Balance ", balance); let s = "";
         for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--  ) {
 
-            let block = this.blockchain.blocks[ i ];
+            let block = await this.blockchain.getBlock( i );
             if (!block) continue;
 
             //s += block.height + " ";

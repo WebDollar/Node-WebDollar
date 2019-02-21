@@ -374,9 +374,12 @@ class PoolData {
                     for (let i=0; i < numBlocksInformation; i++){
 
                         buffer = await this._db.get("blocksInformation_"+(i+1), 60000,  20,true);
-                        let response = await this._deserializeBlockInformation(buffer, 0, 1);
-                        if ( !response )
-                            throw 'Unable to load miners from DB'
+
+                        if (buffer) {
+                            let response = await this._deserializeBlockInformation(buffer, 0, 1);
+                            if ( !response )
+                                throw 'Unable to load miners from DB'
+                        }
                     }
 
             } else {

@@ -18,7 +18,7 @@ class BlockRepository
      * @param {string|int}mBlockNumber
      * @return {InterfaceBlockchainBlock|null}
      */
-    findByNumberOrTag(mBlockNumber) {
+    async findByNumberOrTag(mBlockNumber) {
         switch(mBlockNumber)
         {
             case 'latest':
@@ -36,7 +36,7 @@ class BlockRepository
             return null;
         }
 
-        const oBlock = this._oBlockchain.blocks[mBlockNumber];
+        const oBlock = await this._oBlockchain.blocks[mBlockNumber];
 
         return typeof oBlock === 'undefined' ? null : oBlock;
     }
@@ -46,7 +46,7 @@ class BlockRepository
      * @param {int|string} mEndingNumber
      * @return {InterfaceBlockchainBlock[]|Array}
      */
-    findByRange(mStartingNumber, mEndingNumber) {
+    async findByRange(mStartingNumber, mEndingNumber) {
         let aBlocks = [];
 
         switch(mEndingNumber)
@@ -74,14 +74,14 @@ class BlockRepository
 
         for (let i = mStartingNumber; i <= mEndingNumber; i++)
         {
-            let oBlock = this.findByNumberOrTag(i);
+            let oBlock = await this.findByNumberOrTag(i);
 
             if (oBlock === null)
             {
                 throw new Error('Block "' + i + '" was not found');
             }
 
-            aBlocks.push(this.findByNumberOrTag(i));
+            aBlocks.push( await this.findByNumberOrTag(i) );
 
             if (aBlocks.length === this._oConfig.limit)
             {
@@ -108,7 +108,7 @@ class BlockRepository
 
         for (const nBlockNumber of aBlockNumbers)
         {
-            aBlocks.push(this.findByNumberOrTag(nBlockNumber));
+            aBlocks.push( await this.findByNumberOrTag(nBlockNumber) );
 
             if (aBlocks.length === this._oConfig.limit)
             {

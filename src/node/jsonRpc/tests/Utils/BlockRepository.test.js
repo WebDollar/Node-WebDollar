@@ -29,23 +29,23 @@ describe('BlockRepositoryTest', () => {
 
     const oBlockRepository = new BlockRepository(Blockchain);
 
-    it ('BlockRepository::findByNumberOrTag should return null if block number is invalid', () => {
-        assert.isNull(oBlockRepository.findByNumberOrTag('invalid'));
-        assert.isNull(oBlockRepository.findByNumberOrTag('pending'));
-        assert.isNull(oBlockRepository.findByNumberOrTag(-1));
-        assert.isNull(oBlockRepository.findByNumberOrTag(1000));
+    it ('BlockRepository::findByNumberOrTag should return null if block number is invalid', async () => {
+        assert.isNull( await oBlockRepository.findByNumberOrTag('invalid') );
+        assert.isNull( await oBlockRepository.findByNumberOrTag('pending') );
+        assert.isNull( await oBlockRepository.findByNumberOrTag(-1) );
+        assert.isNull( await oBlockRepository.findByNumberOrTag(1000)) ;
     });
 
-    it ('BlockRepository::findByNumberOrTag should return the block at requested height', () => {
-        assert.strictEqual(oBlockRepository.findByNumberOrTag(12).id, 'block_12');
+    it ('BlockRepository::findByNumberOrTag should return the block at requested height', async () => {
+        assert.strictEqual( await oBlockRepository.findByNumberOrTag(12).id, 'block_12');
     });
 
-    it ('BlockRepository::findByNumberOrTag should return the first block when using "earliest"', () => {
-        assert.strictEqual(oBlockRepository.findByNumberOrTag('earliest').id, 'block_0');
+    it ('BlockRepository::findByNumberOrTag should return the first block when using "earliest"', async () => {
+        assert.strictEqual( await oBlockRepository.findByNumberOrTag('earliest').id, 'block_0');
     });
 
-    it ('BlockRepository::findByNumberOrTag should return the last block when using "latest"', () => {
-        assert.strictEqual(oBlockRepository.findByNumberOrTag('latest').id, 'block_100');
+    it ('BlockRepository::findByNumberOrTag should return the last block when using "latest"', async () => {
+        assert.strictEqual( await oBlockRepository.findByNumberOrTag('latest').id, 'block_100');
     });
 
     it ('BlockRepository::findByRange should return null if starting block number is not numeric', () => {

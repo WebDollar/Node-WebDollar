@@ -19,7 +19,7 @@ class TransactionRepository
      * @param {int} nIndex
      * @return {InterfaceBlockchainTransaction|null}
      */
-    findByBlockNumberAndIndex(mBlockNumber, nIndex = 0) {
+    async findByBlockNumberAndIndex(mBlockNumber, nIndex = 0) {
         if (isInteger(nIndex) === false || nIndex < 0)
         {
             return null;
@@ -31,7 +31,7 @@ class TransactionRepository
             return typeof oTransaction === 'undefined' ? null : oTransaction;
         }
 
-        const oBlock = this._oBlockRepository.findByNumberOrTag(mBlockNumber);
+        const oBlock = await this._oBlockRepository.findByNumberOrTag(mBlockNumber);
 
         if (oBlock === null)
         {
@@ -63,13 +63,13 @@ class TransactionRepository
      * @param {string|int} mBlockNumber
      * @return {int}
      */
-    countByBlockNumber(mBlockNumber) {
+    async countByBlockNumber(mBlockNumber) {
         if (mBlockNumber === 'pending')
         {
             return this._oPendingQueueTransactionsManager.listArray.length;
         }
 
-        const oBlock = this._oBlockRepository.findByNumberOrTag(mBlockNumber);
+        const oBlock = await this._oBlockRepository.findByNumberOrTag(mBlockNumber);
 
         if (oBlock === null)
         {

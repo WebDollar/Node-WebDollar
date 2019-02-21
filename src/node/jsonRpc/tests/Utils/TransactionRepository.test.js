@@ -54,22 +54,22 @@ describe('TransactionRepositoryTest', () => {
     const oBlockRepository       = new BlockRepository(Blockchain);
     const oTransactionRepository = new TransactionRepository(oBlockRepository, oPendingQueueTransactionsManager);
 
-    it ('TransactionRepository::findByBlockNumberAndIndex should return null if block number is invalid', () => {
-        assert.isNull(oTransactionRepository.findByBlockNumberAndIndex('invalid'));
-        assert.isNull(oTransactionRepository.findByBlockNumberAndIndex(-1));
-        assert.isNull(oTransactionRepository.findByBlockNumberAndIndex(1000));
+    it ('TransactionRepository::findByBlockNumberAndIndex should return null if block number is invalid', async () => {
+        assert.isNull( await oTransactionRepository.findByBlockNumberAndIndex('invalid'));
+        assert.isNull( await oTransactionRepository.findByBlockNumberAndIndex(-1));
+        assert.isNull( await oTransactionRepository.findByBlockNumberAndIndex(1000));
     });
 
-    it ('TransactionRepository::findByBlockNumberAndIndex should return the transaction', () => {
-        assert.isNotNull(oTransactionRepository.findByBlockNumberAndIndex(10, 0));
-        assert.equal(oTransactionRepository.findByBlockNumberAndIndex(10, 0).txId, 'firstTx');
-        assert.isNull(oTransactionRepository.findByBlockNumberAndIndex(10, 1));
+    it ('TransactionRepository::findByBlockNumberAndIndex should return the transaction', async () => {
+        assert.isNotNull( await oTransactionRepository.findByBlockNumberAndIndex(10, 0));
+        assert.equal(await oTransactionRepository.findByBlockNumberAndIndex(10, 0).txId, 'firstTx');
+        assert.isNull(await oTransactionRepository.findByBlockNumberAndIndex(10, 1));
     });
 
-    it ('TransactionRepository::findByBlockNumberAndIndex should return the transaction from Pending Queue', () => {
-        assert.isNotNull(oTransactionRepository.findByBlockNumberAndIndex('pending', 0));
-        assert.equal(oTransactionRepository.findByBlockNumberAndIndex('pending', 0).txId, 'pendingTx');
-        assert.isNull(oTransactionRepository.findByBlockNumberAndIndex(10, 1));
+    it ('TransactionRepository::findByBlockNumberAndIndex should return the transaction from Pending Queue', async () => {
+        assert.isNotNull( await oTransactionRepository.findByBlockNumberAndIndex('pending', 0));
+        assert.equal(await  oTransactionRepository.findByBlockNumberAndIndex('pending', 0).txId, 'pendingTx');
+        assert.isNull(await oTransactionRepository.findByBlockNumberAndIndex(10, 1));
     });
 
     it ('TransactionRepository::findByBlockHashAndIndex should return null', () => {
@@ -88,25 +88,25 @@ describe('TransactionRepositoryTest', () => {
         expect(() => {oTransactionRepository.findByBlockHashAndIndex('hash', 1);}).to.throw('Find By Hash is not supported. Block hash: hash');
     });
 
-    it ('TransactionRepository::countByBlockNumber should return 0 on invalid block', () => {
-        assert.equal(oTransactionRepository.countByBlockNumber(-1), 0);
-        assert.equal(oTransactionRepository.countByBlockNumber(null), 0);
-        assert.equal(oTransactionRepository.countByBlockNumber(false), 0);
+    it ('TransactionRepository::countByBlockNumber should return 0 on invalid block', async () => {
+        assert.equal( await oTransactionRepository.countByBlockNumber(-1), 0);
+        assert.equal( await oTransactionRepository.countByBlockNumber(null), 0);
+        assert.equal( await oTransactionRepository.countByBlockNumber(false), 0);
     });
 
-    it ('TransactionRepository::countByBlockNumber should return 0 on invalid block', () => {
-        assert.equal(oTransactionRepository.countByBlockNumber(-1), 0);
-        assert.equal(oTransactionRepository.countByBlockNumber(null), 0);
-        assert.equal(oTransactionRepository.countByBlockNumber(false), 0);
+    it ('TransactionRepository::countByBlockNumber should return 0 on invalid block', async () => {
+        assert.equal( await oTransactionRepository.countByBlockNumber(-1), 0);
+        assert.equal( await oTransactionRepository.countByBlockNumber(null), 0);
+        assert.equal( await oTransactionRepository.countByBlockNumber(false), 0);
     });
 
-    it ('TransactionRepository::countByBlockNumber should return for pending tag', () => {
-        assert.equal(oTransactionRepository.countByBlockNumber('pending'), 1);
+    it ('TransactionRepository::countByBlockNumber should return for pending tag', async () => {
+        assert.equal( await oTransactionRepository.countByBlockNumber('pending'), 1);
     });
 
-    it ('TransactionRepository::countByBlockNumber should return for existing transactions in block', () => {
-        assert.equal(oTransactionRepository.countByBlockNumber(10), 1);
-        assert.equal(oTransactionRepository.countByBlockNumber(11), 0);
+    it ('TransactionRepository::countByBlockNumber should return for existing transactions in block', async () => {
+        assert.equal(await oTransactionRepository.countByBlockNumber(10), 1);
+        assert.equal(await oTransactionRepository.countByBlockNumber(11), 0);
     });
 
     it ('TransactionRepository::countByBlockHash should throw exception', () => {
