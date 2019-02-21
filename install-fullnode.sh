@@ -19,6 +19,24 @@ cyanbg=$(tput setab 6 && tput bold)
 whitebg=$(tput setab 7 && tput bold)
 stand=$(tput sgr0)
 
+export black
+export red
+export green
+export yellow
+export blue
+export magenta
+export cyan
+export white
+export blackbg
+export redbg
+export greenbg
+export yellowbg
+export bluebg
+export magentabg
+export cyanbg
+export whitebg
+export stand
+
 ### System dialog VARS
 showinfo="$green[info]$stand"
 showerror="$red[error]$stand"
@@ -33,6 +51,19 @@ redhashtag="$redbg$white#$stand"
 abortte="$cyan[abort to Exit]$stand"
 showport="$yellow[PORT]$stand"
 ##
+
+export showinfo
+export showerror
+export showexecute
+export showok
+export showdone
+export showinput
+export showwarning
+export showremove
+export shownone
+export redhashtag
+export abortte
+export showport
 
 #### ROOT User Check
 function checkroot(){
@@ -54,10 +85,27 @@ getgit=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-ca
 #### Dependencies START
 function deps() {
 if [[ "$getiptpersist" == "none" ]]; then
-	echo "$showinfo We need to install IPtables Persistent"
-	echo "$showinfo When asked, press YES to save your current IPtables settings."
-	echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y iptables-persistent; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y iptables-persistent; fi
+
+dep_iptp(){
+
+	read -r -e -p "$showinput Do you want to install IPtables Persistent? This will make your IPtables rules persist after reboot: " yn_iptp
+
+	if [[ $yn_iptp == y ]]; then
+
+		echo "$showinfo When asked, press YES to save your current IPtables settings."
+		echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
+		if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y iptables-persistent; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y iptables-persistent; fi
+
+	elif [[ $yn_iptp == n ]]; then
+
+		echo "$showok We won't install iptables-persistent."
+
+	elif [[ $yn_iptp == * ]]; then
+
+		echo "$showerror Possible options are y or n." && dep_iptp
+	fi
+}
+	dep_iptp
 else
 	if [[ "$getiptpersist" == NA ]]; then
 		echo "$showok IPtables Persistent is not available for CentOS"
@@ -70,29 +118,40 @@ fi
 
 if [[ "$getgit" == "none" ]]; then
 	echo "$showinfo We need to install Git"
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y git; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y git; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y git; fi
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y git; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y git; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y git; fi
 else
-	if [[ "$getgit" == Installed ]]; then
-		echo "$showok Git is already installed!"
-	elif [[ "$getgit" == * ]]; then
-		echo "$showok Git is already installed!"
-	fi
+	if [[ "$getgit" == Installed ]]; then echo "$showok Git is already installed!"; elif [[ "$getgit" == * ]]; then echo "$showok Git is already installed!"; fi
 fi
 }
 #### Dependencies check END
 
 deps # call deps function
 
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update -y; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get upgrade -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum upgrade -y; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y linuxbrew-wrapper; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y linuxbrew-wrapper; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y clang; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y clang; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
+read -r -e -p "$showinput Would you like to update your Linux System? It's recommended: " yn_update
+
+if [[ $yn_update == y ]]; then
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update -y; fi
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get upgrade -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum upgrade -y; fi
+
+elif [[ $yn_update == n ]]; then
+
+	echo "$showok We won't update your system."
+
+elif [[ $yn_update == * ]]; then
+
+	echo "$showerror Possible options are y or n." && yn_update
+fi
+
+
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -z $(apt-cache policy linuxbrew-wrapper | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok linuxbrew-wrapper is already installed"; else sudo apt-get install -y linuxbrew-wrapper; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y linuxbrew-wrapper; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -z $(apt-cache policy build-essential | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok build-essential is already installed"; else sudo apt-get install -y build-essential; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(which clang) == "/usr/bin/clang" ]]; then echo "$showok clang is already installed"; else sudo apt-get install -y clang; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y clang; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
 elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
 elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.bash_profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo npm install pm2 -g --unsafe-perm ; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ ! -z $(which node-gyp) ]]; then echo "$showok node-gyp is already installed!"; else npm install -g node-gyp; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ ! -z $(which pm2) ]]; then echo "$showok pm2 is already installed!"; else npm install pm2 -g --unsafe-perm; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install pm2 -g --unsafe-perm ; fi
 
 if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand"; fi fi
 
@@ -162,7 +221,7 @@ elif [[ "$readft" == 2 ]]; then
 			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+			if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -173,7 +232,7 @@ elif [[ "$readft" == 2 ]]; then
 					echo "$showok Node-WebDollar$i Deployed successfully!"
 				done
 			else
-				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+				if [[ ! $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 					echo "$showok We are outside of a Node-WebDollar Folder"
 
 					for ((i=countcurrentnodes+1; i<=countcurrentnodes+readnrofnodesdeploy; i++));
@@ -242,7 +301,7 @@ elif [[ "$readft" == 3 ]]; then
 			countcurrentnodes=$(sudo find / -name "Node-WebDollar[0-9]" | wc -l)
 #			countcurrentnodes="7"  # this is for testing purposes only
 
-			if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+			if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 				echo "$showinfo We are inside a Node-WebDollar Folder"
 				cd .. && echo "$showinfo Location changed to $(pwd)"
@@ -267,7 +326,7 @@ elif [[ "$readft" == 3 ]]; then
 					fi
 				fi
 			else
-				if [[ ! $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+				if [[ ! $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 					echo "$showok We are outside of a Node-WebDollar Folder"
 					echo -e "---\\n${cyan}$(ls)$stand\\n---"
@@ -329,7 +388,7 @@ elif [[ "$readft" == 3 ]]; then
 	}
 	f_clonewebdnode # node-webdollar clone function
 
-elif [[ "$readft" =~ ^(4|exit)$ ]]; then
+elif [[ "$readft" =~ ^(4|q)$ ]]; then
 
 	echo "$showinfo Okay. Bye."
 	exit 0
