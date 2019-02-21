@@ -158,7 +158,7 @@ class TransactionsPendingQueue {
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
 
-        this.transactions.emitTransactionChangeEvent( transaction, true );
+        await this.transactions.emitTransactionChangeEvent( transaction, true );
 
     }
 
@@ -256,7 +256,7 @@ class TransactionsPendingQueue {
 
     }
 
-    removePendingTransaction (transaction, index){
+    async removePendingTransaction (transaction, index){
 
         if ( typeof index !== "number")
             for (let i=0; i < this.listArray.length; i++)
@@ -271,7 +271,7 @@ class TransactionsPendingQueue {
 
             this.listArray.splice(index, 1);
 
-            this.transactions.emitTransactionChangeEvent(transaction, true, true);
+            await this.transactions.emitTransactionChangeEvent(transaction, true, true);
 
 
         }
@@ -323,7 +323,7 @@ class TransactionsPendingQueue {
             }
 
             if (removeThis)
-                this.removePendingTransaction(tx, i);
+                await this.removePendingTransaction(tx, i);
             else
                 console.log(tx.txId.toString('hex'),"------- GOOD tx");
 

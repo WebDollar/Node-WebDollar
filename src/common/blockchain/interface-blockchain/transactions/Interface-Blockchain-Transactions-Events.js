@@ -139,10 +139,10 @@ class InterfaceBlockchainTransactionsEvents{
         return false;
     }
 
-    emitTransactionChangeEvent(transaction, deleted=false){
+    async emitTransactionChangeEvent(transaction, deleted=false){
 
         if (deleted)
-            if (this.blockchain.transaction.validateTransactionId(transaction.txId) !== null) //I found a transaction already in Blockchain
+            if (!await this.blockchain.transaction.validateTransactionId(transaction.txId)) //I found a transaction already in Blockchain
                 return false;
 
         transaction.from.addresses.forEach((address)=>{
