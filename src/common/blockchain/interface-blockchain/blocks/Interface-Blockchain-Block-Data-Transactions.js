@@ -19,26 +19,6 @@ class InterfaceBlockchainBlockDataTransactions {
         this.hashTransactions = hashTransactions;
     }
 
-    async checkVirtualizedTxId(txId) {
-
-        if( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
-
-        try {
-            let answer = await this.db.get('transactionID-' + txId);
-
-            if (answer) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        catch (err) {
-            return 'ERROR on saving TxId: ' + txId + ':' + err;
-        }
-
-    }
-
     async saveVirtualizedTxId(txId, blockHeight) {
 
         try {
