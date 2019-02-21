@@ -84,7 +84,7 @@ class TransactionsPendingQueue {
 
     async _insertPendingTransaction(transaction,exceptSockets){
 
-        if (await !this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+        if ( ! await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
             throw {message: "Transsaction validation failed"}
 
         //This is just for pool
@@ -304,7 +304,7 @@ class TransactionsPendingQueue {
                     removeThis=true;
                 }
                 else
-                if (await !this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) {
+                if ( ! await this.blockchain.mining.miningTransactionSelector.validateTransaction( tx )) {
                     console.log(tx.txId.toString('hex'),"not valid anymore");
                     removeThis=true;
                 }
