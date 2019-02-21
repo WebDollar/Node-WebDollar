@@ -230,7 +230,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
         Log.info("FORK SOLVER SUCCESS: " + success, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
         Blockchain.blockchain.accountantTree.emitBalancesChanges();
-        Blockchain.blockchain.blocks.recalculateNetworkHashRate();
+        await Blockchain.blockchain.blocks.recalculateNetworkHashRate();
         await Blockchain.blockchain.blocks.emitBlockInserted();
         Blockchain.blockchain.blocks.emitBlockCountChanged();
 

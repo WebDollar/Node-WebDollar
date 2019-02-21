@@ -114,7 +114,7 @@ class InterfaceBlockchainBlocks{
 
         }
 
-        let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
+        let how_much_it_took_to_mine_X_Blocks = await this.blockchain.getTimeStamp( last ) - await this.blockchain.getTimeStamp( first );
         let answer;
 
         if( BlockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
