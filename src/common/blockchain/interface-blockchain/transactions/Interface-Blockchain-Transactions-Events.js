@@ -160,12 +160,7 @@ class InterfaceBlockchainTransactionsEvents{
         return false;
     }
 
-    emitTransactionChangeEvent(transaction, deleted=false){
-
-        if (deleted){
-            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
-                return false;
-        }
+    emitTransactionChangeEvent(transaction, pendingQueue = false, deleted=false){
 
         transaction.from.addresses.forEach((address)=>{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {

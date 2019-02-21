@@ -158,7 +158,7 @@ class TransactionsPendingQueue {
         transaction.confirmed = false;
         transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
 
-        this.transactions.emitTransactionChangeEvent( transaction );
+        this.transactions.emitTransactionChangeEvent( transaction, true );
 
     }
 
@@ -271,7 +271,7 @@ class TransactionsPendingQueue {
 
             this.listArray.splice(index, 1);
 
-            this.transactions.emitTransactionChangeEvent(transaction, true);
+            this.transactions.emitTransactionChangeEvent(transaction, true, true);
 
 
         }
