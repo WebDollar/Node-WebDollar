@@ -13,27 +13,6 @@ class InterfaceBlockchainTransactionsEvents{
 
     }
 
-    async findTransaction(txId){
-
-        if (typeof txId === "string")
-            txId = new Buffer(txId, "hex");
-        if (!Buffer.isBuffer(txId)) return null;
-
-        for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
-
-            let block = await this.blockchain.getBlock(i);
-            if ( !block ) continue;
-
-            for (let i=0; i<block.data.transactions.transactions.length; i++){
-                if ( block.data.transactions.transactions[i].txId.equals(txId))
-                    return block.data.transactions.transactions[i];
-            }
-
-        }
-
-        return null;
-    }
-
     async listTransactions(addressWIF, maxBlockCount = 50){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
@@ -162,10 +141,9 @@ class InterfaceBlockchainTransactionsEvents{
 
     emitTransactionChangeEvent(transaction, deleted=false){
 
-        if (deleted){
-            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
+        if (deleted)
+            if (this.blockchain.transaction.validateTransactionId(transaction.txId) !== null) //I found a transaction already in Blockchain
                 return false;
-        }
 
         transaction.from.addresses.forEach((address)=>{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {
