@@ -8,8 +8,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
         if (!this.blockchain.agent.light)
             return InterfaceBlockchainProtocolForksManager.prototype._getBestFork.call(this);
 
-        let bestFork = null;
-        let fork = null;
+        let bestFork, fork;
 
         try {
 
@@ -19,11 +18,11 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
                     fork = this.blockchain.forksAdministrator.forks[i];
 
                     //it is a small fork that I already have the first forks, but I will download the remaning blocks
-                    if (fork.forkChainStartingPoint <= fork.forkStartingHeight && (bestFork === null || bestFork.forkChainLength < fork.forkChainLength) ){
+                    if (fork.forkChainStartingPoint <= fork.forkStartingHeight && (!bestFork || bestFork.forkChainLength < fork.forkChainLength) ){
 
                         bestFork = fork;
 
-                    } else if ( bestFork !==  null && bestFork.forkProofPi !== undefined && fork.forkProofPi !== undefined ) {
+                    } else if ( bestFork && bestFork.forkProofPi && fork.forkProofPi  ) {
 
                         let compare = await this.blockchain.verifier.compareProofs(bestFork.forkProofPi, fork.forkProofPi);
 
@@ -34,7 +33,7 @@ class PPoWBlockchainProtocolForksManager extends InterfaceBlockchainProtocolFork
 
                         }
 
-                    } else if ( (bestFork ===  null || bestFork.forkProofPi === undefined) && fork.forkProofPi !== undefined){
+                    } else if ( ( !bestFork  || !bestFork.forkProofPi ) && fork.forkProofPi ){
 
                         bestFork = fork;
 

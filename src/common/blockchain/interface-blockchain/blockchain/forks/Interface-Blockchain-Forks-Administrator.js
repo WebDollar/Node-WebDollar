@@ -14,18 +14,15 @@ class InterfaceBlockchainForksAdministrator {
         this.blockchain = blockchain;
 
         this.forks = [];
-
         this.forksId = 0;
-
-        this.socketsProcessing = [];
 
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
-            for (let i=0; i<this.forks.length; i++)
+            for (let i=this.forks.length-1; i>=0; i--)
                 if (!this.forks[i].forkIsSaving) {
 
                     for (let j = this.forks[i].sockets.length-1; j >=0 ; j--)
-                        if (this.forks[i].sockets[j].node.sckAddress === undefined || this.forks[i].sockets[j].node.sckAddress.uuid === nodesListObject.socket.node.sckAddress.uuid ) {
+                        if ( !this.forks[i].sockets[j].node.sckAddress || this.forks[i].sockets[j].node.sckAddress.uuid === nodesListObject.socket.node.sckAddress.uuid ) {
                             this.forks[i].sockets.splice(j, 1);
                             break;
                         }

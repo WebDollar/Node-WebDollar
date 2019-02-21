@@ -104,11 +104,9 @@ class InterfaceBlockchainProtocolForksManager {
             let forkError = exception.fork;
 
             this.blockchain.forksAdministrator.deleteFork(forkError);
-
-            bestFork = null;
         }
 
-        if (bestFork !== null) {
+        if (bestFork ) {
 
             try {
 
@@ -158,8 +156,7 @@ class InterfaceBlockchainProtocolForksManager {
     //will select the best
     _getBestFork(){
 
-        let bestFork = null;
-        let fork = null;
+        let bestFork, fork;
 
         try {
 
@@ -168,14 +165,14 @@ class InterfaceBlockchainProtocolForksManager {
 
                     fork = this.blockchain.forksAdministrator.forks[i];
 
-                    if (bestFork === null || bestFork.forkChainLength < fork.forkChainLength)
+                    if ( !bestFork || bestFork.forkChainLength < fork.forkChainLength)
                         bestFork = fork;
 
                 }
 
 
             // if (Math.random() < 0.1)
-                // console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork !== null)
+                // console.warn("forksAdministrator.forks.length", this.blockchain.forksAdministrator.forks.length, bestFork )
 
         } catch (exception){
 
