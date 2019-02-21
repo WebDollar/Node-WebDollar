@@ -132,6 +132,8 @@ class PPoWBlockchainProofBasic{
 
         try {
 
+            //let lastHashChain = this
+
             if (this.blocks[this.blocks.length - 1].hash.equals( this.blockchain.blocks[this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1  ].hash ))
                 return true;
             else

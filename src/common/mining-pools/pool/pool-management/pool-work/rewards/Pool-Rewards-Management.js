@@ -70,7 +70,7 @@ class PoolRewardsManagement{
             for ( let blockInfo of this.poolData.blocksInfo)
                 if ( blockInfo.block && BlockchainGenesis.isPoSActivated(blockInfo.block.height) ){
 
-                    let block = this.blockchain.blocks[blockInfo.height];
+                    let block = await this.blockchain.getBlock ( blockInfo.height );
 
                     if ( block && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks.length >= block.height+5 && this.blockchain.blocks.length-50 <= block.height )
                         for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
@@ -187,11 +187,14 @@ class PoolRewardsManagement{
                 //at least 2 confirmations
                 if (!blockInfo.payoutTx) found = true;
                 else
-                for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- )
-                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( blockInfo.payoutTx ) >= 0 ){
+                for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- ) {
+
+                    let block = await this.blockchain.getBlock( i );
+                    if ( block.data.transactions.findTransactionInBlockData(blockInfo.payoutTx) >= 0 ) {
                         found = true;
                         break;
                     }
+                }
 
                 //let's delete old payouts
                 if (found){
