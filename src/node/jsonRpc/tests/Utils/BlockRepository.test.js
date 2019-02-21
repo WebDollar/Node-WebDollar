@@ -53,9 +53,9 @@ describe('BlockRepositoryTest', () => {
         assert.isEmpty(oBlockRepository.findByRange('invalid'));
     });
 
-    it ('BlockRepository::findByRange should return null if ending block number is not valid', () => {
-        assert.isArray(oBlockRepository.findByRange(100, 'invalid'));
-        assert.isEmpty(oBlockRepository.findByRange(100, 'invalid'));
+    it ('BlockRepository::findByRange should return null if ending block number is not valid', async () => {
+        assert.isArray( await oBlockRepository.findByRange(100, 'invalid'));
+        assert.isEmpty( await oBlockRepository.findByRange(100, 'invalid'));
     });
 
     it ('BlockRepository::findByRange should return the blocks in range', () => {
@@ -63,13 +63,13 @@ describe('BlockRepositoryTest', () => {
         assert.strictEqual(aBLocks.length, 3);
     });
 
-    it ('BlockRepository::findByNumbers should return null if argument is not an Array', () => {
-        assert.isArray(oBlockRepository.findByNumbers('invalid'));
-        assert.isEmpty(oBlockRepository.findByNumbers('invalid'));
+    it ('BlockRepository::findByNumbers should return null if argument is not an Array', async () => {
+        assert.isArray( await oBlockRepository.findByNumbers('invalid') );
+        assert.isEmpty( await oBlockRepository.findByNumbers('invalid') );
     });
 
-    it ('BlockRepository::findByNumbers should return the requested blocks', () => {
-        const aBLocks = oBlockRepository.findByNumbers([10, 12]);
+    it ('BlockRepository::findByNumbers should return the requested blocks', async () => {
+        const aBLocks = await oBlockRepository.findByNumbers([10, 12]);
         assert.strictEqual(aBLocks.length, 2);
     });
 });

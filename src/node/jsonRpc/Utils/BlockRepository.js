@@ -96,7 +96,7 @@ class BlockRepository
      * @param {Array|int[]}aBlockNumbers
      * @return {InterfaceBlockchainBlock[]|Array}
      */
-    findByNumbers(aBlockNumbers) {
+    async findByNumbers(aBlockNumbers) {
         let aBlocks = [];
 
         if (isArray(aBlockNumbers) === false)
