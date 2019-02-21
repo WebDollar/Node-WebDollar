@@ -42,7 +42,7 @@ class PoolSettings {
         let result = await this._getPoolPrivateKey();
         result = result && await this._getPoolAddress();
 
-        if (poolFee !== undefined )
+        if ( typeof poolFee  === "number")
             await this.setPoolFee(poolFee);
 
         result = result && await this._getPoolDetails();
@@ -321,45 +321,40 @@ class PoolSettings {
         try {
 
             poolFee = await this._db.get("pool_fee", 10 * 1000, 20, true);
-            if (poolFee === null)
-                poolFee = 0.02;
+            if ( typeof poolFee  !== "number") poolFee = 0.02;
 
             poolFee = parseFloat(poolFee);
         } catch (exception){
-
             poolFee = 0.02;
-
         }
 
         let poolWebsite = await this._db.get("pool_website", 10*1000, 20, true);
-        if (poolWebsite === null) poolWebsite = '';
+        if ( !poolWebsite ) poolWebsite = '';
 
         let poolServers = JSON.parse( await this._db.get("pool_servers", 10*1000, 20, true) );
-        if (poolServers === null) poolServers = '';
+        if ( !poolServers ) poolServers = '';
 
         let poolActivated = await this._db.get("pool_activated", 10*1000, 20, true);
-        if (poolActivated === null) poolActivated = false;
-        poolActivated = false;
 
         if (poolActivated === "true") poolActivated = true;
         else if (poolActivated === "false") poolActivated = false;
-        else if (poolActivated === null) poolActivated = false;
+        else poolActivated = false;
 
         let poolUsePoolServers = await this._db.get("pool_use_pool_servers", 10*1000, 20, true);
         if (poolUsePoolServers === "true") poolUsePoolServers = true;
         else if (poolUsePoolServers === "false") poolUsePoolServers = false;
-        else if (poolUsePoolServers === null) poolUsePoolServers = true;
+        else poolUsePoolServers = true;
 
         let poolUseSignatures = await this._db.get("pool_use_signatures",  10*1000, 20, true);
         if (poolUseSignatures === "true") poolUseSignatures = true;
         else if (poolUseSignatures === "false") poolUseSignatures = false;
-        else if (poolUseSignatures === null) poolUseSignatures = true;
+        else poolUseSignatures = true;
 
         if (!poolUsePoolServers)
             poolUseSignatures = false;
 
         let poolReferralFee = await this._db.get("pool_referral_fee",  10*1000, 20, true);
-        if (poolReferralFee === null) poolReferralFee = 0.05; // 5%
+        if ( typeof poolReferralFee  !== "number") poolReferralFee = 0.05; // 5%
 
         if (false === await this.justValidatePoolDetails(poolName, poolFee, poolWebsite, poolServers, poolActivated, poolReferralFee))
             return false;
