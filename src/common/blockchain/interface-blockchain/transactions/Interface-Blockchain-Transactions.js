@@ -26,12 +26,9 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         if( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
 
         try {
-            let answer = await this.blockchain.db.get('transactionID-' + txId);
 
-            if (answer)
-                return true;
-            else
-                return false;da
+           return await this.blockchain.db.get('transactionID-' + txId) ? true : false;
+
         }
         catch (err) {
             return 'ERROR on saving TxId: ' + txId + ':' + err;
