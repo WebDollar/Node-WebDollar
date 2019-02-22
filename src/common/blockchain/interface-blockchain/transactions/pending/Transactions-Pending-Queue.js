@@ -31,7 +31,7 @@ class TransactionsPendingQueue {
         let foundMissingNonce = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
         if(foundMissingNonce)
-            this.transactionsProtocol.transactionsDownloadingManager.removeMissingNonceList(transaction.from.addresses[0].unencodedAddress.toString('hex')+transaction.nonce);
+            this.transactionsProtocol.transactionsDownloadingManager.removeMissingNonceList(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
         if (index === undefined)
             this.listArray.push(transaction);

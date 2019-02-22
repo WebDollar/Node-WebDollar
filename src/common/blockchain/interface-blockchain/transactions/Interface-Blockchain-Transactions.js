@@ -28,12 +28,10 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         try {
             let answer = await this.blockchain.db.get('transactionID-' + txId);
 
-            if (answer) {
+            if (answer)
                 return true;
-            }
-            else {
-                return false;
-            }
+            else
+                return false;da
         }
         catch (err) {
             return 'ERROR on saving TxId: ' + txId + ':' + err;
