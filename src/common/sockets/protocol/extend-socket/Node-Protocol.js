@@ -127,11 +127,9 @@ class NodeProtocol {
 
     sendLastBlock(callback){
 
-        console.log("Send block",Blockchain.blockchain.blocks.last)
-
         if (Blockchain.blockchain.blocks.last === undefined) return;
 
-        console.log("Send block2",Blockchain.blockchain.blocks.last)
+        console.log("Propagate ", Blockchain.blockchain.blocks._length)
 
         this.node.sendRequest("head/new-block", {
             l: Blockchain.blockchain.blocks.length,
