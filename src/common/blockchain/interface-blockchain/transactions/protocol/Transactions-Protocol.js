@@ -257,8 +257,6 @@ class InterfaceBlockchainTransactionsProtocol {
             for (let element of Blockchain.PoolManagement.poolProtocol.poolConnectedMinersProtocol.list)
                 exceptSockets.push(element);
 
-        console.log("Broadcasted",transaction.txId.toString('hex'))
-
         NodeProtocol.broadcastRequest( "transactions/new-pending-transaction-id", { txId: transaction.txId }, undefined, exceptSockets );
 
     }
