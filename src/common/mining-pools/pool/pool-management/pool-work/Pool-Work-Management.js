@@ -218,7 +218,7 @@ class PoolWorkManagement{
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
 
-                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
+                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
                                 //returning false, because a new fork was changed in the mean while
                                 if (this.blockchain.blocks.length !== block.height)
@@ -227,7 +227,7 @@ class PoolWorkManagement{
                                 //calculate blockHashChain
                                 block.hashChain = block.calculateChainHash();
 
-                                return this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
+                                return await this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
 
                             }) === false) throw {message: "Mining2 returned false"};
 
