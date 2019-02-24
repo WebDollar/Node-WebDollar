@@ -66,7 +66,7 @@ class InterfaceBlockchainProtocolForkSolver{
                 return await this._discoverForkBinarySearch(socket, initialLeft, left, mid);
             else
             //was found, search right because the fork must be there
-            return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
+                return await this._discoverForkBinarySearch(socket, initialLeft, mid + 1, right);
 
         } catch (exception){
 
@@ -265,8 +265,8 @@ class InterfaceBlockchainProtocolForkSolver{
 
             if (this.blockchain.agent.light)
                 if ([ "FORK is empty", "fork is something new",
-                        "discoverAndProcessFork - fork already found by socket",
-                        "same proof, but your blockchain is smaller than mine", "Your proof is worse than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
+                    "discoverAndProcessFork - fork already found by socket",
+                    "same proof, but your blockchain is smaller than mine", "Your proof is worse than mine because you have the same block", "fork proof was already downloaded" ].indexOf( exception.message ) >= 0)
                     bIncludeBan = false;
 
             if (bIncludeBan) {
@@ -318,8 +318,8 @@ class InterfaceBlockchainProtocolForkSolver{
             if (this.protocol.acceptBlocks)
                 onlyHeader = false;
             else
-                if (this.protocol.acceptBlockHeaders)
-                    onlyHeader = true;
+            if (this.protocol.acceptBlockHeaders)
+                onlyHeader = true;
 
             let answer;
 
@@ -328,14 +328,13 @@ class InterfaceBlockchainProtocolForkSolver{
             let alreadyDownloaded = 0;
             let resolved = false;
 
-            let socketIndex = 0;
             let finished = new Promise((resolve)=>{
 
                 let downloadingBlock = async (index)=>{
 
                     try{
 
-                        if ( trialsList[index] > 10 || global.TERMINATED) {
+                        if ( trialsList[index] > 20 || global.TERMINATED) {
 
                             if (!resolved) {
                                 resolved = true;
@@ -345,11 +344,11 @@ class InterfaceBlockchainProtocolForkSolver{
                             return false;
                         }
 
-                        socketIndex++;
                         if ( !trialsList[index]  ) trialsList[index] = 0;
                         trialsList[index] ++ ;
 
-                        let socket = fork.getForkSocket(socketIndex);
+                        let socketIndex = Math.floor( Math.random() * fork.sockets.length );
+                        let socket = fork.getForkSocket( socketIndex );
 
                         if ( !socket ) {
 
