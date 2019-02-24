@@ -285,7 +285,7 @@ consts.SETTINGS = {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
         STATUS_INTERVAL: 40 * 1000,
         LATENCY_CHECK: 5*1000,
-        MAX_ALLOWED_LATENCY: 6*1000,  //miliseconds
+        MAX_ALLOWED_LATENCY: 8*1000,  //miliseconds
         CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
 
 
@@ -323,8 +323,8 @@ consts.SETTINGS = {
 
                 CLIENT: {
 
-                    MAX_SOCKET_CLIENTS_WAITLIST: 3,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                    MAX_SOCKET_CLIENTS_WAITLIST: 5,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 5,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
                     MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
