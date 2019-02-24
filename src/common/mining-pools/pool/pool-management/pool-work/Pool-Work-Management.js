@@ -214,9 +214,7 @@ class PoolWorkManagement{
 
                         let serialization = await prevBlock.serializeBlock();
                         block = await this.blockchain.blockCreator.createEmptyBlock(prevBlock.height, undefined );
-                        block.deserializeBlock( serialization, prevBlock.height, prevBlock.reward, await await this.blockchain.getDifficultyTarget( prevBlock.height - 1 ) );
-
-                        let blockInformation = blockInformationMinerInstance.blockInformation;
+                        block.deserializeBlock( serialization, prevBlock.height, prevBlock.reward, await this.blockchain.getDifficultyTarget( prevBlock.height - 1 ) );
 
                         if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
 
@@ -227,7 +225,7 @@ class PoolWorkManagement{
                                 //calculate blockHashChain
                                 block.hashChain = block.calculateChainHash();
 
-                                return this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
+                                return this.blockchain.includeBlockchainBlock(block, false, "all", true, revertActions);
 
                             }) === false) throw {message: "Mining2 returned false"};
 
@@ -236,6 +234,7 @@ class PoolWorkManagement{
                         //confirming transactions
                         block.data.transactions.confirmTransactions();
 
+                        let blockInformation = blockInformationMinerInstance.blockInformation;
 
                         try {
                             blockInformation.block = block;

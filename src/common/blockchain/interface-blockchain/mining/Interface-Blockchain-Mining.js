@@ -191,7 +191,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             //calculate blockHashChain
                             block.hashChain = block.calculateChainHash();
 
-                            return this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
+                            return this.blockchain.includeBlockchainBlock( block, false, "all", true, revertActions, false );
 
                         }) === false) throw {message: "Mining2 returned false"};
 

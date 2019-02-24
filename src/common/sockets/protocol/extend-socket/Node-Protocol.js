@@ -127,13 +127,13 @@ class NodeProtocol {
 
     sendLastBlock(callback){
 
-        if (Blockchain.blockchain.blocks.last === undefined) return;
+        if ( !Blockchain.blockchain.blocks.last ) return;
 
         this.node.sendRequest("head/new-block", {
             l: Blockchain.blockchain.blocks.length,
             h: Blockchain.blockchain.blocks.last.hashChain,
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
-            p: Blockchain.blockchain.agent.light ? ( (Blockchain.blockchain.proofPi  && Blockchain.blockchain.proofPi.validatesLastBlock()) ? true : false ) : true, // i also have the proof
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi  && Blockchain.blockchain.proofPi.validatesLastBlock()) : true, // i also have the proof
             W: Blockchain.blockchain.blocks.chainWorkSerialized, // chain work
         }, callback);
     }
