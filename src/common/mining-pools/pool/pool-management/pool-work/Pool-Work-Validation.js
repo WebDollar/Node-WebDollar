@@ -37,7 +37,8 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
-        console.log("pushWorkForValidation", work);
+        if (Math.random() < 0.1)
+            console.log("pushWorkForValidation", work);
 
         try{
 

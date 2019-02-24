@@ -70,6 +70,9 @@ class PoolWorkManagement{
             for (let i=0; i < minerInstance.addresses.length; i++)
                 balances.push( await this._getMinerBalance( minerInstance.addresses[i] ));
 
+            if (Math.random() < 0.1)
+                console.log("balances", balances);
+
         }
 
 
@@ -348,10 +351,17 @@ class PoolWorkManagement{
 
             //s += block.height + " ";
 
-            for (let tx of block.data.transactions.transactions )
+            for (let tx of block.data.transactions.transactions ) {
+
+                for (let from of tx.from.addresses)
+                    if ( from.unencodedAddress.equals( address ) )
+                        balance += from.amount;
+
                 for (let to of tx.to.addresses)
-                    if ( to.unencodedAddress.equals( address))
+                    if (to.unencodedAddress.equals(address))
                         balance -= to.amount;
+
+            }
 
 
         }
