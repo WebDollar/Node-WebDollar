@@ -38,7 +38,7 @@ class NodeBlockchainPropagation{
         //verifiy if I am propagating a better block
         if (this._blockPropagating && this._blockPropagating === block) return;
         if ( socketsAvoidBroadcast === "all") return;
-        
+
         if (socketsAvoidBroadcast) {
 
             this._socketsAlreadyBroadcast = [];

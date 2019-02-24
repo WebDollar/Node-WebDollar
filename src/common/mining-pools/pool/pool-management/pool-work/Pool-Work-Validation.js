@@ -37,6 +37,8 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
+        console.log("pushWorkForValidation", work);
+
         try{
 
             if (!work.hash) return;

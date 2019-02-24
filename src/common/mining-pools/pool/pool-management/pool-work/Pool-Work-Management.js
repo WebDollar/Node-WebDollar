@@ -334,9 +334,7 @@ class PoolWorkManagement{
     }
 
 
-    async _getMinerBalance(address, prevBlock){
-
-        prevBlock = prevBlock || this.poolWork.lastBlock;
+    async _getMinerBalance(address, prevBlock = this.poolWork.lastBlock){
 
         let balance = this.blockchain.accountantTree.getBalance( address );
         if ( !balance ) balance = 0;
