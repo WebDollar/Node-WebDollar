@@ -70,9 +70,6 @@ class PoolWorkManagement{
             for (let i=0; i < minerInstance.addresses.length; i++)
                 balances.push( await this._getMinerBalance( minerInstance.addresses[i] ));
 
-            if (Math.random() < 0.1)
-                console.log("balances", balances);
-
         }
 
 
