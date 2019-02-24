@@ -152,39 +152,52 @@ class InterfaceBlockchainTransactionsProtocol {
 
         socket.node.on("transactions/get-pending-transactions-by-ids", async (response) => {
 
+            let transaction = undefined;
 
-            if (!response ) return false;
+            try{
 
-            if (response.format !== "json")  response.format = "buffer";
+                console.log("broadcast tx 1");
+                if (!response ) return false;
 
-            if (!response.ids || !Array.isArray ( response.ids) ) return false;
+                if (response.format !== "json")  response.format = "buffer";
 
-            let list = [];
+                console.log("broadcast tx 2");
+                if (!response.ids || !Array.isArray ( response.ids) ) return false;
 
-            await this.blockchain.sleep(20);
-
-            for (let i=0; i<response.ids.length; i++ ){
-
-                if(response.ids[i].length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
-                    continue;
-
-                let transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
-
-                if ( !transaction ) {
-                    await this.blockchain.sleep(20);
-                    continue;
-                }
+                let list = [];
 
                 await this.blockchain.sleep(20);
 
-                if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
-                if (response.format === "buffer") list.push( transaction.serializeTransaction() );
+                for (let i=0; i<response.ids.length; i++ ){
+
+                    if(response.ids[i].length !== consts.BLOCKCHAIN.BLOCKS_POW_LENGTH)
+                        continue;
+
+                    let transaction = this.blockchain.transactions.pendingQueue.findPendingTransaction(response.ids[i]);
+
+                    if ( !transaction ) {
+                        await this.blockchain.sleep(20);
+                        continue;
+                    }
+
+                    await this.blockchain.sleep(20);
+
+                    if (response.format === "json") list.push( transaction.txId.toString("hex") ); else
+                    if (response.format === "buffer") list.push( transaction.serializeTransaction() );
+
+                }
+
+                await this.blockchain.sleep(200);
+
+                console.log("broadcast tx 4");
+                console.log(list);
+                socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
+
+            } catch (exception){
+
+                console.error("error sending tx -",transaction, exception)
 
             }
-
-            await this.blockchain.sleep(200);
-
-            socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
         });
 
