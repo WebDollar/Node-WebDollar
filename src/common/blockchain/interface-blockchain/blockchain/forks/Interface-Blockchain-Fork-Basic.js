@@ -266,11 +266,13 @@ class InterfaceBlockchainFork {
 
         if (this.sockets.length === 0) return undefined;
 
-        if (! this.sockets[index % this.sockets.length].connected) {
-            this.sockets.splice(index % this.sockets.length);
+        index = index % this.sockets.length;
+
+        if (! this.sockets[ index ].connected) {
+            this.sockets.splice(index, 1);
             return undefined;
         }
-        return this.sockets[index % this.sockets.length];
+        return this.sockets[ index ];
     }
 
     pushSocket(socket, priority){

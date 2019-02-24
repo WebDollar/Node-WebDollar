@@ -328,7 +328,6 @@ class InterfaceBlockchainProtocolForkSolver{
             let alreadyDownloaded = 0;
             let resolved = false;
 
-            let socketIndex = 0;
             let finished = new Promise((resolve)=>{
 
                 let downloadingBlock = async (index)=>{
@@ -345,11 +344,11 @@ class InterfaceBlockchainProtocolForkSolver{
                             return false;
                         }
 
-                        socketIndex++;
                         if ( !trialsList[index]  ) trialsList[index] = 0;
                         trialsList[index] ++ ;
 
-                        let socket = fork.getForkSocket(socketIndex);
+                        let socketIndex = Math.floor( Math.random() * fork.sockets.length );
+                        let socket = fork.getForkSocket( socketIndex );
 
                         if ( !socket ) {
 
