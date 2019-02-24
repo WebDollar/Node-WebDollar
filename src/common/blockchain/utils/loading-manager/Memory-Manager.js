@@ -33,22 +33,6 @@ class MemoryManager{
 
         if (!this._loaded[height]){
 
-            // let resolver;
-            // let promise = new Promise ( (resolve)=>{
-            //     resolver = resolve;
-            // });
-            //
-            // this.addToLoaded(height, promise );
-            //
-            // let data = await this._loadData(height);
-            //
-            // if (this._loaded[height].data === promise)
-            //     this._loaded[height].data = data;
-            //
-            // resolver(data);
-            //
-            // return this._loaded[height].data;
-
             let data = await this._loadData(height);
             this.addToLoaded(height, data );
             return await data;

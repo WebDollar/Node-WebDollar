@@ -334,7 +334,7 @@ class InterfaceBlockchainProtocolForkSolver{
 
                     try{
 
-                        if ( trialsList[index] > 20 || global.TERMINATED) {
+                        if ( trialsList[index] > 10 || global.TERMINATED) {
 
                             if (!resolved) {
                                 resolved = true;

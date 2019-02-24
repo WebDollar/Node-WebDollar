@@ -351,12 +351,12 @@ class PoolWorkManagement{
 
             //s += block.height + " ";
 
-            block.data.transactions.transactions.forEach( (tx) => {
-                tx.to.addresses.forEach((to)=>{
+            for (let tx of block.data.transactions.transactions )
+                for (let to of tx.to.addresses)
                     if ( to.unencodedAddress.equals( address))
                         balance -= to.amount;
-                });
-            });
+
+
         }
 
         //console.log("2 After Balance ", balance, s);

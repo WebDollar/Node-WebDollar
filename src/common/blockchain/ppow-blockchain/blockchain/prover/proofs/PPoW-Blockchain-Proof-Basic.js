@@ -89,7 +89,7 @@ class PPoWBlockchainProofBasic{
     hasBlock(height){
 
         for (let i=0; i<this.blocks.length; i++)
-            if (this.blocks[i].height === height)
+            if (this.blocks[i] === height)
                 return this.blocks[i];
 
         return null;
@@ -127,17 +127,18 @@ class PPoWBlockchainProofBasic{
 
     validatesLastBlock(){
 
-        if (this.blocks.length <= 0) return false;
-        if (this.blocks.length <= consts.POPOW_PARAMS.m) return false;
+        if (this.blocks.length <= 0 || this.blocks.length <= consts.POPOW_PARAMS.m ) return false;
 
         try {
 
-            //let lastHashChain = this
+            return true;
 
-            if (this.blocks[this.blocks.length - 1].hash.equals( this.blockchain.blocks[this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1  ].hash ))
-                return true;
-            else
-                return false;
+            // let hashChain = await this.blockchain.getChainHash( this.blocks[this.blocks.length - 1] );
+            //
+            // if ( hashChain && hashChain.equals( await this.blockchain.getChainHash( this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1 ) ) )
+            //     return true;
+            // else
+            //     return false;
 
         } catch (exception){
 
