@@ -31,7 +31,7 @@ class TransactionsPendingQueue {
         let foundMissingNonce = this.transactionsProtocol.transactionsDownloadingManager.findMissingNonce(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
         if(foundMissingNonce)
-            this.transactionsProtocol.transactionsDownloadingManager.removeMissingNonceList(transaction.from.addresses[0].unencodedAddress.toString('hex')+transaction.nonce);
+            this.transactionsProtocol.transactionsDownloadingManager.removeMissingNonceList(transaction.from.addresses[0].unencodedAddress,transaction.nonce);
 
         if (index === undefined)
             this.listArray.push(transaction);
@@ -84,81 +84,89 @@ class TransactionsPendingQueue {
 
     async _insertPendingTransaction(transaction,exceptSockets){
 
-        if ( ! await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
-            throw {message: "Transsaction validation failed"}
+        try {
 
-        //This is just for pool
-        //TODO remove on light consensus
-        if (this.blockchain.agent.light)
-            if( transaction.timeLock < this.blockchain.blocks.length-1 )
-                throw {message: "transaction is too old"};
+            if (!await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+                throw {message: "Transsaction validation failed"}
 
-        let inserted = false;
+            //This is just for pool
+            //TODO remove on light consensus
+            if (this.blockchain.agent.light)
+                if (transaction.timeLock < this.blockchain.blocks.length - 1)
+                    throw {message: "transaction is too old"};
 
-        for (let i=0; i<this.listArray.length ; i++ ) {
+            let inserted = false;
 
-            let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
+            for (let i = 0; i < this.listArray.length; i++) {
 
-            if (compare < 0) // next
-                continue;
-            else if (compare === 0){ //order by nonce
+                let compare = transaction.from.addresses[0].unencodedAddress.compare(this.listArray[i].from.addresses[0].unencodedAddress);
 
-                if (transaction.nonce === this.listArray[i].nonce){
+                if (compare < 0) // next
+                    continue;
+                else if (compare === 0) { //order by nonce
 
-                    inserted = true;
-                    break;
+                    if (transaction.nonce === this.listArray[i].nonce) {
 
-                }else if (transaction.nonce < this.listArray[i].nonce){ // will add a smaller nonce
+                        inserted = true;
+                        break;
 
-                    this._addNewTransaction(i,transaction);
+                    } else if (transaction.nonce < this.listArray[i].nonce) { // will add a smaller nonce
+
+                        this._addNewTransaction(i, transaction);
+                        inserted = true;
+                        i++;
+
+                    }
+
+                } else if (compare > 0) { // i will add a higher nonce
+
+                    this._addNewTransaction(i, transaction);
                     inserted = true;
                     i++;
 
+                    this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+
                 }
 
-            } else if (compare > 0) { // i will add a higher nonce
+                if (inserted) {
+                    if (this.listArray[i].from.addresses[0].unencodedAddress.compare(this.listArray[i - 1].from.addresses[0].unencodedAddress) === 0)
+                        if (this.listArray[i].nonce - this.listArray[i - 1].nonce === 1) {
 
-                this._addNewTransaction(i,transaction);
-                inserted = true;
-                i++;
+                            this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
 
+                            //Propagate all tx after solving nonce gap
+                            for (let j = this.listArray[i].nonce; j < this.listArray.length - 1; j++)
+                                if (this.listArray[j + 1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0) {
+                                    if (this.listArray[j + 1].nonce - this.listArray[j].nonce === 1)
+                                        this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+                                    else
+                                        this.analyseMissingNonce(j);
+                                } else
+                                    break;
+
+                        } else
+                            this.analyseMissingNonce(i - 1 >= 0 ? i - 1 : i);
+
+                    break;
+                }
+
+            }
+
+            if (!inserted) {
+                this._addNewTransaction(undefined, transaction);
                 this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
-
             }
 
-            if(inserted){
-                if (this.listArray[i].from.addresses[0].unencodedAddress.compare(this.listArray[i-1].from.addresses[0].unencodedAddress) === 0)
-                    if (this.listArray[i].nonce - this.listArray[i - 1].nonce === 1){
+            transaction.confirmed = false;
+            transaction.pendingDateBlockHeight = this.blockchain.blocks.length - 1;
 
-                        this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
+            await this.transactions.emitTransactionChangeEvent(transaction, true);
 
-                        //Propagate all tx after solving nonce gap
-                        for (let j = this.listArray[i].nonce; j < this.listArray.length - 1; j++)
-                            if (this.listArray[j + 1].from.addresses[0].unencodedAddress.compare(this.listArray[j].from.addresses[0].unencodedAddress) === 0) {
-                                if (this.listArray[j + 1].nonce - this.listArray[j].nonce === 1)
-                                    this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
-                                else
-                                    this.analyseMissingNonce(j);
-                            } else
-                                break;
+        }catch (e) {
 
-                    }else
-                        this.analyseMissingNonce(i - 1 >= 0 ? i - 1 : i);
-
-                break;
-            }
+            console.error("insertPendingTransaction - ",e)
 
         }
-
-        if ( !inserted ){
-            this._addNewTransaction(undefined,transaction);
-            this.propagateTransaction(this.listObject[transaction.txId.toString("hex")], exceptSockets);
-        }
-
-        transaction.confirmed = false;
-        transaction.pendingDateBlockHeight = this.blockchain.blocks.length-1;
-
-        await this.transactions.emitTransactionChangeEvent( transaction, true );
 
     }
 

@@ -129,6 +129,8 @@ class NodeProtocol {
 
         if (Blockchain.blockchain.blocks.last === undefined) return;
 
+        console.log("Propagate ", Blockchain.blockchain.blocks._length)
+
         this.node.sendRequest("head/new-block", {
             l: Blockchain.blockchain.blocks.length,
             h: Blockchain.blockchain.blocks.last.hashChain,
