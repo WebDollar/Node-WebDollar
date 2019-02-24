@@ -12,7 +12,7 @@ class BlockDifficultyManager extends MemoryManager{
             return (await this.savingManager._pendingBlocks[height]).difficultyTarget;
 
         if (this.loadingManager.blockManager._loaded[height])
-            return (await this.loadingManager.blockManager._loaded[height]).data.difficultyTarget;
+            return (await (await this.loadingManager.blockManager._loaded[height]).data).difficultyTarget;
 
         return MemoryManager.prototype.getData.call(this, height);
 

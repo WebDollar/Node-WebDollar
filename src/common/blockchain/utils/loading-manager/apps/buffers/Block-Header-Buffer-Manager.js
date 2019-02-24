@@ -12,7 +12,7 @@ class BlockHeaderBufferManager extends MemoryManager{
             return (await this.savingManager._pendingBlocks[height]).block.serializeBlock( true );
 
         if (this.loadingManager.blockManager._loaded[height])
-            return (await this.loadingManager.blockManager._loaded[height]).serializeBlock( true );
+            return (await (await this.loadingManager.blockManager._loaded[height]).data).serializeBlock( true );
 
         return MemoryManager.prototype.getData.call(this, height);
 
