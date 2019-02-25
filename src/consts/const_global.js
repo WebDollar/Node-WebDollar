@@ -461,7 +461,7 @@ consts.TERMINAL_WORKERS = {
 };
 
 consts.JSON_RPC = {
-    version: '1.0.0',
+    version: '1.0.1',
     serverConfig: {
         host: process.env.JSON_RPC_SERVER_HOST || '127.0.0.1',
         port: process.env.JSON_RPC_SERVER_PORT,
