@@ -8,11 +8,17 @@ class BlockHeaderBufferManager extends MemoryManager{
 
     async getData(height) {
 
-        if (this.savingManager._pendingBlocks[height])
-            return (await this.savingManager._pendingBlocks[height]).block.serializeBlock( true );
+        if (this.savingManager._pendingBlocks[height]) {
+            let data = await this.savingManager._pendingBlocks[height];
+            if (data)
+                return data.serializeBlock(true);
+        }
 
-        if (this.loadingManager.blockManager._loaded[height])
-            return (await (await this.loadingManager.blockManager._loaded[height]).data).serializeBlock( true );
+        if (this.loadingManager.blockManager._loaded[height]) {
+            let data = await this.loadingManager.blockManager._loaded[height].data;
+            if (data)
+                return data.serializeBlock(true);
+        }
 
         return MemoryManager.prototype.getData.call(this, height);
 

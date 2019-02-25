@@ -8,11 +8,17 @@ class BlockHashManager extends MemoryManager{
 
     async getData(height) {
 
-        if (this.savingManager._pendingBlocks[height])
-            return (await this.savingManager._pendingBlocks[height]).timeStamp;
+        if (this.savingManager._pendingBlocks[height]) {
+            let data = await this.savingManager._pendingBlocks[height];
+            if (data)
+                return data.timeStamp;
+        }
 
-        if (this.loadingManager.blockManager._loaded[height])
-            return (await (await this.loadingManager.blockManager._loaded[height]).data).timeStamp;
+        if (this.loadingManager.blockManager._loaded[height]) {
+            let data = await this.loadingManager.blockManager._loaded[height].data;
+            if (data)
+                return data.timeStamp;
+        }
 
         return MemoryManager.prototype.getData.call(this, height);
     }

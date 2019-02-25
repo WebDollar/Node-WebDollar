@@ -20,11 +20,17 @@ class ChainWorkManager extends MemoryManager{
         if (height < 0)
             return BigInteger(0);
 
-        if (this.savingManager._pendingBlocks[height])
-            return (await this.savingManager._pendingBlocks[height]).getChainWork( );
+        if (this.savingManager._pendingBlocks[height]) {
+            let data = await this.savingManager._pendingBlocks[height];
+            if (data)
+                return data.getChainWork();
+        }
 
-        if (this.loadingManager.blockManager._loaded[height])
-            return (await (await this.loadingManager.blockManager._loaded[height]).data).getChainWork( );
+        if (this.loadingManager.blockManager._loaded[height]) {
+            let data = await this.loadingManager.blockManager._loaded[height].data;
+            if (data)
+                return data.getChainWork();
+        }
 
         return MemoryManager.prototype.getData.call(this, height);
 
