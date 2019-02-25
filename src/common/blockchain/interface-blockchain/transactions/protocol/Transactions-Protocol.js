@@ -36,7 +36,7 @@ class InterfaceBlockchainTransactionsProtocol {
 
     _newSocketCreateProtocol(nodesListObject) {
 
-        if (this.blockchain.loaded)
+        if (Blockchain.loaded)
             this._initializeSocket(nodesListObject.socket)
 
     }
@@ -61,20 +61,17 @@ class InterfaceBlockchainTransactionsProtocol {
 
             let transaction;
 
+            if (!response || typeof response !== "object") throw {message: "missing-nonce invalid response"}
             if ( !Buffer.isBuffer(response.buffer)) throw {message: "missing-nonce - address buffer is invalid", response};
-            if ( !typeof "number" ) throw {message: "missing-nonce - nonce is not a number", response};
+            if ( typeof response.nonce !== "number" ) throw {message: "missing-nonce - nonce is not a number", response};
 
             if (response.nonce > this.blockchain.accountantTree.getAccountNonce(response.buffer)){
 
-                if( typeof response === "object"){
+                transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
 
-                    transaction = this.blockchain.transactions.pendingQueue.findPendingTransactionByAddressAndNonce(response.buffer,response.nonce);
-
-                    if(transaction){
-                        console.warn("Sending missing nonce", transaction);
-                        socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
-                    }
-
+                if(transaction){
+                    console.warn("Sending missing nonce", transaction);
+                    socket.node.sendRequest('transactions/missing-nonce/answer', { result: transaction ? true : false, transaction: transaction } );
                 }
 
             }
@@ -156,12 +153,10 @@ class InterfaceBlockchainTransactionsProtocol {
 
             try{
 
-                console.log("broadcast tx 1");
                 if (!response ) return false;
 
                 if (response.format !== "json")  response.format = "buffer";
 
-                console.log("broadcast tx 2");
                 if (!response.ids || !Array.isArray ( response.ids) ) return false;
 
                 let list = [];
@@ -189,8 +184,6 @@ class InterfaceBlockchainTransactionsProtocol {
 
                 await this.blockchain.sleep(200);
 
-                console.log("broadcast tx 4");
-                console.log(list);
                 socket.node.sendRequest('transactions/get-pending-transactions-by-ids/answer', { result: true, format: response.format, transactions: list } );
 
             } catch (exception){
@@ -275,6 +268,8 @@ class InterfaceBlockchainTransactionsProtocol {
     }
 
     propagateNewMissingNonce(addressBuffer,nonce, exceptSockets){
+
+        if (exceptSockets === "all") return;
 
         if (!Array.isArray(exceptSockets) ) exceptSockets = [exceptSockets];
 
