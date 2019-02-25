@@ -28,10 +28,10 @@ class InterfaceBlockchainProtocol {
     setBlockchain(blockchain){
         this.blockchain = blockchain;
 
-        if (this.forkSolver !== undefined)
+        if (this.forkSolver)
             this.forkSolver.blockchain = blockchain;
 
-        if (this.tipsManager !== undefined)
+        if (this.tipsManager)
             this.tipsManager.blockchain = blockchain;
     }
 
@@ -74,9 +74,9 @@ class InterfaceBlockchainProtocol {
 
         if (typeof data.height !== 'number') throw {message: 'height is not specified'};
         if (typeof data.header !== 'object') throw {message: 'header is not specified'};
-        if (data.header === undefined ) throw {message:'header.header is not specified'};
-        if (data.header.hashPrev === undefined ) throw {message:'header.hashPrev is not specified'};
-        if (data.header.hash === undefined) throw {message: 'header.hash is not specified'};
+        if ( !data.header ) throw {message:'header.header is not specified'};
+        if ( !data.header.hashPrev ) throw {message:'header.hashPrev is not specified'};
+        if ( !data.header.hash ) throw {message: 'header.hash is not specified'};
 
         if (typeof data.header.hashPrev === 'string')
             data.header.hashPrev = Serialization.fromBase(data.header.hashPrev);
