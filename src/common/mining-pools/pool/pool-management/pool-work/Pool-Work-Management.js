@@ -278,7 +278,7 @@ class PoolWorkManagement{
                 else {
 
 
-                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(3,64)+"FFF";
+                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(1,64)+"FFFFF";
                     target = Buffer.from( target, "hex" );
 
                     if ( work.hash.compare( target ) <= 0){
