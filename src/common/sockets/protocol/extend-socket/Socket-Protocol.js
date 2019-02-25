@@ -41,7 +41,7 @@ class SocketProtocol {
 
     sendRequestWaitOnce (request, requestData, answerSuffix, timeOutInterval=3000) {
 
-        if ( answerSuffix ) answerSuffix = String(answerSuffix); //in case it is a number
+        if ( answerSuffix !== undefined) answerSuffix = String(answerSuffix); //in case it is a number
 
         return new Promise((resolve) => {
 
@@ -57,8 +57,8 @@ class SocketProtocol {
 
                 if (global.TERMINATED) return;
 
-                if (timeoutId ) clearTimeout(timeoutId);
-                else return false;
+                if (timeoutId !== undefined) clearTimeout(timeoutId);
+                if (timeoutId === undefined ) return false;
 
                 SocketProtocol._processBufferArray(resData);
 
@@ -67,10 +67,10 @@ class SocketProtocol {
 
             let clearReturnFunction = ()=>{
 
-                if (this.removeListener ) //websocket io
+                if (this.removeListener !== undefined) //websocket io
                     this.removeListener(requestAnswer, requestFunction);
                 else
-                if (this.emitter && this.emitter.removeListener !== undefined) //websocket io
+                if (this.emitter !== undefined && this.emitter.removeListener !== undefined) //websocket io
                     this.emitter.removeListener(requestAnswer, requestFunction);
 
                 resolve(null);
