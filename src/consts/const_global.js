@@ -513,7 +513,7 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
 
 if ( consts.DEBUG === true ) {
 
-    consts.MINING_POOL.SKIP_POW_REWARDS = true;
+    consts.MINING_POOL.SKIP_POW_REWARDS = false;
     consts.MINING_POOL.SKIP_POS_REWARDS = false;
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
