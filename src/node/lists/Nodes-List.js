@@ -37,7 +37,7 @@ class NodesList {
             2:0,
         };
 
-        setInterval( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
+        setTimeout( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
 
         this.removeDisconnectedSockets();
     }
@@ -288,12 +288,20 @@ class NodesList {
 
     }
 
-    recalculateSocketsLatency(){
+    async recalculateSocketsLatency(){
 
-        for (let i=0; i<this.nodes.length; i++)
-            this.nodes[i].socket.node.protocol.calculateLatency();
+        try{
 
+            for (let i=0; i<this.nodes.length; i++)
+                await this.nodes[i].socket.node.protocol.calculateLatency();
+
+        }catch(exception){
+
+        }
+
+        setTimeout( this.recalculateSocketsLatency.bind(this), consts.SETTINGS.PARAMS.LATENCY_CHECK );
     }
+
 
 }
 
