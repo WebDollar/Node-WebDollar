@@ -216,9 +216,8 @@ class PoolWorkManagement{
                         block = await this.blockchain.blockCreator.createEmptyBlock(prevBlock.height, undefined );
                         block.deserializeBlock( serialization, prevBlock.height, prevBlock.reward, await this.blockchain.getDifficultyTarget( prevBlock.height - 1 ) );
 
-                        let blockInformation = blockInformationMinerInstance.blockInformation;
 
-                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+                        if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( () => {
 
                                 //returning false, because a new fork was changed in the mean while
                                 if (this.blockchain.blocks.length !== block.height)
@@ -227,7 +226,7 @@ class PoolWorkManagement{
                                 //calculate blockHashChain
                                 block.hashChain = block.calculateChainHash();
 
-                                return await this.blockchain.includeBlockchainBlock(block, false, ["all"], true, revertActions);
+                                return this.blockchain.includeBlockchainBlock(block, false, "all", true, revertActions);
 
                             }) === false) throw {message: "Mining2 returned false"};
 
@@ -236,6 +235,7 @@ class PoolWorkManagement{
                         //confirming transactions
                         await block.data.transactions.confirmTransactions(block.height);
 
+                        let blockInformation = blockInformationMinerInstance.blockInformation;
 
                         try {
                             blockInformation.block = block;
@@ -279,7 +279,7 @@ class PoolWorkManagement{
                 else {
 
 
-                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(3,64)+"FFF";
+                    let target = prevBlock.difficultyTargetPrev.toString("hex").substr(2 )+"FF";
                     target = Buffer.from( target, "hex" );
 
                     if ( work.hash.compare( target ) <= 0){
@@ -335,9 +335,7 @@ class PoolWorkManagement{
     }
 
 
-    async _getMinerBalance(address, prevBlock){
-
-        prevBlock = prevBlock || this.poolWork.lastBlock;
+    async _getMinerBalance(address, prevBlock = this.poolWork.lastBlock){
 
         let balance = this.blockchain.accountantTree.getBalance( address );
         if ( !balance ) balance = 0;
@@ -351,12 +349,19 @@ class PoolWorkManagement{
 
             //s += block.height + " ";
 
-            block.data.transactions.transactions.forEach( (tx) => {
-                tx.to.addresses.forEach((to)=>{
-                    if ( to.unencodedAddress.equals( address))
+            for (let tx of block.data.transactions.transactions ) {
+
+                for (let from of tx.from.addresses)
+                    if ( from.unencodedAddress.equals( address ) )
+                        balance += from.amount;
+
+                for (let to of tx.to.addresses)
+                    if (to.unencodedAddress.equals(address))
                         balance -= to.amount;
-                });
-            });
+
+            }
+
+
         }
 
         //console.log("2 After Balance ", balance, s);

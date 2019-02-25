@@ -19,7 +19,7 @@ class BlockManager extends MemoryManager{
             block.difficultyTargetPrev = await this.blockchain.getDifficultyTarget(height-1);
             block.difficultyTarget = await this.loadingManager.getBlockDifficulty(height);
             block.hash = await this.blockchain.getHash(height);
-            block.chainHash = await this.blockchain.getChainHash(height);
+            block.hashChain = await this.blockchain.getChainHash(height);
 
             if (await block.loadBlock() === false)
                 throw {message: "no block to load was found"};

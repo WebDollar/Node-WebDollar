@@ -179,7 +179,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 try {
 
-                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+                    if (await this.blockchain.semaphoreProcessing.processSempahoreCallback(  () => {
 
                             //returning false, because a new fork was changed in the mean while
                             if (this.blockchain.blocks.length !== block.height)
@@ -191,7 +191,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                             //calculate blockHashChain
                             block.hashChain = block.calculateChainHash();
 
-                            return await this.blockchain.includeBlockchainBlock( block, false, ["all"], true, revertActions, false );
+                            return this.blockchain.includeBlockchainBlock( block, false, "all", true, revertActions, false );
 
                         }) === false) throw {message: "Mining2 returned false"};
 
