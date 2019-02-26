@@ -38,10 +38,27 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             Log.info("============================================================================" , Log.LOG_TYPE.SAVING_MANAGER);
 
             //
+            //
             //to continue slow loading uncomment the following command
             //this will enable to index the entire blockchain
             //
             //await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
+
+            let chainHash = await this.db.get("blockChainHash"+0);
+
+            if ( !chainHash ){
+                console.error("============================================================================" );
+                console.error("For Virtualized branch, you need to download a new blockchainDB3 because it is no longer compatible with your version" );
+                console.error("============================================================================" );
+                process.exit();
+            }
+
+            if ( await this.transactions.checkVirtualizedTxId("6a81930823e659286cfffe592172c0f054d0e2a4760d0d51770ffab440d00bfa") === null ){
+                console.error("============================================================================" );
+                console.error("For Transactions branch, you need to download a new blockchainDB3 because it is no longer compatible with your version" );
+                console.error("============================================================================" );
+                process.exit();
+            }
 
         } catch (exception){
 
