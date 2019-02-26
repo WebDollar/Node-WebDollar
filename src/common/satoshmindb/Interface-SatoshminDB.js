@@ -113,7 +113,7 @@ class InterfaceSatoshminDB {
             let doc = await this.db.get(key, {attachments: true});
             if (!doc) return false;
 
-            let response = await this.db.remove(doc._id, doc._rev);
+            let response = await this.db.remove( doc );
             return response && response.ok;
 
         } catch (err) {
@@ -124,7 +124,7 @@ class InterfaceSatoshminDB {
             if (err.status === 500)
                 StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
-            console.error("_deleteDocument raised an error ", key);
+            console.error("_deleteDocument raised an error ", key, err);
             return false;
 
         }

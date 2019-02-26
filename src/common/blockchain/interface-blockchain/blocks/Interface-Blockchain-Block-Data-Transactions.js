@@ -44,10 +44,13 @@ class InterfaceBlockchainBlockDataTransactions {
 
     }
 
-    async confirmTransactions(blockHeight) {
+    async confirmTransactions(blockHeight, save = false) {
 
         await this.transactions.forEach(async transaction => {
-            await this.saveVirtualizedTxId(transaction.txId.toString('hex'), blockHeight);
+
+            if (save)
+                await this.saveVirtualizedTxId(transaction.txId.toString('hex'), blockHeight);
+
             transaction.confirmed = true;
         });
 
@@ -60,8 +63,10 @@ class InterfaceBlockchainBlockDataTransactions {
             transaction.confirmed = false;
 
             try {
+
                 await this.deleteVirtualizedTxId(transaction.txId.toString('hex'));
                 await this.blockData.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, 'all');
+
             }
             catch (exception) {
                 Log.warn('Transaction Was Rejected to be Added to the Pending Queue ', Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON());

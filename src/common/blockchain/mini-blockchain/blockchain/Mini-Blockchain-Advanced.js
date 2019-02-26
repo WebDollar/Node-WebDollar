@@ -61,14 +61,14 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
-    async saveMiniBlockchain(setSemaphore = true){
+    async saveMiniBlockchain(setGlobalVariable = true){
 
-        if (setSemaphore)
+        if (setGlobalVariable)
             global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
 
         try {
 
-            if (await this.semaphoreProcessing.processSempahoreCallback(async () => {
+            let save = async () => {
 
                 let length = this.blocks.length;
                 let serialization = this.accountantTree.serializeMiniAccountant(true, );
@@ -94,8 +94,9 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
                 return true;
 
-            }) === false) throw {message: "Saving was not done"};
+            };
 
+            if (await this.semaphoreProcessing.processSempahoreCallback(save) === false) throw {message: "Saving was not done"};
 
             Log.info('Accountant Tree Saved Successfully ' + this.blocks.length, Log.LOG_TYPE.SAVING_MANAGER);
 
@@ -105,7 +106,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         }
 
-        if (setSemaphore)
+        if (setGlobalVariable)
             global.MINIBLOCKCHAIN_ADVANCED_SAVED = true;
 
     }

@@ -23,7 +23,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
 
     async checkVirtualizedTxId(txId) {
 
-        if( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
+        if ( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
 
         try {
 
@@ -31,7 +31,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
 
         }
         catch (err) {
-            return 'ERROR on saving TxId: ' + txId + ':' + err;
+            console.error( 'ERROR on saving TxId: ' + txId , err);
         }
 
     }
