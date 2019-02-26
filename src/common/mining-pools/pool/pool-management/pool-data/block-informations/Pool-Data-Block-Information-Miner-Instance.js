@@ -173,6 +173,8 @@ class PoolDataBlockInformationMinerInstance {
 
             if(ratio>1) ratio = 1;
 
+            ratio/=100;
+
         }
 
         let rewardPOW = BigNumber(0);
