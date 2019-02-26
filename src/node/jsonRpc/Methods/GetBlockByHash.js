@@ -1,11 +1,10 @@
 import {RpcMethod} from './../../../jsonRpc';
-import {defaults} from 'lodash';
+import {defaults}  from 'lodash';
 
 /**
  * The information about a block by hash.
  */
-class GetBlockByHash extends RpcMethod
-{
+class GetBlockByHash extends RpcMethod {
     /**
      * @param {string} name
      * @param {BlockRepository} oBlockRepository
@@ -18,8 +17,7 @@ class GetBlockByHash extends RpcMethod
     }
 
     async getHandler(args) {
-        if (args.length < 1)
-        {
+        if (args.length < 1) {
             throw new Error('Params must contain at least one entry, the block hash');
         }
 
@@ -30,12 +28,11 @@ class GetBlockByHash extends RpcMethod
 
         const oBlock = await this._oBlockRepository.findByHash(args[0]);
 
-        if (oBlock === null)
-        {
+        if (oBlock === null) {
             return null;
         }
 
-        return this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true}));
+        return await this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true}));
     }
 }
 
