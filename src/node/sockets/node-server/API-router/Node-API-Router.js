@@ -49,9 +49,9 @@ class NodeAPIRouter{
         // Return block information
         this._addRoute( 'blocks/at/:block', NodeAPIPublicBlocks.block, nodeApiType, 20, app, prefix, middleWare );
 
-        // this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 , app, prefix, middleWare ) ;
-        //
-        // this._addRoute('address/nonce/:address', NodeAPIPublicAddresses.addressNonce, nodeApiType,  200 , app, prefix, middleWare ) ;
+        this._addRoute('address/balance/:address', NodeAPIPublicAddresses.addressBalance, nodeApiType,  200 , app, prefix, middleWare ) ;
+
+        this._addRoute('address/nonce/:address', NodeAPIPublicAddresses.addressNonce, nodeApiType,  200 , app, prefix, middleWare ) ;
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
