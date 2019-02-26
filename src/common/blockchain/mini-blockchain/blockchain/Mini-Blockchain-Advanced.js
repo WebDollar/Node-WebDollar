@@ -78,7 +78,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
-    async saveMiniBlockchain(setGlobalVariable = true){
+    async saveMiniBlockchain(setGlobalVariable = true, useSemaphore = true){
 
         if (setGlobalVariable)
             global.MINIBLOCKCHAIN_ADVANCED_SAVED = false;
@@ -113,7 +113,10 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             };
 
-            if (await this.semaphoreProcessing.processSempahoreCallback(save) === false) throw {message: "Saving was not done"};
+            if (useSemaphore) {
+                if ( !( await this.semaphoreProcessing.processSempahoreCallback(save) )) throw {message: "Saving was not done"};
+            } else
+                if ( !( await save() ) ) throw {message: "Saving was not done"};
 
             Log.info('Accountant Tree Saved Successfully ' + this.blocks.length, Log.LOG_TYPE.SAVING_MANAGER);
 
