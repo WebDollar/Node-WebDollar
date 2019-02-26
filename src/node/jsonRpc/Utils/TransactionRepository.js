@@ -1,10 +1,10 @@
 import {isInteger, isEmpty, isString} from 'lodash';
+import BlockDataHardForksProcessor    from './BlockDataHardForksProcessor';
 
 /**
  * Repository for Transactions
  */
-class TransactionRepository
-{
+class TransactionRepository {
     /**
      * @param {BlockRepository}          oBlockRepository
      * @param {TransactionsPendingQueue} oPendingQueueTransactionsManager
@@ -103,8 +103,7 @@ class TransactionRepository
         }
 
         oBlock.data.transactions.transactions.forEach((oBlockTransaction, nTransactionIndex) => {
-            if (oBlockTransaction.txId.toString('hex') === sTransactionHash)
-            {
+            if (oBlockTransaction.txId.toString('hex') === sTransactionHash) {
                 // Add some virtual properties to prevent another searches/loadings
                 oTransaction          = oBlockTransaction;
                 oTransaction.__nIndex = nTransactionIndex;
@@ -118,6 +117,12 @@ class TransactionRepository
     async findBlockNumberForHash(sTransactionHash) {
         if (isString(sTransactionHash) === false || isEmpty(sTransactionHash)) {
             return null;
+        }
+
+        let nBlockNumber = BlockDataHardForksProcessor.findBlockNumberForTransactionHash(sTransactionHash);
+
+        if (nBlockNumber !== null) {
+            return nBlockNumber;
         }
 
         const self = this;
