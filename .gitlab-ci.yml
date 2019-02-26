@@ -1,0 +1,23 @@
+build:
+    stage: build
+    image: docker:stable
+    services:
+        - docker:dind
+    script:
+        - docker info
+        - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+        - docker pull $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:latest || true
+        - docker build --cache-from $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:latest --file Dockerfile -t $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:latest --pull .
+        - docker push $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG:latest
+
+test:
+    stage: test
+    image: gliderlabs/herokuish:latest
+    script:
+        - cp -R . /tmp/app
+        - /bin/herokuish buildpack test
+    only:
+        - branches
+    except:
+        variables:
+            - $TEST_DISABLED
