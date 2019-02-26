@@ -85,7 +85,9 @@ class NodeAPIRouter{
         this._addRoute( 'pools/pool-data', NodeAPIPublicPools.poolData, nodeApiType, 5, app, prefix, middleWare );
 
         this._addRoute( 'transactions/pending', NodeAPIPublicTransactions.pending, nodeApiType, 200 , app, prefix, middleWare );
-        
+
+        this._addRoute( 'transactions/exists/:tx_id', NodeAPIPublicTransactions.checkTransactionExists, nodeApiType, 200 , app, prefix, middleWare );
+
         // respond with "hello"
         this._addRoute( 'hello', NodeAPIPublic.helloWorld, nodeApiType, 1000, app, prefix, middleWare );
 
