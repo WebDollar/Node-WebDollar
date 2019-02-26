@@ -27,6 +27,7 @@ class NodeServerSocketAPI{
 
             socket.node.sendRequest("api/start/answer", {result: true} );
 
+
         });
 
         socket.node.once("api/start-subscribers", ( data )=>{
@@ -34,6 +35,7 @@ class NodeServerSocketAPI{
             NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback.bind(socket), "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
 
             socket.node.sendRequest("api/start-subscribers/answer",{result: true});
+
 
         });
 

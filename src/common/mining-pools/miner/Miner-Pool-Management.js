@@ -168,7 +168,7 @@ class MinerPoolManagement {
 
                     await this.minerPoolReferrals.stopLoadMinerPoolReferrals();
 
-                    this.blockchain.blocks.length = 0;
+                    this.blockchain.blocks.clearBlocks();
                     this.blockchain.agent.consensus = true;
                     this.minerPoolReward.totalReward = 0;
                     this.minerPoolReward.confirmedReward = 0;

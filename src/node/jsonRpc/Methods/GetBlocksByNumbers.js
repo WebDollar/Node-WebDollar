@@ -12,7 +12,7 @@ class GetBlocksByNumbers extends RpcMethod
         this._oBlockTransformer = oBlockTransformer;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         const oTransformOptions = {
             includeTransactions: args[1] || undefined,
             processHardForks   : args[2] || undefined
@@ -23,7 +23,7 @@ class GetBlocksByNumbers extends RpcMethod
             throw new Error('First parameter must be an Array containing the corresponding block numbers');
         }
 
-        const aBlocks          = this._oBlockRepository.findByNumbers(args[0]);
+        const aBlocks          = await this._oBlockRepository.findByNumbers(args[0]);
         let aTransformedBlocks = [];
 
         for (const oBlock of aBlocks)

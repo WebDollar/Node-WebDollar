@@ -5,7 +5,7 @@
 
 // TUTORIAL BASED ON https://www.scaledrone.com/blog/posts/webrtc-chat-tutorial
 
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 import SocketExtend from 'common/sockets/protocol/extend-socket/Socket-Extend'
 import NodesList from 'node/lists/Nodes-List'
 import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/client/Node-Signaling-Client-Protocol';
@@ -62,8 +62,7 @@ class NodeWebPeerRTC {
 
         this.peer = null;
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(20);
+        this.emitter = new AdvancedEmitter(20);
 
         this._messages = [];
 
@@ -127,8 +126,6 @@ class NodeWebPeerRTC {
             console.log('WEBRTC PEER CONNECTED', this.peer);
 
             let remoteData = this.processDescription(this.peer.remoteDescription);
-
-
             this.peer.remoteAddress = remoteAddress||remoteData.address;
             this.peer.remoteUUID = remoteUUID||remoteData.uuid;
             this.peer.remotePort = remotePort||remoteData.port;
@@ -136,17 +133,16 @@ class NodeWebPeerRTC {
 
             SocketExtend.extendSocket(this.peer, this.peer.remoteAddress,  this.peer.remotePort, this.peer.remoteUUID, socketSignaling.node.level + 1 );
 
-            this.peer.node.protocol.sendHello({"uuid":true}).then( (answer)=>{
-
-                if (answer)
-                    this.initializePeer({"uuid": true} );
-                else
-                    this.peer.disconnect()
-
-            });
-
         });
 
+        this.peer.once("HelloNode", async (data) => {
+
+            if (data) {
+                await this.socket.node.protocol.processHello(data, {"ip":true,"uuid":true});
+                await this.initializePeer({"uuid": true} );
+            } else
+                this.peer.disconnect()
+        });
 
         this.peer.on('data', (data) => {
             console.log('data: ' , data)

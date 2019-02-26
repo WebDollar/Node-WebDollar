@@ -24,7 +24,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
             this.computeAccountantTreeHashBlockData();
 
         //recalculate hashData
-        if (hashData === undefined || hashData === null)
+        if ( !hashData )
             this.computeHashBlockData();
 
     }
@@ -37,19 +37,13 @@ class MiniBlockchainBlockData extends  inheritBlockData {
         if (!result)
             return false;
 
-        if (this.hashAccountantTree === undefined || this.hashAccountantTree === null || !Buffer.isBuffer(this.hashAccountantTree))
+        if ( !this.hashAccountantTree || !Buffer.isBuffer(this.hashAccountantTree))
             throw {message: 'hashAccountantTree is empty'};
 
         if ( !blockValidation.blockValidationType['skip-validation'] && !blockValidation.blockValidationType['skip-accountant-tree-validation'] ) {
 
             //validate hashAccountantTree
             let hashAccountantTree = this.calculateAccountantTreeHashBlockData();
-
-            // console.log("hashAccountantTree", this.hashAccountantTree.toString("hex"), hashAccountantTree.toString("hex") );
-            // console.log("hashAccountantTree", this.blockchain.accountantTree.serializeMiniAccountant().toString("hex") );
-            //
-            // if (this.blockchain.accountantTree.root.edges.length > 0)
-            //     console.log("hashAccountantTree", this.blockchain.accountantTree.root.edges[0].targetNode.balances[0].amount );
 
             if ( ! BufferExtended.safeCompare(hashAccountantTree, this.hashAccountantTree) )
                 throw {message: "block.data hashAccountantTree is not right  ", hashAccountantTree: hashAccountantTree.toString("hex"), myHashAccoutantTree:this.hashAccountantTree.toString("hex") };
@@ -71,7 +65,7 @@ class MiniBlockchainBlockData extends  inheritBlockData {
     }
 
     calculateAccountantTreeHashBlockData(){
-        return this.blockchain.accountantTree.root.hash.sha256;
+        return this.blockchain.accountantTree.root.hash;
     }
 
     computeAccountantTreeHashBlockData(){

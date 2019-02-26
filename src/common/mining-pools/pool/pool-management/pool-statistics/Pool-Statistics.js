@@ -1,15 +1,14 @@
-const EventEmitter = require('events');
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Log from 'common/utils/logging/Log';
 import NodesList from 'node/lists/Nodes-List'
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class PoolStatistics{
 
     constructor(poolManagement, databaseName){
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this.poolManagement = poolManagement;
 
@@ -72,9 +71,7 @@ class PoolStatistics{
         for (let i = 0; i < this._poolHashesLast.length; i++)
             array.push(this._poolHashesLast[i]);
 
-        array.sort(function (a, b) {
-            return a - b;
-        });
+        array.sort((a, b) =>  a - b );
 
         this.poolHashes = array[Math.floor(array.length / 4)];
 
@@ -109,8 +106,8 @@ class PoolStatistics{
     async _load(){
 
         Log.info('Loading pool statistics...', Log.LOG_TYPE.POOLS);
-        let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000, true);
-        let unconfirmed = await this._db.get("serverPool_statistics_unconfirmed", 30*1000, true);
+        let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000,  undefined, true);
+        let unconfirmed = await this._db.get("serverPool_statistics_unconfirmed", 30*1000,  undefined,true);
 
         if (typeof confirmedAndPaid !== "number") confirmedAndPaid = 0;
         if (typeof unconfirmed !== "number") unconfirmed = 0;

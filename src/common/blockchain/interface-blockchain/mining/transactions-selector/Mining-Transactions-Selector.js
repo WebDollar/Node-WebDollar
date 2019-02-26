@@ -12,20 +12,18 @@ class MiningTransactionsSelector{
 
     }
 
-    validateTransactionId(txId){
+    async validateTransactionId(txId){
 
-        if (typeof txId === "string") txId = Buffer.from(txId, "hex");
+        let response = await this.blockchain.transactions.checkVirtualizedTxId(txId);
 
-        //Verify if was included in last blocks
-        for(let i=Math.max(this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint ); i<this.blockchain.blocks.length; i++)
-            if( this.blockchain.blocks[i] && this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( txId ) >= 0 )
-                return false;
-
-        return true;
+        if(response)
+            return false;
+        else
+            return true;
 
     }
 
-    validateTransaction(transaction, miningFeePerByte){
+    async validateTransaction(transaction, miningFeePerByte){
 
         //don't upset the SPAM_GUARDIAN
         for (let j = 0; j < transaction.from.addresses.length; j++) {
@@ -48,7 +46,7 @@ class MiningTransactionsSelector{
 
         }
 
-        if (!this.validateTransactionId(transaction.txId))
+        if (! await this.validateTransactionId(transaction.txId))
             throw {message: "This transaction was already inserted by txId"};
 
         if (transaction.nonce < this.blockchain.accountantTree.getAccountNonce(transaction.from.addresses[0].unencodedAddress))
@@ -75,7 +73,7 @@ class MiningTransactionsSelector{
 
     }
 
-    selectNextTransactions(miningFeePerByte,showLogsOnlyOnce){
+    async selectNextTransactions(miningFeePerByte,showLogsOnlyOnce){
 
         this._transactions = [];
         let missingFirstNonce = false;
@@ -98,7 +96,7 @@ class MiningTransactionsSelector{
                     continue;
                 }
 
-                this.validateTransaction( transaction, miningFeePerByte );
+                await this.validateTransaction( transaction, miningFeePerByte );
 
                 let bRemoveTransaction = false;
 

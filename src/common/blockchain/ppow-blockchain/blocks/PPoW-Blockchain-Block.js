@@ -10,9 +10,9 @@ import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data';
 
 class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
-    constructor (blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db) {
+    constructor (blockchain, blockValidation, version, hash, hashPrev, difficultyTargetPrev, hashChainPrev, timeStamp, nonce, data, height, db) {
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, difficultyTargetPrev, hashChainPrev, timeStamp, nonce, data, height, db);
 
         //first pointer is to Genesis
         this._level = undefined;
@@ -20,19 +20,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         this._provesClculatedInserted = undefined;
     }
 
-    destroyBlock(){
-
-        //in case it was already included
-        if (!this.blockchain ) return;
-
-        if (this._provesClculatedInserted)
-            this.blockchain.prover.provesCalculated.deleteBlock(this);
-
-        InterfaceBlockchainBlock.prototype.destroyBlock.call(this);
-    }
-
-    updateInterlink(){
-        this.interlink = this.calculateInterlink();
+    async updateInterlink(){
+        this.interlink = await this.calculateInterlink();
     }
 
     get level(){
@@ -42,11 +31,9 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         //we use difficultyTargetPrev instead of current difficultyTarget
         let T = this.difficultyTargetPrev;
 
-        if ( this.height === 0 )
-            T = BlockchainGenesis.difficultyTarget;
+        if ( this.height === 0 ) T = BlockchainGenesis.difficultyTarget;
         else
-        if ( this.height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION )
-            T = BlockchainGenesis.difficultyTargetPOS;
+        if ( this.height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION ) T = BlockchainGenesis.difficultyTargetPOS;
 
 
         if (!T) throw {message: "Target is not defined"};
@@ -78,7 +65,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     /**
      * Algorithm 1
      */
-    calculateInterlink(){
+    async calculateInterlink(){
 
         if (this.blockValidation.blockValidationType["skip-interlinks-update"] === true) return this.interlink;
 
@@ -87,7 +74,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         let blockLevel = 0;
         // interlink = interlink'
-        let prevBlock = this.blockValidation.getBlockCallBack( this.height );
+        let prevBlock =  await this.blockValidation.getBlockCallBack( this.height - 1 );
 
         if (prevBlock === BlockchainGenesis) blockLevel = 0;
         else
@@ -141,7 +128,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             }
 
             level--;
-
 
         }
 
@@ -213,7 +199,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
         return offset;
     }
 
-    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation , onlyHeader , usePrevHash){
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation , onlyHeader ){
 
 
         offset = InterfaceBlockchainBlock.prototype.deserializeBlock.apply(this, arguments);
@@ -305,11 +291,11 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
 
-    validateBlockInterlinks(){
+    async validateBlockInterlinks(){
 
         if (!this.blockValidation.blockValidationType["skip-validation-interlinks"]) {
 
-            let interlink = this.calculateInterlink();
+            let interlink = await this.calculateInterlink();
 
             if (interlink.length !== this.interlink.length)
                 throw {message: "interlink has different sizes"};
@@ -324,19 +310,6 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
 
         }
 
-
-        return true;
-
-    }
-
-    async validateBlock(height){
-
-        let answer = await InterfaceBlockchainBlock.prototype.validateBlock.call(this, height);
-
-        if (!answer)
-            return answer;
-
-        this.validateBlockInterlinks();
 
         return true;
 

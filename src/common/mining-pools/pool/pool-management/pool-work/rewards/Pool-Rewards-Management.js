@@ -30,7 +30,7 @@ class PoolRewardsManagement{
 
         this.poolPayouts = new PoolPayouts(poolManagement, poolData, blockchain);
 
-        StatusEvents.on("blockchain/block-inserted",async (data)=>{
+        StatusEvents.on("blockchain/blocks-count-changed",async (data)=>{
 
             if (!this.poolManagement._poolStarted) return;
             if (!Blockchain.loaded) return;
@@ -70,7 +70,7 @@ class PoolRewardsManagement{
             for ( let blockInfo of this.poolData.blocksInfo)
                 if ( blockInfo.block && BlockchainGenesis.isPoSActivated(blockInfo.block.height) ){
 
-                    let block = this.blockchain.blocks[blockInfo.height];
+                    let block = await this.blockchain.getBlock ( blockInfo.height );
 
                     if ( block && blockInfo.height >= this.blockchain.blocks.blocksStartingPoint && this.blockchain.blocks.length >= block.height+5 && this.blockchain.blocks.length-50 <= block.height )
                         for (let blockInformationMinerInstance of blockInfo.blockInformationMinersInstances)
@@ -143,9 +143,8 @@ class PoolRewardsManagement{
 
                 for (let i = this.blockchain.blocks.length - 1, n = Math.max(this.blockchain.blocks.blocksStartingPoint, firstBlock); i >= n; i--) {
 
-                    let block = this.blockchain.blocks[i];
-
-                    if (this.blockchain.mining.unencodedMinerAddress.equals(block.data.minerAddress))
+                    let block = await this.blockchain.getBlock(i);
+                    if (this.blockchain.mining.unencodedMinerAddress.equals( block.data.minerAddress))
                         confirmationsPool++;
                     else {
 
@@ -188,11 +187,14 @@ class PoolRewardsManagement{
                 //at least 2 confirmations
                 if (!blockInfo.payoutTx) found = true;
                 else
-                for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- )
-                    if (this.blockchain.blocks[i].data.transactions.findTransactionInBlockData( blockInfo.payoutTx ) >= 0 ){
+                for (let i=this.blockchain.blocks.length-1 - 2; i >= Math.max( this.blockchain.blocks.length - 100, this.blockchain.blocks.blocksStartingPoint); i-- ) {
+
+                    let block = await this.blockchain.getBlock( i );
+                    if ( block.data.transactions.findTransactionInBlockData(blockInfo.payoutTx) >= 0 ) {
                         found = true;
                         break;
                     }
+                }
 
                 //let's delete old payouts
                 if (found){
@@ -246,9 +248,10 @@ class PoolRewardsManagement{
             //confirm using my own blockchain / light blockchain
             if (this.blockchain.blocks.blocksStartingPoint < block.height){ //i can confirm the block by myself
 
-                if ( !this.blockchain.blocks[block.height] ) continue;
+                let blockckahinBlock = await this.blockchain.getBlock(blockInfo.height);
+                if (  !blockckahinBlock ) continue;
 
-                if ( BufferExtended.safeCompare( block.hash, this.blockchain.blocks[block.height].hash  ) ){
+                if ( BufferExtended.safeCompare( block.hash, blockckahinBlock.hash  ) ){
 
                     found = true;
 
@@ -371,7 +374,7 @@ class PoolRewardsManagement{
 
                 let blockValidation = this._createServerBlockValidation(i, this._serverBlocks.length-1);
 
-                let block = this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
+                let block = await this.blockchain.blockCreator.createEmptyBlock(i, blockValidation);
                 block.data._onlyHeader = true; //only header
                 block.deserializeBlock(answer.block, i, undefined, blockInfo.block.difficultyTargetPrev);
 

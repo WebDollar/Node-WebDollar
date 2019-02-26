@@ -37,6 +37,9 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
+        if (Math.random() < 0.001)
+            console.log("pushWorkForValidation", work);
+
         try{
 
             if (!work.hash) return;
@@ -156,7 +159,7 @@ class PoolWorkValidation{
             let time = new Date().getTime();
 
             for (let key in this._worksDuplicate)
-                if ( time - this._worksDuplicate[key] > 600000 ){
+                if ( time - this._worksDuplicate[key] > 180000 ){
                     delete this._worksDuplicate[key];
                 }
 

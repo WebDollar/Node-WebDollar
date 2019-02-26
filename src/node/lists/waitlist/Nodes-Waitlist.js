@@ -9,8 +9,7 @@ import Blockchain from "main-blockchain/Blockchain";
 import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
 
 import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
-
-const EventEmitter = require('events');
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class NodesWaitlist {
 
@@ -20,8 +19,7 @@ class NodesWaitlist {
 
         this.NodesWaitlistObject = NodesWaitlistObject;
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         this.waitListFullNodes = [];
         this.waitListLightNodes = [];
@@ -162,20 +160,22 @@ class NodesWaitlist {
     }
     async _deleteObsoleteFullNodesWaitlist(){
 
-        for (let i=this.waitListFullNodes.length-1; i>=0; i--)
+        for (let i=this.waitListFullNodes.length-1; i>=0; i--) {
+            if (!this.waitListFullNodes[i])
+                this.waitListFullNodes.splice(i, 1);
+            else
             if (!this.waitListFullNodes[i].isFallback) {
 
                 try {
 
-                    if ( (Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted ) && [ NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf( this.waitListFullNodes[i].nodeConsensusType ) >= 0) continue;
+                    if ((Blockchain.MinerPoolManagement.minerPoolStarted || Blockchain.MinerPoolManagement.poolStarted) && [NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER, NODES_CONSENSUS_TYPE.NODE_CONSENSUS_POOL].indexOf(this.waitListFullNodes[i].nodeConsensusType) >= 0) continue;
 
                     let response = await DownloadManager.downloadFile(this.waitListFullNodes[i].sckAddresses[0].getAddress(true, true), 10000);
 
                     if (response && response.protocol === consts.SETTINGS.NODE.PROTOCOL && response.version >= Blockchain.versionCompatibility) {
                         this.waitListFullNodes[i].failsChecking = 0;
                         continue;
-                    }
-                    else {
+                    } else {
                         this.waitListFullNodes[i].failsChecking++;
 
                         if (this.waitListFullNodes[i].failsChecking >= 5)
@@ -183,12 +183,13 @@ class NodesWaitlist {
 
                     }
 
-                } catch (exception){
+                } catch (exception) {
 
                 }
 
-                await Blockchain.blockchain.sleep( 500 + Math.floor( Math.random()*2000) );
+                await Blockchain.blockchain.sleep(500 + Math.floor(Math.random() * 2000));
             }
+        }
 
         setTimeout( this._deleteObsoleteFullNodesWaitlist.bind(this), ( 4 + Math.floor( Math.random()*5 )) *60*1000 ); // 10 in 10 minutes
 
@@ -249,9 +250,7 @@ class NodesWaitlist {
         for (let i=0; i<list.length; i++)
             list[i].score = list[i].sortingScore();
 
-        list.sort(function(a, b) {
-            return b.score - a.score;
-        });
+        list.sort(  (a, b) =>  b.score - a.score );
 
     }
 
@@ -279,7 +278,7 @@ class NodesWaitlist {
     isAddressFallback(address){
 
         let answer = this._searchNodesWaitlist(address, undefined, NODE_TYPE.NODE_TERMINAL);
-        if ( answer.waitlist !== null) return answer.waitlist.isFallback;
+        if ( answer.waitlist ) return answer.waitlist.isFallback;
 
         return false;
     }

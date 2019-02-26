@@ -36,13 +36,12 @@ class NodeBlockchainPropagation{
     propagateBlock(block, socketsAvoidBroadcast){
 
         //verifiy if I am propagating a better block
-        if (this._blockPropagating !== undefined && this._blockPropagating === block) return;
-
+        if (this._blockPropagating && this._blockPropagating === block) return;
         if ( socketsAvoidBroadcast === "all") return;
 
-        this._socketsAlreadyBroadcast = [];
+        if (socketsAvoidBroadcast) {
 
-        if (socketsAvoidBroadcast && socketsAvoidBroadcast !== "all") {
+            this._socketsAlreadyBroadcast = [];
 
             if (! Array.isArray(socketsAvoidBroadcast) )
                 socketsAvoidBroadcast = [socketsAvoidBroadcast];
@@ -53,10 +52,9 @@ class NodeBlockchainPropagation{
                     socketsAvoidBroadcast.push(NodesList.nodes[i].socket);
 
             this._socketsAlreadyBroadcast = socketsAvoidBroadcast;
+            this._blockPropagating = block;
 
         }
-
-        this._blockPropagating = block;
 
     }
 

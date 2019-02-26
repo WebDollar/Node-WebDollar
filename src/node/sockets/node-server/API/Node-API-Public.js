@@ -14,9 +14,7 @@ class NodeAPIPublic{
 
     info(){
 
-        let lastBlock = Blockchain.blockchain.blocks.last;
-
-        if (lastBlock === undefined){
+        if ( !Blockchain.blockchain.blocks.last ){
             return {
                 message: "lastBlock is undefined",
                 length: Blockchain.blockchain.blocks.length,
@@ -25,7 +23,7 @@ class NodeAPIPublic{
 
         let is_synchronized    = false;
         let currentTimestamp   = new Date().getTime();
-        let oDate              = new Date((lastBlock.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
+        let oDate              = new Date((Blockchain.blockchain.blocks.last.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
         let blockTimestamp     = oDate.getTime();
         let nSecondsBehind     = currentTimestamp - blockTimestamp;
         const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
@@ -43,7 +41,7 @@ class NodeAPIPublic{
 
             blocks: {
                 length: Blockchain.blockchain.blocks.length,
-                lastBlockHash: lastBlock !== undefined ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
+                lastBlockHash: Blockchain.blockchain.blocks.last ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
             },
             networkHashRate: Blockchain.blockchain.blocks.networkHashRate,
             chainWork: Blockchain.blockchain.blocks.chainWork.toString(),

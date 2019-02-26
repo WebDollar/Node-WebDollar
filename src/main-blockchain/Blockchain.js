@@ -161,11 +161,11 @@ class Blockchain{
 
     async startMining(){
         if (process.env.START_MINING || this._startMiningNextTimeSynchronized)
-            this.Mining.startMining();
+            return this.Mining.startMining();
     }
 
     async startMiningInstantly(){
-        this.Mining.startMining();
+        return this.Mining.startMining();
     }
 
 
@@ -175,7 +175,7 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        if (this.synchronized === false) return;
+        if ( this.synchronized === false) return;
 
         this.synchronized = false;
         console.warn("################### RESYNCHRONIZATION STARTED ##########");
@@ -332,7 +332,7 @@ class Blockchain{
 
     get versionCompatibility() {
 
-        if (consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE !== '' && consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT !== 0 && this.blockchain.blocks.length > consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT)
+        if ( consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE )
             return consts.SETTINGS.NODE.VERSION_COMPATIBILITY_UPDATE;
         else
             return consts.SETTINGS.NODE.VERSION_COMPATIBILITY;

@@ -27,8 +27,10 @@ class PPoWBlockchainProver{
 
     async _createProofPi(chain){
 
+        return;
+        
         //B ← C[0]
-        let B = chain.blocks[0];
+        let B = await chain.getBlock(0);
 
         // π
         // π is underlyingChain
@@ -45,69 +47,47 @@ class PPoWBlockchainProver{
 
             //for µ = |C[−k].interlink| down to 0 do
 
-            if (chainLength - consts.POPOW_PARAMS.k >= 0)
-                for (let miu = chain.blocks[chainLength - consts.POPOW_PARAMS.k].interlink.length; miu >= 0; --miu) {
+            let C = await chain.getBlock(chainLength - consts.POPOW_PARAMS.k);
 
-                    // //  α ← C[: −k]{B :}↑µ
-                    // //  α is superChain
+            if (chainLength - consts.POPOW_PARAMS.k >= 0)
+                for (let miu = C.interlink.length; miu >= 0; --miu) {
+
+                    // α ← C[: −k]{B :}↑µ
+                    // α is superChain
                     let superChain = new PPowBlockchainProofPi(this.blockchain, []);
 
+                    // C[: −k]{B :}
+                    for (let level = miu; level < 256; level++){
 
-                    // // C[: −k]{B :}
-                    // for (let level = miu; level < 256; level++){
-                    //
-                    //     //C[: −k] ↑µ
-                    //     let chainBlocks = this.provesCalculated.levels[level];
-                    //
-                    //     // {B :}
-                    //     let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
-                    //
-                    //     for (let i=index; i<chainBlocks.length; i++)
-                    //         if ( chainBlocks[i].height < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i].height >= B.height ){
-                    //
-                    //             superChain.push(chainBlocks[i]);
-                    //
-                    //             // π ← π ∪ α
-                    //             if ( underlyingChain.blocksIndex[ chainBlocks[i].height ] === undefined )
-                    //                 underlyingChain.push(chainBlocks[i]);
-                    //
-                    //         }
-                    //
-                    // }
-                    //
-                    // //TODO keep the superChain.blocks already sorted and insert it using binary search
-                    //
-                    // superChain.blocks.sort(function(a,b){
-                    //     return a.height - b.height;
-                    // });
+                        //C[: −k] ↑µ
+                        let chainBlocks = this.provesCalculated.levels[level];
 
-                    // //slow version
-                    for (let i = 0; i < chainLength - consts.POPOW_PARAMS.k; ++i)
-                        if (chain.blocks[i].height >= B.height &&   //C[: −k]{B :}
-                            chain.blocks[i].level >= miu) {
+                        // {B :}
+                        let index = this.provesCalculated._binarySearch( chainBlocks, B.height );
 
-                            superChain.push(chain.blocks[i]);
+                        for (let i=index; i<chainBlocks.length; i++)
+                            if ( chainBlocks[i] < ( chainLength - consts.POPOW_PARAMS.k) && chainBlocks[i] >= B.height ){
 
-                            // π ← π ∪ α
-                            if ( underlyingChain.blocksIndex[ chain.blocks[i].height ] === undefined )
-                                underlyingChain.push(chain.blocks[i]);
+                                superChain.push(chainBlocks[i]);
 
-                        }
+                                // π ← π ∪ α
+                                if ( !underlyingChain.blocksIndex[ chainBlocks[i] ] )
+                                    underlyingChain.push(chainBlocks[i]);
 
+                            }
 
+                    }
 
+                    //TODO keep the superChain.blocks already sorted and insert it using binary search
 
-
-
-
+                    superChain.blocks.sort( (a,b) => a - b );
 
                     //if goodδ,m(C, α, µ)
                     if (PPoWHelper.good(underlyingChain, superChain, miu) )
-                        B = superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m];
-
+                        B = await this.blockchain.getBlock( superChain.blocks[superChain.blocks.length - consts.POPOW_PARAMS.m] );
 
                     count ++;
-                    if (count % 20 === 0)
+                    if (count % 100 === 0)
                         await this.blockchain.sleep(5);
 
                 }
@@ -121,11 +101,9 @@ class PPoWBlockchainProver{
 
         }
 
-        if (underlyingChain !== null) {
+        if (underlyingChain ) {
 
-            underlyingChain.blocks.sort(function(a, b) {
-                return a.height - b.height;
-            });
+            underlyingChain.blocks.sort( (a, b) => a - b );
 
             await underlyingChain.calculateProofHash();
             await underlyingChain.calculateProofSerialized();
@@ -161,13 +139,13 @@ class PPoWBlockchainProver{
 
     async createProofs() {
 
-        return;
-
         if ( !this.proofActivated )
             return false;
 
         if ( this.proofPi )
-            this.proofPi.destroyProof();
+            this.proofPi = undefined;
+
+        console.info("Creating proof: ", this.blockchain.blocks.length);
 
         this.proofPi = await this._createProofPi(this.blockchain);
 

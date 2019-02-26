@@ -19,56 +19,21 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    destroyProof(){
-
-        if (!this.blockchain.agent.light)
-            this.blocks = [];
-        else
-        for (let i=0; i<this.blocks.length; i++) {
-
-            if (this.blocks[i] === undefined || this.blocks[i] === null) continue;
-
-            let found = false;
-
-            //TODO optimization instead of using for j
-
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi !== undefined)
-                for (let j=0; j<this.blockchain.proofPi.blocks.length; j++)
-                    if (this.blockchain.proofPi.blocks[j] === this.blocks[i] ){
-                        found = true;
-                        break;
-                    }
-
-            if (!found) {
-
-                // avoid destroying real blocks
-                if (this.blocks[i] !== undefined && typeof this.blocks[i].destroyBlock === "function")
-                    this.blocks[i].destroyBlock();
-
-            }
-
-            this.blocks[i] = undefined;
-
-        }
-
-        this.blockchain = undefined;
-
-    }
-
-    getProofHeaders(starting, length){
+    async getProofHeaders(starting, length){
 
         let list = [];
         for (let i=starting; i<Math.min( starting+length, this.blocks.length); i++) {
 
             try {
 
-                list.push(this.blocks[i].getBlockHeader());
+                let block = await this.blockchain.getBlock(i);
+                list.push(block.getBlockHeader());
 
             } catch (exception){
 
                 console.error("Failed to retrieve block " , i, exception );
                 try {
-                    console.error("Failed to retrieve block ", this.blocks[i] !== null ? this.blocks[i].toJSON() : 'block is null');
+                    console.error("Failed to retrieve block ", this.blocks[i] ? this.blocks[i].toJSON() : 'block is null');
                 } catch (exception){
 
                 }
@@ -84,8 +49,10 @@ class PPoWBlockchainProofBasic{
 
         let list = [];
 
-        for (let i=0; i<this.blocks.length; i++)
-            list.push(this.serializeProof(this.blocks[i].getBlockHeader()));
+        for (let i=0; i<this.blocks.length; i++){
+            let block = await this.blockchain.getBlock( this.blocks[i]+1 );
+            list.push( this.serializeProof(block.getBlockHeader()) );
+        }
 
         this.proofSerialized  = Buffer.concat(list);
         return this.proofSerialized;
@@ -122,7 +89,7 @@ class PPoWBlockchainProofBasic{
     hasBlock(height){
 
         for (let i=0; i<this.blocks.length; i++)
-            if (this.blocks[i].height === height)
+            if (this.blocks[i] === height)
                 return this.blocks[i];
 
         return null;
@@ -140,11 +107,11 @@ class PPoWBlockchainProofBasic{
 
     }
 
-    calculateProofHash(){
+    async calculateProofHash(){
 
         let buffers = [];
         for (let i=0; i <this.blocks.length; i++)
-            buffers.push(this.blocks[i].hash);
+            buffers.push( await this.blockchain.getDifficultyTarget( this.blocks[i] ) );
 
         let buffer = Buffer.concat(buffers);
 
@@ -160,15 +127,18 @@ class PPoWBlockchainProofBasic{
 
     validatesLastBlock(){
 
-        if (this.blocks.length <= 0) return false;
-        if (this.blocks.length <= consts.POPOW_PARAMS.m) return false;
+        if (this.blocks.length <= 0 || this.blocks.length <= consts.POPOW_PARAMS.m ) return false;
 
         try {
 
-            if (this.blocks[this.blocks.length - 1].hash.equals( this.blockchain.blocks[this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1  ].hash ))
-                return true;
-            else
-                return false;
+            return true;
+
+            // let hashChain = await this.blockchain.getChainHash( this.blocks[this.blocks.length - 1] );
+            //
+            // if ( hashChain && hashChain.equals( await this.blockchain.getChainHash( this.blockchain.blocks.length - consts.POPOW_PARAMS.m - 1 ) ) )
+            //     return true;
+            // else
+            //     return false;
 
         } catch (exception){
 
@@ -189,11 +159,11 @@ class PPoWBlockchainProofBasic{
 
     push(block){
 
-        if (this.blocksIndex[block.height] === block)
+        if (this.blocksIndex[block] === block)
             return;
 
         this.blocks.push(block);
-        this.blocksIndex[block.height] = block;
+        this.blocksIndex[block] = block;
 
     }
 

@@ -3,8 +3,9 @@ import MiniBlockchainLight from 'common/blockchain/mini-blockchain/blockchain/Mi
 
 let inheritedBlockchain;
 
-if (process.env.BROWSER) inheritedBlockchain = MiniBlockchainLight
-else inheritedBlockchain = MiniBlockchainAdvanced;
+if (process.env.BROWSER) inheritedBlockchain = MiniBlockchainLight;
+else
+    inheritedBlockchain = MiniBlockchainAdvanced;
 
 //inheritedBlockchain = MiniBlockchainLight;
 

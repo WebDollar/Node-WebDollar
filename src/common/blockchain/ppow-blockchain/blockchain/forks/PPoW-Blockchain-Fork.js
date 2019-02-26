@@ -18,31 +18,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     }
 
-    destroyFork(){
-
-        try {
-            if (this.blockchain === undefined) return; //already destroyed
-
-            if (this._forkProofPiClone !== undefined && (this.blockchain.proofPi === undefined || this.blockchain.proofPi !== this._forkProofPiClone))
-                this._forkProofPiClone.destroyProof();
-
-            this._forkProofPiClone = undefined;
-
-            if (this.forkProofPi !== undefined && (this.blockchain.proofPi === undefined || this.blockchain.proofPi !== this.forkProofPi))
-                this.forkProofPi.destroyProof();
-
-            this.forkProofPi = undefined;
-        } catch (exception){
-            console.error("PPoW destroyFork raised an exception ", exception)
-        }
-
-        InterfaceBlockchainFork.prototype.destroyFork.call(this);
-
-    }
-
     async initializeFork(){
-
-        if (this.blockchain === undefined) return false;
 
         if ( this.blockchain.agent.light ) {
             if (! (await this._downloadProof()))
@@ -69,20 +45,20 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
                 proofPiData = await socket.node.sendRequestWaitOnce("get/nipopow-blockchain/headers/get-proofs/pi/hash", {}, "answer", consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-                if (proofPiData === null || proofPiData === undefined)
-                    BansList.addBan(socket, 10000, "proofPiFailed");
+                if (!proofPiData )
+                    BansList.addBan(socket, 30000, "proofPiFailed");
                 else {
                     this.sockets[0] = socket;
                     break;
                 }
             }
 
-            if (proofPiData === null || proofPiData === undefined)
+            if ( !proofPiData)
                 throw { message: "Proof Failed to answer" };
 
             if (typeof proofPiData.length !== "number" || proofPiData.length <= 0) throw {message: "Proof Pi length is invalid"};
 
-            if (this.blockchain.proofPi !== undefined && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
+            if (this.blockchain.proofPi && this.blockchain.proofPi.hash.equals(proofPiData.hash)) {
 
                 if (this.forkChainWork.greater(this.blockchain.blocks.chainWork)){
                     this.forkProofPi = this.blockchain.proofPi;
@@ -146,7 +122,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             }
 
             let offset = 0;
-            while(offset!=buffer.length){
+            while(offset!==buffer.length){
 
                 let result = this.forkProofPi.deserializeProof(buffer, offset);
 
@@ -204,9 +180,9 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         if (!this.blockchain.agent.light)
             return InterfaceBlockchainFork.prototype._validateFork.call(this, validateHashesAgain );
 
-        if (this.forkProofPi === undefined) throw {message: "Proof is invalid being null"};
+        if (!this.forkProofPi ) throw {message: "Proof is invalid being null"};
 
-        if ( this.blockchain.proofPi !== undefined ) {
+        if ( this.blockchain.proofPi ) {
 
             if (this._isProofBetter())
                 return true;
@@ -234,7 +210,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
             }
 
             if (!found) {
-                block = this.blockchain.blockCreator.createEmptyBlock(proofsList[i].height);
+                block = await this.blockchain.blockCreator.createEmptyBlock(proofsList[i].height);
                 await block.importBlockFromHeader( proofsList[i] );
             }
 
@@ -245,14 +221,14 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
         }
 
-        this.forkProofPi.calculateProofHash();
+        await this.forkProofPi.calculateProofHash();
 
     }
 
 
     getForkProofsPiBlock(height){
         
-        if (height <= 0) 
+        if (height < 0)
             return BlockchainGenesis; // based on genesis block
         else {
 
@@ -280,8 +256,6 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
         if (this.blockchain.agent.light )
             this.blockchain.proofPi = this._forkProofPiClone;
 
-        return InterfaceBlockchainFork.prototype.revertFork.call(this);
-
     }
 
     _isProofBetter(LCA){
@@ -298,8 +272,15 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
             if (comparison === 0 && this.forkChainLength < this.blockchain.blocks.length) throw {message: "Your proof is worst than mine"};
 
-            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length && this.forkHeaders[0].compare(this.blockchain.getHashPrev(this.forkStartingHeight + 1)) >= 0)
+            if (comparison === 0 && this.forkChainLength === this.blockchain.blocks.length ) {
+
+                //TODO FIX THIS
+                // let chainHash = this.blockchain.getChainHash(this.forkStartingHeight );
+                //     if (this.forkChainHashes[chainHash.toString("hex")])
+                // && this.forkHeaders[0].compare() >= 0
+
                 throw {message: "Your proof is worst than mine because you have the same block"};
+            }
 
         }
 
@@ -309,7 +290,7 @@ class PPoWBlockchainFork extends InterfaceBlockchainFork {
 
     _shouldTakeNewProof(){
 
-        if (this.blockchain.proofPi === undefined)
+        if (!this.blockchain.proofPi)
             return true;
 
         let comparison = this.blockchain.verifier.compareProofs( this.blockchain.proofPi, this.forkProofPi );

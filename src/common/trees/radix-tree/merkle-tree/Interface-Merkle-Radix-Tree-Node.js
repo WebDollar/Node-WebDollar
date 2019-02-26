@@ -21,7 +21,7 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
     serializeNodeDataHash(includeHashes){
 
         if (includeHashes)
-            return this.hash.sha256;
+            return this.hash;
         else return null;
     }
 
@@ -31,7 +31,7 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
 
         let hash = this.serializeNodeDataHash(includeHashes);
 
-        if (hash !== null)
+        if (hash)
             list.push(hash);
 
         list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments));
@@ -39,16 +39,12 @@ class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
         return Buffer.concat ( list );
     }
 
-    deserializeNodeDataHash(buffer, offset, includeHashes){
+    deserializeNodeDataHash(buffer, offset = 0, includeHashes){
 
         if (includeHashes) {
 
-            offset = offset || 0;
-
-            let hashSha256 = BufferExtended.substr(buffer, offset, 32);
+            this.hash= BufferExtended.substr(buffer, offset, 32);
             offset += 32;
-
-            this.hash = {sha256: hashSha256};
 
         }
 

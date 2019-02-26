@@ -59,9 +59,6 @@ class PoolDataBlockInformation {
 
         this.blockInformationMinersInstances = [];
 
-        if (this.block )
-            this.block.destroyBlock();
-
         this.block = undefined;
 
     }
@@ -128,7 +125,7 @@ class PoolDataBlockInformation {
 
     }
 
-    serializeBlockInformation(){
+    async serializeBlockInformation(){
 
         let buffers = [
 
@@ -156,14 +153,14 @@ class PoolDataBlockInformation {
 
         let array=[];
         //serialize block
-        if (this.block && this.block.blockchain ) {
+        if (this.block && this.block ) {
 
             try {
 
                 array.push(Serialization.serializeNumber4Bytes( this.block.height ));
                 array.push( this.block.difficultyTargetPrev );
 
-                array.push(this.block.serializeBlock());
+                array.push( await this.block.serializeBlock()) ;
 
             } catch (exception){
                 Log.error("Error saving block", Log.LOG_TYPE.POOLS, this.block ? this.block.toJSON() : '');
@@ -228,7 +225,7 @@ class PoolDataBlockInformation {
 
         if (hasBlock === 1){
 
-            this.block = this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
+            this.block =await  this.poolManagement.blockchain.blockCreator.createEmptyBlock(0, undefined);
 
             let height = Serialization.deserializeNumber4Bytes( buffer, offset, );
             offset += 4;
@@ -301,9 +298,9 @@ class PoolDataBlockInformation {
     }
 
 
-    calculateTargetDifficulty(){
+    async calculateTargetDifficulty(){
 
-        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") ) );
+        this.targetDifficulty = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET.dividedBy( new BigNumber ( "0x"+ (await this.poolManagement.blockchain.getDifficultyTarget()).toString("hex") ) );
 
     }
 
@@ -322,7 +319,7 @@ class PoolDataBlockInformation {
         // if (this.bestHash === undefined) return 40;
         //
 
-        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
+        // this.timeRemaining =  Math.max(0, Math.floor( new BigNumber ( "0x"+ this.bestHash.toString("hex")) .dividedBy( new BigNumber ( "0x"+ await this.poolManagement.blockchain.getDifficultyTarget().toString("hex") )) .multipliedBy( dTime ).toNumber() - dTime));
 
         //formula no 2
 

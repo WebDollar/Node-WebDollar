@@ -8,7 +8,7 @@ import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockch
 import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions"
 import global from "consts/global"
-
+import MiniBlockchainBlocks from "./../blocks/Mini-Blockchain-Blocks"
 let inheritBlockchain;
 
 if (consts.POPOW_PARAMS.ACTIVATED)
@@ -29,11 +29,16 @@ class MiniBlockchain extends  inheritBlockchain{
     }
 
     _createBlockchainElements(){
+        this.blocks = new MiniBlockchainBlocks(this, this.db);
         this.transactions = new MiniBlockchainTransactions(this);
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, MiniBlockchainBlock, MiniBlockchainBlockData );
     }
 
     async simulateNewBlock(block, revertAutomatically, revertActions, callback, showUpdate = true ){
+
+        if (!block) throw {message: "block is undefined"};
+
+        if (!revertActions) revertActions = new RevertActions( this  );
 
         revertActions.push( { name: "breakpoint" } );
 
@@ -42,7 +47,7 @@ class MiniBlockchain extends  inheritBlockchain{
         try{
 
 
-            if (block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] !== true) {
+            if ( !block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] ) {
 
                 //updating reward
                 let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
@@ -52,8 +57,6 @@ class MiniBlockchain extends  inheritBlockchain{
 
                 if (await block.data.transactions.validateTransactions(block.height, block.blockValidation.blockValidationType) === false)
                     throw {message: "Validate Transactions is wrong"};
-
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
 
                 if (block.blockValidation.blockValidationType['skip-validation-transactions-from-values'] !== true) {
 
@@ -65,50 +68,37 @@ class MiniBlockchain extends  inheritBlockchain{
                 if (!block.data.transactions.processBlockDataTransactions( block, + 1, revertActions, showUpdate ))
                     throw {message: "Process Block Data Transactions failed"};
 
-                if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
             }
 
-            let callbackDone = await callback();
-
-            if (!block.blockValidation.blockValidationType['skip-sleep']) await this.sleep(2);
-
-            if (callbackDone === false)
+            if (await callback() === false)
                 throw {message: "couldn't process the InterfaceBlockchain.prototype.includeBlockchainBlock"};
 
         } catch (ex){
             revertException = true;
-            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", block.height, ex, block ? block.toJSON() : '' );
+            console.error("MiniBlockchain simulateNewBlock 1 raised an exception at blockHeight", ex, block ? block.height : -1, ex, block ? block.toJSON() : '' );
         }
 
+        let result = true;
         try{
 
             //revert back the database
             if (revertException || revertAutomatically){
-
-                revertActions.revertOperations();
-
-                if (revertException)
-                    return false;
-
+                await revertActions.revertOperations();
+                if (revertException) return false;
             }
-
 
         } catch (exception){
 
             console.log("MiniBlockchain Reverting Error raised an exception", exception);
-            revertActions.clearUntilBreakpoint();
-
-            return false;
+            result = false;
         }
 
         revertActions.clearUntilBreakpoint();
-
-        return true;
+        return result;
 
     }
 
-    /**
+    /**11
      * operate the mini-blockchain accountant tree
      * mini-blockchain, will update reward and take in consideration all transactions
      * @param block
@@ -122,11 +112,9 @@ class MiniBlockchain extends  inheritBlockchain{
 
         if (await this.simulateNewBlock( args[0], false, args[4],
 
-                async ()=>{
-                    return await inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs );
-                }
+                 ()=>  inheritBlockchain.prototype.includeBlockchainBlock.apply( this, myArgs )
 
-            , args[5] )===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
+            , args[5] ) ===false) throw {message: "Error includeBlockchainBlock MiniBlockchain "};
 
         return true;
     }
@@ -136,44 +124,6 @@ class MiniBlockchain extends  inheritBlockchain{
     getBalances(address){
         return this.accountantTree.getBalances(address);
     }
-
-
-
-
-    /**
-     * Load blocks and check the Accountant Tree
-     * @returns boolean
-     */
-    async _loadBlockchain(){
-
-        if (process.env.BROWSER)
-            return true;
-
-        try {
-
-            let result;
-
-
-            result = await inheritBlockchain.prototype._loadBlockchain.call( this  );
-
-            if ( result === false )
-                throw {message: "Problem loading the blockchain"};
-
-            //check the accountant Tree if matches
-            console.log("this.accountantTree final", this.accountantTree.root.hash.sha256);
-
-            //TODO verify accountantTree
-
-            return result;
-
-        } catch (exception){
-
-            console.error("Couldn't load  MiniBlockchain", exception);
-            return false;
-        }
-
-    }
-
 
 
 

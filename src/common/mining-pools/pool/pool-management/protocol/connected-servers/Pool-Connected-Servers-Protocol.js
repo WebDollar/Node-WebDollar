@@ -92,7 +92,7 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
         try{
 
-            if (answer === null || answer.result !== true) throw {message: "ServerPool returned false"};
+            if ( !answer || !answer.result ) throw {message: "ServerPool returned false"};
             if (typeof answer.serverPoolFee !== "number" ) throw {message: "ServerPool returned a wrong fee"};
             if ( answer.serverPoolFee < 0 || answer.serverPoolFee > 1) throw {message: "ServerPool returned a wrong fee"};
             if ( !Buffer.isBuffer(answer.messageToSign) || answer.messageToSign.length !== 32) throw {message: "ServerPool message is wrong"};
@@ -114,9 +114,9 @@ class PoolConnectedServersProtocol extends PoolProtocolList{
 
             let confirmation = await socket.node.sendRequestWaitOnce("server-pool/register-pool/answer/confirmation", { result: true, signature: signature}, "answer");
 
-            if (confirmation === null) throw {message: "ServerPool returned a null confirmation"};
+            if ( !confirmation ) throw {message: "ServerPool returned a null confirmation"};
 
-            if (confirmation.result === true){
+            if ( confirmation.result ){
 
                 this._addConnectedServerPool(socket, answer.serverPoolFee);
 

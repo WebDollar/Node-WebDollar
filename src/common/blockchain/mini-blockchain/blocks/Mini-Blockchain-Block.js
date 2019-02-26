@@ -23,9 +23,9 @@ else  inheritBlockchainBlock = InterfaceBlock;
 
 class MiniBlockchainBlock extends inheritBlockchainBlock {
 
-    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
+    constructor(blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, difficultyTargetPrev, timeStamp, nonce, data, height, db, posMinerAddress, posMinerPublicKey, posSignature ){
 
-        super(blockchain, blockValidation, version, hash, hashPrev, hashChain, timeStamp, nonce, data, height, db);
+        super(blockchain, blockValidation, version, hash, hashPrev, hashChainPrev, difficultyTargetPrev, timeStamp, nonce, data, height, db);
 
         if ( BlockchainGenesis.isPoSActivated(this.height) ){
 
@@ -54,7 +54,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
 
-    computeHash(){
+    async computeHash(){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) )
             return this.computeHashPOS.apply(this, arguments);
@@ -72,7 +72,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
      * signature is not included to avoid attacks changing signatures or timestamp
      *
      */
-    async computeHashPOS( newTimestamp, posNewMinerAddress, balance){
+    async computeHashPOS( newTimestamp, posNewMinerAddress, balance ){
 
         let virtualBalance = balance;
 
@@ -99,7 +99,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
                 balance = Blockchain.blockchain.accountantTree.getBalance( whoIsMining );
 
             //reward already included in the new balance
-            if ( Blockchain.blockchain.accountantTree.root.hash.sha256.equals( this.data.hashAccountantTree )  && balance !== null) {
+            if ( Blockchain.blockchain.accountantTree.root.hash.equals( this.data.hashAccountantTree )  && balance !== null) {
 
                 if ( whoIsReceivingMoney .equals( whoIsMining )) { //in case it was sent to the minerAddress
 
@@ -108,19 +108,17 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 }
 
-                this.data.transactions.transactions.forEach((tx)=>{
+                for (let tx of this.data.transactions.transactions){
 
-                    tx.from.addresses.forEach((from)=>{
-                        if ( from.unencodedAddress.equals( whoIsMining ))
+                    for (let from of tx.from.addresses)
+                        if ( from.unencodedAddress.equals( whoIsMining ) )
                             balance += from.amount;
-                    });
 
-                    tx.to.addresses.forEach((to)=>{
+                    for (let to of tx.to.addresses)
                         if ( to.unencodedAddress.equals( whoIsMining ))
                             balance -= to.amount;
-                    });
 
-                });
+                }
 
             }
 
@@ -131,18 +129,16 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
                 for (let i = this.height - 1; i >= 0 && i >= this.height - 1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--) {
 
-                    let block = this.blockValidation.getBlockCallBack(i + 1);
+                    let block = await this.blockValidation.getBlockCallBack( i );
 
                     if ( !block ) continue;
 
                     //s += block.height + " ";
 
-                    block.data.transactions.transactions.forEach((tx) => {
-                        tx.to.addresses.forEach((to) => {
+                    for (let tx of block.data.transactions.transactions)
+                        for (let to of tx.to.addresses)
                             if (to.unencodedAddress.equals(whoIsMining))
                                 balance -= to.amount;
-                        });
-                    });
                 }
 
                 //console.log("After Balance ", balance, s);
@@ -276,15 +272,24 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
         } else
             return inheritBlockchainBlock.prototype._deserializeBlock.call(this, buffer, offset);
+
+    }
+
+    deserializeBlock(buffer, height, reward, difficultyTargetPrev,  offset = 0, blockLengthValidation, onlyHeader ) {
+
+        offset = inheritBlockchainBlock.prototype.deserializeBlock.apply(this, arguments);
+
+        this.hashChain = this.calculateChainHash();
+
     }
 
 
-    calculateNewChainHash(){
+    calculateChainHash(){
 
         if ( BlockchainGenesis.isPoSActivated(this.height) )
             return WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( this._calculateSerializedBlock( true ) ));
         else
-            return InterfaceBlockchainBlock.prototype.calculateNewChainHash.call(this);
+            return InterfaceBlockchainBlock.prototype.calculateChainHash.call(this);
 
     }
 

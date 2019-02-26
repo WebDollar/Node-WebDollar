@@ -14,28 +14,21 @@ class InterfaceBlockchainForksAdministrator {
         this.blockchain = blockchain;
 
         this.forks = [];
-
         this.forksId = 0;
-
-        this.socketsProcessing = [];
 
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
-            for (let i=0; i<this.forks.length; i++)
+            for (let i=this.forks.length-1; i>=0; i--)
                 if (!this.forks[i].forkIsSaving) {
 
                     for (let j = this.forks[i].sockets.length-1; j >=0 ; j--)
-                        if (this.forks[i].sockets[j].node.sckAddress === undefined || this.forks[i].sockets[j].node.sckAddress.uuid === nodesListObject.socket.node.sckAddress.uuid ) {
+                        if ( !this.forks[i].sockets[j].node.sckAddress || this.forks[i].sockets[j].node.sckAddress.uuid === nodesListObject.socket.node.sckAddress.uuid ) {
                             this.forks[i].sockets.splice(j, 1);
                             break;
                         }
 
-                    if (this.forks[i].sockets.length === 0 && !this.forks[i].forkIsSaving ) {
-
-                        this.forks[i].destroyFork();
+                    if (this.forks[i].sockets.length === 0 && !this.forks[i].forkIsSaving )
                         this.forks.splice(i, 1);
-
-                    }
                 }
 
         });
@@ -45,8 +38,8 @@ class InterfaceBlockchainForksAdministrator {
 
     findFork(socket, hash, forkProof){
 
-        let forkFound = this._findForkyByHeader(hash);
-        if ( forkFound !== null ) {
+        let forkFound = this.findForkyByChainHash(hash);
+        if ( forkFound ) {
 
             if (Math.random() < 0.001)
                 console.error("discoverAndProcessFork - fork already found by forkLastBlockHeader");
@@ -57,7 +50,7 @@ class InterfaceBlockchainForksAdministrator {
         }
 
         forkFound = this.findForkBySockets(socket);
-        if ( forkFound !== null ) {
+        if ( forkFound ) {
 
             if (Math.random() < 0.001)
                 console.error("discoverAndProcessFork - fork already found by socket");
@@ -66,22 +59,22 @@ class InterfaceBlockchainForksAdministrator {
         }
 
 
-
         return null;
 
     }
 
-    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready){
+    createNewFork(sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, forkChainHashes, ready){
 
         if (!Array.isArray(sockets)) sockets = [sockets];
 
         let fork = this.findForkBySockets(sockets);
-        if ( fork !== null ) return fork;
+        if ( fork ) return fork;
 
-        fork = this.findForkByHeaders(headers);
-        if ( fork !== null) return fork;
+        for (let key in forkChainHashes)
+            if (this.findForkyByChainHash(key))
+                return fork;
 
-        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, headers, ready );
+        fork = this.blockchain.agent.newFork( this.blockchain, this.forksId++, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, forkChainWork, forkChainHashes, ready );
 
         this.forks.push(fork);
 
@@ -120,38 +113,17 @@ class InterfaceBlockchainForksAdministrator {
      * @param header
      * @returns {*}
      */
-    findForkByHeaders(headers){
 
-        if (headers === null || headers === undefined)
-            return null;
-
-        if (Array.isArray(headers))
-            for (let i=0; i<headers.length; i++) {
-
-                let fork = this._findForkyByHeader(headers[i]);
-                if (fork !== null)
-                    return fork;
-            }
-        else
-            return this._findForkyByHeader(headers);
-
-        return null;
-
-    }
-
-    _findForkyByHeader(header){
+    findForkyByChainHash(header){
 
         if ( !header )
             return null;
 
-        for (let i = 0; i < this.forks.length; i++)
-            if (this.forks[i] !== null)
-            for (let j=0; j<this.forks[i].forkHeaders.length; j++)
-                if (this.forks[i].forkHeaders[j] && Buffer.isBuffer(this.forks[i].forkHeaders[j])) {
+        if (Buffer.isBuffer(header))
+            header = header.toString("hex");
 
-                    if (this.forks[i].forkHeaders[j].equals(header))
-                        return this.forks[i];
-                }
+        for (let fork of this.forks)
+            if (fork.forkChainHashes[header]) return fork;
 
         return null;
 
@@ -176,17 +148,11 @@ class InterfaceBlockchainForksAdministrator {
 
     deleteFork(fork){
 
-        if (fork === undefined || fork === null)
-            return false;
+        if (!fork ) return false;
 
         for (let i=this.forks.length-1; i>=0; i--)
-            if (this.forks[i] === undefined || this.forks[i] === null || this.forks[i] === fork || this.forks[i].forkId === fork) {
-
-                if (this.forks[i] !== undefined && this.forks[i] !== null)
-                    this.forks[i].destroyFork();
-
+            if ( !this.forks[i] || this.forks[i] === fork || this.forks[i].forkId === fork)
                 this.forks.splice(i, 1);
-            }
 
         return false;
     }

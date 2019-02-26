@@ -11,7 +11,7 @@ class RevertActions {
         this._actions .push(data);
     }
 
-    revertOperations(actionName='', all=''){
+    async revertOperations(actionName='', all=''){
 
         for (let i=this._actions .length-1; i>=0; i--) {
 
@@ -35,18 +35,24 @@ class RevertActions {
 
                     action.block.blockValidation.blockValidationType["skip-validation-transactions-from-values"] = !action.value;
                 }
+                else if (action.name === "block-removed"  && (actionName === '' || actionName === action.name) ) {
+
+                    await this.blockchain.includeBlockchainBlock( action.data, false, "all", true, undefined, false );
+
+                }
                 else if (action.name === "block-added" && (actionName === '' || actionName === action.name)) {
 
-                    this.blockchain.blocks.spliceBlocks(action.height, true);
+                    await this.blockchain.blocks.spliceBlocks(action.height, true);
 
                     if (this.blockchain.agent.light) {
                         this.blockchain.lightPrevHashPrevs.splice(action.height);
                         this.blockchain.lightPrevTimeStamps.splice(action.height);
                         this.blockchain.lightPrevDifficultyTargets.splice(action.height);
 
-                        this.blockchain.lightPrevHashPrevs[action.height] = this.blockchain.blocks[action.height-1].hash;
-                        this.blockchain.lightPrevTimeStamps[action.height] = this.blockchain.blocks[action.height-1].timeStamp;
-                        this.blockchain.lightPrevDifficultyTargets[action.height] = this.blockchain.blocks[action.height-1].difficultyTarget;
+                        let block = await this.blockchain.getBlock(action.height-1);
+                        this.blockchain.lightPrevHashPrevs[action.height] = block.hash;
+                        this.blockchain.lightPrevTimeStamps[action.height] = block.timeStamp;
+                        this.blockchain.lightPrevDifficultyTargets[action.height] = block.difficultyTarget;
 
                     }
 
@@ -80,26 +86,15 @@ class RevertActions {
 
     clearUntilBreakpoint(){
 
-        for (let i=this._actions .length-1; i>=0; i--) {
+        for (let i=this._actions.length-1; i>=0; i--) {
 
             let action = this._actions[i];
 
-            if (action.name === "breakpoint") {
-
-                this._actions.splice(i);
-                return;
-
-            }
+            if (action.name === "breakpoint")
+                return this._actions.splice(i);
 
         }
 
-        this._actions = [];
-
-    }
-
-    destroyRevertActions(){
-
-        this.blockchain = undefined;
         this._actions = [];
 
     }

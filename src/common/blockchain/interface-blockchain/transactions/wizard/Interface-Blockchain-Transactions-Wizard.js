@@ -122,7 +122,7 @@ class InterfaceBlockchainTransactionsWizard{
             };
 
 
-            transaction = this.transactions._createTransaction(
+            transaction = await this.transactions._createTransaction(
 
                 from, //from
                 to, //to
@@ -196,7 +196,7 @@ class InterfaceBlockchainTransactionsWizard{
 
         try{
 
-            this.transactions.pendingQueue.includePendingTransaction(transaction);
+            await this.transactions.pendingQueue.includePendingTransaction(transaction);
 
         } catch (exception){
             console.error("Creating a new transaction raised an exception - Including Pending Transaction", exception);

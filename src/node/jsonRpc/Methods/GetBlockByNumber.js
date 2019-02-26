@@ -12,7 +12,7 @@ class GetBlockByNumber extends RpcMethod
         this._oBlockTransformer = oBlockTransformer;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         if (args.length < 1)
         {
             throw new Error('Params must contain at least one entry, the block number/TAG');
@@ -23,7 +23,7 @@ class GetBlockByNumber extends RpcMethod
             processHardForks   : args[2] || undefined
         };
 
-        const oBlock = this._oBlockRepository.findByNumberOrTag(args[0]);
+        const oBlock = await this._oBlockRepository.findByNumberOrTag(args[0]);
 
         if (oBlock === null)
         {

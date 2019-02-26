@@ -144,7 +144,7 @@ class CLI {
             let answer = null;
 
             //Trick for blocks length and address nonce
-            Blockchain.blockchain.blocks.length = timelock+1;
+            Blockchain.blockchain.blocks._length = timelock+1;
 
             for(let i=0; i<Blockchain.Wallet.addresses.length; i++)
                 if(addressString === Blockchain.Wallet.addresses[i].address)
@@ -158,7 +158,7 @@ class CLI {
                 data.signature = answer.signature;
 
                 if (wantToPropagate)
-                    Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction( answer.transaction, undefined, true);
+                    await Blockchain.blockchain.transactions.pendingQueue.includePendingTransaction( answer.transaction, undefined, true);
 
             }else{
 
@@ -448,11 +448,7 @@ class CLI {
 
 
 
-        await this._callCallbackBlockchainSync( undefined, async ()=>{
-
-            await Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false);
-
-        }, async ()=>{
+        await this._callCallbackBlockchainSync( undefined, () => Blockchain.MinerPoolManagement.minerPoolSettings.setMinerPoolActivated(false), async ()=>{
 
             if (instantly)
                 await Blockchain.startMiningInstantly();
@@ -634,31 +630,25 @@ class CLI {
 
             await Blockchain.createBlockchain("full-node", callbackBeforeBlockchainLoaded, async () => {
 
-                if (typeof callbackBeforeServerInitialization === "function")
-                    await callbackBeforeServerInitialization();
+                if (callbackBeforeServerInitialization ) await callbackBeforeServerInitialization();
 
                 await Node.NodeServer.startServer();
 
                 await Node.NodeClientsService.startService();
 
-                if (typeof callbackAfterServerInitialization === "function")
-                    await callbackAfterServerInitialization();
+                if ( callbackAfterServerInitialization ) await callbackAfterServerInitialization();
 
             }, afterSynchronizationCallback, synchronize );
 
         } else {
 
-            if (typeof callbackBeforeBlockchainLoaded === "function")
-                await callbackBeforeBlockchainLoaded();
+            if (callbackBeforeBlockchainLoaded ) await callbackBeforeBlockchainLoaded();
 
-            if (typeof callbackBeforeServerInitialization === "function")
-                await callbackBeforeServerInitialization();
+            if (callbackBeforeServerInitialization ) await callbackBeforeServerInitialization();
 
-            if (typeof callbackAfterServerInitialization === "function")
-                await callbackAfterServerInitialization();
+            if (callbackAfterServerInitialization ) await callbackAfterServerInitialization();
 
-            if (typeof afterSynchronizationCallback === "function")
-                await afterSynchronizationCallback();
+            if (afterSynchronizationCallback ) await afterSynchronizationCallback();
 
         }
 

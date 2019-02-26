@@ -20,7 +20,7 @@ class Argon2Node {
             let options = HASH_ARGON2_OPTIONS;
             options.raw = true;
 
-            return await argon2.hash(data, options)
+            return argon2.hash(data, options)
 
         } catch (Exception){
             console.log("Argon2 exception Argon2-Node.hash", Exception.message, Exception.code)

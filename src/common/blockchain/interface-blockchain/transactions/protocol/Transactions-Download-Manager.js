@@ -64,12 +64,12 @@ class TransactionsDownloadManager{
         this._transactionsQueueLength--;
     }
 
-    createTransaction(txId,socket){
+    async createTransaction(txId,socket){
 
         if(txId.length !== 64)
             return;
 
-        if(this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
+        if(await this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
             this._transactionsQueue[txId]= { buffer: undefined, socket: [socket], totalSocketsProcessed: 0, fails:0, lastTrialTime:undefined, dateInitial: new Date().getTime() };
             this._transactionsQueueLength++;
         }
@@ -103,14 +103,14 @@ class TransactionsDownloadManager{
     /**
      * This function will find tx avaiable for download and in the same time is cleaning the list
      * **/
-    processTransactionsList(){
+    async processTransactionsList(){
 
         let foundPriorityTransaction = false;
         let foundHighFailedTransaction = false;
 
         for (let txId in this._transactionsQueue){
 
-            if(!this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
+            if( ! await this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
                 this.removeTransaction(txId);
                 continue;
             }
@@ -151,14 +151,14 @@ class TransactionsDownloadManager{
                 this.smallestTrial = this.smallestTrial === 0 ? 0 : this.smallestTrial--;
             else{
                 this.smallestTrial ++;
-                return this.processTransactionsList();
+                return await this.processTransactionsList();
             }
 
         }
 
     }
 
-    addTransaction(socket, txId, topPriority){
+    async addTransaction(socket, txId, topPriority){
 
         if ( !Buffer.isBuffer(txId) )
             throw {message: "txId is not a buffer"};
@@ -173,7 +173,7 @@ class TransactionsDownloadManager{
 
         if ( !this.findTransactionById(txId.toString('hex')) ) {
 
-            this.createTransaction(txId.toString('hex'),socket);
+            await this.createTransaction(txId.toString('hex'),socket);
             return true;
 
         }else{
@@ -251,7 +251,7 @@ class TransactionsDownloadManager{
 
                 try {
 
-                    let firstUneleted = this.processTransactionsList();
+                    let firstUneleted = await this.processTransactionsList();
                     let txId = undefined;
                     let found = false;
                     let wasAdded = null;
@@ -290,7 +290,7 @@ class TransactionsDownloadManager{
                                 if (Buffer.isBuffer(this._transactionsQueue[txId].buffer)) {
 
                                     found = true;
-                                    wasAdded = this._createTransaction(this._transactionsQueue[txId].buffer, socket);
+                                    wasAdded = await this._createTransaction(this._transactionsQueue[txId].buffer, socket);
 
                                     //If tx was not added into pending queue increase socket invalidTransactions
                                     if (!wasAdded) {
@@ -379,7 +379,7 @@ class TransactionsDownloadManager{
 
     }
 
-    _createTransaction(buffer, socket){
+    async _createTransaction(buffer, socket){
 
         let transaction;
 
@@ -387,7 +387,7 @@ class TransactionsDownloadManager{
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
-            if (!this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+            if (! await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
                 throw {message: "Transsaction validation failed"};
 
             var blockValidationType = {};
@@ -396,7 +396,7 @@ class TransactionsDownloadManager{
             if (!transaction.isTransactionOK(true, false, blockValidationType))  //not good
                 throw {message: "transaction is invalid"};
 
-            return this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, true);
+            return await this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, true);
 
         } catch (exception) {
 

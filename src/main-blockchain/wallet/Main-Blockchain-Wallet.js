@@ -15,8 +15,8 @@ import AdvancedMessages from "node/menu/Advanced-Messages";
 import Blockchain from "../Blockchain";
 
 import NanoWalletProtocol from "common/blockchain/interface-blockchain/agents/Nano/Nano-Wallet-Protocol"
+import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
-const EventEmitter = require('events');
 const FileSystem = require('fs');
 
 class MainBlockchainWallet {
@@ -33,8 +33,7 @@ class MainBlockchainWallet {
 
         this.addresses = [];
 
-        this.emitter = new EventEmitter();
-        this.emitter.setMaxListeners(100);
+        this.emitter = new AdvancedEmitter(100);
 
         NanoWalletProtocol.initializeNanoProtocolWallet(this);
 
@@ -152,11 +151,11 @@ class MainBlockchainWallet {
 
         }, 20*1000 );
 
-        let buffer = await this.db.get(this.walletFileName, 30*1000, true);
+        let buffer = await this.db.get(this.walletFileName, 100000, 20,true);
 
         clearTimeout(timeout);
 
-        if ( buffer === null || buffer === undefined)
+        if ( !buffer )
             return false;
 
         try {

@@ -90,12 +90,7 @@ class NodePropagationList{
 
         if ( !socket.emit ) console.warn("socket.emit is not supported");
 
-        let list;
-
-        if (nodeType === NODE_TYPE.NODE_WEB_PEER) //let's send only SSL
-            list = this._waitlistSimpleSSL;
-        else
-            list = this._waitlistSimple;
+        let list =  nodeType === NODE_TYPE.NODE_WEB_PEER ? this._waitlistSimpleSSL : this._waitlistSimple;
 
         let timeout;
         if (disconnectSocket)

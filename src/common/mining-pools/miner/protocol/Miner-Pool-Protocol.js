@@ -83,11 +83,7 @@ class MinerPoolProtocol extends PoolProtocolList{
                 if (!answer)
                     throw {message: "send hello is not working"};
 
-                socket.on("mining-pool/hello-pool/again",async (data)=>{
-
-                    await this._sendPoolHello(socket);
-
-                });
+                socket.on("mining-pool/hello-pool/again", (data) => this._sendPoolHello(socket) );
             }
 
         } catch (exception){
@@ -233,22 +229,16 @@ class MinerPoolProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/new-work", async (data)=>{
 
-            try {
+            if ( !data ) throw {message: "new-work invalid work"};
 
-                if (typeof data.work !== "object") throw {message: "new-work invalid work"};
+            //await this._validateRequestWork( data.work, socket );
 
-                //await this._validateRequestWork( data.work, socket );
+            this._updateStatistics( data);
+            this.minerPoolManagement.minerPoolReward.setReward(data);
 
-                this._updateStatistics( data);
-                this.minerPoolManagement.minerPoolReward.setReward(data);
+            this._validateRequestWork( data.work, socket);
 
-                this._validateRequestWork( data.work, socket);
-
-                this.minerPoolManagement.minerPoolMining.resetForced = true;
-
-            } catch (exception){
-                console.error("new work raised an exception", exception);
-            }
+            this.minerPoolManagement.minerPoolMining.resetForced = true;
 
         });
 

@@ -46,26 +46,27 @@ class InterfaceBlockchainTransactionFrom {
 
     setFrom(addresses, currencyTokenId) {
 
-        if (addresses === undefined) return false;
+        if ( !addresses ) return false;
 
-        if (typeof addresses === "object" && currencyTokenId === undefined && addresses.hasOwnProperty('addresses') && addresses.hasOwnProperty('currencyTokenId')) {
+        if (addresses && typeof addresses === "object" && !currencyTokenId && addresses.addresses && addresses.hasOwnProperty("currencyTokenId")) {
             addresses = addresses.addresses;
             currencyTokenId = addresses.currencyTokenId;
         }
 
-        if (!Array.isArray(addresses))
-            addresses = [addresses];
+        if (!Array.isArray( addresses ))
+            addresses = [ addresses ];
 
-        addresses.forEach((fromObject, index) => {
+        //console.log("addresses", addresses);
+        for (let fromObject of addresses){
 
-            if (fromObject.unencodedAddress !== undefined) {
+            if (fromObject.unencodedAddress ) {
 
-                if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.hasOwnProperty("unencodedAddress"))
+                if (typeof fromObject.unencodedAddress === "object" && fromObject.unencodedAddress.unencodedAddress)
                     fromObject.unencodedAddress = fromObject.unencodedAddress.unencodedAddress;
 
                 fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress);
 
-            } else if (fromObject.address !== undefined) {
+            } else if (fromObject.address ) {
                 fromObject.unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.address);
             }
 
@@ -75,23 +76,23 @@ class InterfaceBlockchainTransactionFrom {
             if (typeof fromObject.signature === "string")
                 fromObject.signature = new Buffer(fromObject.signature, "hex");
 
-            if (fromObject.signature === undefined)
+            if ( !fromObject.signature )
                 fromObject.signature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
 
             if (typeof fromObject.amount === "string")
                 fromObject.amount = parseInt(fromObject.amount);
 
-        });
+        }
 
-        addresses.forEach((fromObject, index) => {
+        for (let fromObject of addresses){
 
             //optional
-            if (fromObject.unencodedAddress === undefined)
-                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(publicKey, false);
+            if ( !fromObject.unencodedAddress )
+                fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey( fromObject.publicKey, false);
 
-        });
+        }
 
-        if (currencyTokenId === undefined) {
+        if ( !currencyTokenId ) {
             currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             currencyTokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
@@ -149,15 +150,18 @@ class InterfaceBlockchainTransactionFrom {
         //TODO validate currency
 
 
-        this.addresses.forEach((fromObject, index) => {
+        let index = -1;
+        for (let fromObject of this.addresses ){
 
-            if (!fromObject.publicKey || fromObject.publicKey === null)
+            index++;
+
+            if (!fromObject.publicKey )
                 throw { message: 'From.address.publicKey ' + index + ' is not specified',  address: fromObject,  index: index };
 
-            if (fromObject.unencodedAddress === undefined || fromObject.unencodedAddress === null)
+            if (!fromObject.unencodedAddress )
                 fromObject.unencodedAddress = InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey);
 
-            if (!fromObject.unencodedAddress || fromObject.unencodedAddress === null)
+            if (!fromObject.unencodedAddress )
                 throw {message: 'From.address.unencodedAddress is not specified', address: fromObject, index: index};
 
             if (!InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(fromObject.unencodedAddress))
@@ -178,7 +182,7 @@ class InterfaceBlockchainTransactionFrom {
             if (fromObject.amount <= 0)
                 throw {message: "Amount is an invalid number", amount: fromObject.amount, index: index};
 
-        });
+        }
 
 
         //validate of the value is done in the Mini Blockchain Transaction From
@@ -247,9 +251,12 @@ class InterfaceBlockchainTransactionFrom {
 
     validateSignatures() {
 
-        this.addresses.forEach((fromObject, index) => {
+        let index = -1;
+        for (let fromObject of this.addresses ){
 
-            if (!fromObject.signature || fromObject.signature === null)
+            index++;
+
+            if (!fromObject.signature )
                 throw {message: 'From.address.signature is not specified', address: fromObject, index: index};
 
 
@@ -262,7 +269,7 @@ class InterfaceBlockchainTransactionFrom {
             if (!InterfaceBlockchainAddressHelper._generateUnencodedAddressFromPublicKey(fromObject.publicKey).equals( fromObject.unencodedAddress ) )
                 throw { message: "From.address.publicKey " + index + " doesn't match address",  address: fromObject,  index: index };
 
-        });
+        }
 
         return true;
 

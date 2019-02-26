@@ -160,11 +160,8 @@ class NodeDiscoveryService {
             console.log("error processing fallback list processFallbackNodes", data, exception);
         }
 
-
         return null;
     }
-
-
 
 }
 

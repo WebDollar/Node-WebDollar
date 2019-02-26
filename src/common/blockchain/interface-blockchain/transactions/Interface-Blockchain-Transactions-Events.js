@@ -13,27 +13,7 @@ class InterfaceBlockchainTransactionsEvents{
 
     }
 
-    findTransaction(txId){
-
-        if (typeof txId === "string")
-            txId = new Buffer(txId, "hex");
-
-        for (let i=this.blockchain.blocks.blocksStartingPoint; i<this.blockchain.blocks.endingPosition; i++) {
-
-            let block = this.blockchain.blocks[i];
-            if (block === undefined) continue;
-
-            for (let i=0; i<block.data.transactions.transactions.length; i++){
-                if (BufferExtended.safeCompare(block.data.transactions.transactions[i].txId, txId))
-                    return block.data.transactions.transactions[i];
-            }
-
-        }
-
-        return null;
-    }
-
-    listTransactions(addressWIF, maxBlockCount = 50){
+    async listTransactions(addressWIF, maxBlockCount = 50){
 
         if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='')
             return [];
@@ -49,8 +29,8 @@ class InterfaceBlockchainTransactionsEvents{
 
         for (let i=Math.max(startingPoint, this.blockchain.blocks.endingPosition-1-maxBlockCount); i<this.blockchain.blocks.endingPosition; i++){
 
-            let block = this.blockchain.blocks[i];
-            if (block === undefined) continue;
+            let block = await this.blockchain.getBlock(i);
+            if ( !block ) continue;
 
             block.data.transactions.transactions.forEach((transaction)=>{
 
@@ -159,12 +139,11 @@ class InterfaceBlockchainTransactionsEvents{
         return false;
     }
 
-    emitTransactionChangeEvent(transaction, deleted=false){
+    async emitTransactionChangeEvent(transaction, deleted=false){
 
-        if (deleted){
-            if (this.findTransaction(transaction.txId) !== null) //I found a transaction already in Blockchain
+        if (deleted)
+            if (!await this.blockchain.mining.miningTransactionSelector.validateTransactionId(transaction.txId)) //I found a transaction already in Blockchain
                 return false;
-        }
 
         transaction.from.addresses.forEach((address)=>{
             if (this._checkTransactionIsSubscribed(address.unencodedAddress)) {

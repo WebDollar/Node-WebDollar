@@ -101,49 +101,42 @@ class NanoWalletProtocol{
 
             socket.node.on("api/subscribe/address/balances/answer/"+address, (data)=>{
 
-                try{
+                if ( !this._allowConsensus && Blockchain.agent.consensus) //make sure the virtualization was not canceled
+                    return true;
 
-                    if ( !this._allowConsensus && Blockchain.agent.consensus) //make sure the virtualization was not canceled
-                        return true;
+                if ( !data || !data.result) return false;
 
-                    if (data === null || !data.result) return false;
+                trials = 0;
 
-                    trials = 0;
+                let prevVal = Blockchain.AccountantTree.getBalance(address);
+                if ( !prevVal ) prevVal = 0;
 
-                    let prevVal = Blockchain.AccountantTree.getBalance(address);
-                    if (prevVal=== null ) prevVal = 0;
+                let currentVal;
+                if ( !data.balances ) currentVal = 0;
+                else currentVal = data.balances["0x01"];
 
-                    let currentVal;
-                    if (data.balances === null) currentVal = 0;
-                    else currentVal = data.balances["0x01"];
-
-                    try {
-                        Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
-                    } catch (exception){
-
-                    }
-
-                    let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
-                    if (prevNonce === null ) prevNonce = 0;
-
-                    let currentNonce = data.nonce;
-                    if (currentNonce === null) currentNonce = 0;
-
-                    try {
-                        Blockchain.AccountantTree.updateAccountNonce(address, currentNonce - prevNonce, undefined, undefined, true);
-                    } catch (exception){
-
-                    }
-
-                    //TODO use SPV
-
-                    trials = 0;
-                    resolve(true);
-
+                try {
+                    Blockchain.AccountantTree.updateAccount(address, currentVal - prevVal, undefined, undefined, true);
                 } catch (exception){
 
                 }
 
+                let prevNonce = Blockchain.AccountantTree.getAccountNonce(address);
+                if ( !prevNonce ) prevNonce = 0;
+
+                let currentNonce = data.nonce;
+                if ( !currentNonce ) currentNonce = 0;
+
+                try {
+                    Blockchain.AccountantTree.updateAccountNonce(address, currentNonce - prevNonce, undefined, undefined, true);
+                } catch (exception){
+
+                }
+
+                //TODO use SPV
+
+                trials = 0;
+                resolve(true);
 
             });
 
@@ -151,7 +144,7 @@ class NanoWalletProtocol{
 
                 let answer = await socket.node.sendRequestWaitOnce("api/subscribe/address/balances", { address: address  }, undefined, 5000);
 
-                if (typeof answer === "object" && answer !== null && answer.result){
+                if (answer && answer.result){
                     resolve(true);
                     return;
                 }
@@ -174,96 +167,90 @@ class NanoWalletProtocol{
 
             socket.node.on("api/subscribe/address/transactions/answer/"+address, async (data)=>{
 
-                try{
+                if ( !this._allowConsensus && Blockchain.agent.consensus) //make sure the virtualization was not canceled
+                    return true;
 
-                    if ( !this._allowConsensus && Blockchain.agent.consensus) //make sure the virtualization was not canceled
-                        return true;
+                if ( !data || !data.result) return false;
 
-                    if (data === null || !data.result) return false;
+                trials = 0;
 
-                    trials = 0;
+                let done;
 
-                    let done;
+                for (let k in data.transactions){
 
-                    for (let k in data.transactions){
+                    let transaction = data.transactions[k];
+                    let from = transaction.from;
 
-                        let transaction = data.transactions[k];
-                        let from = transaction.from;
+                    //making the transactions valid...
 
-                        //making the transactions valid...
+                    from.addresses.forEach( address =>{
+
+                        address.amountPrev = Blockchain.AccountantTree.getAccountNonce(address.address);
+                        if (address.amountPrev === null ) address.amountPrev = 0;
+
+                        let currentVal = parseInt(address.amount);
+
+                        try {
+                            Blockchain.AccountantTree.updateAccount(address.address, currentVal - address.amountPrev, undefined, undefined, true);
+                        } catch (exception){
+
+                        }
+
+                    });
+
+
+                    transaction.noncePrev = Blockchain.AccountantTree.getAccountNonce(address);
+                    if (transaction.noncePrev === null ) transaction.noncePrev = 0;
+
+                    let currentNonce = transaction.nonce;
+                    if (currentNonce === null) currentNonce = 0;
+
+                    try {
+                        Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, currentNonce - transaction.noncePrev, undefined, undefined, true);
+                    } catch (exception){
+
+                    }
+
+                    //TODO use SPV
+
+                    let tx = null;
+                    if (transaction ) tx = await Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined);
+
+                    let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
+
+                    if ( !foundTx ) {
+                        await Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all");
+                        foundTx = transaction;
+                    }
+
+                    tx._confirmed = transaction.confirmed;
+
+                    //restore to the original values
+                    try{
+
+                        let currentNonce = Blockchain.AccountantTree.getAccountNonce(address);
+                        if (currentNonce === null) currentNonce = 0;
+
+                        Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, transaction.noncePrev - currentNonce , undefined, undefined, true);
 
                         from.addresses.forEach( address =>{
 
-                            address.amountPrev = Blockchain.AccountantTree.getAccountNonce(address.address);
-                            if (address.amountPrev === null ) address.amountPrev = 0;
+                            let currentVal = Blockchain.AccountantTree.getBalance(address.address);
+                            if (currentVal === null) currentVal = 0;
 
-                            let currentVal = parseInt(address.amount);
-
-                            try {
-                                Blockchain.AccountantTree.updateAccount(address.address, currentVal - address.amountPrev, undefined, undefined, true);
-                            } catch (exception){
-
-                            }
+                            Blockchain.AccountantTree.updateAccount(address.address, address.amountPrev - currentVal , undefined, undefined, true);
 
                         });
 
+                    } catch (exception){
 
-                        transaction.noncePrev = Blockchain.AccountantTree.getAccountNonce(address);
-                        if (transaction.noncePrev === null ) transaction.noncePrev = 0;
-
-                        let currentNonce = transaction.nonce;
-                        if (currentNonce === null) currentNonce = 0;
-
-                        try {
-                            Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, currentNonce - transaction.noncePrev, undefined, undefined, true);
-                        } catch (exception){
-
-                        }
-
-                        //TODO use SPV
-
-                        let tx = null;
-                        if (transaction ) tx = Blockchain.Transactions._createTransaction( transaction.from, transaction.to, transaction.nonce, transaction.timeLock, transaction.version, undefined);
-
-                        let foundTx = Blockchain.Transactions.pendingQueue.findPendingTransaction( transaction.txId );
-
-                        if ( !foundTx ) {
-                            Blockchain.Transactions.pendingQueue.includePendingTransaction(tx, "all");
-                            foundTx = transaction;
-                        }
-
-                        tx._confirmed = transaction.confirmed;
-
-                        //restore to the original values
-                        try{
-
-                            let currentNonce = Blockchain.AccountantTree.getAccountNonce(address);
-                            if (currentNonce === null) currentNonce = 0;
-
-                            Blockchain.AccountantTree.updateAccountNonce(transaction.from.addresses[0].address, transaction.noncePrev - currentNonce , undefined, undefined, true);
-
-                            from.addresses.forEach( address =>{
-
-                                let currentVal = Blockchain.AccountantTree.getBalance(address.address);
-                                if (currentVal === null) currentVal = 0;
-
-                                Blockchain.AccountantTree.updateAccount(address.address, address.amountPrev - currentVal , undefined, undefined, true);
-
-                            });
-
-                        } catch (exception){
-
-                        }
-
-                        done = true;
                     }
 
-                    if (done)
-                        resolve(true);
-
-                } catch (exception){
-
+                    done = true;
                 }
+
+                if (done)
+                    resolve(true);
 
 
             });

@@ -3,11 +3,16 @@ import StatusEvents from "common/events/Status-Events"
 
 const BigInteger = require('big-integer');
 const BigNumber = require('bignumber.js');
-import BlockchainGenesis from './../../../../common/blockchain/global/Blockchain-Genesis'
+import BlockchainGenesis from 'src/common/blockchain/global/Blockchain-Genesis'
 
 import Serialization from "common/utils/Serialization";
 import InterfaceBlockchainBlockTimestamp from "./../blocks/Interface-Blockchain-Block-Timestamp"
 import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
+
+import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
+import LoadingManager from "common/blockchain/utils/loading-manager/Loading-Manager"
+import Log from "../../../utils/logging/Log";
+import NodeBlockchainPropagation from "../../../sockets/protocol/propagation/Node-Blockchain-Propagation";
 
 /**
  * It creates like an Array of Blocks. In case the Block doesn't exist, it will be stored as `undefined`
@@ -15,119 +20,75 @@ import WebDollarCrypto from "../../../crypto/WebDollar-Crypto";
 
 class InterfaceBlockchainBlocks{
 
-    constructor(blockchain){
+    constructor(blockchain, db){
 
         this.blockchain = blockchain;
 
+        this.db = db;
+
         this.blocksStartingPoint = 0;
         this._length = 0;
+        this.chainWork = BigInteger(0);
+        this.chainWorkSerialized = new Buffer(0);
 
         this._networkHashRate = 0 ;
 
-        this._chainWork =  new BigInteger(0);
-        this.chainWorkSerialized = new Buffer(0);
-
-        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER > 0)
-            setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
-
         this.timestampBlocks = new InterfaceBlockchainBlockTimestamp(blockchain);
+
+        this.savingManager = new SavingManager(this.blockchain);
+        this.loadingManager = new LoadingManager(this.blockchain, this.savingManager);
+
+        this.last = undefined;
+        this.first = undefined;
+
     }
 
-    addBlock(block, revertActions, saveBlock, showUpdate = true){
+    async addBlock(block, revertActions, saveBlock, showUpdate = true, socketsAvoidBroadcast){
 
-        this[this.length] =  block;
+        this.savingManager.addBlockToSave(block);
+        await this.emitBlockInserted(block);
 
-        this.length += 1;
+        NodeBlockchainPropagation.propagateBlock( block, socketsAvoidBroadcast);
 
-        if (showUpdate)
-            this.emitBlockCountChanged();
-
-        if (saveBlock)
-            this.emitBlockInserted(block);
-
-        //delete old blocks when I am in light node
-        if (this.blockchain.agent && this.blockchain.agent.light){
-
-            let index = this.length - consts.BLOCKCHAIN.LIGHT.SAFETY_LAST_BLOCKS_DELETE;
-
-            while (this[index] ){
-                this[index].destroyBlock();
-                delete this[index];
-
-                index--;
-            }
-
-            while (this.length > 0 && !this[this.blocksStartingPoint] && this.blocksStartingPoint < this.length)
-                this.blocksStartingPoint++;
-
-        }
+        await this.setLength( this.length + 1 );
 
         if ( revertActions )
             revertActions.push( {name: "block-added", height: this.length-1 } );
 
-        this.chainWork = this.chainWork.plus( block.workDone );
-
+        if (showUpdate)
+            this.emitBlockCountChanged();
 
     }
 
-    emitBlockInserted(block){
-        StatusEvents.emit("blockchain/block-inserted", block !== undefined ? block : this[this._length-1]);
+    async emitBlockInserted(block){
+        StatusEvents.emit("blockchain/block-inserted", block ? block : await this.last );
     }
 
     emitBlockCountChanged(){
         StatusEvents.emit("blockchain/blocks-count-changed", this._length);
     }
 
-    spliceBlocks(after, freeMemory = false, showUpdate = true){
+    async spliceBlocks(after, showUpdate = true){
 
-        for (let i = this.length - 1; i >= after; i--)
-            if (this[i] !== undefined){
-
-                this.chainWork = this.chainWork.minus( this[i].workDone );
-
-                if (freeMemory) {
-                    this[i].destroyBlock();
-                    delete this[i];
-                }
-                else
-                    this[i] = undefined;
-
-            }
-
-        if (this.length === 0)
-            this._chainWork =  new BigInteger(0);
-
-        this.length = after;
+        await this.setLength( after );
 
         if (showUpdate)
             this.emitBlockCountChanged();
+
     }
 
-    clear(){
-
-        this.spliceBlocks(0, true);
-
+    async clearBlocks(){
+        return this.spliceBlocks(0, true);
     }
 
     get endingPosition(){
 
-        if (this.blockchain.agent.light)
-            return this.blockchain.blocks.length;
-        else //full node
-            return this.blockchain.blocks.length;
+        //full node
+        return this.length;
+
     }
 
-    // aka head
-    get last() {
-        return this[this.length - 1];
-    }
-
-    // aka tail
-    get first() {
-        return this[ this.blocksStartingPoint ];
-    }
-
-    recalculateNetworkHashRate (){
+    async recalculateNetworkHashRate(){
 
         let MaxTarget = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET;
         let diff;
@@ -136,12 +97,14 @@ class InterfaceBlockchainBlocks{
         let SumDiffPoW = new BigNumber( 0 );
 
         let last, first;
-        for (let i = Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS*3); i<this.blockchain.blocks.endingPosition; i++) {
+        for (let i = Math.max( this.blockchain.blocks.blocksStartingPoint, Math.max(0, this.blockchain.blocks.endingPosition - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS*3)); i<this.blockchain.blocks.endingPosition; i++) {
 
-            if (this.blockchain.blocks[i] === undefined) continue;
-            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ this.blockchain.blocks[i].difficultyTarget.toString("hex") ) );
+            let block = await this.blockchain.getBlock(i);
 
-            if( BlockchainGenesis.isPoSActivated( this.blockchain.blocks[i].height ) )
+            if (i < 0) continue;
+            diff = MaxTarget.dividedBy( new BigNumber ( "0x"+ block.difficultyTarget.toString("hex") ) );
+
+            if( BlockchainGenesis.isPoSActivated( block.height ) )
                 SumDiffPoS = SumDiffPoS.plus( diff );
             else
                 SumDiffPoW = SumDiffPoW.plus( diff );
@@ -151,7 +114,7 @@ class InterfaceBlockchainBlocks{
 
         }
 
-        let how_much_it_took_to_mine_X_Blocks = this.blockchain.getTimeStamp( last ) - this.blockchain.getTimeStamp( first );
+        let how_much_it_took_to_mine_X_Blocks = await this.blockchain.getTimeStamp( last ) - await this.blockchain.getTimeStamp( first );
         let answer;
 
         if( BlockchainGenesis.isPoSActivated(this.blockchain.blocks.length-1) )
@@ -175,41 +138,32 @@ class InterfaceBlockchainBlocks{
         return this._networkHashRate;
     }
 
-    set length(newValue){
+    async setLength(newValue){
+
         this._length = newValue;
+
+        this.chainWork = await this.loadingManager.getChainWork( newValue - 1 );
+        this.chainWorkSerialized = Serialization.serializeBigInteger( this.chainWork );
+
+        this.last = await this.loadingManager.getBlock( newValue - 1);
     }
 
     get length(){
         return this._length;
     }
 
-    set chainWork(newValue){
-        this._chainWork = newValue;
-        this.chainWorkSerialized = Serialization.serializeBigInteger( newValue );
-    }
+    async readBlockchainLength(){
 
-    get chainWork(){
-        return this._chainWork;
-    }
+        let length = await this.loadingManager.readBlockchainLength();
+        if (!length) return false;
 
-    _freeAllBlocksTransactionsFromMemory(){
-
-        if (consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER <= 0) return false;
-
-        try {
-
-            for (let i = 0; i < Math.max(0, Math.floor( this.length - consts.SETTINGS.FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER ) ); i++)
-                if (this[i] !== undefined)
-                    this[i].data.transactions.freeTransactionsFromMemory();
-
-        } catch (exception){
-            console.error("_freeAllBlocksTransactionsFromMemory raised an error", this[i].data.transactions.freeTransactionsFromMemory() );
-        }
-
-        setTimeout( this._freeAllBlocksTransactionsFromMemory.bind(this), 100000 );
+        await this.setLength(length);
 
     }
 
+    async saveBlockchainLength(length = this.length){
+        return this.savingManager.saveBlockchainLength(length);
+    }
 
 }
 

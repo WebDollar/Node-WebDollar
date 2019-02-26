@@ -10,7 +10,6 @@ import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestma
 import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
 import StatusEvents from "common/events/Status-Events";
 import consts from 'consts/const_global'
-import SavingManager from "common/blockchain/utils/saving-manager/Saving-Manager"
 
 class InterfaceBlockchainBasic{
 
@@ -21,10 +20,8 @@ class InterfaceBlockchainBasic{
         this.agent = agent;
 
         this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
+
         this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
-
-
-        this.blocks = new InterfaceBlockchainBlocks(this);
 
         this.mining = undefined;
 
@@ -36,7 +33,6 @@ class InterfaceBlockchainBasic{
         this._createBlockchainElements();
 
         this.semaphoreProcessing = new SemaphoreProcessing();
-        this.savingManager = new SavingManager(this);
 
     }
 
@@ -46,6 +42,7 @@ class InterfaceBlockchainBasic{
     }
 
     _createBlockchainElements(){
+        this.blocks = new InterfaceBlockchainBlocks(this, this.db);
         this.transactions = new InterfaceBlockchainTransactions( this);
         this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
     }
@@ -69,7 +66,6 @@ class InterfaceBlockchainBasic{
     async _loadBlockchain(){
         return true;
     }
-
 
     toString(){
     }

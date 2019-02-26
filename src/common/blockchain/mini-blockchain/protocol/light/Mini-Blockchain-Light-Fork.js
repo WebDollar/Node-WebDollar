@@ -3,7 +3,6 @@ import MiniBlockchainFork from "./../Mini-Blockchain-Fork"
 import InterfaceBlockchainBlockValidation from "common/blockchain/interface-blockchain/blocks/validation/Interface-Blockchain-Block-Validation"
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
 const BigInteger = require('big-integer');
-import GZip from "common/utils/GZip";
 
 class MiniBlockchainLightFork extends MiniBlockchainFork {
 
@@ -16,7 +15,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
         this.forkPrevDifficultyTarget = null;
         this.forkPrevTimeStamp = null;
-        this.forkPrevHashPrev = null;
+        this.forkPrevHash = null;
         this.forkPrevChainWork = null;
         this.forkPrevChainWorkPrevHash = null;
 
@@ -64,17 +63,17 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
     }
 
-    getForkPrevHash(height){
+    getForkHash(height){
 
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevHashPrev === null || this.forkPrevHashPrev === undefined)
-                throw {message: "forkPrevHashPrev was not specified"};
-            return this.forkPrevHashPrev;
+            if ( !this.forkPrevHash )
+                throw {message: "forkPrevHash was not specified"};
+            return this.forkPrevHash;
         }
 
-        return MiniBlockchainFork.prototype.getForkPrevHash.call(this, height);
+        return MiniBlockchainFork.prototype.getForkHash.call(this, height);
     }
 
     getForkChainHash(height){
@@ -82,7 +81,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         let forkHeight = height - this.forkStartingHeight;
 
         if (this.forkChainStartingPoint === this.forkStartingHeight && height !== 0 && height === this.forkStartingHeight){
-            if (this.forkPrevChainWorkPrevHash === null || this.forkPrevChainWorkPrevHash === undefined)
+            if ( !this.forkPrevChainWorkPrevHash )
                 throw {message: "forkChainHash was not specified"};
             return this.forkPrevChainWorkPrevHash;
         }
@@ -108,7 +107,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             validationType["skip-validation-interlinks"] = true;
 
 
-        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(  this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     _createBlockValidation_BlockchainValidation(height, forkHeight){
@@ -127,7 +126,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
         if ( forkHeight === 0)
             validationType["skip-interlinks-update"] = true;
 
-        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
+        return new InterfaceBlockchainBlockValidation(   this.forkProofPi !== undefined ? this.getForkProofsPiBlock.bind(this) : this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
     preForkClone(){
@@ -186,7 +185,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
 
             this.blockchain.lightPrevDifficultyTargets[diffIndex] = this.forkPrevDifficultyTarget;
             this.blockchain.lightPrevTimeStamps[diffIndex] = this.forkPrevTimeStamp;
-            this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHashPrev;
+            this.blockchain.lightPrevHashPrevs[diffIndex] = this.forkPrevHash;
 
             this.blockchain.lightAccountantTreeSerializations[diffIndex] = this.forkPrevAccountantTree;
             this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] = this.forkPrevAccountantTreeGzipped;

@@ -14,26 +14,20 @@ import AdvancedMessages from "node/menu/Advanced-Messages"
 
 class InterfaceBlockchainAddressHelper{
 
-    constructor (){
-
-    }
-
     static _generatePrivateKeyAdvanced(salt, showDebug, privateKeyWIF){
 
         //tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
 
         let privateKey;
 
-        if (privateKeyWIF !== undefined && privateKeyWIF !== null) {
+        if ( privateKeyWIF ) {
             let result = InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKeyWIF);
-            if (result.result) {
+            if (result.result)
                 privateKey = result.privateKey;
-            }
         }
 
-        if (privateKey === undefined) {
+        if ( !privateKey )
             privateKey = ed25519.generatePrivateKey();
-        }
 
 
         //if you want to follow the step-by-step results in this article, comment the
@@ -88,7 +82,7 @@ class InterfaceBlockchainAddressHelper{
 
         // Tutorial based on https://github.com/cryptocoinjs/secp256k1-node
 
-        if (privateKeyWIF === null || privateKeyWIF === undefined || !Buffer.isBuffer(privateKeyWIF) ){
+        if ( !privateKeyWIF || !Buffer.isBuffer(privateKeyWIF) ){
             console.error("ERROR! ",  privateKeyWIF, " is not a Buffer");
             throw {message: 'privateKeyWIF must be a Buffer', privateKeyWIF: privateKeyWIF};
         }
@@ -267,7 +261,7 @@ class InterfaceBlockchainAddressHelper{
      */
     static validatePrivateKeyWIF(privateKeyWIF){
 
-        if (privateKeyWIF === null || !Buffer.isBuffer(privateKeyWIF) ){
+        if ( !privateKeyWIF || !Buffer.isBuffer(privateKeyWIF) ){
             throw {message: 'privateKeyWIF must be a Buffer'};
         }
 
@@ -335,7 +329,7 @@ class InterfaceBlockchainAddressHelper{
      */
     static _validateAddressWIF(addressWIF){
 
-        if (addressWIF === null || !Buffer.isBuffer(addressWIF) ){
+        if ( !addressWIF  || !Buffer.isBuffer(addressWIF) ){
             throw { message: 'addressWIF must be a Buffer', addressWIF: addressWIF };
         }
 
@@ -426,18 +420,13 @@ class InterfaceBlockchainAddressHelper{
             let password = answer.trim().split(' ');
 
             for (let i = password.length - 1; i >= 0; i--)
-            {
                 if (password[i].length === 0)
-                {
                     password.splice( i , 1);
-                }
-            }
 
-            if (password.length !== 12)
-            {
+
+            if (password.length !== 12) {
                 AdvancedMessages.alert(`You entered a password that has ${password.length} words. It must have 12!`, 'Password Error', 'error', 5000);
-                resolve(null);
-                return;
+                return resolve(null);
             }
 
             resolve(password);

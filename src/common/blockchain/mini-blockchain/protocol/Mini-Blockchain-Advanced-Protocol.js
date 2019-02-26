@@ -12,121 +12,29 @@ class MiniBlockchainAdvancedProtocol extends MiniBlockchainProtocol{
         MiniBlockchainProtocol.prototype._initializeNewSocket.call(this, nodesListObject);
 
         /**
-         * Get last K accountant Trees
-         */
-        socket.node.on("get/blockchain/accountant-tree/get-accountant-tree", async (data)=>{
-
-            try{
-
-                if (data.height === undefined) data.height = -1;
-
-                if (typeof data.height !== "number")
-                    throw {message: "data.height is not a number"};
-
-                if (this.blockchain.blocks.length < data.height)
-                    throw {message: "height is not valid"};
-
-                if (data.height < -1)
-                    throw {message: "height is not valid"};
-
-                let gzipped = data.gzipped || false;
-
-                let serialization = this.blockchain.getSerializedAccountantTree( data.height , gzipped );
-
-                if (serialization === undefined && gzipped) { //just send the initial tree
-                    serialization = this.blockchain.getSerializedAccountantTree(data.height);
-                    gzipped = false;
-                }
-
-                let moreChunks = false;
-
-                if (typeof data.substr === "object" && data.substr !== null) {
-
-                    if (typeof data.substr.startIndex === "number" && typeof data.substr.count === "number") {
-
-                        if (data.substr.count < consts.SETTINGS.PARAMS.MAX_SIZE.MINIMUM_SPLIT_CHUNKS_BUFFER_SOCKETS_SIZE_BYTES) throw {message:"way to few messages"};
-
-
-                        if ((serialization.length - data.substr.startIndex) > data.substr.count)
-                            moreChunks = true;
-                        else
-                            moreChunks = false;
-
-                        if (serialization.length - 1 - data.substr.startIndex > 0)
-                            serialization = BufferExtended.substr(serialization, data.substr.startIndex, Math.min(data.substr.count, serialization.length  - data.substr.startIndex));
-                        else
-                            serialization = new Buffer(0);
-
-                        return socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
-                            result: true,
-                            accountantTree: serialization,
-                            moreChunks: moreChunks,
-                            gzipped: gzipped,
-                        });
-                        
-                    }
-
-                } else {
-                    return socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
-                        result: true,
-                        accountantTree:serialization,
-                        gzipped: gzipped,
-                    }); 
-                }
-
-
-            } catch (exception){
-
-                console.error("Socket Error - get/blockchain/accountant-tree/get-accountant-tree", exception, data);
-
-                socket.node.sendRequest("get/blockchain/accountant-tree/get-accountant-tree/" + data.height, {
-                    result: false,
-                    message: exception
-                });
-
-            }
-
-
-        });
-
-        /**
          * Get difficulty, accountant Tree for Light Nodes
          */
         socket.node.on("get/blockchain/light/get-light-settings", async (data)=>{
 
-            try{
+            if (data.height === undefined)
+                data.height = -1;
 
-                if (data.height === undefined)
-                    data.height = -1;
+            if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
+            if (data.height < 0) throw {message: "height is not valid"};
 
-                if (typeof data.height !== "number" ) throw {message: "data.height is not a number"};
-                if (data.height < 0) throw {message: "height is not valid"};
+            if (this.blockchain.blocks.length < data.height)
+                throw {message: "height is not valid"};
 
-                if (this.blockchain.blocks.length < data.height)
-                    throw {message: "height is not valid"};
+            let difficultyTarget = await this.blockchain.getDifficultyTarget(data.height);
+            let timestamp = this.blockchain.getTimeStamp(data.height);
+            let hashPrev = this.blockchain.getHash(data.height-1);
 
-                let difficultyTarget = this.blockchain.getDifficultyTarget(data.height);
-                let timestamp = this.blockchain.getTimeStamp(data.height);
-                let hashPrev = this.blockchain.getHashPrev(data.height);
-
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
-                    result: difficultyTarget !== null ? true : false,
-                    difficultyTarget: difficultyTarget,
-                    timeStamp: timestamp,
-                    hashPrev: hashPrev,
-                });
-
-
-            } catch (exception){
-
-                console.error("Socket Error - get/blockchain/light/get-light-settings", exception, data);
-
-                socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
-                    result: false,
-                    message: exception
-                });
-
-            }
+            socket.node.sendRequest("get/blockchain/light/get-light-settings/" + data.height, {
+                result: difficultyTarget ? true : false,
+                difficultyTarget: difficultyTarget,
+                timeStamp: timestamp,
+                hashPrev: hashPrev,
+            });
 
         });
 

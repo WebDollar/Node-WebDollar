@@ -13,7 +13,7 @@ class GeoHelper {
 
         if (consts.SETTINGS.GEO_IP_ENABLED === false) return;
 
-        if ( skipSocketAddress === undefined) skipSocketAddress = false;
+        if ( !skipSocketAddress ) skipSocketAddress = false;
 
         let sckAddress = null;
 
@@ -26,6 +26,25 @@ class GeoHelper {
                 return sckAddress._geoLocation;
         }
 
+
+        let result = {
+            country: '',
+            countryCode: '',
+            city: '',
+            state: '',
+            region: '',
+            regionCode: '',
+
+            lat: (22.2120780),
+            lng: (-40.1109744),
+            isp: '',
+            timezone: '',
+
+            continent: '',
+            address: address,
+        };
+
+
         try{
 
             let localIP = false;
@@ -35,78 +54,47 @@ class GeoHelper {
             }
 
             let list = [];
-            list.push("https://geo.xoip.ro/?address="+address);
+            list.push("https://ipstack.com/ipstack_api.php?ip="+address);
+            // list.push("https://geo.xoip.ro/?address="+address);
             // list.push("https://geoip.tools/v1/json/?q="+address);
             // list.push ( ["https://geoip-db.com/json/"+address,  ]); //don't support domains
 
             let data = await DownloadHelper.downloadMultipleFiles( list, 20000 );
 
-            if (data !== null && data !== undefined){
+            if (data){
 
-                let countryCode = '';
-                let country = '';
-                let continent = '--';
+                if (data.length === 1) data = data[0];
 
                 //console.log("location data", address, data);
 
-                if (data.country !== undefined) country = data.country;
-                if (data.country_name !== undefined) country = data.country_name;
-
-                if (data.countryCode !== undefined) countryCode = data.countryCode;
-                if (data.country_code !== undefined) countryCode = data.country_code;
+                result.country = data.country || data.country_name;
+                result.countryCode = data.countryCode || data.country_code;
 
                 if (address === '')
-                    if (data.query !== undefined) address = address || data.query;
+                    if (data.query ) result.address = address || data.query;
 
-                if (countryCode !== '')
-                    continent = getContinentFromCountry(countryCode);
+                if (result.countryCode )
+                    result.continent = getContinentFromCountry(result.countryCode);
 
-                let geoLocation = {
-                    country: country,
-                    countryCode: countryCode,
-                    city: data.city||'',
-                    state: data.state||'',
-                    region: data.regionname||data.region_name||'',
-                    regionCode: data.regioncode||data.region_code||'',
-
-                    lat: (data.latitude||data.lat||22.2120780) + (localIP ? 0.05* (-1 + 2*Math.random() ) : 0),
-                    lng: (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.05*(-1 + 2*Math.random()) : 0),
-                    isp: data.isp,
-                    timezone: data.timezone||data.time_zone||'',
-
-                    continent: continent,
-                    address: address,
-                };
+                result.city = data.city||'';
+                result.state = data.state||'';
+                result.region = data.regionname||data.region_name||'';
+                result.regionCode = data.regioncode||data.region_code||'';
+                result.lat = (data.latitude||data.lat||22.2120780) + (localIP ? 0.05* (-1 + 2*Math.random() ) : 0);
+                result.lng = (data.longitude||data.lng||data.lon||-40.1109744) + (localIP ? 0.05*(-1 + 2*Math.random()) : 0);
+                result.timezone = data.timezone||data.time_zone||'';
 
                 if (!skipSocketAddress)
-                    sckAddress._geoLocationResolver( geoLocation );
+                    sckAddress._geoLocationResolver( result );
 
-
-                return geoLocation;
-
-            } else throw {message: "error downloading data"};
+            }
 
         }
         catch(Exception){
             console.error("GeoHelper getLocationFromAddress raised an error ",Exception);
-
-            return {
-                country: '',
-                countryCode: '',
-                city: '',
-                state: '',
-                region: '',
-                regionCode: '',
-
-                lat: (22.2120780),
-                lng: (-40.1109744),
-                isp: '',
-                timezone: '',
-
-                continent: '',
-                address: address,
-            };
         }
+
+        return result;
 
     }
 

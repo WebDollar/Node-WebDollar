@@ -5,7 +5,7 @@ class BansList{
 
     constructor(){
 
-        this.bans = [];
+        this._bans = [];
 
         NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
 
@@ -13,91 +13,87 @@ class BansList{
 
         });
 
-        setInterval( this._listBans.bind(this), 20*1000  )
+        this._intervalRemove = setInterval( this._removeEmptyBans.bind(this), 10*1000  );
 
     }
 
     isBanned(sckAddress){
 
-        let ban = this.getBan(sckAddress);
-        if (ban === null)
-            return false;
+        let pos = this._findBan(sckAddress);
+        if ( pos < 0 ) return false;
 
-        return ban.isBanned(sckAddress);
+        return this._bans[pos].isBanned(sckAddress);
     }
 
     addBan(sckAddress, banTime = 10000, banReason){
 
-        if (sckAddress === undefined || sckAddress === null) return false;
+        if ( !sckAddress ) return false;
 
-        if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("node")) sckAddress = sckAddress.node.sckAddress;
-        if (typeof sckAddress === "object" && sckAddress.hasOwnProperty("sckAddress")) sckAddress = sckAddress.node.sckAddress;
+        if ( sckAddress  && sckAddress.node) sckAddress = sckAddress.node;
+        if ( sckAddress  && sckAddress.sckAddress ) sckAddress = sckAddress.sckAddress;
 
         let ban = this.getBan(sckAddress);
 
-        if (ban === null) {
+        if ( !ban ) {
 
             ban = new BanObject(sckAddress);
-            this.bans.push(ban);
+            this._bans.push(ban);
 
         }
 
         ban.increaseBanTrials(banTime, banReason);
 
-        this._removeEmptyBans();
-
         return ban;
     }
 
-    findBan(sckAddress){
+    _findBan(sckAddress){
 
-        for (let i = 0; i < this.bans.length; i++)
-            if (this.bans[i].sckAddress.matchAddress(sckAddress, {"uuid": true} ) )
+        for (let i = 0; i < this._bans.length; i++)
+            if (this._bans[i].sckAddress.matchAddress(sckAddress, {"uuid": true} ) )
                 return i;
 
-        return null;
+        return -1;
     }
 
     getBan(sckAddress){
 
-        let index = this.findBan(sckAddress);
-        if (index !== null)
-            return this.bans[index];
+        let pos = this._findBan(sckAddress);
+        if (pos >= 0) return this._bans[pos];
 
-        return null;
     }
 
     deleteBan(sckAddress){
 
-        let ban = this.getBan(sckAddress);
-
-        if (ban !== null)
-            ban.upLiftBan();
+        let position = this._findBan(sckAddress);
+        if ( position >= 0 ){
+            this._bans[position].upLiftBan();
+            this._bans.splice(position, 1)
+        }
 
     }
 
     _removeEmptyBans(){
 
-        for (let i=this.bans.length-1; i>=0; i--)
-            if (this.bans[i].sckAddress === undefined || !this.bans[i].isBanned() )
-                this.bans.splice(i,1)
+        for (let i=this._bans.length-1; i>=0; i--)
+            if ( !this._bans[i].sckAddress || !this._bans[i].isBanned() )
+                this._bans.splice(i,1)
 
     }
 
-    _listBans(){
+    listBans(){
         
-        if (this.bans.length > 0)
+        if (this._bans.length > 0)
             console.info("BANNNNNNNNNNNNNNS");
 
-        for (let i=0; i<this.bans.length; i++) {
+        for (let i=0; i<this._bans.length; i++) {
 
-            let timeLeft  = (this.bans[i].banTimestamp + this.bans[i].banTime) - new Date().getTime() ;
+            let timeLeft  = (this._bans[i].banTimestamp + this._bans[i].banTime) - new Date().getTime() ;
 
             if (timeLeft > 0)
-                console.warn("Address", this.bans[i].sckAddress.toString(),
-                    "banTime", this.bans[i].banTime,
+                console.warn(this._bans[i].sckAddress.toString(),
+                    "banTime", this._bans[i].banTime,
                     "timeLeft", timeLeft ,
-                    "messages", this.bans[i].banReasons);
+                    "messages", this._bans[i].banReasons);
         }
 
     }

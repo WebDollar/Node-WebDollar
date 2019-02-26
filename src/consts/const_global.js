@@ -69,7 +69,7 @@ consts.BLOCKCHAIN = {
         WALLET_RECOVERY: 153060,
 
         TRANSACTIONS_BUG_2_BYTES: 46950,
-        TRANSACTIONS_OPTIMIZATION: 153060,
+        TRANSACTIONS_OPTIMIZATION: 153065,
 
         DIFFICULTY_TIME_BIGGER: 153060,
         DIFFICULTY_REMOVED_CONDITION: 161990,
@@ -266,18 +266,17 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.203.2",
+        VERSION: "1.211.4",
 
-        VERSION_COMPATIBILITY: "1.200.1",
+        VERSION_COMPATIBILITY: "1.200.2",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
 
         VERSION_COMPATIBILITY_UPDATE: "",
-        VERSION_COMPATIBILITY_UPDATE_BLOCK_HEIGHT: 0,
 
         PROTOCOL: "WebDollar",
         SSL: true,
 
-        PORT: 80, //port
+        PORT: 8080, //port
         MINER_POOL_PORT: 8086, //port
 
     },
@@ -286,7 +285,7 @@ consts.SETTINGS = {
         FALLBACK_INTERVAL: 10 * 1000,                     //miliseconds
         STATUS_INTERVAL: 40 * 1000,
         LATENCY_CHECK: 5*1000,
-        MAX_ALLOWED_LATENCY: 6*1000,  //miliseconds
+        MAX_ALLOWED_LATENCY: 5*1000,  //miliseconds
         CONCURRENCY_BLOCK_DOWNLOAD_MINERS_NUMBER: (process.env.BROWSER? 10 : 30),
 
 
@@ -324,8 +323,8 @@ consts.SETTINGS = {
 
                 CLIENT: {
 
-                    MAX_SOCKET_CLIENTS_WAITLIST: 3,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                    MAX_SOCKET_CLIENTS_WAITLIST: 5,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 5,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
                     MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
@@ -406,7 +405,6 @@ consts.SETTINGS = {
 
     },
     GEO_IP_ENABLED: true,
-    FREE_TRANSACTIONS_FROM_MEMORY_MAX_NUMBER: 50000, //use 0 to be disabled
 };
 
 consts.TERMINAL_WORKERS = {
@@ -515,7 +513,7 @@ if (process.env.NETWORK && process.env.NETWORK !== '' && process.env.NETWORK ===
 
 if ( consts.DEBUG === true ) {
 
-    consts.MINING_POOL.SKIP_POW_REWARDS = true;
+    consts.MINING_POOL.SKIP_POW_REWARDS = false;
     consts.MINING_POOL.SKIP_POS_REWARDS = false;
 
     consts.SETTINGS.NODE.VERSION = "3"+consts.SETTINGS.NODE.VERSION;
@@ -535,15 +533,16 @@ if ( consts.DEBUG === true ) {
 
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
-        //"addr": ["http://86.126.138.61:2024"],
+        "addr": ["http://86.126.138.61:2024"],
     }];
+
 
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_INPUTS = 1000;
     consts.SPAM_GUARDIAN.TRANSACTIONS.MAXIMUM_IDENTICAL_OUTPUTS = 1000;
 
-    consts.SETTINGS.NODE.VERSION = "1.210.6" ;
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.6";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.6";
+    consts.SETTINGS.NODE.VERSION = "1.210.9" ;
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.9";
+    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.9";
 
 }
 

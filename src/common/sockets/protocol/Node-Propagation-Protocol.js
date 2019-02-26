@@ -97,10 +97,15 @@ class NodePropagationProtocol {
 
         socket.on("propagation/simple-waitlist-nodes", async ( data, callback )=>{
 
+            try{
 
-            await this._processNodesList(data, socket);
+                await this._processNodesList(data, socket);
 
-            callback("received",{ });
+                callback("received",{ });
+
+            } catch (exception){
+
+            }
 
         });
 
@@ -198,13 +203,13 @@ class NodePropagationProtocol {
 
     initializeNodesPropagation(socket){
 
-        socket.on("propagation/nodes", async data => { await this._processNodesList(data, socket )}, );
+        socket.on("propagation/nodes",  data => this._processNodesList(data, socket ) );
 
         socket.node.on("propagation/request-all-wait-list/full-nodes", response =>{
 
             let answer = this._getWaitlist( response, NodesWaitlist.waitListFullNodes );
 
-            if (answer !== null && answer.list.length > 0)
+            if (answer && answer.list.length > 0)
                 socket.node.sendRequest("propagation/nodes", {"op": "new-full-nodes", addresses: answer.list, next: answer.next});
 
         });
@@ -213,7 +218,7 @@ class NodePropagationProtocol {
 
             let answer = this._getWaitlist( response, NodesWaitlist.waitListLightNodes );
 
-            if (answer !== null && answer.list.length > 0)
+            if (answer && answer.list.length > 0)
                 socket.node.sendRequest("propagation/nodes", {"op": "new-light-nodes", addresses: answer.list, next: answer.next});
 
         });

@@ -146,6 +146,7 @@ class Serialization{
             value = (value * 256) + buffer[i];
 
         return value;
+
     }
 
     deserializeNumber(buffer){
@@ -182,6 +183,7 @@ class Serialization{
         }
 
         return result;
+
     }
 
     serializeHashOptimized(hash){

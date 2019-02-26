@@ -1,5 +1,6 @@
 import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import SocketAddress from "common/sockets/protocol/extend-socket/Socket-Address";
+import Utils from "common/utils/helpers/Utils";
 
 const io = require('socket.io');
 
@@ -99,17 +100,18 @@ class NodeServer {
                 if (!this.loaded) return;
 
                 if (socket.request._query["msg"] !== "HelloNode"){
-                    console.error("No Hello Msg");
+                    if (Math.random() < 0.05) console.error("No Hello Msg");
                     return socket.disconnect();
                 }
 
                 if (!socket.request._query["version"] || socket.request._query["version"] < consts.SETTINGS.NODE.VERSION_COMPATIBILITY){
-                    if (Math.random() < 0.05)
-                        console.error("version is invalid", socket.request._query["version"]);
+                    if (Math.random() < 0.05) console.error("version is invalid", socket.request._query["version"]);
                     return socket.disconnect();
                 }
-
                 if ( socket.request._query["uuid"] === consts.SETTINGS.UUID ) return false;
+
+                let nodeVersion = socket.request._query["version"];
+                let nodeUUID = socket.request._query["uuid"];
 
                 let nodeType = socket.request._query["nodeType"];
                 if (typeof nodeType  === "string") nodeType = parseInt(nodeType);
@@ -199,24 +201,24 @@ class NodeServer {
 
                     SocketExtend.extendSocket(socket, sckAddress, undefined, undefined, 1);
 
+                    if (await socket.node.protocol.processHello({
+                        version: nodeVersion,
+                        uuid: nodeUUID,
+                        nodeType: nodeType,
+                        nodeConsensusType: nodeConsensusType,
+                        domain: nodeDomain,
+                        UTC: nodeUTC,
+                    }, { "uuid": true, "ip": true, "port": true} ) === false) {
+                        return socket.disconnect();
+                    }
+
                     if ( Math.random() < 0.3)
                         console.warn('New connection from ' + socket.node.sckAddress.getAddress(true) + " "+ (nodeType === NODE_TYPE.NODE_WEB_PEER ? "browser" : "terminal") );
 
                     if (nodeType === NODE_TYPE.NODE_TERMINAL ) this._rooms.terminals.serverSits--;
                     else if (nodeType === NODE_TYPE.NODE_WEB_PEER ) this._rooms.browsers.serverSits--;
 
-                    if (await socket.node.protocol.sendHello({ "uuid": true, "ip": true, "port": true}, false) === false){
-
-                        socket.disconnect();
-                        return false;
-
-                    }
-
-                    socket.node.protocol.nodeType = nodeType;
-                    socket.node.protocol.nodeUTC = nodeUTC;
-                    socket.node.protocol.nodeDomain = nodeDomain;
-
-                    socket.node.protocol.nodeConsensusType = nodeConsensusType || NODES_CONSENSUS_TYPE.NODE_CONSENSUS_PEER;
+                    await socket.node.protocol.justSendHello();
 
                     socket.node.protocol.helloValidated = true;
 

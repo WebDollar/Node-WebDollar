@@ -10,12 +10,6 @@ else inheritFork = InterfaceBlockchainFork;
 class MiniBlockchainFork extends inheritFork{
 
 
-    constructor(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header){
-
-        super(blockchain, forkId, sockets, forkStartingHeight, forkChainStartingPoint, forkChainLength, header)
-
-    }
-
     /**
      * Fork Validation for Mini Blockchain is not checking the Accountant Tree
      */
@@ -26,41 +20,7 @@ class MiniBlockchainFork extends inheritFork{
             "skip-validation-transactions-from-values": true //can not validate the transactions
         };
 
-        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkPrevHash.bind(this), this.getForkChainHash.bind(this), validationType );
-    }
-
-    preForkClone(cloneBlocks=true, cloneAccountantTree=true){
-
-        InterfaceBlockchainFork.prototype.preForkClone.call(this, cloneBlocks);
-
-
-
-    }
-
-    preFork(revertActions, showUpdate=true){
-
-        //remove transactions and rewards from each blocks
-        for (let i = this.blockchain.blocks.length - 1; i >= this.forkStartingHeight; i--) {
-
-            let block = this.blockchain.blocks[i];
-
-            // remove transactions
-            for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
-                block.data.transactions.transactions[j].processTransaction( -1, block.data.minerAddress, revertActions, showUpdate );
-
-            // remove reward
-            this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, revertActions, showUpdate);
-
-        }
-
-        return inheritFork.prototype.preFork.call(this, revertActions);
-
-    }
-
-    revertFork(){
-
-        return inheritFork.prototype.revertFork.call(this);
-
+        return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 
 

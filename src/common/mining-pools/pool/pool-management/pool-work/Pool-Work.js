@@ -58,8 +58,6 @@ class PoolWork {
         this.lastBlockPromise = Utils.makeQuerablePromise( new Promise( async (resolve)=>{
 
             this.lastBlock = await this.blockchain.mining.getNextBlock();
-            this.lastBlock._difficultyTargetPrev = this.lastBlock.difficultyTargetPrev;
-            this.lastBlock._hashPrev = this.lastBlock.hashPrev;
 
             this.lastBlockNonce = 0;
 
@@ -74,7 +72,7 @@ class PoolWork {
 
             try{
 
-                this.lastBlockSerialization = this.lastBlock.serializeBlock(true );
+                this.lastBlockSerialization = await this.lastBlock.serializeBlock(true );
 
             } catch (exception){
 
@@ -150,8 +148,6 @@ class PoolWork {
                         for (let key in this._blocksList[i].instances)
                             this._blocksList[i].instances[key].workBlock = undefined;
 
-                        if (this._blocksList[i].block )
-                            this._blocksList[i].block.destroyBlock();
 
                         this._blocksList[i].block = undefined;
                         this._blocksList[i].instances = undefined;

@@ -5,7 +5,7 @@ import NodeSignalingClientProtocol from 'common/sockets/protocol/signaling/clien
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 import SocketProtocol from "./Socket-Protocol"
 import global from "consts/global"
-
+import consts from "consts/const_global";
 // Extending Socket / Simple Peer
 
 class SocketExtend{
@@ -20,31 +20,45 @@ class SocketExtend{
             level: level,
         };
 
-        socket.node.getSocket = () => { return socket; };
+        socket.node.getSocket = () => socket ;
 
-        socket.node.on = (name, callback ) => {
-            socket.on(name, (data)=>{
+        socket.node.on = (name, callback ) =>
+            socket.on(name, async (data)=>{
 
-                if (global.TERMINATED)
-                    return;
+                if (global.TERMINATED) return;
 
-                SocketProtocol._processBufferArray(data);
+                try{
 
-                return callback(data);
-            })
-        } ;
+                    SocketProtocol._processBufferArray(data);
 
-        socket.node.once = (name, callback ) => {
-            socket.once(name, (data)=>{
+                    let answer = await callback(data);
+                    return answer;
 
-                if (global.TERMINATED)
-                    return;
+                }catch(exception){
+                    if (consts.DEBUG)
+                        console.log("socket.on raised an error", exception);
+                }
 
-                SocketProtocol._processBufferArray(data);
+            });
 
-                return callback(data);
-            })
-        } ;
+        socket.node.once = (name, callback ) =>
+            socket.once(name, async (data)=>{
+
+                if (global.TERMINATED) return;
+
+                try{
+
+                    SocketProtocol._processBufferArray(data);
+
+                    let answer = await callback(data);
+                    return answer;
+
+                }catch(exception){
+                    if (consts.DEBUG)
+                        console.log("socket.on raised an error", exception);
+                }
+            });
+
         socket.node.sckAddress = SocketAddress.createSocketAddress(address, port, uuid);
 
         if (socket.webRTC)
@@ -61,7 +75,6 @@ class SocketExtend{
         socket.node.protocol.blocksPrevious = 0;
 
         socket.node.protocol.justSendHello = NodeProtocol.prototype.justSendHello.bind(socket);
-        socket.node.protocol.sendHello = NodeProtocol.prototype.sendHello.bind(socket);
         socket.node.protocol.processHello = NodeProtocol.prototype.processHello.bind(socket);
 
         socket.node.protocol.sendLastBlock = NodeProtocol.prototype.sendLastBlock.bind(socket);
@@ -74,14 +87,14 @@ class SocketExtend{
         });
 
         socket.node.protocol.propagation = {};
-        socket.node.protocol.propagation.initializePropagation = () => { return NodePropagationProtocol.initializeSocketForPropagation(socket) };
+        socket.node.protocol.propagation.initializePropagation = () => NodePropagationProtocol.initializeSocketForPropagation(socket);
 
         socket.node.protocol.signaling = {};
         socket.node.protocol.signaling.server = {};
-        socket.node.protocol.signaling.server.initializeSignalingServerService = () => { return NodeSignalingServerProtocol.initializeSignalingServerService(socket) };
+        socket.node.protocol.signaling.server.initializeSignalingServerService = () => NodeSignalingServerProtocol.initializeSignalingServerService(socket);
 
         socket.node.protocol.signaling.client = {};
-        socket.node.protocol.signaling.client.initializeSignalingClientService = () => { return NodeSignalingClientProtocol.initializeSignalingClientService(socket, ) };
+        socket.node.protocol.signaling.client.initializeSignalingClientService = () =>  NodeSignalingClientProtocol.initializeSignalingClientService(socket, );
 
         socket.node.protocol.agent = {};
         socket.node.protocol.agent.startedAgentDone = false;

@@ -30,13 +30,13 @@ class InterfaceBlockchainTransaction{
 
         this._confirmed = false;
 
-        if(validateTimeLock)
+        if (validateTimeLock)
             if ( !timeLock )
                 this.timeLock = blockchain.blocks.length-1;
             else
                 this.timeLock = timeLock;
 
-        if(validateVersion)
+        if (validateVersion)
             if ( !version ){
 
                 if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
@@ -115,27 +115,6 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    destroyTransaction(pendingTransactionsWereIncluded){
-
-        //avoid to delete
-        if (pendingTransactionsWereIncluded)
-            this.pendingTransactionsIncluded--;
-
-        if ( this.pendingTransactionsIncluded && this.pendingTransactionsIncluded > 0)
-            return;
-
-        this.blockchain.transactions.pendingQueue.removePendingTransaction(this, undefined, false);
-
-        this.blockchain = undefined;
-
-        delete this._serializated;
-        delete this.from.addresses;
-        delete this.from.currencyTokenId;
-        delete this.to.addresses;
-        delete this.txId;
-
-    }
-
     _createTransactionFrom(from){
         return new InterfaceBlockchainTransactionFrom(this, from);
     }
@@ -191,12 +170,19 @@ class InterfaceBlockchainTransaction{
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
 
         if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
-        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
-        if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
-
         if (blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
-        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
-        if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+
+        //there are 2 blocks that include two types of transactions
+        if (blockHeight !== 153065 && blockHeight !== 154939  && blockHeight !== 163636 && blockHeight !== 165207 && blockHeight !== 185767 && blockHeight !== 185769 ){
+
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+            if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+
+            if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
+            if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+
+        }
+
 
         if (this.nonce > 0xFFFF) throw {message: "nonce is invalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
@@ -316,9 +302,7 @@ class InterfaceBlockchainTransaction{
         return Buffer.concat (array);
     }
 
-    deserializeTransaction(buffer, offset, returnTransaction=false){
-
-        offset = offset || 0;
+    deserializeTransaction(buffer, offset=0, returnTransaction=false){
 
         if (!Buffer.isBuffer(buffer))
             buffer = WebDollarCryptoData.createWebDollarCryptoData(buffer).buffer;
@@ -440,7 +424,7 @@ class InterfaceBlockchainTransaction{
         if (this._confirmed !== newValue)
             this._confirmed = newValue;
 
-        this.blockchain.transactions.emitTransactionChangeEvent(this);
+        this.blockchain.transactions.emitTransactionChangeEvent(this, false, newValue);
 
     }
 

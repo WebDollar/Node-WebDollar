@@ -34,9 +34,11 @@ class InterfaceBlockchainHardForks{
         // Get mined blocks and transactions
         for (let i=height; i<this.blockchain.blocks.length; i++) {
 
-            for (let j = 0; j < this.blockchain.blocks[i].data.transactions.transactions.length; j++) {
+            let block = await this.blockchain.getBlock(i);
 
-                let transaction = this.blockchain.blocks[i].data.transactions.transactions[j];
+            for (let j = 0; j < block.data.transactions.transactions.length; j++) {
+
+                let transaction = block.data.transactions.transactions[j];
 
                 let addrIndex = findAddressInList(transaction.from.addresses[0].unencodedAddress);
                 if (addrIndex !== -1) {
@@ -55,7 +57,7 @@ class InterfaceBlockchainHardForks{
 
                     let fee = transaction.fee;
 
-                    let miner = InterfaceBlockchainAddressHelper.generateAddressWIF( this.blockchain.blocks[i].data.minerAddress, false, true);
+                    let miner = InterfaceBlockchainAddressHelper.generateAddressWIF( block.data.minerAddress, false, true);
                     if (this._output[miner] === undefined) this._output[miner] = 0;
                     this._output[miner] += Math.min( this._output[from], fee);
 
@@ -67,7 +69,7 @@ class InterfaceBlockchainHardForks{
                     console.log("miner  ", miner, "  ", fee / WebDollarCoins.WEBD);
 
                     list.push(transaction.to.addresses[0].unencodedAddress);
-                    list.push(this.blockchain.blocks[i].data.minerAddress);
+                    list.push( block.data.minerAddress);
 
                 }
 

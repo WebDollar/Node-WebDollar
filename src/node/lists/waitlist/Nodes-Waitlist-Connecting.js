@@ -153,7 +153,7 @@ class NodesWaitlistConnecting {
 
         //search if the new protocol was already connected in the past
         let nodeClient = NodesList.searchNodeSocketByAddress( nextWaitListObject.sckAddresses[index], 'all', {"id": true,"uuid":true } );
-        if (nodeClient !== null) return nodeClient;
+        if (nodeClient ) return nodeClient;
 
         nodeClient = new NodeClient();
 
@@ -162,7 +162,10 @@ class NodesWaitlistConnecting {
             let answer = await nodeClient.connectToWaitlist (nextWaitListObject, index);
 
             if (answer) nextWaitListObject.socketConnected(nodeClient.socket);
-            else nextWaitListObject.socketErrorConnected();
+            else{
+                nextWaitListObject.socketErrorConnected();
+                await NodesList.disconnectSocket(nodeClient.socket);
+            }
 
             nextWaitListObject.connecting = false;
             return answer;

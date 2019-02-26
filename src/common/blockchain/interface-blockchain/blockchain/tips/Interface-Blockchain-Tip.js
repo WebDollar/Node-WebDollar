@@ -60,7 +60,7 @@ class InterfaceBlockchainTip{
             return true;
         else
         if (this.blockchain.blocks.length === this.forkChainLength) //I need to check
-            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHashPrev(this.blockchain.blocks.length) ) < 0)
+            if (this.forkLastBlockHeader.hash.compare( this.blockchain.getHash(this.blockchain.blocks.length-1) ) < 0)
                 return true;
 
         return false;

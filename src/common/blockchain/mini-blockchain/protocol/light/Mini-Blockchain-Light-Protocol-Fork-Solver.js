@@ -58,7 +58,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, [12, 13, 14, 15, 16, 17, 18,   19,      20, 21 ]
          diff1        	  diff2                                        diff3
 
-         pt 11: am nevoie 0,1,2,3,4,5,6,7,8,9,10, 11,
+         For 11: I need 0,1,2,3,4,5,6,7,8,9,10, 11,
 
          -----------------------------------------------
 
@@ -66,7 +66,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, [18,   19,   20, 21, 22, 23, 24, 25, 26, 27, 28]
          diff1        	  diff2                                          diff3
 
-         pt 18: am nevoie 0, 1, 2,3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13,14,15,16,17
+         For 18: I need 0, 1, 2,3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ,13,14,15,16,17
 
 
          ------------------------------------------------
@@ -75,7 +75,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, 18,   [19,   20, 21, 22, 23, 24, 25, 26, 27, 28, 29 ]
          diff1        	  diff2                                         diff3
 
-         pt 19: am nevoie 10, 11, 12 ,13,14,15,16,17,18,
+         For 19: I need 10, 11, 12 ,13,14,15,16,17,18,
 
          ------------------------------------------------
 
@@ -83,7 +83,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, 18,   19,   [20, 21, 22, 23, 24, 25, 26, 27, 28, 29 30 ]
          diff1        	  diff2                                         diff3
 
-         pt 20: am nevoie 10, 11, 12 ,13,14,15,16,17,18, 19
+         For  20: I need 10, 11, 12 ,13,14,15,16,17,18, 19
 
          -----------------------------------------------
 
@@ -91,7 +91,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, 18,   19,   20, [ 21, 22, 23, 24, 25, 26, 27, 28, 29 30  31]
          diff1        	  diff2                                         diff3
 
-         pt 21: am nevoie 10, 11, 12 ,13,14,15,16,17,18, 19, 20
+         For  21: I need 10, 11, 12 ,13,14,15,16,17,18, 19, 20
 
          -----------------------------------------------
 
@@ -99,7 +99,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, 18,   19,   20, 21, 22, 23, 24, 25, 26, 27, [ 28, 29     30  31 32 33 34 35 36 37 38]
          diff1        	  diff2                                         diff3 					     diff4
 
-         pt 28: am nevoie 10, 11, 12 ,13,14,15,16,17,18, 19, 20, 21 22 23 24 25 26 27 28
+         For 28: I need 10, 11, 12 ,13,14,15,16,17,18, 19, 20, 21 22 23 24 25 26 27 28
 
          -----------------------------------------------
 
@@ -108,7 +108,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          0..... 7, 8,          9,  10,  11, 12, 13, 14, 15, 16, 17, 18,   19,   20, 21, 22, 23, 24, 25, 26, 27, 28, [29         30 31 32 33 34 35 36 37 38 39] 40
          diff1        	  diff2                                         diff3 					                    diff4
 
-         pt 29: am nevoie 20,21,22,23,24,25,26,27,28
+         For 29: I need 20,21,22,23,24,25,26,27,28
 
          -----------------------------------------------
 
@@ -118,7 +118,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
          diff3                              diff4		                 diff5
 
 
-         pt 30: am nevoie: 20,21,22,23,24,25,26,27,28,29
+         For 30: I need: 20,21,22,23,24,25,26,27,28,29
 
          */
 
@@ -134,11 +134,11 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
         let blockFirstPosition = forkAdditionalBlocksBlocksRequired[0];
         let answer = await socket.node.sendRequestWaitOnce("get/blockchain/light/get-light-settings", {height: blockFirstPosition+1 }, blockFirstPosition+1,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT );
 
-        if (answer === null) throw {message: "get-accountant-tree[0] never received ", height: (blockFirstPosition+1)};
+        if (!answer ) throw {message: "get-accountant-tree[0] never received ", height: (blockFirstPosition+1)};
         if (!answer.result) throw {message: "get-accountant-tree[0] return false ", answer: answer.message};
 
-        if (answer.result === false) throw {message: "get-light-settings return false ", answer: answer.message};
-        if (answer.difficultyTarget === null ) throw {message: "get-light-settings difficultyTarget is null"};
+        if (!answer.result ) throw {message: "get-light-settings return false ", answer: answer.message};
+        if (!answer.difficultyTarget ) throw {message: "get-light-settings difficultyTarget is null"};
 
         return {
             difficultyAdditionalBlocks: forkAdditionalBlocksBlocksRequired,
@@ -184,7 +184,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
 
             fork.forkPrevDifficultyTarget = answer.difficultyTarget;
             fork.forkPrevTimeStamp = answer.timeStamp;
-            fork.forkPrevHashPrev = answer.hashPrev;
+            fork.forkPrevHash = answer.hash;
 
             //let's download the requested blocks for proving the difficulty
             for (let i = 0; i < fork.forkDifficultyCalculation.difficultyAdditionalBlocks.length; i++ ){
@@ -197,14 +197,14 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
                 //TODO it is not necessary to download full blocks, but rather also other nodes will require
                 answer = await socket.node.sendRequestWaitOnce("blockchain/blocks/request-block-by-height", { height: blockRequested, onlyHeader: false }, blockRequested,  consts.SETTINGS.PARAMS.CONNECTIONS.TIMEOUT.WAIT_ASYNC_DISCOVERY_TIMEOUT);
 
-                if ( answer === null || answer === undefined )
+                if ( !answer )
                     throw {message: "block never received ", answer: blockRequested};
 
-                if ( answer === undefined || answer === null || !answer.result || answer.block === undefined  || !Buffer.isBuffer(answer.block) )
+                if ( !answer.result || !answer.block || !Buffer.isBuffer(answer.block) )
                     throw {message: "block for difficulty never received ", blockRequested: blockRequested};
 
                 let blockValidation = fork._createBlockValidation_ForkValidation(blockRequested, fork.forkBlocks.length-1);
-                let block = this._deserializeForkBlock( fork, answer.block, blockRequested , blockValidation);
+                let block = await this._deserializeForkBlock( fork, answer.block, blockRequested , blockValidation);
 
                 if (blockRequested < fork.forkDifficultyCalculation.difficultyCalculationStarts)
                     block.difficultyTarget = fork.forkDifficultyCalculation.difficultyAdditionalBlockFirstDifficulty;
@@ -230,7 +230,7 @@ class MiniBlockchainLightProtocolForkSolver extends inheritForkSolver{
             fork.forkPrevAccountantTree = null;
             fork.forkPrevDifficultyTarget = null;
             fork.forkPrevTimeStamp = null;
-            fork.forkPrevHashPrev = null;
+            fork.forkPrevHash = null;
         }
 
         return inheritForkSolver.prototype._solveFork.call(this, fork);

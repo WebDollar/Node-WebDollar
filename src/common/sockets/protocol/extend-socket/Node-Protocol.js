@@ -22,7 +22,7 @@ class NodeProtocol {
 
     async justSendHello(){
 
-        this.node.sendRequest("HelloNode", {
+        return this.node.sendRequest("HelloNode", {
             version: consts.SETTINGS.NODE.VERSION,
             uuid: consts.SETTINGS.UUID,
             nodeType: process.env.BROWSER ? NODE_TYPE.NODE_WEB_PEER : NODE_TYPE.NODE_TERMINAL,
@@ -83,48 +83,6 @@ class NodeProtocol {
         return true;
     }
 
-    async sendHello ( validationDoubleConnectionsTypes, process = true ) {
-
-        // Waiting for Protocol Confirmation
-
-        if (this.connected === false) return false;
-
-        let response = await new Promise( (resolve)=> {
-
-            let interval, timeout;
-
-            this.node.once("HelloNode", (data) => {
-
-                clearInterval(interval);
-                clearTimeout(timeout);
-                resolve(data);
-
-            });
-
-            this.node.protocol.justSendHello();
-
-            interval = setInterval(async () => {
-
-                this.node.protocol.justSendHello();
-
-            }, 3000);
-
-            this.node.protocol.justSendHello();
-
-            timeout = setTimeout(() => {
-                clearInterval(interval);
-                clearTimeout(timeout)
-                resolve(false);
-            }, 10000);
-
-        });
-
-        if (!process)
-            return true;
-
-        return this.node.protocol.processHello( response, validationDoubleConnectionsTypes );
-
-    }
 
 
     /**
@@ -169,13 +127,13 @@ class NodeProtocol {
 
     sendLastBlock(callback){
 
-        if (Blockchain.blockchain.blocks.last === undefined) return;
+        if ( !Blockchain.blockchain.blocks.last ) return;
 
         this.node.sendRequest("head/new-block", {
             l: Blockchain.blockchain.blocks.length,
-            h: Blockchain.blockchain.blocks.last.calculateNewChainHash(),
+            h: Blockchain.blockchain.blocks.last.hashChain,
             s: Blockchain.blockchain.blocks.blocksStartingPoint,
-            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi  && Blockchain.blockchain.proofPi.validatesLastBlock() ? true : false ) : true, // i also have the proof
+            p: Blockchain.blockchain.agent.light ? ( Blockchain.blockchain.proofPi  && Blockchain.blockchain.proofPi.validatesLastBlock()) : true, // i also have the proof
             W: Blockchain.blockchain.blocks.chainWorkSerialized, // chain work
         }, callback);
     }

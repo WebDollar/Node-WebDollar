@@ -31,7 +31,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
      */
     updateAccount(address, value, tokenId, revertActions, showUpdate = true) {
 
-        if (tokenId === undefined || tokenId === '' || tokenId === null) {
+        if ( !tokenId ) {
             tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
@@ -53,7 +53,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         let resultUpdate = node.updateBalanceToken(value, tokenId);
 
-        if (revertActions !== undefined) revertActions.push({
+        if (revertActions ) revertActions.push({
             name: "revert-updateAccount",
             address: address,
             value: value,
@@ -105,7 +105,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
 
         node.nonce += nonceChange;
 
-        if (revertActions !== undefined) revertActions.push({
+        if (revertActions ) revertActions.push({
             name: "revert-updateAccountNonce",
             address: address,
             nonceChange: nonceChange,
@@ -266,6 +266,13 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
         list = this.root.getAccountantTreeList(list, false, true, 2000);
 
         return list;
+
+    }
+
+    clear(){
+
+        this.root.destroyNode();
+        this.createRoot();
 
     }
 

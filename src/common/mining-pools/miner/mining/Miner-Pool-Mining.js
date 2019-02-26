@@ -40,7 +40,6 @@ class MinerPoolMining extends InheritedPoolMining {
             resolved: true,
             poolSock1et: undefined,
 
-            blocks: [],
         };
 
         NodesList.emitter.on("nodes-list/disconnected", ( nodesListObject ) => {
@@ -117,14 +116,12 @@ class MinerPoolMining extends InheritedPoolMining {
 
         }
 
-        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );
+        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );
         block.deserializeBlock( work.block, work.h, undefined, work.t, undefined, undefined, true, true );
 
         //required data
         if (BlockchainGenesis.isPoSActivated(work.h))
             block.posMinerAddress = Blockchain.Mining.unencodedMinerAddress;
-
-        this._miningWork.blocks.push(block);
 
         this._miningWork.block = block;
         this._miningWork.blockSerialized = work.block;
@@ -139,7 +136,7 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;
 
-        Blockchain.blockchain.blocks.length = work.h;
+        Blockchain.blockchain.blocks._length = work.h;
         Blockchain.blockchain.blocks.emitBlockCountChanged();
 
         this._miningWork.start = work.start;
@@ -168,20 +165,6 @@ class MinerPoolMining extends InheritedPoolMining {
             else {
 
                 try {
-
-                    //except the last block
-                    if (this.block){
-                        for ( let i=this._miningWork.blocks.length-2; i >= 0; i-- )
-                            if ( this._miningWork.blocks[i].height  < this.block.height  ){
-                                this._miningWork.blocks[i].destroyBlock();
-                                this._miningWork.blocks.splice(i, 1);
-                            }
-
-                        let prevBlock = this.block;
-
-                        if (prevBlock && prevBlock !== this._miningWork.block )
-                            prevBlock.destroyBlock();
-                    }
 
                     let timeInitial = new Date().getTime();
 

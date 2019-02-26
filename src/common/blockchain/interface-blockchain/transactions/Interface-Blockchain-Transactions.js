@@ -21,6 +21,20 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
         this.wizard = new InterfaceBlockchainTransactionsWizard(this, blockchain, wallet);
     }
 
+    async checkVirtualizedTxId(txId) {
+
+        if ( Buffer.isBuffer(txId) ) txId = txId.toString('hex');
+
+        try {
+
+           return await this.blockchain.db.get('transactionID-' + txId) ? true : false;
+
+        }
+        catch (err) {
+            console.error( 'ERROR on saving TxId: ' + txId , err);
+        }
+
+    }
 
     _createTransaction(from, to, nonce, timeLock, version, txId, validateFrom, validateTo, validateNonce, validateTimeLock, validateVersion, validateTxId ){
         return new InterfaceTransaction(this.blockchain, from, to, nonce, timeLock, txId, validateFrom, validateTo, validateNonce, validateTimeLock, validateVersion, validateTxId);

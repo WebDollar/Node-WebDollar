@@ -1,9 +1,10 @@
 import global from "consts/global"
 import consts from 'consts/const_global'
-import Blockchain from "main-blockchain/Blockchain";
 import Log from 'common/utils/logging/Log';
+import Utils from "common/utils/helpers/Utils";
 
 const SAVING_MANAGER_INTERVAL = 5000;
+const MAX_BLOCKS_MEMORY = 1000;
 
 class SavingManager{
 
@@ -11,49 +12,26 @@ class SavingManager{
 
         this.blockchain = blockchain;
 
-        this._pendingBlocksList = {};
+        this._pendingBlocks = {};
+        this._pendingBlocksCount = 0;
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
 
-        this._factor = Math.floor( Math.random()*10 );
-        this._lastSave = 0;
+        this._factor = Math.floor( Math.random()*20 );
+
     }
 
 
-    addBlockToSave(block, height){
+    addBlockToSave(block, height = block.height){
 
         if (process.env.BROWSER) return;
 
         if ( !block ) return false;
 
-        if ( !height )
-            height = block.height;
+        if (!this._pendingBlocks[height])
+            this._pendingBlocksCount++;
 
-        if ( !this._pendingBlocksList[height] ) {
-
-            this._pendingBlocksList[height] = [{
-                saving: false,
-                block: block,
-            }];
-
-        } else {
-
-
-            for (let i=0; i<this._pendingBlocksList[height].length; i++)
-                if (!this._pendingBlocksList[height][i].saving){       //not saved
-                    this._pendingBlocksList[height][i].saving = false;
-                    this._pendingBlocksList[height][i].block = block;
-                    return true;
-                }
-
-            this._pendingBlocksList[height].push({
-                saving: false,
-                block: block,
-            });
-
-        }
-
-
+        this._pendingBlocks[height] = block;
 
     }
 
@@ -61,37 +39,30 @@ class SavingManager{
 
         if (process.env.BROWSER) return;
 
-        for (let key in this._pendingBlocksList){
+        if (this.blockchain.semaphoreProcessing._list.length > 0) return;
 
-            let blocks = this._pendingBlocksList[key];
+        let block = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
 
-            if ( !blocks || blocks.length === 0 ){
-                this._pendingBlocksList[key] = undefined;
-                delete this._pendingBlocksList[key];
-                continue;
-            }
+            for (let key in this._pendingBlocks){
 
-            let done = false;
+                let block = this._pendingBlocks[key];
+                if (block instanceof Promise) continue;
 
-            for (let i=0; i<blocks.length; i++){
+                //it is a forkBlock, it is skipped
+                if (block.isForkBlock) continue;
 
-                let block = blocks[i];
+                //mark a promise to the save to enable loading to wait until it is saved
+                let resolver;
+                this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
 
-                //already deleted
-                if (!block.block || !block.block.blockchain ){
-                    blocks.splice(i,1);
-                    i--;
-                    continue;
-                }
+                await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
 
                 try {
 
-                    block.saving = true;
+                    await block.saveBlock();
 
-                    if (block.block.height % 5000 === 0)
+                    if (block.height % 5000 === 0)
                         await this.blockchain.db.restart();
-
-                    await this.blockchain.saveNewBlock(block.block, false, true);
 
                 } catch (exception){
 
@@ -99,39 +70,58 @@ class SavingManager{
 
                 }
 
-                //saving Accountant Tree
-                if (block.block.height === this.blockchain.blocks.length-1 && block.block.height % (100 + this._factor ) === 0 && this._lastSave !== block.block.height) {
-                    let length = this.blockchain.blocks.length;
-                    let serialization = this.blockchain.accountantTree.serializeMiniAccountant(false, 5000);
-                    await this.blockchain.sleep(5000);
-                    await this.blockchain.saveAccountantTree( serialization, length );
-                    this._lastSave = block.block.height;
-                }
+                this._pendingBlocksCount--;
 
+                //propagate block in case loadingManager was using this block
+                await resolver(block);
+
+                //no new object, just the promise
+                if ( this._pendingBlocks[ key ] instanceof Promise)
+                    delete this._pendingBlocks[ key ] ;
+
+                //saving Accountant Tree
+                if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
+                    await this.saveBlockchain();
 
                 block.saving = false;
-
-
-                done = true;
-                blocks.splice(i, 1);
-                break;
+                return block;
 
             }
 
-            if (done)
-                return key;
+            return undefined;
 
-        }
+        });
 
-        return null;
+        return block;
+
+    }
+
+    async saveBlockchain(){
+        return this.blockchain.saveMiniBlockchain(true, );
     }
 
     async _saveManager(){
 
-        try{
-            await this._saveNextBlock();
-        } catch (exception){
+        let count = 1;
 
+
+        try{
+
+            if (this._pendingBlocksCount > MAX_BLOCKS_MEMORY )
+                count = this._pendingBlocksCount - MAX_BLOCKS_MEMORY;
+
+            for (let i=0; i < count; i++) {
+
+                if (this._isBeingSavedAll) return;
+
+                await this._saveNextBlock();
+
+                if (i > 0 && i % 50 === 0)
+                    await this.blockchain.sleep(1000);
+
+            }
+        } catch (exception){
+            console.error("SavingManager _clearOldUnusedBlocks raised an error", exception);
         }
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
@@ -141,29 +131,56 @@ class SavingManager{
     async saveAllBlocks(){
 
         if (this._isBeingSavedAll) return;
-
         this._isBeingSavedAll = true;
+        clearTimeout( this._timeoutSaveManager );
 
         global.INTERFACE_BLOCKCHAIN_SAVED = false;
 
+        Log.info("Saving Manager - Saving All Blocks started", Log.LOG_TYPE.SAVING_MANAGER);
+
         let answer = 1;
 
-        while (answer ){
+        while ( this.blockchain.semaphoreProcessing._list.length > 0 ) {
+            await Utils.sleep(2000);
+            Log.info("Saving Manager - Waiting for Forks to be resolved...", Log.LOG_TYPE.SAVING_MANAGER);
+        }
 
-            clearTimeout( this._timeoutSaveManager );
+        await Utils.sleep(1000);
+
+        Log.info("Saving Manager - No more forks", Log.LOG_TYPE.SAVING_MANAGER);
+
+        while ( this._pendingBlocksCount > 0 ){
 
             answer = await this._saveNextBlock();
 
-            if (answer && answer % 100 === 0) {
+            if (answer && answer.height % 50 === 0) {
 
-                Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer);
+                Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer.height);
                 await this.blockchain.sleep(10);
             }
 
         }
 
+        await this.saveBlockchain();
+
+        Log.info("Saving Manager - Saving All Blocks finished", Log.LOG_TYPE.SAVING_MANAGER);
+
         global.INTERFACE_BLOCKCHAIN_SAVED = true;
 
+
+    }
+
+
+    async saveBlockchainLength(length ){
+
+        let answer = await this.blockchain.db.save( this.blockchain._blockchainFileName, length, 20000, 1000000) ;
+
+        if (!answer) {
+            Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);
+            return false;
+        }
+
+        return true;
 
     }
 

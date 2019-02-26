@@ -89,7 +89,7 @@ class MinerPoolSettings {
         if (newValue === null || newValue === this._poolURL) return;
 
         let data = PoolsUtils.extractPoolURL(newValue);
-        if (data === null) throw {message: "poolURL is invalid"};
+        if ( !data ) throw {message: "poolURL is invalid"};
 
         this.poolName = data.poolName;
         this.poolFee = data.poolFee;
@@ -137,9 +137,9 @@ class MinerPoolSettings {
 
     async _getMinerPoolDetails(){
 
-        let poolURL = await this._db.get("minerPool_poolURL", 30*1000, true);
+        let poolURL = await this._db.get("minerPool_poolURL", 30*1000, undefined, true);
 
-        let poolMinerActivated = await this._db.get("minerPool_activated", 30*1000, true);
+        let poolMinerActivated = await this._db.get("minerPool_activated", 30*1000,  undefined, true);
 
         if (poolMinerActivated === "true") poolMinerActivated = true;
         else if (poolMinerActivated === "false") poolMinerActivated = false;
@@ -188,7 +188,7 @@ class MinerPoolSettings {
 
     async _getMinerPoolList(){
 
-        let result = await this._db.get("minerPool_poolsList", 30*1000, true);
+        let result = await this._db.get("minerPool_poolsList", 30*1000, undefined, true);
 
         if (result !== null){
             if (Buffer.isBuffer(result))

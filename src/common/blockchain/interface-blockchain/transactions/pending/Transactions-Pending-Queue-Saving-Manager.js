@@ -40,8 +40,7 @@ class TransactionsPendingQueueSavingManager{
         if (data === null) return true; //nothing to process
 
         if (Buffer.isBuffer(data))
-            this._deserializePendingTransactions(data);
-
+            await this._deserializePendingTransactions(data);
 
         return true;
 
@@ -72,7 +71,7 @@ class TransactionsPendingQueueSavingManager{
 
     }
 
-    _deserializePendingTransactions(buffer, offset  = 0){
+    async _deserializePendingTransactions(buffer, offset  = 0){
 
         try {
 
@@ -84,7 +83,7 @@ class TransactionsPendingQueueSavingManager{
                 offset = transaction.deserializeTransaction(buffer, offset);
 
                 try {
-                    this.pendinQueue.includePendingTransaction(transaction);
+                    await this.pendinQueue.includePendingTransaction(transaction);
                 } catch (exception){
                     Log.error("Error Including Pending Transaction", Log.LOG_TYPE.BLOCKCHAIN, error);
                 }

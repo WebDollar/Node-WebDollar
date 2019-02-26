@@ -77,13 +77,13 @@ class PoolSettings {
 
     async _getServerPoolDetails(){
 
-        let serverPoolFee = await this._db.get("serverPool_fee", 30 * 1000, true);
+        let serverPoolFee = await this._db.get("serverPool_fee", 30 * 1000, undefined, true);
 
         if (serverPoolFee === null) serverPoolFee = 0;
 
         serverPoolFee = parseFloat(serverPoolFee);
 
-        let serverPoolActivated = await this._db.get("serverPool_activated", 30*1000, true);
+        let serverPoolActivated = await this._db.get("serverPool_activated", 30*1000, undefined, true);
 
         if (serverPoolActivated === "true") serverPoolActivated = true;
         else if (serverPoolActivated === "false") serverPoolActivated = false;
