@@ -81,7 +81,7 @@ class SavingManager{
 
                 //saving Accountant Tree
                 if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
-                    await this.saveBlockchain();
+                    await this.saveBlockchain(false);
 
                 block.saving = false;
                 return block;
@@ -96,8 +96,8 @@ class SavingManager{
 
     }
 
-    async saveBlockchain(){
-        return this.blockchain.saveMiniBlockchain(true, );
+    async saveBlockchain( useSemaphore ){
+        return this.blockchain.saveMiniBlockchain(true, useSemaphore );
     }
 
     async _saveManager(){
