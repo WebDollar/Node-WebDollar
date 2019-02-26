@@ -153,7 +153,7 @@ class SavingManager{
 
             answer = await this._saveNextBlock();
 
-            if (answer && answer.height % 100 === 0) {
+            if (answer && answer.height % 50 === 0) {
 
                 Log.info("Saving successfully", Log.LOG_TYPE.SAVING_MANAGER, answer.height);
                 await this.blockchain.sleep(10);
