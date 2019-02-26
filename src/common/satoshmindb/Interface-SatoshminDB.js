@@ -117,12 +117,16 @@ class InterfaceSatoshminDB {
             return response && response.ok;
 
         } catch (err) {
+
             if (err.status === 404) //NOT FOUND
                 return true;
-            else {
-                console.error("_deleteDocument raised an error ", key);
-                return err;
-            }
+            else
+            if (err.status === 500)
+                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
+
+            console.error("_deleteDocument raised an error ", key);
+            return false;
+
         }
 
     }
@@ -327,18 +331,24 @@ class InterfaceSatoshminDB {
 
     }
 
-    async remove(key) {
+    async remove(key, trials = 10) {
 
-        try {
-            return this._deleteDocument(key);
-        } catch (exception) {
+        trials = 1000000;
 
-            console.error("db.remove error " + key, exception);
+        let i=0;
+        while ( i < trials){
 
-            if (exception.status === 500)
-                StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
+            let out = await this._deleteDocument(key);
+            if (out)
+                return out;
+
+            if (i > 0 && i % 5 === 0 )
+                await this.restart();
+
+            i++;
 
         }
+
         return null;
     }
 

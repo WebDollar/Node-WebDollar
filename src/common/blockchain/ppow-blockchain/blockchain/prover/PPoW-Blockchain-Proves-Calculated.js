@@ -40,13 +40,14 @@ class PPoWBlockchainProvesCalculated{
         if (this.allBlocks[height] && this.allBlocks[height] !== level) {
 
             let oldlevel = this.allBlocks[height];
-            this.levelsLengths[oldlevel]--;
 
             delete this.allBlocks[height];
 
             let oldPos = this._binarySearch( this.levels[oldlevel], height);
-            if (this.levels[oldlevel][oldPos] === height)
+            if (this.levels[oldlevel] && this.levels[oldlevel][oldPos] === height) {
                 this.levels[oldlevel].splice(oldPos, 1);
+                this.levelsLengths[oldlevel]--;
+            }
 
         }
 
@@ -174,7 +175,7 @@ class PPoWBlockchainProvesCalculated{
                     offset += 4;
 
                     this.levels[i][j] = height;
-                    this.allBlocks[height] = j;
+                    this.allBlocks[height] = i;
 
                 }
 

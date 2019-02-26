@@ -21,33 +21,41 @@ class InterfaceBlockchainBlockDataTransactions {
 
     async saveVirtualizedTxId(txId, blockHeight) {
 
+        if (Buffer.isBuffer(txId) ) txId = txId.toString("hex");
+
         try {
-            return await this.db.save('transactionID-' + txId, blockHeight);
+            return this.db.save('transactionID-' + txId, blockHeight);
         }
         catch (err) {
-            return 'ERROR on saving TxId: ' + txId + ':' + err;
+            console.error( 'ERROR on saving TxId: ' + txId, err);
         }
     }
 
     async deleteVirtualizedTxId(txId) {
+
+        if (Buffer.isBuffer(txId) ) txId = txId.toString("hex");
+
         try {
-            return await this.db.remove('transactionID-' + txId);
+            return  this.db.remove('transactionID-' + txId);
         }
         catch (err) {
-            return 'ERROR on saving TxId '+txId+':' + err;
+            console.error( 'ERROR deleting TxId: ' + txId, err);
         }
+
     }
 
     async confirmTransactions(blockHeight) {
-        await this.transactions.forEach(async (transaction) => {
+
+        await this.transactions.forEach(async transaction => {
             await this.saveVirtualizedTxId(transaction.txId.toString('hex'), blockHeight);
             transaction.confirmed = true;
-            // this.blockData.blockchain.transactions.pendingQueue.removePendingTransaction(transaction);
         });
+
     }
 
     async unconfirmTransactions() {
-        await this.transactions.forEach(async (transaction) => {
+
+        await this.transactions.forEach(async transaction => {
 
             transaction.confirmed = false;
 
@@ -58,6 +66,7 @@ class InterfaceBlockchainBlockDataTransactions {
             catch (exception) {
                 Log.warn('Transaction Was Rejected to be Added to the Pending Queue ', Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON());
             }
+
         });
     }
 
