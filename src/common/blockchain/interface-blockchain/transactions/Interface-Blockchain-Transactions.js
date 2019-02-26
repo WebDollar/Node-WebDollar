@@ -27,7 +27,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
 
         try {
 
-           return await this.blockchain.db.get('transactionID-' + txId) ? true : false;
+           return this.blockchain.db.get('transactionID-' + txId) ;
 
         }
         catch (err) {
