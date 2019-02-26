@@ -24,10 +24,10 @@ class InterfaceBlockchainBlockDataTransactions {
         if (Buffer.isBuffer(txId) ) txId = txId.toString("hex");
 
         try {
-            return await this.db.save('transactionID-' + txId, blockHeight);
+            return this.db.save('transactionID-' + txId, blockHeight);
         }
         catch (err) {
-            return 'ERROR on saving TxId: ' + txId + ':' + err;
+            console.error( 'ERROR on saving TxId: ' + txId, err);
         }
     }
 
@@ -36,10 +36,10 @@ class InterfaceBlockchainBlockDataTransactions {
         if (Buffer.isBuffer(txId) ) txId = txId.toString("hex");
 
         try {
-            return await this.db.remove('transactionID-' + txId);
+            return  this.db.remove('transactionID-' + txId);
         }
         catch (err) {
-            return 'ERROR on saving TxId '+txId+':' + err;
+            console.error( 'ERROR deleting TxId: ' + txId, err);
         }
 
     }
