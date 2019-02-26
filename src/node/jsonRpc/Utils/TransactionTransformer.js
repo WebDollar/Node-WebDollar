@@ -3,8 +3,7 @@ import WebDollarCoins                   from './../../../common/utils/coins/WebD
 import BufferExtended                   from './../../../common/utils/BufferExtended';
 import InterfaceBlockchainAddressHelper from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
-class TransactionTransformer
-{
+class TransactionTransformer {
     /**
      * @param {InterfaceBlockchainTransaction} oTransaction
      * @param {InterfaceBlockchainBlock|null}  oBlock
@@ -38,6 +37,7 @@ class TransactionTransformer
             from            : {trxs: [], addresses: [], amount: nInputSum  / WebDollarCoins.WEBD, amount_raw: nInputSum},
             to              : {trxs: [], addresses: [], amount: nOutputSum / WebDollarCoins.WEBD, amount_raw: nOutputSum},
             isConfirmed     : false,
+            isVirtual       : false,
         };
 
         if (oBlock !== null) {

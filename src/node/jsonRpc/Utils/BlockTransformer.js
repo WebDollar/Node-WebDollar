@@ -4,8 +4,7 @@ import InterfaceBlockchainAddressHelper from './../../../common/blockchain/inter
 import BufferExtended                   from './../../../common/utils/BufferExtended';
 import WebDollarCoins                   from './../../../common/utils/coins/WebDollar-Coins';
 
-class BlockTransformer
-{
+class BlockTransformer {
     constructor(oBlockDataHardForkProcessor, oTransactionTransformer) {
         this._oBlockDataHardForksProcessor = oBlockDataHardForkProcessor;
         this._oTransactionTransformer      = oTransactionTransformer;
@@ -16,7 +15,7 @@ class BlockTransformer
      * @param {Object}                                       oOptions
      * @returns Object
      */
-    transform(oBlock, oOptions) {
+    async transform(oBlock, oOptions) {
         const bIsPosActivated    = BlockchainGenesis.isPoSActivated(oBlock.height);
         const nBlockTimestampRaw = oBlock.timeStamp;
         const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
@@ -43,7 +42,7 @@ class BlockTransformer
             reward         : oBlock.reward === null ? 0 : oBlock.reward / WebDollarCoins.WEBD,
             reward_raw     : oBlock.reward === null ? 0 : oBlock.reward,
             createdAtUTC   : oBlockTimestampUTC,
-            block_raw      : BufferExtended.toBase(oBlock.serializeBlock().toString('hex')),
+            block_raw      : BufferExtended.toBase((await oBlock.serializeBlock()).toString('hex')),
             isPOS            : bIsPosActivated === true,
             isPOW            : bIsPosActivated === false,
             posMinerAddress  : null,

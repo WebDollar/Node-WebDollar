@@ -33,6 +33,7 @@
         ],
         "no-unused-vars": [
             "warn"
-        ]
+        ],
+        "brace-style": ["error", "stroustrup"]
     }
 }

@@ -1,15 +1,26 @@
 import WebDollarCoins from '../../../common/utils/coins/WebDollar-Coins';
 
-class BlockDataHardForksProcessor
-{
+class BlockDataHardForksProcessor {
     static processBlockData(oBlockData, bIncludeTransactions = true) {
-        switch (oBlockData.block_id)
-        {
+        switch (oBlockData.block_id) {
             case 153060:
                 return this._wallet_recovery_fork_153060(oBlockData, bIncludeTransactions);
         }
 
         return oBlockData;
+    }
+
+    /**
+     * @param  {String} sHash
+     * @return null|int
+     */
+    static findBlockNumberForTransactionHash(sHash) {
+        switch (sHash) {
+            case 'virtual_tx_153060_1':
+                return 153060;
+        }
+
+        return null;
     }
 
     static _wallet_recovery_fork_153060(oBlockData, bIncludeTransactions = true) {
@@ -209,6 +220,7 @@ class BlockDataHardForksProcessor
         let aTransaction = {
             trx_id         : 'virtual_tx_' + HARD_FORK_INFO.BLOCK_NUMBER + '_1',
             isVirtual      : true,
+            isConfirmed    : true,
             version        : 1,
             nonce          : 1,
             time_lock      : HARD_FORK_INFO.BLOCK_NUMBER - 1,
@@ -228,8 +240,7 @@ class BlockDataHardForksProcessor
 
         let i = 0;
 
-        for (let sAddress in HARD_FORK_INFO.ADDRESS_BALANCE_REDUCTION)
-        {
+        for (let sAddress in HARD_FORK_INFO.ADDRESS_BALANCE_REDUCTION) {
             aTransaction.from.trxs.push({
                 trx_from_address   : sAddress,
                 trx_from_pub_key   : 'pubKey_virtual_tx_' + HARD_FORK_INFO.BLOCK_NUMBER + '_1' + '_' + i,
@@ -258,6 +269,11 @@ class BlockDataHardForksProcessor
 
         aTransaction.from.amount     = nInputSum / WebDollarCoins.WEBD;
         aTransaction.from.amount_raw = nInputSum;
+
+        aTransaction.amount           = nInputSum / WebDollarCoins.WEBD;
+        aTransaction.amount_raw       = nInputSum;
+        aTransaction.total_amount     = aTransaction.amount;
+        aTransaction.total_amount_raw = aTransaction.amount_raw;
 
         oBlockData.trxs_number += 1;
         oBlockData.trxs.push(bIncludeTransactions ? aTransaction : aTransaction.trx_id);
