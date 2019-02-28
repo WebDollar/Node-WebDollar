@@ -70,6 +70,7 @@ class InterfaceBlockchainBlockDataTransactions {
             }
             catch (exception) {
                 Log.warn('Transaction Was Rejected to be Added to the Pending Queue ', Log.LOG_TYPE.BLOCKCHAIN_FORKS, transaction.toJSON());
+                console.error(exception);
             }
 
         });
