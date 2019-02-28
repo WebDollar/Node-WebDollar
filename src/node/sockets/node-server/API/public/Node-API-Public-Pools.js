@@ -50,6 +50,7 @@ class NodeAPIPublicPools {
           reward_sent: minerInstance.miner._rewardSent,
           date_activity: minerInstance.dateActivity,
           miner_index: minerInstance.miner.index,
+          totalPOSBalance: Blockchain.blockchain.accountantTree.getBalance(minerInstance.addressWIF),
           ip: minerInstance.socket ? minerInstance.socket.node.sckAddress.getAddress(true, true) : "offline",
         });
 
