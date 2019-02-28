@@ -35,8 +35,6 @@ export default {
         {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
 
-        //{"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
-
         {"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5003"]}, // Thanks to @int_webd
