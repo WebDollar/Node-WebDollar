@@ -114,7 +114,7 @@ class CLI {
 
     signTransaction(){
 
-        console.info('Sign Transaction');
+        console.log('Sign Transaction');
 
         return new Promise( async (resolve) => {
 
@@ -190,7 +190,7 @@ class CLI {
 
     async _start() {
 
-        Log.info('CLI menu started', Log.LOG_TYPE.CLI_MENU);
+        Log.log('CLI menu started', Log.LOG_TYPE.CLI_MENU);
 
         if (Blockchain !== undefined)
             await Blockchain.loadWallet();
@@ -226,10 +226,10 @@ class CLI {
 
     _showCommands() {
 
-        console.info('\nChoose one of the following commands:');
+        console.log('\nChoose one of the following commands:');
 
         for (let i = 0; i < commands.length; ++i){
-            console.info(commands[i]);
+            console.log(commands[i]);
         }
         console.log();
 
@@ -240,7 +240,7 @@ class CLI {
 
 
         console.warn("INFO: YOU NEED TO BE SYNC TO SEE THE VALUE OF YOUR WALLET!!!");
-        console.info('\nWallet addresses:');
+        console.log('\nWallet addresses:');
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
         if (miningAddress === undefined)
@@ -282,10 +282,10 @@ class CLI {
 
     async createNewAddress() {
 
-        console.info('Create new address.');
+        console.log('Create new address.');
         try {
             let address = await Blockchain.Wallet.createNewAddress();
-            console.info("Address was created: " + address.address);
+            console.log("Address was created: " + address.address);
             return true;
         } catch(err) {
             console.err(err);
@@ -296,7 +296,7 @@ class CLI {
 
     async deleteAddress() {
 
-        console.info('Delete address.');
+        console.log('Delete address.');
 
         let addressId = await this._chooseAddress();
 
@@ -312,7 +312,7 @@ class CLI {
 
     importAddress() {
 
-        console.info('Import address.');
+        console.log('Import address.');
 
         return new Promise( async (resolve) => {
 
@@ -356,7 +356,7 @@ class CLI {
 
     exportAddress() {
 
-        console.info('Export address.');
+        console.log('Export address.');
 
         return new Promise( async (resolve) => {
 
@@ -407,7 +407,7 @@ class CLI {
 
     async encryptAddress() {
 
-        console.info('Encrypt address.');
+        console.log('Encrypt address.');
 
         let addressId = await this._chooseAddress();
 
@@ -421,7 +421,7 @@ class CLI {
         let response = await Blockchain.Wallet.encryptAddress(addressString, newPassword);
 
         if (response === true)
-            console.info("Address was encrypted:", addressString);
+            console.log("Address was encrypted:", addressString);
         else
             console.error("Address couldn't be encrypted:", addressString);
 
@@ -430,7 +430,7 @@ class CLI {
 
     async setMiningAddress() {
 
-        console.info('Set mining address.');
+        console.log('Set mining address.');
 
         let addressId = await this._chooseAddress();
 
@@ -461,7 +461,7 @@ class CLI {
 
     async startMiningInsidePool(){
 
-        Log.info('Mining inside a POOL', Log.LOG_TYPE.POOLS);
+        Log.log('Mining inside a POOL', Log.LOG_TYPE.POOLS);
 
         consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
 
@@ -473,7 +473,7 @@ class CLI {
 
                 if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== '') {
 
-                    Log.info('Your current mining pool is: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolName +" " +Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite, Log.LOG_TYPE.error);
+                    Log.log('Your current mining pool is: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolName +" " +Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite, Log.LOG_TYPE.error);
                     let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
 
                     if (response === true) getNewLink = false;
@@ -485,7 +485,7 @@ class CLI {
                 if (getNewLink) {
 
                     miningPoolLink = await AdvancedMessages.input('Enter the new mining pool link: ');
-                    Log.info('Your new MiningPool is : ' + miningPoolLink, Log.LOG_TYPE.info);
+                    Log.log('Your new MiningPool is : ' + miningPoolLink, Log.LOG_TYPE.info);
 
                 }
 
@@ -510,7 +510,7 @@ class CLI {
 
     async createMiningPool(){
 
-        Log.info('Create Mining Pool', Log.LOG_TYPE.info );
+        Log.log('Create Mining Pool', Log.LOG_TYPE.info );
 
         await this._callCallbackBlockchainSync( async ()=>{
 
@@ -524,7 +524,7 @@ class CLI {
 
                 if (typeof Blockchain.PoolManagement.poolSettings.poolURL === "string" && Blockchain.PoolManagement.poolSettings.poolURL !== ''){
 
-                    console.info('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
+                    console.log('You have some settings for a pool: ', Blockchain.PoolManagement.poolSettings.poolName," ", Blockchain.PoolManagement.poolSettings.poolWebsite );
                     let response = await AdvancedMessages.confirm('Do you want to continue using the settings for : '+Blockchain.PoolManagement.poolSettings.poolURL);
 
                     if (response === true) getNewLink = false;
@@ -542,7 +542,7 @@ class CLI {
                         return false;
                     }
                     else
-                        Log.info("Your fee is "+poolFee, Log.LOG_TYPE.POOLS);
+                        Log.log("Your fee is "+poolFee, Log.LOG_TYPE.POOLS);
 
                     poolName = await AdvancedMessages.input('Pool Name: ');
                     poolWebsite = await AdvancedMessages.input('Pool Website: ');
@@ -562,7 +562,7 @@ class CLI {
                     else
                         poolServers = await NodeServer.getServerHTTPAddress(true);
 
-                    console.info("Pool Servers:", poolServers);
+                    console.log("Pool Servers:", poolServers);
 
                     if (response){
                         await Blockchain.PoolManagement.poolSettings.setPoolUsePoolServers( true ) ;
@@ -598,7 +598,7 @@ class CLI {
 
         await this._callCallbackBlockchainSync( async ()=> {
 
-                console.info('Create Server Pool');
+                console.log('Create Server Pool');
                 console.warn('To be accessible by Browser miners you need an authorized SSL certificate and a free domain.');
 
                 let serverPoolFee = await AdvancedMessages.readNumber('Choose a fee(0...100): ', true);
