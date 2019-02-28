@@ -88,9 +88,9 @@ class AdvancedMessages{
     log(cliMsg, browserMsg) {
 
         if (process.env.BROWSER)
-            console.info(browserMsg || cliMsg);
+            console.log(browserMsg || cliMsg);
         else
-            console.info(cliMsg);
+            console.log(cliMsg);
     }
 
 
@@ -98,7 +98,7 @@ class AdvancedMessages{
 
         return new Promise ((resolve)=> {
 
-            console.info(message);
+            console.log(message);
             this.WEBD_CLI.question('', (answer)=>{
                 resolve(answer);
             });
