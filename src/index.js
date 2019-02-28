@@ -36,6 +36,34 @@ if ( typeof global.window !== 'undefined')
 if ( typeof window !== 'undefined')
     window.WebDollar = exportObject;
 
+if (!isBrowser && process && !process.env.BROWSER && process.env.LOG_LEVEL) {
+  var overwrite = function() {};
+
+  switch(process.env.LOG_LEVEL) {
+    case 'info':
+      console.debug = overwrite;
+    break;
+
+    case 'log':
+      console.info = overwrite;
+      console.debug = overwrite;
+    break;
+
+    case 'warn':
+      console.log = overwrite;
+      console.info = overwrite;
+      console.debug = overwrite;
+    break;
+
+    case 'error':
+      console.warn = overwrite;
+      console.log = overwrite;
+      console.info = overwrite;
+      console.debug = overwrite;
+    break;
+  }
+}
+
 // if ( !isBrowser && process && !process.env.BROWSER && process.env.COLLECT_STATS === true ){
 //
 //     var Raven = require('raven');
