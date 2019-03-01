@@ -27,6 +27,24 @@ export default {
         {"addr": ["https://node9.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node10.petreus.ro:443"]}, // Thanks to Dani Petreus
 
+        {"addr": ["https://node.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node1.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node2.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node3.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node4.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node5.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node6.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node7.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node8.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node9.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node10.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node11.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node12.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node13.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node14.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node15.timi.ro:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node16.timi.ro:443"]}, // Thanks to @TimiDani
+        
         //{"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         //{"addr": ["https://us.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         //{"addr": ["https://losangeles.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
