@@ -124,7 +124,7 @@ class InterfaceSatoshminDB {
             if (err.status === 500)
                 StatusEvents.emit("blockchain/logs", {message: "IndexedDB Error", reason: exception.reason.toString() });
 
-            console.error("_deleteDocument raised an error ", key, err);
+            //console.error("_deleteDocument raised an error ", key, err);
             return false;
 
         }

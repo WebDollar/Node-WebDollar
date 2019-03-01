@@ -35,8 +35,6 @@ export default {
         {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
 
-        //{"addr": ["https://pool.webdollarminingpool.com:41000"]}, // Thanks to @morion4000
-
         {"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
         {"addr": ["https://node-eu.int-webd.com:5003"]}, // Thanks to @int_webd
@@ -60,6 +58,16 @@ export default {
 
         {"addr": ["https://webdchucknorris.vpnromania.ro:80"]}, // Thanks to @cbusuioceanu
         {"addr": ["https://webdchucknorris.vpnromania.ro:8080"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8081"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8082"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8083"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8084"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8085"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8086"]}, // Thanks to @cbusuioceanu
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8087"]}, // Thanks to @cbusuioceanu        
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8088"]}, // Thanks to @cbusuioceanu       
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8089"]}, // Thanks to @cbusuioceanu       
+        {"addr": ["https://webdchucknorris.vpnromania.ro:8090"]}, // Thanks to @cbusuioceanu       
 
         //{"addr": ["https://webdollar.csland.ro:8440"]}, // Thanks to @mariotheodor
         //{"addr": ["https://webdollar.csland.ro:8441"]}, // Thanks to @mariotheodor

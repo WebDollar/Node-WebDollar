@@ -366,9 +366,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         await block.saveBlockTimestamp();
         await block.saveChainWork();
 
-        for (const transaction of block.data.transactions.transactions) {
-            await block.data.transactions.saveVirtualizedTxId(transaction.txId.toString('hex'), index);
-        }
+        for (const transaction of block.data.transactions.transactions)
+            await block.data.transactions.saveVirtualizedTxId(transaction.txId, block.height);
+
 
         return block;
     }

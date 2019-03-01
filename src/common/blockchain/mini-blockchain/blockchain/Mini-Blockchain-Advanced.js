@@ -42,7 +42,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
             //to continue slow loading uncomment the following command
             //this will enable to index the entire blockchain
             //
-            //await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	595000);
+            //await this.inheritBlockchain.prototype._loadBlockchain.call(this, this.blocks.length, 	622969);
 
             let chainHash = await this.db.get("blockChainHash"+0);
 
@@ -53,7 +53,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 process.exit();
             }
 
-            if ( await this.transactions.checkVirtualizedTxId("6a81930823e659286cfffe592172c0f054d0e2a4760d0d51770ffab440d00bfa") === null ){
+            if ( this.blocks.length > 100 && await this.transactions.checkVirtualizedTxId("6a81930823e659286cfffe592172c0f054d0e2a4760d0d51770ffab440d00bfa") === null ){
                 console.error("============================================================================" );
                 console.error("For Transactions branch, you need to download a new blockchainDB3 because it is no longer compatible with your version" );
                 console.error("============================================================================" );
