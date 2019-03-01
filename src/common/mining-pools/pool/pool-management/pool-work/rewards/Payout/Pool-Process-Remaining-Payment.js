@@ -6,6 +6,8 @@ import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockc
 import Log from 'common/utils/logging/Log';
 import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward';
 
+const PAYOUT_FEE = WebDollarCoins.WEBD * consts.MINING_POOL.POOL_PAYOUT_FEE;
+
 class PoolRewardsManagement{
 
     constructor(poolManagement, poolData, blockchain){
@@ -167,7 +169,7 @@ class PoolRewardsManagement{
             let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
             try {
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, 0, );
+                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
                 if (!transaction.result) throw {message: "Transaction was not made"};
             } catch (exception){
                 Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

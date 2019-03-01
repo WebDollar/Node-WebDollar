@@ -255,8 +255,9 @@ consts.MINING_POOL = {
     },
 
     SKIP_POW_REWARDS: false,
-    SKIP_POS_REWARDS: false
+    SKIP_POS_REWARDS: false,
 
+    POOL_PAYOUT_FEE : (process.env.POOL_PAYOUT_FEE || 0),
 
 };
 

@@ -49,6 +49,7 @@ const config = merge(base, {
                 TERMINAL_WORKERS_CPU_MAX: "'" + (process.env.TERMINAL_WORKERS_CPU_MAX || '') + "'",
                 COLLECT_STATS: process.env.COLLECT_STATS,
                 GH_COMMIT: "'" + (process.env.GH_COMMIT || '') + "'",
+                POOL_PAYOUT_FEE: process.env.POOL_PAYOUT_FEE,
             }
         })
     ]
