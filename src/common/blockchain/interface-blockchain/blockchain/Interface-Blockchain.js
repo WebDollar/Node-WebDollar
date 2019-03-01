@@ -191,7 +191,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height >= this.blocks.length ) throw {message: "getDifficultyTarget invalid height ", height:height, blocksLength: this.blocks.length};
 
         let difficulty = await this.blocks.loadingManager.getBlockDifficulty(height);
-        if ( !difficulty ) throw {message:"getDifficultyTarget invalid", height:height, blocksLength: this.blocks.length};
+
+        if ( !difficulty )
+            throw {message:"getDifficultyTarget invalid", height:height, blocksLength: this.blocks.length};
 
         return difficulty;
 
