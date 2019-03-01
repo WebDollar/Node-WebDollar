@@ -5,8 +5,7 @@ import InterfaceBlockchainAddressHelper from '../../../common/blockchain/interfa
 /**
  * Repository for Blocks
  */
-class BlockRepository
-{
+class BlockRepository {
     constructor(oBlockchain, oConfig = {}) {
         this._oBlockchain = oBlockchain;
         this._oConfig     = defaults(oConfig, {
@@ -19,8 +18,7 @@ class BlockRepository
      * @return {InterfaceBlockchainBlock|null}
      */
     async findByNumberOrTag(mBlockNumber) {
-        switch(mBlockNumber)
-        {
+        switch(mBlockNumber) {
             case 'latest':
                 mBlockNumber = this._oBlockchain.blocks.last.height;
                 break;
@@ -31,8 +29,7 @@ class BlockRepository
                 return null;
         }
 
-        if (isInteger(mBlockNumber) === false || mBlockNumber < this._oBlockchain.blocksStartingPoint || mBlockNumber > this._oBlockchain.blocks.last.height)
-        {
+        if (isInteger(mBlockNumber) === false || mBlockNumber < this._oBlockchain.blocksStartingPoint || mBlockNumber > this._oBlockchain.blocks.last.height) {
             return null;
         }
 
@@ -52,8 +49,7 @@ class BlockRepository
     async findByRange(mStartingNumber, mEndingNumber) {
         let aBlocks = [];
 
-        switch(mEndingNumber)
-        {
+        switch(mEndingNumber) {
             case 'latest':
                 mEndingNumber = this._oBlockchain.blocks.last.height;
                 break;
@@ -63,31 +59,22 @@ class BlockRepository
                 throw new Error('Finding a block by "pending" is not supported');
         }
 
-        if (isInteger(mStartingNumber) === false || isInteger(mEndingNumber) === false)
-        {
+        if (isInteger(mStartingNumber) === false || isInteger(mEndingNumber) === false) {
             return aBlocks;
         }
 
-        mEndingNumber = mEndingNumber > this._oBlockchain.blocks.last.height ? this._oBlockchain.blocks.last.height : mEndingNumber;
-
-        if (mEndingNumber < mStartingNumber)
-        {
+        if (mEndingNumber < mStartingNumber) {
             [mStartingNumber, mEndingNumber] = [mEndingNumber, mStartingNumber];
         }
 
-        for (let i = mStartingNumber; i <= mEndingNumber; i++)
-        {
+        for (let i = mStartingNumber; i <= mEndingNumber; i++) {
             let oBlock = await this.findByNumberOrTag(i);
 
-            if (oBlock === null)
-            {
-                throw new Error('Block "' + i + '" was not found');
+            if (oBlock !== null) {
+                aBlocks.push(await this.findByNumberOrTag(i));
             }
 
-            aBlocks.push(await this.findByNumberOrTag(i));
-
-            if (aBlocks.length === this._oConfig.limit)
-            {
+            if (aBlocks.length === this._oConfig.limit) {
                 break;
             }
         }
@@ -102,19 +89,20 @@ class BlockRepository
     async findByNumbers(aBlockNumbers) {
         let aBlocks = [];
 
-        if (isArray(aBlockNumbers) === false)
-        {
+        if (isArray(aBlockNumbers) === false) {
             return aBlocks;
         }
 
         aBlockNumbers = uniq(aBlockNumbers);
 
-        for (const nBlockNumber of aBlockNumbers)
-        {
-            aBlocks.push(await this.findByNumberOrTag(nBlockNumber));
+        for (const nBlockNumber of aBlockNumbers) {
+            const oBlock = await this.findByNumberOrTag(nBlockNumber);
 
-            if (aBlocks.length === this._oConfig.limit)
-            {
+            if (oBlock !== null) {
+                aBlocks.push(oBlock);
+            }
+
+            if (aBlocks.length === this._oConfig.limit) {
                 break;
             }
         }
