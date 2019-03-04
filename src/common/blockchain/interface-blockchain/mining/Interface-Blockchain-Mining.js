@@ -344,7 +344,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 } else {
 
-                    await this.blockchain.sleep(100);
+                    await this.blockchain.sleep(500);
                 }
 
             } catch (exception){
@@ -364,7 +364,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 }
 
-                await this.blockchain.sleep(200);
+                await this.blockchain.sleep(1000);
 
             }
 
