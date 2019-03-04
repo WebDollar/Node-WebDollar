@@ -1,7 +1,8 @@
 import {oAddressBalanceProvider, oBlockRepository, oTransactionRepository, oBlockTransformer, oTransactionTransformer} from './../Utils';
-import Blockchain   from './../../../main-blockchain/Blockchain';
-import NodesList    from './../../../node/lists/Nodes-List';
-import const_global from '../../../consts/const_global';
+import Blockchain          from './../../../main-blockchain/Blockchain';
+import NodesList           from './../../../node/lists/Nodes-List';
+import const_global        from './../../../consts/const_global';
+import oWebdNodesWaitlist  from './../../lists/waitlist/Nodes-Waitlist';
 
 /**
  * METHODS Account
@@ -31,6 +32,7 @@ import GetTransactionByBlockNumberAndIndex from './GetTransactionByBlockNumberAn
 import GetTransactionByHash                from './GetTransactionByHash';
 import GetTransactionCount                 from './GetTransactionCount';
 import NetVersion                          from './NetVersion';
+import NodeWaitList                        from './NodeWaitList';
 import NetworkHashRate                     from './NetworkHashRate';
 import PeerCount                           from './PeerCount';
 import ProtocolVersion                     from './ProtocolVersion';
@@ -66,6 +68,7 @@ const oGetTransactionByBlockNumberAndIndex = new GetTransactionByBlockNumberAndI
 const oGetTransactionByHash                = new GetTransactionByHash('getTransactionByHash', oTransactionRepository, oTransactionTransformer);
 const oGetTransactionCount                 = new GetTransactionCount('getTransactionCount');
 const oNetVersion                          = new NetVersion('netVersion', const_global.NETWORK_TYPE);
+const oNodeWaitList                        = new NodeWaitList('nodeWaitList', oWebdNodesWaitlist);
 const oNetworkHashRate                     = new NetworkHashRate('networkHashRate', Blockchain.blockchain);
 const oPeerCount                           = new PeerCount('peerCount', NodesList);
 const oProtocolVersion                     = new ProtocolVersion('protocolVersion', const_global.SETTINGS.NODE.VERSION);
@@ -98,6 +101,7 @@ export {
     oGetTransactionByHash,
     oGetTransactionCount,
     oNetVersion,
+    oNodeWaitList,
     oNetworkHashRate,
     oPeerCount,
     oProtocolVersion,
