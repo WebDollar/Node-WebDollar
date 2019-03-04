@@ -68,10 +68,10 @@ class BlockRepository {
         }
 
         for (let i = mStartingNumber; i <= mEndingNumber; i++) {
-            let oBlock = await this.findByNumberOrTag(i);
+            const oBlock = await this.findByNumberOrTag(i);
 
             if (oBlock !== null) {
-                aBlocks.push(await this.findByNumberOrTag(i));
+                aBlocks.push(oBlock);
             }
 
             if (aBlocks.length === this._oConfig.limit) {
