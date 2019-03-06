@@ -20,29 +20,35 @@ class BlockTransformer {
         const nBlockTimestampRaw = oBlock.timeStamp;
         const nBlockTimestamp    = nBlockTimestampRaw + BlockchainGenesis.timeStampOffset;
         const oBlockTimestampUTC = new Date(nBlockTimestamp * 1000);
+        const nBlockReward       = oBlock.reward === null ? 0 : oBlock.reward;
+        const nTransactionsFee   = oBlock.data.transactions.calculateFees();
 
         let oBlockData = {
-            id             : oBlock.height,
-            block_id       : oBlock.height,
-            hash           : oBlock.hash.toString('hex'),
-            nonce          : Serialization.deserializeNumber4Bytes_Positive(Serialization.serializeNumber4Bytes(oBlock.nonce)),
-            nonce_raw      : oBlock.nonce,
-            version        : oBlock.version,
-            previous_hash  : oBlock.hashPrev.toString('hex'),
-            timestamp      : oBlockTimestampUTC.toUTCString(),
-            timestamp_UTC  : nBlockTimestamp,
-            timestamp_block: nBlockTimestampRaw,
-            hash_data      : oBlock.data.hashData.toString('hex'),
-            miner_address  : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oBlock.data._minerAddress)),
-            trxs_hash_data : oBlock.data.transactions.hashTransactions.toString('hex'),
-            trxs_number    : oBlock.data.transactions.transactions.length,
-            trxs           : oOptions.includeTransactions
+            id               : oBlock.height,
+            block_id         : oBlock.height,
+            hash             : oBlock.hash.toString('hex'),
+            nonce            : Serialization.deserializeNumber4Bytes_Positive(Serialization.serializeNumber4Bytes(oBlock.nonce)),
+            nonce_raw        : oBlock.nonce,
+            version          : oBlock.version,
+            previous_hash    : oBlock.hashPrev.toString('hex'),
+            timestamp        : oBlockTimestampUTC.toUTCString(),
+            timestamp_UTC    : nBlockTimestamp,
+            timestamp_block  : nBlockTimestampRaw,
+            hash_data        : oBlock.data.hashData.toString('hex'),
+            miner_address    : BufferExtended.toBase(InterfaceBlockchainAddressHelper.generateAddressWIF(oBlock.data._minerAddress)),
+            trxs_hash_data   : oBlock.data.transactions.hashTransactions.toString('hex'),
+            trxs_number      : oBlock.data.transactions.transactions.length,
+            trxs             : oOptions.includeTransactions
                 ? oBlock.data.transactions.transactions.map((tx, i) => this._oTransactionTransformer.transform(tx, oBlock, i))
                 : oBlock.data.transactions.transactions.map((tx) => tx.txId.toString('hex')),
-            reward         : oBlock.reward === null ? 0 : oBlock.reward / WebDollarCoins.WEBD,
-            reward_raw     : oBlock.reward === null ? 0 : oBlock.reward,
-            createdAtUTC   : oBlockTimestampUTC,
-            block_raw      : BufferExtended.toBase((await oBlock.serializeBlock()).toString('hex')),
+            reward           : nBlockReward / WebDollarCoins.WEBD,
+            reward_raw       : nBlockReward,
+            fee_reward       : nTransactionsFee / WebDollarCoins.WEBD,
+            fee_reward_raw   : nTransactionsFee,
+            total_reward     : (nBlockReward / WebDollarCoins.WEBD) + (nTransactionsFee / WebDollarCoins.WEBD),
+            total_reward_raw : nBlockReward + nTransactionsFee,
+            createdAtUTC     : oBlockTimestampUTC,
+            block_raw        : BufferExtended.toBase((await oBlock.serializeBlock()).toString('hex')),
             isPOS            : bIsPosActivated === true,
             isPOW            : bIsPosActivated === false,
             posMinerAddress  : null,
