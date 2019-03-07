@@ -45,6 +45,22 @@ export default {
         {"addr": ["https://node15.timi.ro:443"]}, // Thanks to @TimiDani
         {"addr": ["https://node16.timi.ro:443"]}, // Thanks to @TimiDani
         
+        {"addr": ["https://node1.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node2.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node3.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node4.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node5.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node6.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node7.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node8.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node9.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node10.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node11.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node12.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node13.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node14.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        {"addr": ["https://node15.webdollarminingpool.com:443"]}, // Thanks to @TimiDani
+        
         //{"addr": ["https://webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         //{"addr": ["https://us.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
         //{"addr": ["https://losangeles.webdollarpool.win:80/"]}, // Thanks to @vladimirpetre
