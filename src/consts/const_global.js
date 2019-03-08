@@ -255,8 +255,9 @@ consts.MINING_POOL = {
     },
 
     SKIP_POW_REWARDS: false,
-    SKIP_POS_REWARDS: false
+    SKIP_POS_REWARDS: false,
 
+    POOL_PAYOUT_FEE : (process.env.POOL_PAYOUT_FEE || 0),
 
 };
 
@@ -459,7 +460,7 @@ consts.TERMINAL_WORKERS = {
 };
 
 consts.JSON_RPC = {
-    version: '1.0.1',
+    version: '1.4.1',
     serverConfig: {
         host: process.env.JSON_RPC_SERVER_HOST || '127.0.0.1',
         port: process.env.JSON_RPC_SERVER_PORT,

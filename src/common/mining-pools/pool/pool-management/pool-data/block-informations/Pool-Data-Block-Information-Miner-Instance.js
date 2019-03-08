@@ -169,7 +169,10 @@ class PoolDataBlockInformationMinerInstance {
             let diff = Math.floor( (new Date().getTime() - this.blockInformation.date)/1000);
 
             if (diff > 0 && this.blockInformation._timeRemaining > 0)
-                ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining*100 );
+                if( diff + this.blockInformation._timeRemaining !== 0 )
+                    ratio = new BigNumber( diff).dividedBy( diff + this.blockInformation._timeRemaining*10 );
+                else
+                    ratio = new BigNumber( diff);
 
             if(ratio>1) ratio = 1;
 

@@ -257,6 +257,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             if (!this.poolManagement._poolStarted || !data || !socket.node.protocol.minerPool) return;
 
+            if ((!BlockchainGenesis.isPoSActivated(data.work.h)) &&
+                ((data.work.nonce === 0) || (data.work.hashes === 0))) return;
+
             let suffix = "";
 
             //in case there is an suffix in the answer

@@ -1,4 +1,5 @@
 import MemoryManager from "./../Memory-Manager"
+import Blockchain from "main-blockchain/Blockchain";
 
 class BlockManager extends MemoryManager{
 
@@ -19,7 +20,10 @@ class BlockManager extends MemoryManager{
         try {
             let block = await this.blockchain.blockCreator.createEmptyBlock( height );
 
-            block.difficultyTargetPrev = await this.blockchain.getDifficultyTarget(height-1);
+            //TODO change the condition for SPV
+            if( !this.blockchain.agent.light )
+                block.difficultyTargetPrev = await this.blockchain.getDifficultyTarget(height-1);
+
             block.difficultyTarget = await this.loadingManager.getBlockDifficulty(height);
             block.hash = await this.blockchain.getHash(height);
             block.hashChain = await this.blockchain.getChainHash(height);

@@ -104,8 +104,6 @@ class NodeAPIRouter{
         this._addRoute( 'subscribe/address/transactions',  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType, 100 , app, prefix, middleWare );
 
     }
-
-
     
 }
 

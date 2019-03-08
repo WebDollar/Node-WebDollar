@@ -11,7 +11,7 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 import Blockchain from "main-blockchain/Blockchain";
 
 const PAYOUT_INTERVAL = consts.DEBUG ? 6 : 30; //in blocks;
-const PAYOUT_FEE = WebDollarCoins.WEBD * 0;
+const PAYOUT_FEE = WebDollarCoins.WEBD * consts.MINING_POOL.POOL_PAYOUT_FEE;
 
 
 class PoolPayouts{
