@@ -55,15 +55,15 @@ class MiningTransactionsSelector{
         // if (transaction.timeLock !== 0 && this.blockchain.blocks.length-1 < transaction.timeLock )
         //     throw { message: "blockHeight < timeLock", timeLock: transaction.timeLock, blockHeight: this.blockchain.blocks.length-1 };
 
+        //validating its own transaction
+        if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
+            return true;
+
         if( transaction.timeLock + consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH/2 < this.blockchain.blocks.length )
             throw {message: "transaction is too old"};
 
         if( transaction.timeLock - consts.BLOCKCHAIN.FORKS.IMMUTABILITY_LENGTH/2 > this.blockchain.blocks.length )
             throw {message: "transaction is in future"};
-
-        //validating its own transaction
-        if (transaction.from.addresses[0].unencodedAddress.equals( this.blockchain.mining.unencodedMinerAddress ) )
-            return true;
 
         //verify fee
         if (transaction.fee < this.blockchain.transactions.wizard.calculateFeeWizzard( transaction.serializeTransaction(), miningFeePerByte ) )
@@ -129,7 +129,7 @@ class MiningTransactionsSelector{
                             bRemoveTransaction = true;
 
                 } catch (exception){
-                    //console.warn('Error Including Transaction', exception);
+                    console.warn('Error Including Transaction', exception);
 
                     if(!missingFirstNonce)
                         if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' ){
@@ -151,6 +151,8 @@ class MiningTransactionsSelector{
                     ; //to nothing
 
             } catch (exception){
+
+                console.warn('Error Including Transaction', exception);
 
             }
 
