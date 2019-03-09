@@ -129,7 +129,7 @@ class MiningTransactionsSelector{
                             bRemoveTransaction = true;
 
                 } catch (exception){
-                    //console.warn('Error Including Transaction', exception);
+                    console.warn('Error Including Transaction', exception);
 
                     if(!missingFirstNonce)
                         if( exception.message === 'Nonce is invalid' || exception.message === 'Nonce is not right 2' || exception.message === 'Nonce is not right' ){
@@ -151,6 +151,8 @@ class MiningTransactionsSelector{
                     ; //to nothing
 
             } catch (exception){
+
+                console.warn('Error Including Transaction', exception);
 
             }
 
