@@ -5,12 +5,13 @@ import {isObject, isString, isNumber}   from 'lodash';
  * Creates and sign a transaction based on the provided parameters
  */
 class SendTransaction extends RpcMethod {
-    constructor(name, oTransactionsManager, oWallet, oSyncing) {
+    constructor(name, oTransactionsManager, oWallet, oSyncing, oAddressBalanceProvider) {
         super(name);
 
-        this._oTransactionsManager = oTransactionsManager;
-        this._oWallet              = oWallet;
-        this._oSyncing             = oSyncing;
+        this._oTransactionsManager    = oTransactionsManager;
+        this._oWallet                 = oWallet;
+        this._oSyncing                = oSyncing;
+        this._oAddressBalanceProvider = oAddressBalanceProvider;
     }
 
     async getHandler(args) {
@@ -32,6 +33,15 @@ class SendTransaction extends RpcMethod {
 
         if (isString(fromAddress) === false) {
             throw new Error('From address is invalid. Only string values are supported.');
+        }
+
+        try {
+            if (this._oAddressBalanceProvider.getBalance({address: fromAddress}) <= 0) {
+                throw new Error('From Address balance is 0');
+            }
+        }
+        catch (e) {
+            throw new Error('From Address is new or balance is 0');
         }
 
         try {
@@ -74,7 +84,7 @@ class SendTransaction extends RpcMethod {
         );
 
         if (!aResponse.result) {
-            if (typeof password !== 'undefined') {
+            if (typeof password !== 'undefined' && aResponse.message === 'Wrong password') {
                 // try also with the password as non-array
                 aResponse = await this._oTransactionsManager.wizard.createTransactionSimple(
                     fromAddress,
