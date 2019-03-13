@@ -74,7 +74,7 @@ const oPeerCount                           = new PeerCount('peerCount', NodesLis
 const oProtocolVersion                     = new ProtocolVersion('protocolVersion', const_global.SETTINGS.NODE.VERSION);
 const oSyncing                             = new Syncing('syncing', Blockchain.blockchain);
 const oSendRawTransaction                  = new SendRawTransaction('sendRawTransaction', Blockchain.Transactions, oSyncing);
-const oSendTransaction                     = new SendTransaction('sendTransaction', Blockchain.Transactions, Blockchain.Wallet, oSyncing);
+const oSendTransaction                     = new SendTransaction('sendTransaction', Blockchain.Transactions, Blockchain.Wallet, oSyncing, oAddressBalanceProvider);
 
 export {
     // Account
