@@ -1,5 +1,6 @@
 import {authenticatedMethod, RpcMethod} from './../../../jsonRpc';
 import {isObject, isString, isNumber}   from 'lodash';
+import const_global                     from './../../../consts/const_global';
 
 /**
  * Creates and sign a transaction based on the provided parameters
@@ -35,13 +36,26 @@ class SendTransaction extends RpcMethod {
             throw new Error('From address is invalid. Only string values are supported.');
         }
 
-        try {
-            if (this._oAddressBalanceProvider.getBalance({address: fromAddress}) <= 0) {
-                throw new Error('From Address balance is 0');
-            }
+        if (isString(toAddress) === false) {
+            throw new Error('To address is invalid. Only string value is supported.');
         }
-        catch (e) {
-            throw new Error('From Address is new or balance is 0');
+
+        if (isNumber(value) === false || value <= 0) {
+            throw new Error('Value is invalid. Only numerical values greater than 0 are supported.');
+        }
+
+        if (value < const_global.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT) {
+            throw new Error('Value is less than minimum amount of ' + const_global.SETTINGS.MEM_POOL.MINIMUM_TRANSACTION_AMOUNT);
+        }
+
+        if (typeof fee !== 'undefined' && (isNumber(fee) === false || fee <= 0)) {
+            throw new Error('Fee is invalid. Only numerical values greater than 0 are supported.');
+        }
+
+        const nFromAddressBalance = this._oAddressBalanceProvider.getBalance({address: fromAddress});
+
+        if (nFromAddressBalance < (value + fee)) {
+            throw new Error('Balance is less than value (fee included)');
         }
 
         try {
@@ -51,18 +65,6 @@ class SendTransaction extends RpcMethod {
         }
         catch(e) {
             throw new Error(e.message);
-        }
-
-        if (isString(toAddress) === false) {
-            throw new Error('To address is invalid. Only string value is supported.');
-        }
-
-        if (isNumber(value) === false || value <= 0) {
-            throw new Error('Value is invalid. Only numerical values greater than 0 are supported.');
-        }
-
-        if (typeof fee !== 'undefined' && (isNumber(fee) === false || fee <= 0)) {
-            throw new Error('Fee is invalid. Only numerical values greater than 0 are supported.');
         }
 
         try {
