@@ -168,7 +168,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
                     let timeInitial = new Date().getTime();
 
-                    this._isBeingMining = new Promise( async (resolve)=>{
+                    this._isBeingMining = new Promise( async (resolve) => {
 
                         try {
 
@@ -179,20 +179,22 @@ class MinerPoolMining extends InheritedPoolMining {
 
                             let answer = await this._run();
 
-                            if (!answer)  answer = {
-                                hash: consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER,
-                                nonce: 0,
-                            };
+                            if (!answer) {
+                                await Blockchain.blockchain.sleep(10000); // nu mineaza, poate dormi
+                                resolve(false);
+                                return false;
+                            }
 
                             answer.timeDiff = new Date().getTime() - timeInitial;
                             answer.id = workId;
                             answer.h = workHeight;
 
-                            if (!this._miningWork.resolved)
+                            if (answer.hashes != 0)
                                 answer.hashes = workEnd - workStart;
 
-                            this.resetForced = false;
-                            this._miningWork.resolved = true;
+                            if (!this.resetForced)
+                                this._miningWork.resolved = true;
+                            else this.resetForced = false;
 
                             this.minerPoolManagement.minerPoolProtocol.pushWork( answer, this._miningWork.poolSocket );
 
@@ -210,6 +212,7 @@ class MinerPoolMining extends InheritedPoolMining {
                     await this._isBeingMining;
 
                 } catch (exception) {
+                    console.log("Pool Mining Exception 2", exception);
                 }
 
             }
