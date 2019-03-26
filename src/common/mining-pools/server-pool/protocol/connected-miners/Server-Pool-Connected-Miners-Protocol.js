@@ -115,25 +115,18 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
-            try{
+            if ( !data || !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+            if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
-                if ( !data || !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-                if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+            let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+            if ( !socketPool ) throw {message: "pool was not found in the serverPool"};
 
-                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
-                if ( !socketPool ) throw {message: "pool was not found in the serverPool"};
+            data.suffix = Math.random().toString();
+            let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
 
-                data.suffix = Math.random().toString();
-                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
+            if ( !answer ) throw {message: "there is a problem with the pool"};
 
-                if ( !answer ) throw {message: "there is a problem with the pool"};
-
-                socket.node.sendRequest("mining-pool/work-done/answer", answer );
-
-            } catch(error){
-                console.error("work-done failed", error);
-            }
-
+            socket.node.sendRequest("mining-pool/work-done/answer", answer );
 
         });
 
