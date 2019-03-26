@@ -115,18 +115,24 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
-            if ( !data || !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
-            if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
+            try{
 
-            let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
-            if ( !socketPool ) throw {message: "pool was not found in the serverPool"};
+                if ( !data || !Buffer.isBuffer(data.miner) || data.miner.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "minerPublicKey is invalid"};
+                if ( !Buffer.isBuffer(data.pool)  || data.pool.length !== consts.ADDRESSES.PUBLIC_KEY.LENGTH) throw {message: "poolPublicKey is invalid"};
 
-            data.suffix = Math.random().toString();
-            let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
+                let socketPool = this.serverPoolManagement.serverPoolProtocol.serverPoolConnectedPoolsProtocol.findPoolByPoolPublicKey(data.pool);
+                if ( !socketPool ) throw {message: "pool was not found in the serverPool"};
 
-            if (answer === null) throw {message: "there is a problem with the pool"};
+                data.suffix = Math.random().toString();
+                let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
 
-            socket.node.sendRequest("mining-pool/work-done/answer", answer );
+                if ( !answer ) throw {message: "there is a problem with the pool"};
+
+                socket.node.sendRequest("mining-pool/work-done/answer", answer );
+
+            } catch(error){
+                console.error("work-done failed", error);
+            }
 
 
         });
