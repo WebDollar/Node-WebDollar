@@ -255,26 +255,21 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
-            let suffix = "", minerInstance;
 
-            try{
+            if (!this.poolManagement._poolStarted || !data || !socket.node.protocol.minerPool) return;
 
-                if (!this.poolManagement._poolStarted || !data || !socket.node.protocol.minerPool) return;
+            if ((!BlockchainGenesis.isPoSActivated(data.work.h)) &&
+                ((data.work.nonce === 0) || (data.work.hashes === 0))) return;
 
-                if ((!BlockchainGenesis.isPoSActivated(data.work.h)) &&
-                    ((data.work.nonce === 0) || (data.work.hashes === 0))) return;
+            let suffix = "";
+            //in case there is an suffix in the answer
+            if ( typeof data.suffix === "string")
+                suffix = '/'+data.suffix;
 
-                //in case there is an suffix in the answer
-                if ( typeof data.suffix === "string")
-                    suffix = '/'+data.suffix;
-
-                let minerInstance = socket.node.protocol.minerPool.minerInstance;
-                if ( !minerInstance ) throw {message: "publicKey was not found"};
+            let minerInstance = socket.node.protocol.minerPool.minerInstance;
+            if ( !minerInstance ) throw {message: "publicKey was not found"};
 
 
-            }catch(exception){
-                console.log("mining-pool/work-done exception 1", exception)
-            }
 
             try{
 
