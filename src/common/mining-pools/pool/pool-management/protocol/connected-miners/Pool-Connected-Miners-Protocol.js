@@ -255,14 +255,14 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
+            let suffix = "", minerInstance;
+
             try{
 
                 if (!this.poolManagement._poolStarted || !data || !socket.node.protocol.minerPool) return;
 
                 if ((!BlockchainGenesis.isPoSActivated(data.work.h)) &&
                     ((data.work.nonce === 0) || (data.work.hashes === 0))) return;
-
-                let suffix = "";
 
                 //in case there is an suffix in the answer
                 if ( typeof data.suffix === "string")
@@ -271,10 +271,16 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 let minerInstance = socket.node.protocol.minerPool.minerInstance;
                 if ( !minerInstance ) throw {message: "publicKey was not found"};
 
-                await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
             }catch(exception){
-                console.log("mining-pool/work-done exception", exception)
+                console.log("mining-pool/work-done exception 1", exception)
+            }
+
+            try{
+
+                await this.poolManagement.receivePoolWork(minerInstance, data.work);
+            }catch(exception){
+                console.log("mining-pool/work-done exception 2", exception)
             }
 
             try{
@@ -288,7 +294,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, } );
 
             }catch(exception){
-                console.log("mining-pool/work-done exception", exception)
+                console.log("mining-pool/work-done exception 3", exception)
             }
 
         });
