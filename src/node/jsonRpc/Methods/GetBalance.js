@@ -4,8 +4,7 @@ import InterfaceBlockchainAddressHelper from './../../../common/blockchain/inter
 /**
  * The balance of the account of given address.
  */
-class GetBalance extends RpcMethod
-{
+class GetBalance extends RpcMethod {
     constructor(name, oAddressBalanceProvider) {
         super(name);
         this._oAddressBalanceProvider = oAddressBalanceProvider;
@@ -14,16 +13,25 @@ class GetBalance extends RpcMethod
     getHandler(args) {
         let sAddress = args[0] || undefined;
 
-        try
-        {
+        try {
             sAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(sAddress);
+
+            if (sAddress === null)
+            {
+                throw new Error('Address cannot be decoded');
+            }
         }
-        catch (exception)
-        {
+        catch (exception) {
+            console.error(exception);
             throw new Error('Address is invalid');
         }
 
-        return this._oAddressBalanceProvider.getBalance({address: sAddress});
+        try {
+            return this._oAddressBalanceProvider.getBalance({address: sAddress});
+        }
+        catch (e) {
+            return 0;
+        }
     }
 }
 
