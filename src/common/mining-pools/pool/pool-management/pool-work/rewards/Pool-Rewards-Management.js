@@ -251,7 +251,7 @@ class PoolRewardsManagement{
                 let blockckahinBlock = await this.blockchain.getBlock(blockInfo.height);
                 if (  !blockckahinBlock ) continue;
 
-                if ( BufferExtended.safeCompare( block.hash, blockckahinBlock.hash  ) ){
+                if ( BufferExtended.safeCompare( block.hashChain, blockckahinBlock.hashChain  ) ){
 
                     found = true;
 

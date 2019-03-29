@@ -124,10 +124,9 @@ class ServerPoolConnectedMinersProtocol extends  PoolProtocolList{
             data.suffix = Math.random().toString();
             let answer = await socketPool.node.sendRequestWaitOnce("mining-pool/work-done", data, "answer/"+data.suffix, 6000 );
 
-            if (answer === null) throw {message: "there is a problem with the pool"};
+            if ( !answer ) throw {message: "there is a problem with the pool"};
 
             socket.node.sendRequest("mining-pool/work-done/answer", answer );
-
 
         });
 

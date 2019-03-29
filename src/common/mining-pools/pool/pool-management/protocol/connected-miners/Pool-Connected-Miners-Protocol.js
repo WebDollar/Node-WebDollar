@@ -255,13 +255,13 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
         socket.node.on("mining-pool/work-done", async (data) => {
 
+
             if (!this.poolManagement._poolStarted || !data || !socket.node.protocol.minerPool) return;
 
             if ((!BlockchainGenesis.isPoSActivated(data.work.h)) &&
                 ((data.work.nonce === 0) || (data.work.hashes === 0))) return;
 
             let suffix = "";
-
             //in case there is an suffix in the answer
             if ( typeof data.suffix === "string")
                 suffix = '/'+data.suffix;
@@ -269,15 +269,29 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
             let minerInstance = socket.node.protocol.minerPool.minerInstance;
             if ( !minerInstance ) throw {message: "publicKey was not found"};
 
-            await this.poolManagement.receivePoolWork(minerInstance, data.work);
 
-            let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
-            minerInstance.lastWork = newWork;
 
-            //the new reward
-            socket.node.sendRequest("mining-pool/work-done/answer"+suffix, { result: true, newWork: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
-                                                                             h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
-                                                                             b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, } );
+            try{
+
+                await this.poolManagement.receivePoolWork(minerInstance, data.work);
+            }catch(exception){
+                console.log("mining-pool/work-done exception 2", exception)
+            }
+
+            try{
+
+                let newWork = await this.poolManagement.generatePoolWork(minerInstance, true);
+                minerInstance.lastWork = newWork;
+
+                //the new reward
+                socket.node.sendRequest("mining-pool/work-done/answer"+suffix, { result: true, newWork: newWork, reward: minerInstance.miner.rewardTotal||0, confirmed: minerInstance.miner.rewardConfirmedTotal||0,  refReward: minerInstance.miner.referrals.rewardReferralsTotal||0,  refConfirmed: minerInstance.miner.referrals.rewardReferralsConfirmed||0,
+                    h:this.poolManagement.poolStatistics.poolHashes,  m: this.poolManagement.poolStatistics.poolMinersOnline.length,  t: this.poolManagement.poolStatistics.poolTimeRemaining,  n: Blockchain.blockchain.blocks.networkHashRate,
+                    b: this.poolManagement.poolStatistics.poolBlocksConfirmed,  bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,  ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,  bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed, } );
+
+            }catch(exception){
+                console.log("mining-pool/work-done exception 3", exception)
+            }
+
         });
 
 

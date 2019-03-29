@@ -398,7 +398,7 @@ class MinerPoolProtocol extends PoolProtocolList{
                 signature: signature,
                 type: "only instance",
 
-            }, "answer", 6000);
+            }, "answer", 12000);
 
             if (answer === null) throw {message: "pool didn't respond"};
             if (answer.result !== true) throw answer;

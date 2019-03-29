@@ -35,7 +35,7 @@ class MemoryManager{
 
             let data = await this._loadData(height);
             this.addToLoaded(height, data );
-            return await data;
+            return data;
 
         }
 
