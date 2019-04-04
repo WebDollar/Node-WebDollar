@@ -688,12 +688,12 @@ class CLI {
 
     }
 
-    setIntervalDisconnectAllMinersNodes(){
+    async setIntervalDisconnectAllMinersNodes(){
 
-        let intervalTime = await AdvancedMessages.input('Enter the interval time: \n 0 - disable interval \n x - minutes');
+        let intervalTime = await AdvancedMessages.readNumber('Enter the interval time: \n 0 - disable interval \n x - minutes');
 
         if (this._intervalDisconnectingMiners)
-            clearTimeout(this._intervalDisconnectingMiners)
+            clearTimeout(this._intervalDisconnectingMiners);
 
         if (intervalTime > 0) {
 
