@@ -102,6 +102,9 @@ class CLI {
             case '23':
                 await this.disconnectAllMinersNodes();
                 break;
+            case '24':
+                await this.setIntervalDisconnectAllMinersNodes();
+                break;
             case '30':  // Set Password
                 await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
                 break;
@@ -685,6 +688,23 @@ class CLI {
 
     }
 
+    setIntervalDisconnectAllMinersNodes(){
+
+        let intervalTime = await AdvancedMessages.input('Enter the interval time: \n 0 - disable interval \n x - minutes');
+
+        if (this._intervalDisconnectingMiners)
+            clearTimeout(this._intervalDisconnectingMiners)
+
+        if (intervalTime > 0) {
+
+            this._intervalDisconnectingMiners = setInterval( ()=>{
+               this.disconnectAllMinersNodes();
+            }, intervalTime * 60 * 1000);
+
+        }
+
+    }
+
 }
 
 const commands = [
@@ -705,7 +725,8 @@ const commands = [
         '20. HTTPS Express Start',
         '21. Disable Node Immutability',
         '22. Disconnect from all consensus nodes',
-        '23. Disconnect from all miner nodes',
+        '23. Disconnect all miner nodes',
+        '24. Set Interval to disconnect all miner nodes',
         '30. Set Password for Mining Address',
     ];
 
