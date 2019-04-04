@@ -1,5 +1,7 @@
 /* eslint-disable */
 import CONNECTION_TYPE from "../lists/types/Connection-Type";
+import NODES_CONSENSUS_TYPE from "../lists/types/Node-Consensus-Type";
+
 
 const FileSystem = require('fs');
 import {JsonRpcServer} from './../jsonRpc';
@@ -21,7 +23,6 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
-import PoolRewardsManagement from "common/mining-pools/pool/pool-management/pool-work/rewards/Payout/Pool-Process-Remaining-Payment"
 
 class CLI {
 
@@ -97,6 +98,9 @@ class CLI {
                 break;
             case '22': // Disable Forks Immutability
                 await this.disconnectFromAllConnectedNodes();
+                break;
+            case '23':
+                await this.disconnectAllMinersNodes();
                 break;
             case '30':  // Set Password
                 await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
@@ -477,7 +481,7 @@ class CLI {
                     let response = await AdvancedMessages.confirm('Do you want to continue mining in the same pool: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolURL);
 
                     if (response === true) getNewLink = false;
-
+7
                 }
 
                 let miningPoolLink = undefined;
@@ -674,6 +678,13 @@ class CLI {
 
     }
 
+    disconnectAllMinersNodes(){
+
+        let NodesList = require('node/lists/Nodes-List').default;
+        NodesList.disconnectAllNodesByConsensusType(NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL);
+
+    }
+
 }
 
 const commands = [
@@ -693,7 +704,8 @@ const commands = [
         '13. Create Offline Transaction',
         '20. HTTPS Express Start',
         '21. Disable Node Immutability',
-        '22. Disconnect from all nodes',
+        '22. Disconnect from all consensus nodes',
+        '23. Disconnect from all miner nodes',
         '30. Set Password for Mining Address',
     ];
 
