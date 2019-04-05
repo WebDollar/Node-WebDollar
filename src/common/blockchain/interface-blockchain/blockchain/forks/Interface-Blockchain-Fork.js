@@ -114,7 +114,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
         Log.log("Save Fork after validateFork", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
 
         let revertActions = new RevertActions(this.blockchain);
-        revertActions.push({action: "breakpoint"});
+
+        let revertActionsOldBlocks = new RevertActions(this.blockchain);
+
+        let revertActionsNewBlocks = new RevertActions(this.blockchain);
 
         let success = false;
 
@@ -139,6 +142,8 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                 Log.log("Accountant Tree", Log.LOG_TYPE.BLOCKCHAIN_FORKS, this.blockchain.accountantTree.root.hash.toString("hex"));
 
+                let oldBlocks = [];
+
                 try {
 
                     //making a copy of the current blockchain
@@ -146,7 +151,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                     await this.preFork(revertActions);
 
-                    let oldBlocks = await this.blockchain.blocks.spliceBlocks( this.forkStartingHeight, false, revertActions);
+                    oldBlocks = await this.blockchain.blocks.spliceBlocks( this.forkStartingHeight, false, revertActionsOldBlocks);
 
                     Log.log("===========================", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
                     Log.log("===========================", Log.LOG_TYPE.BLOCKCHAIN_FORKS);
@@ -166,10 +171,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                         forkBlock.blockValidation = this._createBlockValidation_BlockchainValidation( forkBlock.height , index);
 
-                        if ( await this.saveIncludeBlock(index, revertActions,  false) === false)
+                        if ( await this.saveIncludeBlock(index, revertActionsNewBlocks,  false) === false)
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
-                        revertActions.push( {name: "block-added", height: forkBlock.height } );
+                        revertActionsNewBlocks.push( {name: "block-added", height: forkBlock.height } );
 
                         if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
                             forkBlock.blockValidation.blockValidationType['skip-sleep'] = true;
@@ -196,7 +201,17 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                     Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
+                    await revertActionsNewBlocks.revertOperations('', "all");
                     await revertActions.revertOperations('', "all");
+
+                    let revertOldBlocksActions = new RevertActions(this.blockchain);
+
+                    //revert previous block
+                    for (let i=0; i < oldBlocks.length; i++)
+                        if ( await this.blockchain.includeBlockchainBlock( oldBlocks[i], false, "all", true, revertOldBlocksActions, false ) === false) {
+                            Log.error("fork oldBLock couldn't be included in main Blockchain " + index, Log.LOG_TYPE.BLOCKCHAIN_FORKS);
+                            return false;
+                        }
 
                     //other revert settings
                     await this.revertFork();
