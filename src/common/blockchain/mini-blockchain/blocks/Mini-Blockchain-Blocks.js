@@ -32,7 +32,7 @@ class MiniBlockchainBlocks extends InterfaceBlockchainBlocks{
 
                 revertActions.push({
                     name: "block-removed",
-                    height: this.length-1,
+                    height: block.height,
                     data: block,
                 });
 

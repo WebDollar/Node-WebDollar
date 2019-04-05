@@ -198,7 +198,7 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
     async revertFork(){
 
         //recover to the original Accountant Tree & state
-        if (this.forkPrevAccountantTree !== null && Buffer.isBuffer(this.forkPrevAccountantTree)){
+        if (this.forkPrevAccountantTree && Buffer.isBuffer(this.forkPrevAccountantTree)){
 
             this.blockchain.blocks.blocksStartingPoint = this._blocksStartingPointClone;
 
