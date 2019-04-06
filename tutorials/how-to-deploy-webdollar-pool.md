@@ -50,18 +50,23 @@ npm run dev # better use screen command or open another terminal - Run this comm
 ```
 ### 5. Configuring your WebDollar Pool (run commands in Node Window)
 ```shell
-press 12, hit enter. Write your Pool Server`s Address - default should be: https://your_domain.tld:80
 press 11, hit enter. When asked about Pool Website - default should be: https://your_domain.tld:9094
-When asked if you want to use external pool servers, hit y and enter your Pool Server's Address (do this to avoid seeing a IP address at the end of your Pool link)
+When asked if you want to use external pool servers, hit n
 ```
 ### 6. Updating Node and vue
 ```shell
 bash update.sh # for Node-WebDollar
 git pull origin MiningPools # for vue-Frontend
 ```
+----
 ### Additional Info:
 
 #### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a>
 #### ^ These backups are made at every 6 hours.
 #### Create a folder named ```blockchainDB3``` inside Node-WebDollar1 and unpack the downloaded arhive to that folder. If the folder is already created, delete the contents inside it and download the backup inside.
 #### To unzip it, run: ```tar -zxvf blockchainDB3.tar.gz -C .``` -> always run this inside blockchainDB3 folder!
+----
+### How to change default PORTS?
+
+#### FOR NODE, run: ```nano src/consts/const_global.js``` inside Node folder, scroll till you see ```PORT: 80``` and change it to your preferred port.
+#### FOR vue-Frontend(UI), run:  ```nano vue-Frontend/server.js``` inside Node folder, scroll till you see ```port || 9094``` and change it to your preferred port.
