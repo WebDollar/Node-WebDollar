@@ -6,37 +6,29 @@
  *
  */
 
-import consts from "consts/const_global"
-const uuid = require('uuid');
+import consts from 'consts/const_global'
 
-import ProcessWorker from "./Process-Worker"
+import ProcessWorker from './Process-Worker'
+const uuid = require('uuid')
 
 class ProcessWorkerGPU extends ProcessWorker {
+  constructor (gpuID, noncesWorkBatch) {
+    super(gpuID, noncesWorkBatch)
 
-    constructor(gpuID, noncesWorkBatch){
+    let gpuInstance
 
-        super(gpuID, noncesWorkBatch);
+    gpuInstance = gpuID % consts.TERMINAL_WORKERS.GPU_INSTANCES
+    gpuID = Math.floor(gpuID / consts.TERMINAL_WORKERS.GPU_INSTANCES)
 
-        let gpuInstance;
+    this.gpuID = gpuID || 0
+    this.gpuInstance = gpuInstance || 0
 
-        gpuInstance = gpuID % consts.TERMINAL_WORKERS.GPU_INSTANCES;
-        gpuID = Math.floor( gpuID / consts.TERMINAL_WORKERS.GPU_INSTANCES);
+    this.suffix = this.gpuID + '_' + this.gpuInstance
+  }
 
-        this.gpuID = gpuID||0;
-        this.gpuInstance = gpuInstance || 0;
-
-        this.suffix = this.gpuID+"_"+this.gpuInstance;
-
-    }
-
-    _getProcessParams(){
-
-        return ' '+this._path+ ' -m '+consts.TERMINAL_WORKERS.GPU_MODE+ ' -b '+ this.noncesWorkBatch + ' -d '+this.gpuID+ ' -r socket -f '+'./dist_bundle/GPU/input.txt'+this.suffix;
-
-    }
-
-
-
+  _getProcessParams () {
+    return ' ' + this._path + ' -m ' + consts.TERMINAL_WORKERS.GPU_MODE + ' -b ' + this.noncesWorkBatch + ' -d ' + this.gpuID + ' -r socket -f ' + './dist_bundle/GPU/input.txt' + this.suffix
+  }
 }
 
 export default ProcessWorkerGPU

@@ -2,44 +2,44 @@
     original source https://github.com/antelle/argon2-browser/blob/master/docs/js/worker.js
  */
 
-'use strict';
+'use strict'
 
-var calcHashArg;
+var calcHashArg
 
 self.onmessage = (e) => {
-    self.postMessage('calc:' + e.data.calc);
-    calcHashArg = e.data.arg;
-    switch (e.data.calc) {
-        case 'asm':
-            calcAsmJs(calcHashArg);
-            break;
-        case 'wasm':
-            calcWasm(calcHashArg);
-            break;
-    }
-};
-
-function clearLog() {
+  self.postMessage('calc:' + e.data.calc)
+  calcHashArg = e.data.arg
+  switch (e.data.calc) {
+    case 'asm':
+      calcAsmJs(calcHashArg)
+      break
+    case 'wasm':
+      calcWasm(calcHashArg)
+      break
+  }
 }
 
-function log(msg) {
-    self.postMessage({ msg: msg });
+function clearLog () {
 }
 
-function loadScript(script, callback, errorCallback) {
-    try {
-        importScripts(script);
-    } catch (e) {
-        console.error('Error loading script', script, e);
-        errorCallback(e);
-        return;
-    }
-    callback();
+function log (msg) {
+  self.postMessage({ msg: msg })
 }
 
-function getArg() {
-    return calcHashArg;
+function loadScript (script, callback, errorCallback) {
+  try {
+    importScripts(script)
+  } catch (e) {
+    console.error('Error loading script', script, e)
+    errorCallback(e)
+    return
+  }
+  callback()
 }
 
-importScripts('calc.js');
-self.postMessage({ msg: 'Worker started' });
+function getArg () {
+  return calcHashArg
+}
+
+importScripts('calc.js')
+self.postMessage({ msg: 'Worker started' })

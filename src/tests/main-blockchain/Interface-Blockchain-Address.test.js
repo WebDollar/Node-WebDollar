@@ -1,88 +1,78 @@
-import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
-let assert = require('assert');
+import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig'
+import Blockchain from 'main-blockchain/Blockchain'
+import BufferExtended from 'common/utils/BufferExtended'
 
-import MultiSig from 'common/blockchain/interface-blockchain/addresses/MultiSig';
-import Blockchain from 'main-blockchain/Blockchain';
-import BufferExtended from "common/utils/BufferExtended";
+let assert = require('assert')
 
 describe('test save addresses to local storage', () => {
+  let response = null
 
-    let response = null;
+  it('test check multiSig encrypt/decrypt Buffer sample test', () => {
+    let buffer = WebDollarCrypto.getBufferRandomValues(32)
+    let encrypt = MultiSig.getMultiAESEncrypt(buffer, ['ana', 'are', 'mere', 'rosii'])
+    let decrypt = MultiSig.getMultiAESDecrypt(encrypt, ['ana', 'are', 'mere', 'rosii'])
 
-    it('test check multiSig encrypt/decrypt Buffer sample test', () => {
+    assert(decrypt.equals(buffer), 'Buffer differ after multiAESDecrypt' + buffer.toString('hex') + '!==' + decrypt.toString('hex'))
+  })
 
-        let buffer = WebDollarCrypto.getBufferRandomValues(32);
-        let encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana", "are", "mere", "rosii"]);
-        let decrypt = MultiSig.getMultiAESDecrypt(encrypt, ["ana", "are", "mere", "rosii"]);
+  it('test check multiSig encrypt/decrypt Buffer test 2', () => {
+    let buffer = WebDollarCrypto.getBufferRandomValues(32)
+    let encrypt = MultiSig.getMultiAESEncrypt(buffer, ['ana', 'are', 'mere', 'rosii'])
+    let decrypt = MultiSig.getMultiAESDecrypt(encrypt, ['anaare', 'mererosii'])
 
-        assert(decrypt.equals(buffer), "Buffer differ after multiAESDecrypt" + buffer.toString("hex") + "!==" + decrypt.toString("hex"));
-    });
+    assert(decrypt === null || !decrypt.equals(buffer), 'Buffer should differ after multiAESDecrypt')
 
-    it('test check multiSig encrypt/decrypt Buffer test 2', () => {
+    encrypt = MultiSig.getMultiAESEncrypt(buffer, ['ana', 'are', 'mere', 'rosii'])
+    decrypt = MultiSig.getMultiAESDecrypt(encrypt, ['anaaremererosii'])
+    assert(decrypt === null || !decrypt.equals(buffer), 'Buffer should differ after multiAESDecrypt')
+  })
 
-        let buffer = WebDollarCrypto.getBufferRandomValues(32);
-        let encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana", "are", "mere", "rosii"]);
-        let decrypt = MultiSig.getMultiAESDecrypt(encrypt, ["anaare", "mererosii"]);
+  it('test check function isPrivateKeyEncrypted', async () => {
+    let blockchainAddress = await Blockchain.Wallet.createNewAddress()
+    let response = await blockchainAddress.isPrivateKeyEncrypted()
 
-        assert(decrypt === null || !decrypt.equals(buffer), "Buffer should differ after multiAESDecrypt");
+    assert(response === false, "isPrivateKeyEncrypted doesn't work")
+  })
 
-        encrypt = MultiSig.getMultiAESEncrypt(buffer, ["ana", "are", "mere", "rosii"]);
-        decrypt = MultiSig.getMultiAESDecrypt(encrypt, ["anaaremererosii"]);
-        assert(decrypt === null || !decrypt.equals(buffer), "Buffer should differ after multiAESDecrypt");
-    });
+  it('test BufferExtended.fromBase', async () => {
+    let address = 'WEBD$gCV7BpnRcygsUyJZEyKK95cEG1keYcSwk2HAsm9pFbAqpiLhUjsPw=='
+    let unecodedAddress = BufferExtended.fromBase(address)
 
-    it('test check function isPrivateKeyEncrypted', async () => {
+    assert(unecodedAddress !== undefined, 'Error BufferExtended.fromBase')
+    assert(Buffer.isBuffer(unecodedAddress), 'BufferExtended.fromBase(address) should create buffer')
+  })
 
-        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
-        let response = await blockchainAddress.isPrivateKeyEncrypted();
+  it('test check multiSig encrypt/decrypt privateKey with 12 words', async () => {
+    let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    let blockchainAddress = await Blockchain.Wallet.createNewAddress()
+    let privateKey0 = await blockchainAddress._getPrivateKey()
 
-        assert(response === false, "isPrivateKeyEncrypted doesn't work");
-    });
+    let encrypt = MultiSig.getMultiAESEncrypt(privateKey0, passwordZero)
+    let privateKey1 = MultiSig.getMultiAESDecrypt(encrypt, passwordZero)
 
-    it('test BufferExtended.fromBase', async () => {
+    assert(privateKey1.equals(privateKey0), 'privateKey differ after decrypt' + privateKey0.toString('hex') + '!==' + privateKey1.toString('hex'))
+  })
 
-        let address = "WEBD$gCV7BpnRcygsUyJZEyKK95cEG1keYcSwk2HAsm9pFbAqpiLhUjsPw==";
-        let unecodedAddress = BufferExtended.fromBase(address);
+  it('test check save/get privateKey encrypted with 12 words', async () => {
+    let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l']
+    let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti', 'sj', 'ck', 'ul']
+    let blockchainAddress = await Blockchain.Wallet.createNewAddress()
 
-        assert(unecodedAddress !== undefined, "Error BufferExtended.fromBase");
-        assert(Buffer.isBuffer(unecodedAddress), "BufferExtended.fromBase(address) should create buffer");
-    });
-    
-    it('test check multiSig encrypt/decrypt privateKey with 12 words', async () => {
-        
-        let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
-        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
-        let privateKey0 = await blockchainAddress._getPrivateKey();
-        
-        let encrypt = MultiSig.getMultiAESEncrypt(privateKey0, passwordZero);
-        let privateKey1 = MultiSig.getMultiAESDecrypt(encrypt, passwordZero);
-        
-        assert(privateKey1.equals(privateKey0), "privateKey differ after decrypt" + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
-        
-    });
+    let privateKey0 = await blockchainAddress._getPrivateKey()
+    assert(privateKey0 !== null, 'Address should not be null')
 
-    it('test check save/get privateKey encrypted with 12 words', async () => {
+    response = await blockchainAddress.savePrivateKey(privateKey0, passwordZero)
+    assert(response === true, 'Error saving privateKey: ' + response)
 
-        let passwordZero = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i','j', 'k', 'l'];
-        let passwordOne = ['ak', 'bv', 'co', 'dy', 're', 'ff', 'sg', 'rh', 'ti','sj', 'ck', 'ul'];
-        let blockchainAddress = await Blockchain.Wallet.createNewAddress();
+    let privateKey1 = await blockchainAddress._getPrivateKey(passwordZero)
+    assert(privateKey0.equals(privateKey1), 'Address differ after decrypt: ' + privateKey0.toString('hex') + '!==' + privateKey1.toString('hex'))
 
-        let privateKey0 = await blockchainAddress._getPrivateKey();
-        assert(privateKey0 !== null, "Address should not be null");
+    response = await blockchainAddress.savePrivateKey(privateKey0, passwordOne)
+    assert(response === true, 'Error saving privateKey: ' + response)
 
-        response = await blockchainAddress.savePrivateKey(privateKey0, passwordZero);
-        assert(response === true, "Error saving privateKey: " + response);
-
-        let privateKey1 = await blockchainAddress._getPrivateKey(passwordZero);
-        assert(privateKey0.equals(privateKey1), "Address differ after decrypt: " + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
-
-        response = await blockchainAddress.savePrivateKey(privateKey0, passwordOne);
-        assert(response === true, "Error saving privateKey: " + response);
-
-        privateKey0 = await blockchainAddress._getPrivateKey(passwordOne);
-        assert(privateKey0.equals(privateKey1), "Address differ after decrypt: " + privateKey0.toString("hex") + "!==" + privateKey1.toString("hex"));
-    });
-
-
-});
+    privateKey0 = await blockchainAddress._getPrivateKey(passwordOne)
+    assert(privateKey0.equals(privateKey1), 'Address differ after decrypt: ' + privateKey0.toString('hex') + '!==' + privateKey1.toString('hex'))
+  })
+})

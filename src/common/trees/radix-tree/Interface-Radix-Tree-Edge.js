@@ -1,48 +1,39 @@
 import InterfaceTreeEdge from 'common/trees/Interface-Tree-Edge'
 import InterfaceRadixTreeNode from 'common/trees/Interface-Tree-Node'
-import Serialization from "../../utils/Serialization";
-import BufferExtended from "common/utils/BufferExtended";
+import Serialization from '../../utils/Serialization'
+import BufferExtended from 'common/utils/BufferExtended'
 
 class InterfaceRadixTreeEdge extends InterfaceTreeEdge {
+  // label : data
+  // targetNode : Node
 
-    // label : data
-    // targetNode : Node
+  constructor (label, targetNode) {
+    if (targetNode instanceof InterfaceRadixTreeNode === false) { throw { message: 'Target Node is not a Radix Node' } }
 
-    constructor (label, targetNode) {
+    super(targetNode)
 
-        if ( targetNode instanceof InterfaceRadixTreeNode === false )
-            throw {message: "Target Node is not a Radix Node"};
+    this.label = label
+  }
 
-        super ( targetNode );
+  serializeEdge () {
+    return Buffer.concat([
+      Serialization.serializeNumber1Byte(this.label.length),
+      this.label,
+      this.targetNode.serializeNode()
+    ])
+  }
 
-        this.label = label;
-    }
+  deserializeEdge (buffer, offset, createNewNode) {
+    let labelLength = Serialization.deserializeNumber1Bytes(buffer, offset)
+    offset += 1
 
-    serializeEdge(){
+    this.label = BufferExtended.substr(buffer, offset, labelLength)
 
-        return Buffer.concat ( [
-            Serialization.serializeNumber1Byte(this.label.length),
-            this.label,
-            this.targetNode.serializeNode()
-        ]);
+    let node = createNewNode()
+    offset = node.deserializeNode(buffer, offset, true)
 
-    }
-
-    deserializeEdge(buffer, offset, createNewNode){
-
-        let labelLength = Serialization.deserializeNumber1Bytes(buffer, offset);
-        offset +=1;
-
-        this.label =  BufferExtended.substr(buffer, offset, labelLength);
-
-        let node = createNewNode();
-        offset = node.deserializeNode(buffer, offset, true);
-
-        return offset;
-
-    }
-
+    return offset
+  }
 }
 
-
-export default InterfaceRadixTreeEdge;
+export default InterfaceRadixTreeEdge

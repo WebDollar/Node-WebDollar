@@ -1,68 +1,55 @@
-import Serialization from 'common/utils/Serialization';
+import Serialization from 'common/utils/Serialization'
+
+import TestsHelper from 'tests/Tests.helper'
+import WebDollarCoins from 'common/utils/coins/WebDollar-Coins'
 
 var assert = require('assert')
 
-import TestsHelper from 'tests/Tests.helper'
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-
 describe('Serialization test', () => {
+  it('Serialize WebDollarCoins', () => {
+    let data = [WebDollarCoins.MAX_SAFE_COINS, 0, 1, 2, 3, 5, WebDollarCoins.MAX_SAFE_COINS - 10, WebDollarCoins.MAX_SAFE_COINS - 11 ]
 
-    it('Serialize WebDollarCoins', ()=>{
+    for (let i = 0; i < data.length; i++) {
+      let y = data[i]
 
-        let data = [WebDollarCoins.MAX_SAFE_COINS, 0, 1, 2, 3, 5, WebDollarCoins.MAX_SAFE_COINS-10, WebDollarCoins.MAX_SAFE_COINS-11 ];
+      let buffer = Serialization.serializeNumber7Bytes(y)
+      let y2 = Serialization.deserializeNumber7Bytes(buffer)
 
-        for (let i=0; i<data.length; i++){
+      assert(y2 === y, 'Y and Y2 and not equals after serialization: ' + y + '   ' + y2)
+      assert(y === y2, 'Y and Y2 and not equals after serialization: ' + y + '   ' + y2)
+    }
+  })
 
-            let y = data[i];
+  it('Serialize WebDollarCoins - many random ', () => {
+    let v = TestsHelper.makeRandomNumbersArray(5000, true)
+    let sum1 = 0
+    let sum2 = 0
 
-            let buffer = Serialization.serializeNumber7Bytes(y);
-            let y2 = Serialization.deserializeNumber7Bytes(buffer);
+    for (let i = 0; i < v.length; i++) {
+      sum1 += v[i]
 
-            assert(y2 === y, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
-            assert(y === y2, "Y and Y2 and not equals after serialization: "+y+"   "+y2);
-        }
+      let serialization = Serialization.serializeNumber7Bytes(v[i])
+      let deserialization = Serialization.deserializeNumber7Bytes(serialization)
 
-    });
+      assert(deserialization === v[i], "serialization/deserialization of 8 bytes didn't work " + v[i] + ' ' + deserialization)
 
+      sum2 += deserialization
+    }
 
-    it('Serialize WebDollarCoins - many random ', ()=>{
+    assert(sum1 === sum2, 'sum1 is not equal with sum 2')
+  })
 
-        let v = TestsHelper.makeRandomNumbersArray(5000, true);
-        let sum1 = 0;
-        let sum2 = 0;
+  it('Serialize WebDollarCoins tests ', () => {
+    let v = ['321321', 7500, '112', '5555', 32132333, 5551233, 51323, 0, 0, 312321312, 5553434, WebDollarCoins.MAX_SAFE_COINS]
+    let x = []
 
-        for (let i=0; i<v.length; i++){
+    for (let i = 0; i < v.length; i++) {
+      x.push(parseInt(v[i]))
 
-            sum1 +=v[i];
+      let serialization = Serialization.serializeNumber7Bytes(x[i])
+      let deserialization = Serialization.deserializeNumber7Bytes(serialization)
 
-            let serialization = Serialization.serializeNumber7Bytes(v[i]);
-            let deserialization = Serialization.deserializeNumber7Bytes(serialization);
-
-            assert(deserialization === v[i], "serialization/deserialization of 8 bytes didn't work " + v[i]+" "+deserialization );
-
-            sum2 += deserialization;
-        }
-
-        assert(sum1 === sum2, "sum1 is not equal with sum 2");
-
-    });
-
-
-    it('Serialize WebDollarCoins tests ', ()=>{
-
-        let v = ["321321",7500, "112","5555",32132333, 5551233, 51323, 0, 0, 312321312, 5553434, WebDollarCoins.MAX_SAFE_COINS];
-        let x = [];
-
-        for (let i=0; i<v.length; i++){
-
-            x.push( parseInt(v[i]) );
-
-            let serialization = Serialization.serializeNumber7Bytes(x[i]);
-            let deserialization = Serialization.deserializeNumber7Bytes(serialization);
-
-            assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i]+" "+deserialization);
-
-        }
-    });
-
-});
+      assert(deserialization === x[i], "serialization/deserialization of big number didn't work " + v[i] + ' ' + deserialization)
+    }
+  })
+})

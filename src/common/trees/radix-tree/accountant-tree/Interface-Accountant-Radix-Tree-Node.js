@@ -1,107 +1,81 @@
 import InterfaceRadixTreeNode from './../Interface-Radix-Tree-Node'
 import Serialization from 'common/utils/Serialization'
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
+import WebDollarCoins from 'common/utils/coins/WebDollar-Coins'
 
-class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode{
+class InterfaceAccountRadixTreeNode extends InterfaceRadixTreeNode {
+  // value must contain .amount
 
-    // value must contain .amount
+  constructor (parent, edges, value, sum) {
+    super(parent, edges, value)
 
-    constructor(parent, edges, value, sum){
+    this.setSum(sum)
+    this.setValue(value)
+  }
 
-        super (parent, edges, value);
+  setSum (sum) {
+    if (sum === undefined || sum === null) { sum = 0 }
 
-        this.setSum(sum);
-        this.setValue(value);
+    if (typeof sum === 'string') { sum = parseInt(sum) }
+
+    this.sum = Integer(sum)
+  }
+
+  isSumValid () {
+    return WebDollarCoins.validateCoinsNumber(this.sum)
+  }
+
+  setValue (value) {
+    if (typeof value === 'object' && value !== null) {
+      if (typeof value.balances === 'object' && value.balances !== null && typeof value.balance === 'number') {
+      } else {
+        if (value.balances === undefined || value.balances === null) { value.balances = 0 }
+      }
     }
 
-    setSum(sum){
+    this.value = value
+  }
 
-        if (sum === undefined || sum === null)
-            sum = 0;
+  // it is not done
+  serializeNode () {
+    let array = [ ]
 
-        if (typeof sum === "string")
-            sum = parseInt(sum);
+    array.push(Serialization.serializeNumber8Bytes(this.sum))
 
-        this.sum = Integer(sum);
+    if (this.value !== null) { array.push(Serialization.serializeNumber8Bytes(this.value.balances)) }
 
-    }
+    return Buffer.concat(
 
-    isSumValid(){
-        return WebDollarCoins.validateCoinsNumber(this.sum);
-    }
+      array
 
+    )
+  }
 
-    setValue(value){
+  isBalancesValid () {
+    if (typeof this.value !== 'object' || this.value === null) { return false }
 
+    if (!WebDollarCoins.validateCoinsNumber(this.value.balances)) { return false }
 
-        if (typeof value === 'object' && value !== null){
+    return true
+  }
 
-            if (typeof value.balances === "object"  && value.balances !== null && typeof value.balance === "number") {
-            }
-            else {
+  // it is not done
+  serializeNode () {
+    let array = [ ]
 
-                if ( value.balances === undefined || value.balances === null)
-                    value.balances = 0;
+    array.push(Serialization.serializeNumber8Bytes(this.sum))
 
-            }
+    if (this.value !== null) { array.push(Serialization.serializeNumber8Bytes(this.value.balances)) }
 
-        }
+    return Buffer.concat(
 
-        this.value = value;
+      array
 
-    }
+    )
+  }
 
-    // it is not done
-    serializeNode(){
-
-        let array = [ ];
-
-        array.push( Serialization.serializeNumber8Bytes(this.sum) );
-
-        if (this.value !== null )
-            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
-
-        return Buffer.concat(
-
-            array,
-
-        );
-    }
-
-    isBalancesValid(){
-
-        if (typeof this.value !== 'object' || this.value === null)
-            return false;
-
-        if (!WebDollarCoins.validateCoinsNumber(this.value.balances))
-            return false;
-
-        return true;
-
-    }
-
-    // it is not done
-    serializeNode(){
-
-        let array = [ ];
-
-        array.push( Serialization.serializeNumber8Bytes(this.sum) );
-
-        if (this.value !== null )
-            array.push(Serialization.serializeNumber8Bytes(this.value.balances));
-
-        return Buffer.concat(
-
-            array,
-
-        );
-    }
-
-    deserializeNode(buffer){
-        // TO DO
-    }
-
-
+  deserializeNode (buffer) {
+    // TO DO
+  }
 }
 
-export default InterfaceAccountRadixTreeNode;
+export default InterfaceAccountRadixTreeNode

@@ -1,57 +1,46 @@
 import consts from 'consts/const_global'
-import SignalingClientList from "../signaling-client-list/signaling-client-list"
+import SignalingClientList from '../signaling-client-list/signaling-client-list'
 import NodesList from 'node/lists/Nodes-List'
-import Blockchain from "main-blockchain/Blockchain";
+import Blockchain from 'main-blockchain/Blockchain'
 
 class NodeSignalingClientService {
+  constructor () {
+    this.serversList = []
 
-    constructor(){
+    NodesList.emitter.on('nodes-list/disconnected', async (nodesListObject) => {
+      await this._desinitializeNode(nodesListObject.socket)
+    })
+  }
 
-        this.serversList = [];
-
-        NodesList.emitter.on("nodes-list/disconnected", async (nodesListObject) => {
-            await this._desinitializeNode(nodesListObject.socket);
-        });
-
+  _desinitializeNode (socket) {
+    for (let i = 0; i < this.serversList.length; i++) {
+      if (this.serversList[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid) {
+        this.serversList[i].socket = undefined
+        this.serversList.splice(i, 1)
+        return
+      }
     }
+  }
 
-    _desinitializeNode(socket){
+  subscribeSignalingServer (socket) {
+    this.serversList.push({
+      socket: socket
+    })
 
-        for (let i=0; i<this.serversList.length; i++)
-            if ( this.serversList[i].socket.node.sckAddress.uuid === socket.node.sckAddress.uuid ){
-                this.serversList[i].socket = undefined;
-                this.serversList.splice(i,1);
-                return;
-            }
+    this._askSignalingServer(socket)
+  }
 
-    }
+  askRandomSignalingServerToConnect () {
+    let index = Math.floor(Math.random() * this.serversList.length)
 
+    this._askSignalingServer(this.serversList[index].socket)
+  }
 
-    subscribeSignalingServer(socket){
+  _askSignalingServer (socket) {
+    if (!Blockchain.Agent.consensus) { return }
 
-        this.serversList.push({
-            socket: socket
-        });
-
-        this._askSignalingServer(socket);
-    }
-
-    askRandomSignalingServerToConnect(){
-
-        let index = Math.floor ( Math.random () * this.serversList.length );
-
-        this._askSignalingServer(this.serversList[index].socket);
-
-    }
-
-    _askSignalingServer(socket){
-
-        if (!Blockchain.Agent.consensus)
-            return;
-
-        socket.node.sendRequest("signals/server/register/accept-web-peer-connections", {acceptWebPeers : SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS } );
-    }
-
+    socket.node.sendRequest('signals/server/register/accept-web-peer-connections', { acceptWebPeers: SignalingClientList.connected.length < consts.SETTINGS.PARAMS.CONNECTIONS.BROWSER.WEBRTC.MAXIMUM_CONNECTIONS })
+  }
 }
 
-export default new NodeSignalingClientService();
+export default new NodeSignalingClientService()

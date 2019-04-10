@@ -1,48 +1,42 @@
-const ipaddr = require('ipaddr.js');
 import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
+const ipaddr = require('ipaddr.js')
 
 /*
     TUTORIAL BASED ON https://www.npmjs.com/package/ipaddr.js/
  */
 
 class GeoLocationAddressObject {
-
-    /*
+  /*
         sckAddress = Null
         lastTimeChecked = 0
         location = {}
      */
 
-    constructor(sckAddress, port, location){
+  constructor (sckAddress, port, location) {
+    if (location === undefined) location = {}
 
-        if ( location === undefined ) location = {};
+    sckAddress = SocketAddress.createSocketAddress(sckAddress, port)
+    this.sckAddress = sckAddress
 
-        sckAddress = SocketAddress.createSocketAddress(sckAddress, port);
-        this.sckAddress = sckAddress;
+    this.lastTimeChecked = 0
+    this.location = location
+  }
 
-        this.lastTimeChecked = 0;
-        this.location = location;
-    }
+  refreshLastTimeChecked () {
+    this.lastTimeChecked = new Date().getTime()
+  }
 
+  checkLastTimeChecked (minimumDifferenceInMs) {
+    let time = new Date().getTime()
 
-    refreshLastTimeChecked(){
-        this.lastTimeChecked = new Date().getTime();
-    }
+    if ((time - this.lastTimeChecked) >= minimumDifferenceInMs) { return true }
 
-    checkLastTimeChecked(minimumDifferenceInMs){
+    return false
+  }
 
-        let time = new Date().getTime();
-
-        if ( (time - this.lastTimeChecked) >= minimumDifferenceInMs)
-            return true;
-
-        return false;
-    }
-
-    toString(){
-        return this.sckAddress.getAddress();
-    }
-
+  toString () {
+    return this.sckAddress.getAddress()
+  }
 }
 
-export default GeoLocationAddressObject;
+export default GeoLocationAddressObject

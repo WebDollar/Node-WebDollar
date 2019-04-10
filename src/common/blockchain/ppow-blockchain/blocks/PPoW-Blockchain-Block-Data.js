@@ -2,8 +2,6 @@ import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain
 
 class PPoWBlockchainBlockData extends InterfaceBlockchainBlockData {
 
-
-
 }
 
-export default PPoWBlockchainBlockData;
+export default PPoWBlockchainBlockData

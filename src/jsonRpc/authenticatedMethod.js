@@ -1,10 +1,10 @@
 const authenticatedMethod = function (Method) {
-    return function() {
-        const oMethod = new Method(...arguments);
-        oMethod.setOption('isPrivate', true);
+  return function () {
+    const oMethod = new Method(...arguments)
+    oMethod.setOption('isPrivate', true)
 
-        return oMethod;
-    };
-};
+    return oMethod
+  }
+}
 
-export default authenticatedMethod;
+export default authenticatedMethod

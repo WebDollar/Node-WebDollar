@@ -2,11 +2,10 @@
  * Known as χ
  */
 
-import PPoWBlockchainProofBasic from "./PPoW-Blockchain-Proof-Basic"
+import PPoWBlockchainProofBasic from './PPoW-Blockchain-Proof-Basic'
 
 class PPowBlockchainProofXi extends PPoWBlockchainProofBasic {
 
-
 }
 
-export default PPowBlockchainProofXi;
+export default PPowBlockchainProofXi

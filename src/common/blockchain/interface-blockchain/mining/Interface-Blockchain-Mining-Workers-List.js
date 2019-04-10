@@ -1,180 +1,146 @@
-import StatusEvents from "common/events/Status-Events";
-import Blockchain from 'main-blockchain/Blockchain';
+import StatusEvents from 'common/events/Status-Events'
+import Blockchain from 'main-blockchain/Blockchain'
 
 class InterfaceBlockchainMiningWorkersList {
+  constructor (mining) {
+    this.mining = mining
 
-    constructor(mining) {
+    this._workersList = []
 
-        this.mining = mining;
+    this.WORKERS_MAX = 100
 
-        this._workersList = [];
+    this.block = undefined
+    this.difficultyTarget = undefined
 
-        this.WORKERS_MAX = 100;
+    this.workers = 0 // browser webWorkers, backbone cores
 
-        this.block = undefined;
-        this.difficultyTarget = undefined;
+    this._id = 0
 
-        this.workers = 0; // browser webWorkers, backbone cores
+    setInterval(this._makeUnworkingWorkersToWork.bind(this), 2000)
+  }
 
-        this._id = 0;
+  _makeUnworkingWorkersToWork () {
+    // TODO avoid terminating workers
 
-        setInterval(this._makeUnworkingWorkersToWork.bind(this), 2000);
+    let time = new Date().getTime()
+    let terminated = false
 
+    if (!Blockchain.synchronized) { return false }
+
+    for (let i = this._workersList.length - 1; i >= 0; i--) {
+      if (this._workersList[i].dateLast !== undefined && (time - this._workersList[i].dateLast.getTime() > 10000)) {
+        this.terminateWorker(this._workersList[i])
+        this._workersList.splice(i, 1)
+
+        terminated = true
+      }
     }
 
+    if (terminated) { this.createWorkers() }
+  }
 
-    _makeUnworkingWorkersToWork() {
+  addWorkers (number) {
+    if (number === 0) { return false }
 
-        //TODO avoid terminating workers
+    this.workers += number
 
-        let time = new Date().getTime();
-        let terminated = false;
+    if (this.workers <= 0) { this.workers = 0 }
 
-        if (!Blockchain.synchronized)
-            return false;
+    if (this.workers > this.WORKERS_MAX) { this.workers = this.WORKERS_MAX }
 
-        for (let i = this._workersList.length-1; i >= 0; i--){
+    StatusEvents.emit('mining/workers-changed', this.workers)
+  }
 
-            if ( this._workersList[i].dateLast !== undefined && ( time - this._workersList[i].dateLast.getTime() > 10000)  ){
+  _initializeWorkerFirstTime (worker) {
+    worker.suspended = false
+    worker.postMessage({ message: 'initialize-algorithm' })
+  }
 
-                this.terminateWorker(this._workersList[i]);
-                this._workersList.splice(i, 1);
+  _initializeWorker (worker) {
+    worker.suspended = false
+    worker.postMessage({ message: 'initialize', block: this.block, difficulty: this.difficultyTarget, nonce: this.mining._nonce, count: this.mining.WORKER_NONCES_WORK })
 
-                terminated = true;
-            }
-        }
+    this.mining._nonce += this.mining.WORKER_NONCES_WORK
 
-        if (terminated)
-            this.createWorkers();
+    worker.dateLast = new Date()
+  }
 
+  initializeWorkers (block, difficultyTarget) {
+    // initialize new workers
+    this.block = block
+    this.difficultyTarget = difficultyTarget
+
+    // initialize new workers
+    for (let i = 0; i < this._workersList.length; i++) { this._initializeWorker(this._workersList[i]) }
+  }
+
+  createWorkers () {
+    while (this._workersList.length < this.workers) {
+      console.log('createWorkers')
+      let worker = this.createWorker()
+      this._initializeWorkerFirstTime(worker)
     }
+  }
 
+  decreaseWorkers () {
+    if (this.workers < 0) // can not be < 0 workers
+    { this.workers = 0 }
 
-    addWorkers(number){
+    for (let i = this._workersList.length - 1; i > this.workers - 1; i--) { this.terminateWorker(this._workersList[i]) }
 
-        if (number === 0)
-            return false;
+    this._workersList.splice(this.workers - 1)
+  }
 
-        this.workers += number;
+  reduceWorkers () {
+    if (this._workersList.length < this.workers) { return }
 
-        if (this.workers <= 0)
-            this.workers = 0;
+    // be sure we didn't skip anything
 
-        if (this.workers > this.WORKERS_MAX)
-            this.workers = this.WORKERS_MAX;
+    console.log('reduce workers')
 
-        StatusEvents.emit('mining/workers-changed', this.workers);
-    }
+    this.mining._nonce -= this.mining.WORKER_NONCES_WORK * (this._workersList.length - this.workers)
+    if (this.mining._nonce < 0) { this.mining._nonce = 0 }
 
-    _initializeWorkerFirstTime(worker){
+    this.decreaseWorkers()
+  }
 
-        worker.suspended = false;
-        worker.postMessage( {message: "initialize-algorithm"} );
+  createWorker () {
+    let worker = this.mining._getWorker()
+    console.log('worker created', worker)
 
-    }
+    if (worker === undefined || worker === null) { throw { message: 'No Worker specified' } }
 
-    _initializeWorker(worker){
-        worker.suspended = false;
-        worker.postMessage({message: "initialize", block: this.block, difficulty: this.difficultyTarget, nonce: this.mining._nonce , count: this.mining.WORKER_NONCES_WORK });
+    worker.id = ++this._id
+    worker.dateLast = new Date()
 
-        this.mining._nonce += this.mining.WORKER_NONCES_WORK;
+    this._workersList.push(worker)
 
-        worker.dateLast = new Date();
-    }
+    worker.addEventListener('message', (event) => {
+      this.mining._puzzleReceived(worker, event)
+    })
 
-    initializeWorkers(block, difficultyTarget){
+    return worker
+  }
 
-        //initialize new workers
-        this.block = block;
-        this.difficultyTarget = difficultyTarget;
+  terminateWorker (worker) {
+    this.suspendWorker(worker)
+    worker.terminate()
+  }
 
-        //initialize new workers
-        for (let i=0; i<this._workersList.length; i++)
-            this._initializeWorker(this._workersList[i]);
-    }
+  terminateWorkers () {
+    for (let i = 0; i < this._workersList.length; i++) { this.terminateWorker(this._workersList[i]) }
 
-    createWorkers(){
+    this._workersList = []
+  }
 
-        while (this._workersList.length < this.workers) {
-            console.log("createWorkers");
-            let worker = this.createWorker();
-            this._initializeWorkerFirstTime(worker);
-        }
-    }
+  suspendWorker (worker) {
+    worker.suspended = true
+    worker.postMessage({ message: 'terminate' })
+  }
 
-    decreaseWorkers(){
-        if (this.workers < 0) //can not be < 0 workers
-            this.workers = 0;
-
-        for (let i = this._workersList.length - 1; i > this.workers - 1; i--)
-            this.terminateWorker(this._workersList[i]);
-
-        this._workersList.splice(this.workers-1);
-    }
-
-    reduceWorkers(){
-
-        if (this._workersList.length < this.workers)
-            return;
-
-        //be sure we didn't skip anything
-
-        console.log("reduce workers");
-
-        this.mining._nonce -= this.mining.WORKER_NONCES_WORK * (this._workersList.length - this.workers);
-        if (this.mining._nonce < 0)
-            this.mining._nonce = 0;
-
-        this.decreaseWorkers();
-    }
-
-    createWorker() {
-
-        let worker = this.mining._getWorker();
-        console.log("worker created",worker);
-
-        if (worker === undefined || worker === null)
-            throw {message: 'No Worker specified'};
-
-        worker.id = ++this._id;
-        worker.dateLast = new Date();
-
-        this._workersList.push(worker);
-
-
-        worker.addEventListener('message', (event) => {
-            this.mining._puzzleReceived(worker, event);
-        });
-
-        return worker;
-    }
-
-    terminateWorker(worker){
-        this.suspendWorker(worker);
-        worker.terminate()
-    }
-
-    terminateWorkers(){
-
-        for (let i = 0; i < this._workersList.length; i++)
-            this.terminateWorker(this._workersList[i]);
-
-        this._workersList = [];
-    }
-
-    suspendWorker(worker){
-        worker.suspended = true;
-        worker.postMessage({message: "terminate"});
-    }
-
-    suspendWorkers(){
-        for (let i = 0; i < this._workersList.length; i++)
-            this.suspendWorker(this._workersList[i]);
-    }
-
-
+  suspendWorkers () {
+    for (let i = 0; i < this._workersList.length; i++) { this.suspendWorker(this._workersList[i]) }
+  }
 }
 
-
-
-export default InterfaceBlockchainMiningWorkersList;
+export default InterfaceBlockchainMiningWorkersList

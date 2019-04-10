@@ -4,35 +4,34 @@ const merge = require('webpack-merge')
 
 const config = merge(base, {
 
-    //define entry point
-    entry: {
-        app: "./src/tests/main.test.js",
-    },
+  // define entry point
+  entry: {
+    app: './src/tests/main.test.js'
+  },
 
-    output: {
-        filename:'browser/mocha/browser-mocha-bundle.js'
-    },
+  output: {
+    filename: 'browser/mocha/browser-mocha-bundle.js'
+  },
 
-    module:{
-        loaders: [
-            {
-                test: /test\.js$/,
-                use: 'mocha-loader',
-                exclude: /node_modules/,
-            }
-        ],
-        noParse: /(lie|pouchdb)\.js$/
-    },
+  module: {
+    loaders: [
+      {
+        test: /test\.js$/,
+        use: 'mocha-loader',
+        exclude: /node_modules/
+      }
+    ],
+    noParse: /(lie|pouchdb)\.js$/
+  },
 
-    plugins: [
-        new webpack.DefinePlugin({
-            "process.env": {
-                MOCHA_TESTS: 'true'
-            }
-        })
-    ]
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        MOCHA_TESTS: 'true'
+      }
+    })
+  ]
 
-
-});
+})
 
 module.exports = config

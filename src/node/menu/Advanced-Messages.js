@@ -1,114 +1,72 @@
-import Blockchain from "main-blockchain/Blockchain"
+import Blockchain from 'main-blockchain/Blockchain'
 
-let CLI, readline;
-let termination;
+let CLI, readline
+let termination
 
-
-if (!process.env.BROWSER){
-    readline = require('readline');
-    termination = require('./../../termination').default;
+if (!process.env.BROWSER) {
+  readline = require('readline')
+  termination = require('./../../termination').default
 }
 
-class AdvancedMessages{
+class AdvancedMessages {
+  constructor () {
+    if (!process.env.BROWSER) {
+      this.WEBD_CLI = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+        prompt: 'WEBD_CLI:> '
+      })
 
-    constructor(){
-
-        if (!process.env.BROWSER){
-            this.WEBD_CLI = readline.createInterface({
-                input: process.stdin,
-                output: process.stdout,
-                prompt: 'WEBD_CLI:> '
-            });
-
-            this.WEBD_CLI.on("SIGINT", function () {
-
-                termination(Blockchain);
-
-            });
-
-        }
-
+      this.WEBD_CLI.on('SIGINT', function () {
+        termination(Blockchain)
+      })
     }
+  }
 
-    alert(param,title,type,timeout){
-
-        if (process.env.BROWSER)
-            alert(param);
-        else{
-
-            if (type==='error')  console.error(param);
-            if (type==='warn')  console.warn(param);
-            if (type==='info')  console.log(param);
-
-        }
-
+  alert (param, title, type, timeout) {
+    if (process.env.BROWSER) { alert(param) } else {
+      if (type === 'error') console.error(param)
+      if (type === 'warn') console.warn(param)
+      if (type === 'info') console.log(param)
     }
+  }
 
+  input (message) {
+    if (process.env.BROWSER) { return prompt(message) } else { return this._questionCLI(message) }
+  }
 
-    input(message){
+  async confirm (message) {
+    if (process.env.BROWSER) { return await confirm(message) } else {
+      while (1 === 1) {
+        let answer = (await this._questionCLI(message + '  y/n')).toLowerCase()
 
-        if (process.env.BROWSER)
-            return prompt(message);
-        else
-            return this._questionCLI(message);
+        if (answer === 'y') return true
+        else if (answer === 'n') return false
+      }
     }
+  }
 
-    async confirm(message){
+  async readNumber (message, isFloat = false) {
+    let answer = await this.input(message)
 
-        if (process.env.BROWSER)
-            return await confirm(message);
-        else {
+    let num = isFloat ? parseFloat(answer) : parseInt(answer)
+    if (isNaN(num)) { return NaN }
 
-            while (1===1) {
-                let answer = (await this._questionCLI(message + "  y/n")).toLowerCase();
+    return num
+  }
 
-                if (answer === 'y') return true;
-                else if (answer === 'n') return false;
+  log (cliMsg, browserMsg) {
+    if (process.env.BROWSER) { console.info(browserMsg || cliMsg) } else { console.info(cliMsg) }
+  }
 
-            }
-
-        }
-
-    }
-
-
-    async readNumber(message, isFloat = false) {
-
-        let answer = await this.input(message);
-
-        let num = isFloat ? parseFloat(answer) : parseInt(answer);
-        if (isNaN(num))
-            return NaN;
-
-        return num;
-    }
-
-
-
-    log(cliMsg, browserMsg) {
-
-        if (process.env.BROWSER)
-            console.info(browserMsg || cliMsg);
-        else
-            console.info(cliMsg);
-    }
-
-
-    _questionCLI(message){
-
-        return new Promise ((resolve)=> {
-
-            console.info(message);
-            this.WEBD_CLI.question('', (answer)=>{
-                resolve(answer);
-            });
-
-        });
-
-    }
-
-
-
+  _questionCLI (message) {
+    return new Promise((resolve) => {
+      console.info(message)
+      this.WEBD_CLI.question('', (answer) => {
+        resolve(answer)
+      })
+    })
+  }
 }
 
-export default new AdvancedMessages();
+export default new AdvancedMessages()

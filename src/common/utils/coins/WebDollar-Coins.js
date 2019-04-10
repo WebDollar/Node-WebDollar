@@ -1,38 +1,32 @@
-class WebDollarCoins{
+class WebDollarCoins {
+  constructor () {
+    this.MAX_SAFE_COINS = Number.MAX_SAFE_INTEGER
+    this.MIN_SAFE_COINS = Number.MIN_SAFE_INTEGER
 
-    constructor(){
+    // max safe int:     90071992547 40992
+    // rewards           42000000000.00000
 
-        this.MAX_SAFE_COINS = Number.MAX_SAFE_INTEGER;
-        this.MIN_SAFE_COINS = Number.MIN_SAFE_INTEGER;
+    this.WEBD = 10000
+    this.UNIT = 1
+  }
 
+  validateCoinsNumber (number) {
+    if (number === undefined || number === null) return false
 
-        //max safe int:     90071992547 40992
-        //rewards           42000000000.00000
+    if (!Number.isInteger(number)) return false
+    if (number > this.MAX_SAFE_COINS) return false
+    if (number < this.MIN_SAFE_COINS) return false
 
-        this.WEBD = 10000;
-        this.UNIT = 1;
-    }
+    return true
+  }
 
+  convertToUnits (number) {
+    return number * this.WEBD
+  }
 
-    validateCoinsNumber(number){
-
-        if (number === undefined || number === null) return false;
-
-        if (!Number.isInteger(number)) return false;
-        if ( number > this.MAX_SAFE_COINS) return false;
-        if ( number < this.MIN_SAFE_COINS) return false;
-
-        return true;
-    }
-
-    convertToUnits(number){
-        return number * this.WEBD;
-    }
-
-    convertToWEBD(number){
-        return number / this.WEBD;
-    }
-
+  convertToWEBD (number) {
+    return number / this.WEBD
+  }
 }
 
 export default new WebDollarCoins()

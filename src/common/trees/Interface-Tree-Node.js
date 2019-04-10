@@ -1,207 +1,165 @@
-import Serialization from "../utils/Serialization";
-import BufferExtended from "../utils/BufferExtended";
-import InterfaceTreeEdge from "./Interface-Tree-Edge"
+import Serialization from '../utils/Serialization'
+import BufferExtended from '../utils/BufferExtended'
+import InterfaceTreeEdge from './Interface-Tree-Edge'
 
-var uniqueId = 0;
-
+var uniqueId = 0
 
 class InterfaceTreeNode {
+  // parent : Node
+  // value : data
+  // edges : [ of Edges]
 
-    // parent : Node
-    // value : data
-    // edges : [ of Edges]
+  constructor (root, parent, edges, value) {
+    if (edges === undefined) { edges = [] }
 
-    constructor(root, parent, edges, value){
+    if (value === undefined) { value = null }
 
-        if (edges === undefined)
-            edges = [];
+    this.id = uniqueId++
 
-        if (value === undefined)
-            value = null;
+    this.root = root
 
-        this.id = uniqueId++;
+    this.parent = parent
 
-        this.root = root;
+    this.edges = edges
 
-        this.parent = parent;
+    this.value = value
+  }
 
-        this.edges = edges;
-
-        this.value = value;
+  destroyNode () {
+    for (let i = 0; i < this.edges.length; i++) {
+      this.edges[i].destroyEdge()
+      this.edges[i] = undefined
     }
 
-    destroyNode(){
+    this.root = undefined
+    this.parent = undefined
 
-        for (let i=0; i<this.edges.length; i++) {
-            this.edges[i].destroyEdge();
-            this.edges[i] = undefined;
+    delete this.value
+    delete this.edges
+  }
+
+  isLeaf () {
+    return this.value !== null
+  }
+
+  serializeNodeData () {
+    let buffers = []
+
+    if (this.value && Buffer.isBuffer(this.value)) {
+      buffers.push(Serialization.serializeNumber2Bytes(this.value.length))
+      buffers.push(this.value)
+    } else { buffers.push(new Buffer(2)) }
+
+    return Buffer.concat(buffer)
+  }
+
+  serializeNode (includeEdges) {
+    try {
+      let buffer = this.serializeNodeData.apply(this, arguments)
+
+      if (includeEdges) {
+        buffer.push(Serialization.serializeNumber1Byte(this.edges.length))
+        for (let i = 0; i < this.edges.length; i++) { buffer.push(this.edges[i].serializeEdge()) }
+      }
+
+      return Buffer.concat(buffer)
+    } catch (exception) {
+      console.log('Error serializing TreeNode', exception)
+      throw exception
+    }
+  }
+
+  deserializeNodeData (buffer, offset = 0) {
+    let valueLength = Serialization.deserializeNumber2Bytes(buffer, offset)
+    offset += 2
+
+    let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength))
+    offset += valueLength
+
+    this.value = value
+
+    return offset
+  }
+
+  deserializeNode (buffer, offset, includeEdges, includeHashes) {
+    try {
+      offset = this.deserializeNodeData.apply(this, arguments)
+
+      if (includeEdges) {
+        // 1 byte
+        let length = Serialization.deserializeNumber1Bytes(buffer, offset)
+        offset += 1
+
+        for (let i = 0; i < length; i++) {
+          let edge = new this.root.createNewEdge(null)
+          edge.deserializeEdge(buffer, offset, this.createNewNode)
+          this.edgesPush(edge)
         }
+      }
 
-        this.root = undefined;
-        this.parent = undefined;
+      return offset
+    } catch (exception) {
+      console.log('Error deserializing TreeNode', exception)
+      throw exception
+    }
+  }
 
-        delete this.value;
-        delete this.edges
+  createNewEdge (node) {
+    return new InterfaceTreeEdge(node)
+  }
+
+  createNewNode (parent, edges = [], value = null, hash = null) {
+    if (parent === undefined) parent = this
+    return new this.constructor(this.root, parent, edges, value, hash)
+  }
+
+  validateTreeNode () {
+    for (let i = 0; i < this.edges.length; i++) {
+      if (!this.edges[i].targetNode) { throw { message: 'Edge target node is Null', node: this, edge: this.edges[i], edgeIndex: i } }
+
+      if (this.edges[i].targetNode.parent !== this) { throw { message: 'Edge target node parent is different that current node', node: this } }
     }
 
-    isLeaf(){
-        return this.value !== null
-    }
+    return true
+  }
 
-    serializeNodeData(){
-        let buffers = [];
-
-        if ( this.value && Buffer.isBuffer(this.value) ) {
-            buffers.push(Serialization.serializeNumber2Bytes(this.value.length));
-            buffers.push( this.value );
-        } else
-            buffers.push ( new Buffer(2) );
-
-        return Buffer.concat(buffer);
-    }
-
-    serializeNode(includeEdges){
-
-        try {
-            let buffer = this.serializeNodeData.apply(this, arguments);
-
-            if (includeEdges) {
-
-                buffer.push(Serialization.serializeNumber1Byte(this.edges.length));
-                for (let i = 0; i < this.edges.length; i++)
-                    buffer.push(this.edges[i].serializeEdge())
-
-            }
-
-            return Buffer.concat(buffer);
-
-        } catch (exception){
-            console.log("Error serializing TreeNode", exception);
-            throw exception;
-        }
-    }
-
-    deserializeNodeData(buffer, offset=0){
-
-        let valueLength = Serialization.deserializeNumber2Bytes( buffer, offset );
-        offset += 2;
-
-        let value = Serialization.deserializeNumber(BufferExtended.substr(buffer, offset, valueLength));
-        offset += valueLength;
-
-
-        this.value = value;
-
-        return offset;
-
-
-    }
-
-    deserializeNode(buffer, offset, includeEdges, includeHashes){
-
-        try {
-            offset = this.deserializeNodeData.apply(this, arguments);
-
-            if (includeEdges) {
-
-                //1 byte
-                let length = Serialization.deserializeNumber1Bytes(buffer, offset);
-                offset += 1;
-
-                for (let i = 0; i < length; i++) {
-
-                    let edge = new this.root.createNewEdge(null);
-                    edge.deserializeEdge(buffer, offset, this.createNewNode);
-                    this.edgesPush(edge);
-                }
-
-            }
-
-            return offset;
-
-        } catch (exception){
-            console.log("Error deserializing TreeNode", exception)
-            throw exception;
-        }
-    }
-
-    createNewEdge(node){
-        return new InterfaceTreeEdge(node);
-    }
-
-    createNewNode(parent,  edges=[], value=null, hash = null){
-
-        if (parent === undefined ) parent = this;
-        return new this.constructor (this.root, parent, edges, value, hash);
-    }
-
-    validateTreeNode(){
-
-        for (let i = 0; i < this.edges.length; i++) {
-
-            if (  !this.edges[i].targetNode  )
-                throw {message: 'Edge target node is Null', node: this, edge: this.edges[i], edgeIndex:i};
-
-            if (this.edges[i].targetNode.parent !== this)
-                throw {message:'Edge target node parent is different that current node', node:this};
-
-        }
-
-        return true;
-    }
-
-    /**
+  /**
      * It will also Validate its children automatically
      */
-    validateCompleteTreeNode(){
+  validateCompleteTreeNode () {
+    if (!this.validateTreeNode()) return false
 
-        if (!this.validateTreeNode()) return false;
+    for (let i = 0; i < this.edges.length; i++) {
+      if (!this.edges[i].targetNode.validateCompleteTreeNode()) { return false }
+    }
 
-        for (let i = 0; i < this.edges.length; i++) {
-            if (!this.edges[i].targetNode.validateCompleteTreeNode())
-                return false;
+    return true
+  }
+
+  _changedNode (node) {
+    // no changes in a simple tree
+  }
+
+  // lexicographic order
+  edgesPush (edge) {
+    let position = 0
+
+    if (typeof edge.label === 'string') {
+      for (let i = 0; i < this.edges.length; i++) {
+        position = 0
+        while (position >= 0 && position < this.edges.length) {
+          if (edge.label > this.edges[position].label) { position++ } else { break }
         }
-
-        return true;
+      }
+    } else if (Buffer.isBuffer(edge.label)) {
+      position = 0
+      while (position >= 0 && position < this.edges.length) {
+        if (Buffer.compare(edge.label, this.edges[position].label) > 0) { position++ } else { break }
+      }
     }
 
-    _changedNode(node){
-        //no changes in a simple tree
-    }
-
-    //lexicographic order
-    edgesPush(edge){
-
-        let position = 0;
-
-        if (typeof edge.label === "string" ) {
-            for (let i = 0; i < this.edges.length; i++) {
-                position = 0;
-                while (position >= 0 && position < this.edges.length) {
-
-                    if (edge.label > this.edges[position].label)
-                        position++;
-                    else
-                        break
-                }
-            }
-        } else if (Buffer.isBuffer(edge.label)){
-
-            position = 0;
-            while (position >= 0 && position < this.edges.length) {
-
-                if (Buffer.compare(edge.label, this.edges[position].label) > 0)
-                    position++;
-                else
-                    break
-            }
-        }
-
-        this.edges.splice(position, 0, edge);
-
-    }
-
-
+    this.edges.splice(position, 0, edge)
+  }
 }
 
-export default InterfaceTreeNode;
+export default InterfaceTreeNode

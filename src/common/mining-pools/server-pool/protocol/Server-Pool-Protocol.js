@@ -1,60 +1,46 @@
-import NodesList from 'node/lists/Nodes-List';
-import ServerPoolConnectedPoolsProtocol from "./connected-pools/Server-Pool-Connected-Pools-Protocol";
-import ServerPoolConnectedMinersProtocol from "./connected-miners/Server-Pool-Connected-Miners-Protocol";
+import NodesList from 'node/lists/Nodes-List'
+import ServerPoolConnectedPoolsProtocol from './connected-pools/Server-Pool-Connected-Pools-Protocol'
+import ServerPoolConnectedMinersProtocol from './connected-miners/Server-Pool-Connected-Miners-Protocol'
 
-class ServerPoolProtocol{
+class ServerPoolProtocol {
+  constructor (serverPoolManagement, blockchain) {
+    this.serverPoolManagement = serverPoolManagement
+    this.blockchain = blockchain
+    this.loaded = false
 
-    constructor(serverPoolManagement, blockchain){
+    this.serverPoolConnectedPoolsProtocol = new ServerPoolConnectedPoolsProtocol(serverPoolManagement, blockchain)
+    this.serverPoolConnectedMinersProtocol = new ServerPoolConnectedMinersProtocol(serverPoolManagement, blockchain)
+  }
 
-        this.serverPoolManagement = serverPoolManagement;
-        this.blockchain = blockchain;
-        this.loaded = false;
+  _startServerPoolProtocol () {
+    if (this.loaded) return
+    this.loaded = true
 
-        this.serverPoolConnectedPoolsProtocol = new ServerPoolConnectedPoolsProtocol(serverPoolManagement, blockchain);
-        this.serverPoolConnectedMinersProtocol = new ServerPoolConnectedMinersProtocol(serverPoolManagement, blockchain);
+    NodesList.emitter.on('nodes-list/connected', (result) => {
+      this._subscribeSocket(result)
+    })
 
-    }
+    NodesList.emitter.on('nodes-list/disconnected', (result) => {
+      this._unsubscribeSocket(result)
+    })
 
-    _startServerPoolProtocol(){
+    for (let i = 0; i < NodesList.nodes.length; i++) { this._subscribeSocket(NodesList.nodes[i]) }
 
-        if (this.loaded) return;
-        this.loaded = true;
+    this.serverPoolConnectedPoolsProtocol.startServerPoolConnectedPoolsProtocol()
+    this.serverPoolConnectedMinersProtocol.startServerPoolConnectedPoolsProtocol()
+  }
 
-        NodesList.emitter.on("nodes-list/connected", (result) => {
-            this._subscribeSocket(result)
-        });
+  _stopServerPoolProtocol () {
 
-        NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribeSocket(result)
-        });
+  }
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribeSocket(NodesList.nodes[i]);
+  _subscribeSocket (nodesListObject) {
+    let socket = nodesListObject.socket
+  }
 
-        this.serverPoolConnectedPoolsProtocol.startServerPoolConnectedPoolsProtocol();
-        this.serverPoolConnectedMinersProtocol.startServerPoolConnectedPoolsProtocol();
-
-
-
-    }
-
-    _stopServerPoolProtocol(){
-
-    }
-
-    _subscribeSocket(nodesListObject) {
-
-        let socket = nodesListObject.socket;
-
-    }
-
-    _unsubscribeSocket(nodesListObject) {
-
-        let socket = nodesListObject.socket;
-
-    }
-
+  _unsubscribeSocket (nodesListObject) {
+    let socket = nodesListObject.socket
+  }
 }
 
-
-export default ServerPoolProtocol;
+export default ServerPoolProtocol

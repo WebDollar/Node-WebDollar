@@ -3,81 +3,72 @@ import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB'
 import InterfaceBlockchainTransactions from 'common/blockchain/interface-blockchain/transactions/Interface-Blockchain-Transactions'
 import InterfaceBlockchainBlockData from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Data'
 import InterfaceBlockchainBlock from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block'
-import SemaphoreProcessing from "common/utils/Semaphore-Processing"
+import SemaphoreProcessing from 'common/utils/Semaphore-Processing'
 import InterfaceBlockchainBlocks from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Blocks'
 import InterfaceBlockchainForksAdministrator from './forks/Interface-Blockchain-Forks-Administrator'
-import BlockchainTimestamp from "common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp"
-import InterfaceBlockchainTipsAdministrator from "./tips/Interface-Blockchain-Tips-Administrator";
-import StatusEvents from "common/events/Status-Events";
+import BlockchainTimestamp from 'common/blockchain/interface-blockchain/timestmap/Blockchain-Timestamp'
+import InterfaceBlockchainTipsAdministrator from './tips/Interface-Blockchain-Tips-Administrator'
+import StatusEvents from 'common/events/Status-Events'
 import consts from 'consts/const_global'
 
-class InterfaceBlockchainBasic{
+class InterfaceBlockchainBasic {
+  constructor (agent) {
+    this._blockchainLoaded = false
 
-    constructor(agent){
+    this.agent = agent
 
-        this._blockchainLoaded = false;
+    this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME
 
-        this.agent = agent;
+    this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER)
 
-        this._blockchainFileName = consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FILE_NAME;
+    this.mining = undefined
 
-        this.db = new InterfaceSatoshminDB(consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER);
+    this.forksAdministrator = new InterfaceBlockchainForksAdministrator(this)
+    this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator(this)
 
-        this.mining = undefined;
+    this.timestamp = new BlockchainTimestamp()
 
-        this.forksAdministrator = new InterfaceBlockchainForksAdministrator ( this );
-        this.tipsAdministrator = new InterfaceBlockchainTipsAdministrator ( this );
+    this._createBlockchainElements()
 
-        this.timestamp = new BlockchainTimestamp();
+    this.semaphoreProcessing = new SemaphoreProcessing()
+  }
 
-        this._createBlockchainElements();
+  _setAgent (newAgent) {
+    this.agent = newAgent
+  }
 
-        this.semaphoreProcessing = new SemaphoreProcessing();
+  _createBlockchainElements () {
+    this.blocks = new InterfaceBlockchainBlocks(this, this.db)
+    this.transactions = new InterfaceBlockchainTransactions(this)
+    this.blockCreator = new InterfaceBlockchainBlockCreator(this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData)
+  }
 
-    }
+  async loadBlockchain () {
+    if (this._blockchainLoaded) return true
+    if (!this.agent.consensus) return true // no consensus
 
+    StatusEvents.emit('blockchain/status', { message: 'Blockchain Loading' })
 
-    _setAgent(newAgent){
-        this.agent = newAgent;
-    }
+    let loaded = await this._loadBlockchain()
 
-    _createBlockchainElements(){
-        this.blocks = new InterfaceBlockchainBlocks(this, this.db);
-        this.transactions = new InterfaceBlockchainTransactions( this);
-        this.blockCreator = new InterfaceBlockchainBlockCreator( this, this.db, InterfaceBlockchainBlock, InterfaceBlockchainBlockData);
-    }
+    StatusEvents.emit('blockchain/status', { message: 'Blockchain Loaded Successfully' })
 
+    return loaded
+  }
 
-    async loadBlockchain(){
+  async _loadBlockchain () {
+    return true
+  }
 
-        if (this._blockchainLoaded) return true;
-        if (!this.agent.consensus) return true; //no consensus
+  toString () {
+  }
 
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loading"});
+  toJSON () {
+  }
 
-        let loaded = await this._loadBlockchain();
-
-        StatusEvents.emit('blockchain/status', {message: "Blockchain Loaded Successfully"});
-
-        return loaded;
-
-    }
-
-    async _loadBlockchain(){
-        return true;
-    }
-
-    toString(){
-    }
-
-    toJSON(){
-    }
-
-    sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-
+  sleep (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
+  }
 }
 
 export default InterfaceBlockchainBasic

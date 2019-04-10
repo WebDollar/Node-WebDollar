@@ -4,10 +4,8 @@ import MiniBlockchainProtocol from 'common/blockchain/mini-blockchain/protocol/M
  * MainBlockchainProtocol inherit the entire MiniBlockchainProtocol
  *
  */
-class MainBlockchainProtocol extends MiniBlockchainProtocol{
-
-
+class MainBlockchainProtocol extends MiniBlockchainProtocol {
 
 }
 
-export default MainBlockchainProtocol;
+export default MainBlockchainProtocol

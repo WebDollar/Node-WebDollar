@@ -1,61 +1,48 @@
-import NodesList from 'node/lists/Nodes-List';
-import PoolConnectedServerProtocol from "./connected-servers/Pool-Connected-Servers-Protocol"
-import PoolConnectedMinersProtocol from "./connected-miners/Pool-Connected-Miners-Protocol"
+import NodesList from 'node/lists/Nodes-List'
+import PoolConnectedServerProtocol from './connected-servers/Pool-Connected-Servers-Protocol'
+import PoolConnectedMinersProtocol from './connected-miners/Pool-Connected-Miners-Protocol'
 
 class PoolProtocol {
+  constructor (poolManagement) {
+    this.poolManagement = poolManagement
+    this.loaded = false
 
-    constructor(poolManagement) {
+    this.poolConnectedServersProtocol = new PoolConnectedServerProtocol(this.poolManagement)
+    this.poolConnectedMinersProtocol = new PoolConnectedMinersProtocol(this.poolManagement)
+  }
 
-        this.poolManagement = poolManagement;
-        this.loaded = false;
+  async _startPoolProtocol () {
+    if (this.loaded) return true
 
-        this.poolConnectedServersProtocol = new PoolConnectedServerProtocol(this.poolManagement);
-        this.poolConnectedMinersProtocol = new PoolConnectedMinersProtocol(this.poolManagement);
+    this.loaded = true
 
-    }
+    for (let i = 0; i < NodesList.nodes.length; i++) { this._subscribePool(NodesList.nodes[i]) }
 
-    async _startPoolProtocol(){
+    NodesList.emitter.on('nodes-list/connected', (result) => {
+      this._subscribePool(result)
+    })
 
-        if (this.loaded) return true;
+    NodesList.emitter.on('nodes-list/disconnected', (result) => {
+      this._unsubscribePool(result)
+    })
 
-        this.loaded = true;
+    await this.poolConnectedServersProtocol.startPoolConnectedServersProtocol()
+    await this.poolConnectedMinersProtocol.startPoolConnectedMinersProtocol()
 
+    return true
+  }
 
-        for (let i=0; i<NodesList.nodes.length; i++)
-            this._subscribePool(NodesList.nodes[i]);
+  _stopPoolProtocol () {
 
-        NodesList.emitter.on("nodes-list/connected", (result) => {
-            this._subscribePool(result)
-        });
+  }
 
-        NodesList.emitter.on("nodes-list/disconnected", (result) => {
-            this._unsubscribePool(result)
-        });
+  _subscribePool (nodesListObject) {
+    let socket = nodesListObject.socket
+  }
 
-
-        await this.poolConnectedServersProtocol.startPoolConnectedServersProtocol();
-        await this.poolConnectedMinersProtocol.startPoolConnectedMinersProtocol();
-
-        return true;
-    }
-
-    _stopPoolProtocol(){
-
-    }
-
-    _subscribePool(nodesListObject) {
-
-        let socket = nodesListObject.socket;
-
-    }
-
-    _unsubscribePool(nodesListObject) {
-
-        let socket = nodesListObject.socket;
-
-    }
-
-
+  _unsubscribePool (nodesListObject) {
+    let socket = nodesListObject.socket
+  }
 }
 
-export default PoolProtocol;
+export default PoolProtocol

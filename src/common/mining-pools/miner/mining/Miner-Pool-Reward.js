@@ -1,89 +1,70 @@
-import StatusEvents from "common/events/Status-Events";
+import StatusEvents from 'common/events/Status-Events'
 
-class MinerPoolReward{
+class MinerPoolReward {
+  constructor (minerPoolManagement) {
+    this.minerPoolManagement = minerPoolManagement
 
-    constructor(minerPoolManagement){
+    this._totalReward = 0
+    this._confirmedReward = 0
 
-        this.minerPoolManagement = minerPoolManagement;
+    this._totalReferralReward = 0
+    this._confirmedReferralReward = 0
+  }
 
-        this._totalReward = 0;
-        this._confirmedReward = 0;
+  get total () {
+    return this._totalReward + this._totalReferralReward
+  }
 
-        this._totalReferralReward = 0;
-        this._confirmedReferralReward = 0;
+  set totalReward (newValue) {
+    if (this._totalReward === newValue || typeof newValue !== 'number') return
+    this._totalReward = parseInt(newValue)
 
-    }
+    StatusEvents.emit('miner-pool/total-reward', { totalReward: newValue })
+  }
 
-    get total(){
-        return this._totalReward + this._totalReferralReward;
-    }
+  get totalReward () {
+    return this._totalReward
+  }
 
-    set totalReward(newValue){
+  set confirmedReward (newValue) {
+    if (this._confirmedReward === newValue || typeof newValue !== 'number') return
+    this._confirmedReward = parseInt(newValue)
 
-        if (this._totalReward === newValue || typeof newValue !== "number") return;
-        this._totalReward = parseInt( newValue);
+    StatusEvents.emit('miner-pool/confirmed-reward', { confirmedReward: this._confirmedReward })
+  }
 
-        StatusEvents.emit("miner-pool/total-reward", { totalReward: newValue });
+  get confirmedReward () {
+    return this._confirmedReward
+  }
 
-    }
+  set totalReferralReward (newValue) {
+    if (this._totalReferralReward === newValue || typeof newValue !== 'number') return
+    this._totalReferralReward = parseInt(newValue)
 
-    get totalReward(){
-        return this._totalReward;
-    }
+    StatusEvents.emit('miner-pool/referral-total-reward', { referralTotalReward: this._totalReferralReward })
+  }
 
-    set confirmedReward(newValue){
+  set confirmedReferralReward (newValue) {
+    if (this._confirmedReferralReward === newValue || typeof newValue !== 'number') return
+    this._confirmedReferralReward = parseInt(newValue)
 
-        if (this._confirmedReward === newValue || typeof newValue !== "number") return;
-        this._confirmedReward = parseInt( newValue );
+    StatusEvents.emit('miner-pool/referral-confirmed-reward', { referralConfirmedReward: this._confirmedReferralReward })
+  }
 
-        StatusEvents.emit("miner-pool/confirmed-reward", { confirmedReward: this._confirmedReward });
+  get totalReferralReward () {
+    return this._totalReferralReward
+  }
 
-    }
+  get confirmedReferralReward () {
+    return this._confirmedReferralReward
+  }
 
-    get confirmedReward(){
-
-        return this._confirmedReward;
-
-    }
-
-
-    set totalReferralReward(newValue){
-
-        if (this._totalReferralReward === newValue || typeof newValue !== "number") return;
-        this._totalReferralReward = parseInt( newValue );
-
-        StatusEvents.emit("miner-pool/referral-total-reward", { referralTotalReward: this._totalReferralReward });
-
-    }
-
-    set confirmedReferralReward (newValue){
-
-        if (this._confirmedReferralReward === newValue || typeof newValue !== "number") return;
-        this._confirmedReferralReward = parseInt( newValue );
-
-        StatusEvents.emit("miner-pool/referral-confirmed-reward", { referralConfirmedReward: this._confirmedReferralReward });
-
-    }
-
-
-    get totalReferralReward(){
-        return this._totalReferralReward;
-    }
-
-    get confirmedReferralReward(){
-        return this._confirmedReferralReward;
-    }
-
-
-    setReward(data){
-
-        this.confirmedReward = data.confirmed;
-        this.totalReward = data.reward;
-        this.totalReferralReward = data.refReward;
-        this.confirmedReferralReward = data.refConfirmed;
-
-    }
-
+  setReward (data) {
+    this.confirmedReward = data.confirmed
+    this.totalReward = data.reward
+    this.totalReferralReward = data.refReward
+    this.confirmedReferralReward = data.refConfirmed
+  }
 }
 
-export default MinerPoolReward;
+export default MinerPoolReward

@@ -1,27 +1,22 @@
 import consts from 'consts/const_global'
 
-import DownloadHelper from "./Download-Helper";
+import DownloadHelper from './Download-Helper'
 
-class DownloadManager{
+class DownloadManager {
+  constructor () {
+    this.array = []
+  }
 
-    constructor(){
-
-        this.array = [];
-
+  async downloadFile (address, timeout) {
+    for (let key in this.array) {
+      if (key === address) {
+        return this.array[key]
+      }
     }
 
-    async downloadFile(address, timeout){
-
-        for (let key in this.array)
-            if ( key === address){
-                return this.array[key];
-            }
-
-        let answer = await DownloadHelper.downloadFile(address, timeout);
-        this.array[address] = answer;
-
-    }
-
+    let answer = await DownloadHelper.downloadFile(address, timeout)
+    this.array[address] = answer
+  }
 }
 
-export default new DownloadManager();
+export default new DownloadManager()

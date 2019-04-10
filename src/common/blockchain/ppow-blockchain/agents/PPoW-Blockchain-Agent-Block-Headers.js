@@ -1,13 +1,10 @@
-import InterfaceBlockchainAgentBlockHeaders from "common/blockchain/interface-blockchain/agents/Interface-Blockchain-Agent-Block-Headers";
-import PPoWBlockchainProtocol from "./../protocol/PPoW-Blockchain-Protocol"
+import InterfaceBlockchainAgentBlockHeaders from 'common/blockchain/interface-blockchain/agents/Interface-Blockchain-Agent-Block-Headers'
+import PPoWBlockchainProtocol from './../protocol/PPoW-Blockchain-Protocol'
 
-class PPoWBlockchainAgentBlockHeaders extends InterfaceBlockchainAgentBlockHeaders{
-
-    _newProtocol(){
-        this.protocol = new PPoWBlockchainProtocol(this.blockchain, this);
-    }
-
-
+class PPoWBlockchainAgentBlockHeaders extends InterfaceBlockchainAgentBlockHeaders {
+  _newProtocol () {
+    this.protocol = new PPoWBlockchainProtocol(this.blockchain, this)
+  }
 }
 
-export default PPoWBlockchainAgentBlockHeaders;
+export default PPoWBlockchainAgentBlockHeaders

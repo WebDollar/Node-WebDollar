@@ -2,7 +2,6 @@
     WEBRTC Node Peer
  */
 
-
 // TUTORIAL BASED ON
 // https://github.com/feross/simple-peer
 

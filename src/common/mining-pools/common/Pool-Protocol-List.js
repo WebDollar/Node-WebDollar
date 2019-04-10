@@ -1,60 +1,45 @@
-import NodesList from 'node/lists/Nodes-List';
+import NodesList from 'node/lists/Nodes-List'
 
-class PoolProtocolList{
+class PoolProtocolList {
+  constructor () {
+    this.list = []
 
-    constructor(){
+    this._checkDisconnection()
+  }
 
-        this.list = [];
+  _checkDisconnection () {
+    NodesList.emitter.on('nodes-list/disconnected', (nodesListObject) => {
+      this.deleteElementBySocket(nodesListObject.socket)
+    })
+  }
 
+  addElement (socket) {
+    if (this.findElement(socket) !== -1) return false
 
-        this._checkDisconnection();
+    this.list.push(socket)
+    return true
+  }
+
+  findElement (socket) {
+    for (let i = 0; i < this.list.length; i++) {
+      if (this.list[i] === socket) { return i }
     }
 
-    _checkDisconnection(){
+    return -1
+  }
 
-        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
-
-            this.deleteElementBySocket(nodesListObject.socket);
-
-        });
-
+  deleteElement (socket) {
+    for (let i = this.list.length - 1; i >= 0; i--) {
+      if (this.list[i] === socket) {
+        this.list.splice(i, 1)
+        break
+      }
     }
+  }
 
-
-    addElement(socket){
-
-        if (this.findElement(socket) !== -1) return false;
-
-        this.list.push(socket);
-        return true;
-
-    }
-
-    findElement(socket){
-
-        for (let i=0; i<this.list.length; i++)
-            if ( this.list[i] === socket )
-                return i;
-
-        return -1;
-
-    }
-
-    deleteElement(socket){
-
-        for (let i=this.list.length-1; i>= 0; i--)
-            if (this.list[i] === socket) {
-                this.list.splice(i, 1);
-                break;
-            }
-
-    }
-
-
-    deleteElementBySocket(socket){
-        return this.deleteElement(socket);
-    }
-
+  deleteElementBySocket (socket) {
+    return this.deleteElement(socket)
+  }
 }
 
-export default PoolProtocolList;
+export default PoolProtocolList

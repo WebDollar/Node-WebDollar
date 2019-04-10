@@ -1,113 +1,92 @@
 import InterfaceRadixTreeNode from 'common/trees/radix-tree/Interface-Radix-Tree-Node'
-import Serialization from "common/utils/Serialization";
-import BufferExtended from "common/utils/BufferExtended";
-import InterfaceMerkleTreeNode from "common/trees/merkle-tree/Interface-Merkle-Tree-Node"
+import Serialization from 'common/utils/Serialization'
+import BufferExtended from 'common/utils/BufferExtended'
+import InterfaceMerkleTreeNode from 'common/trees/merkle-tree/Interface-Merkle-Tree-Node'
 
-class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode{
+class InterfaceMerkleRadixTreeNode extends InterfaceRadixTreeNode {
+  // parent : Node
+  // value : data
+  // edges : [ of Edges]
+  // hash
 
-    // parent : Node
-    // value : data
-    // edges : [ of Edges]
-    // hash
+  constructor (root, parent, edges, value, hash) {
+    super(root, parent, edges, value)
 
-    constructor(root, parent,  edges, value, hash){
+    this.hash = hash
+  }
 
-        super(root, parent,  edges, value);
+  serializeNodeDataHash (includeHashes) {
+    if (includeHashes) { return this.hash } else return null
+  }
 
-        this.hash = hash;
+  serializeNodeData (includeEdges, includeHashes) {
+    let list = []
 
+    let hash = this.serializeNodeDataHash(includeHashes)
+
+    if (hash) { list.push(hash) }
+
+    list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments))
+
+    return Buffer.concat(list)
+  }
+
+  deserializeNodeDataHash (buffer, offset = 0, includeHashes) {
+    if (includeHashes) {
+      this.hash = BufferExtended.substr(buffer, offset, 32)
+      offset += 32
     }
 
-    serializeNodeDataHash(includeHashes){
+    return offset
+  }
 
-        if (includeHashes)
-            return this.hash;
-        else return null;
-    }
+  deserializeNodeData (buffer, offset, includeEdges, includeHashes) {
+    offset = this.deserializeNodeDataHash.call(this, buffer, offset, includeHashes)
 
-    serializeNodeData(includeEdges, includeHashes){
+    arguments[1] = offset
+    offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments)
 
-        let list = [];
+    return offset
+  }
 
-        let hash = this.serializeNodeDataHash(includeHashes);
+  validateTreeNode () {
+    if (!InterfaceRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false
+    if (!InterfaceMerkleTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false
 
-        if (hash)
-            list.push(hash);
+    return true
+  }
 
-        list.push(InterfaceRadixTreeNode.prototype.serializeNodeData.apply(this, arguments));
+  _getValueToHash () {
+    return this.serializeNode()
+  }
 
-        return Buffer.concat ( list );
-    }
+  _changedNode () {
+    InterfaceMerkleTreeNode.prototype._changedNode.call(this) // computing hash
+    InterfaceRadixTreeNode.prototype._changedNode.call(this) // verifying hash and propagating it
 
-    deserializeNodeDataHash(buffer, offset = 0, includeHashes){
+    return true
+  }
 
-        if (includeHashes) {
-
-            this.hash= BufferExtended.substr(buffer, offset, 32);
-            offset += 32;
-
-        }
-
-        return offset;
-    }
-
-    deserializeNodeData(buffer, offset, includeEdges, includeHashes){
-
-        offset = this.deserializeNodeDataHash.call(this, buffer, offset, includeHashes);
-
-        arguments[1] = offset;
-        offset = InterfaceRadixTreeNode.prototype.deserializeNodeData.apply(this, arguments);
-
-        return offset;
-    }
-
-    validateTreeNode() {
-
-        if (!InterfaceRadixTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
-        if (!InterfaceMerkleTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
-
-        return true;
-
-    }
-
-    _getValueToHash(){
-        return this.serializeNode() ;
-    }
-
-    _changedNode(){
-        InterfaceMerkleTreeNode.prototype._changedNode.call(this); //computing hash
-        InterfaceRadixTreeNode.prototype._changedNode.call(this); //verifying hash and propagating it
-
-        return true;
-    }
-
-
-
-    /*
+  /*
         inherited
     */
-    _validateHash(){
-        return InterfaceMerkleTreeNode.prototype._validateHash.call(this);
-    }
+  _validateHash () {
+    return InterfaceMerkleTreeNode.prototype._validateHash.call(this)
+  }
 
-    _computeHash() {
-        return InterfaceMerkleTreeNode.prototype._computeHash.call(this);
-    }
+  _computeHash () {
+    return InterfaceMerkleTreeNode.prototype._computeHash.call(this)
+  }
 
-    _refreshHash(forced){
-        return InterfaceMerkleTreeNode.prototype._refreshHash.call(this, forced);
-    }
+  _refreshHash (forced) {
+    return InterfaceMerkleTreeNode.prototype._refreshHash.call(this, forced)
+  }
 
-    _calculateHashTree(){
+  _calculateHashTree () {
+    for (let i = 0; i < this.edges.length; i++) { this.edges[i].targetNode._calculateHashTree() }
 
-        for (let i=0; i<this.edges.length; i++)
-            this.edges[i].targetNode._calculateHashTree();
-
-        this._computeHash(true);
-
-    }
-
-
+    this._computeHash(true)
+  }
 }
 
-export default InterfaceMerkleRadixTreeNode;
+export default InterfaceMerkleRadixTreeNode

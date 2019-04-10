@@ -1,35 +1,29 @@
-import BlockchainDifficulty from "common/blockchain/global/difficulty/Blockchain-Difficulty"
+import BlockchainDifficulty from 'common/blockchain/global/difficulty/Blockchain-Difficulty'
 
 class InterfaceBlockchainBlockValidation {
+  constructor (getBlockCallBack, getDifficultyCallback, getTimeStampCallback, getHashCallback, getChainHashCallback, blockValidationType) {
+    if (!blockValidationType) blockValidationType = {}
 
-    constructor(getBlockCallBack, getDifficultyCallback, getTimeStampCallback, getHashCallback, getChainHashCallback, blockValidationType){
+    this.getBlockCallBack = getBlockCallBack
+    this.getDifficultyCallback = getDifficultyCallback
+    this.getTimeStampCallback = getTimeStampCallback
+    this.getHashCallback = getHashCallback
+    this.getChainHashCallback = getChainHashCallback
 
-        if ( !blockValidationType ) blockValidationType = {};
+    this.blockValidationType = blockValidationType
+  }
 
-        this.getBlockCallBack = getBlockCallBack;
-        this.getDifficultyCallback = getDifficultyCallback;
-        this.getTimeStampCallback = getTimeStampCallback;
-        this.getHashCallback = getHashCallback;
-        this.getChainHashCallback = getChainHashCallback;
+  getDifficulty (blockTimestamp, blockNumber) {
+    return BlockchainDifficulty.getDifficulty(this.getDifficultyCallback, this.getTimeStampCallback, blockTimestamp, blockNumber)
+  }
 
-        this.blockValidationType = blockValidationType;
-    }
+  saveValidation () {
 
-    getDifficulty(blockTimestamp, blockNumber){
+  }
 
-        return BlockchainDifficulty.getDifficulty(this.getDifficultyCallback, this.getTimeStampCallback, blockTimestamp, blockNumber)
+  loadValidation () {
 
-    }
-
-
-    saveValidation(){
-
-    }
-
-    loadValidation(){
-
-    }
-
+  }
 }
 
-export default InterfaceBlockchainBlockValidation;
+export default InterfaceBlockchainBlockValidation

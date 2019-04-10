@@ -10,57 +10,45 @@
 
 import nacl from 'tweetnacl'
 
-class ED25519{
+class ED25519 {
+  static generatePrivateKey (fromSecret) {
+    let privateKey
+    if (!fromSecret) privateKey = nacl.sign.keyPair().secretKey
+    else privateKey = nacl.sign.keyPair.fromSecretKey(fromSecret).secretKey
 
-    static generatePrivateKey(fromSecret){
+    if (!Buffer.isBuffer(privateKey)) { privateKey = new Buffer(privateKey) }
 
-        let privateKey;
-        if (!fromSecret ) privateKey = nacl.sign.keyPair().secretKey;
-        else privateKey = nacl.sign.keyPair.fromSecretKey(fromSecret).secretKey;
+    return privateKey
+  }
 
-        if ( ! Buffer.isBuffer(privateKey) )
-            privateKey = new Buffer(privateKey);
+  static generatePublicKey (secretKey) {
+    if (!secretKey || !Buffer.isBuffer(secretKey)) throw { message: 'privateKey must be a Buffer', secretKey: secretKey }
 
-        return privateKey;
-    }
+    let publicKey = nacl.sign.keyPair.fromSecretKey(secretKey).publicKey
 
-    static generatePublicKey(secretKey){
+    if (!Buffer.isBuffer(publicKey)) { publicKey = new Buffer(publicKey) }
 
-        if (!secretKey || !Buffer.isBuffer(secretKey) ) throw { message: 'privateKey must be a Buffer', secretKey: secretKey};
+    return publicKey
+  }
 
-        let publicKey = nacl.sign.keyPair.fromSecretKey(secretKey).publicKey;
+  static sign (data, secretKey) {
+    if (!secretKey || !Buffer.isBuffer(secretKey)) throw { message: 'secretKey must be a Buffer', secretKey: secretKey }
+    if (!data || !Buffer.isBuffer(data)) throw { message: 'data must be a Buffer', data: data }
 
-        if (!Buffer.isBuffer(publicKey))
-            publicKey = new Buffer(publicKey);
+    let signature = nacl.sign.detached(data, secretKey)
 
-        return publicKey;
+    if (!Buffer.isBuffer(signature)) { signature = new Buffer(signature) }
 
-    }
+    return signature
+  }
 
-    static sign(data, secretKey){
+  static verify (signature, data, publicKey) {
+    if (!signature || !Buffer.isBuffer(signature)) throw { message: 'signature must be a Buffer', signature: signature }
+    if (!data || !Buffer.isBuffer(data)) throw { message: 'data must be a Buffer', data: data }
+    if (!publicKey || !Buffer.isBuffer(publicKey)) throw { message: 'publicKey must be a Buffer', publicKey: publicKey }
 
-        if (!secretKey || !Buffer.isBuffer(secretKey) ) throw {message: 'secretKey must be a Buffer', secretKey: secretKey};
-        if (!data || !Buffer.isBuffer(data) ) throw {message: 'data must be a Buffer', data: data};
-
-        let signature = nacl.sign.detached( data, secretKey );
-
-        if ( !Buffer.isBuffer(signature) )
-            signature = new Buffer(signature);
-
-
-        return signature;
-    }
-
-    static verify(signature, data, publicKey){
-
-        if (!signature || !Buffer.isBuffer(signature) ) throw {message: 'signature must be a Buffer', signature: signature};
-        if (!data || !Buffer.isBuffer(data) ) throw {message: 'data must be a Buffer', data:data};
-        if (!publicKey || !Buffer.isBuffer(publicKey) ) throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
-
-        return nacl.sign.detached.verify(data, signature, publicKey)
-
-    }
-
+    return nacl.sign.detached.verify(data, signature, publicKey)
+  }
 }
 
-export default ED25519;
+export default ED25519

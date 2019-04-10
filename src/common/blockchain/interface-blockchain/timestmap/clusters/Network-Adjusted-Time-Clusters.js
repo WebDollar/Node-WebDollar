@@ -1,151 +1,120 @@
 import consts from 'consts/const_global'
-import NetworkAdjustedTimeCluster from "./Network-Adjusted-Time-Cluster"
-import StatusEvents from "common/events/Status-Events"
+import NetworkAdjustedTimeCluster from './Network-Adjusted-Time-Cluster'
+import StatusEvents from 'common/events/Status-Events'
 
-class NetworkAdjustedTimeClusters{
+class NetworkAdjustedTimeClusters {
+  constructor () {
+    this._clusterInitialization = false
+    this.clearClusters()
 
-    constructor(){
+    setTimeout(() => {
+      this._clusterInitialization = true
+      this._refreshClusterStatus()
+    }, 130 * 1000)
+  }
 
-        this._clusterInitialization = false;
-        this.clearClusters();
+  clearClusters () {
+    this.clusters = []
+    this.clusterBest = null
+  }
 
-        setTimeout( ()=>{
-            this._clusterInitialization = true;
-            this._refreshClusterStatus();
-        }, 130*1000);
+  addNAT (socket, socketTimeUTCOffset) {
+    let bestClusterAnswer = this._findNATCluster(socketTimeUTCOffset)
+    let cluster
 
+    if (bestClusterAnswer === null) {
+      cluster = new NetworkAdjustedTimeCluster()
+      cluster.pushSocket(socket, socketTimeUTCOffset)
+
+      this.clusters.push(cluster)
+    } else {
+      cluster = this.clusters[ bestClusterAnswer.clusterIndex ]
+
+      cluster.pushSocket(socket, socketTimeUTCOffset)
     }
 
-    clearClusters() {
+    this._calculateBestCluster()
 
-        this.clusters = [];
-        this.clusterBest = null;
+    return cluster
+  }
+
+  deleteNAT (socket) {
+    let index = this._findNATClusterBySocket(socket)
+
+    if (index === -1) { return false } else {
+      let cluster = this.clusters[index]
+      cluster.deleteSocket(socket)
+
+      if (cluster.sockets.length === 0) { this.clusters.splice(index, 1) }
     }
 
-    addNAT(socket, socketTimeUTCOffset){
+    this._calculateBestCluster()
+  }
 
-        let bestClusterAnswer = this._findNATCluster(socketTimeUTCOffset);
-        let cluster = undefined;
+  _findNATClusterBySocket (socket) {
+    for (let i = 0; i < this.clusters.length; i++) {
+      if (this.clusters[i].findSocketIncluded(socket) !== -1) { return i }
+    }
 
-        if (bestClusterAnswer === null){
+    return -1
+  }
 
-            cluster = new NetworkAdjustedTimeCluster();
-            cluster.pushSocket(socket, socketTimeUTCOffset );
+  _findNATCluster (socketTimeUTCOffset) {
+    let bestCluster = null
 
-            this.clusters.push (cluster);
+    for (let i = 0; i < this.clusters.length; i++) {
+      let difference = Math.abs(socketTimeUTCOffset - this.clusters[i].socketTimeUTCOffset)
 
-        } else {
-
-            cluster = this.clusters[ bestClusterAnswer.clusterIndex ];
-
-            cluster.pushSocket(socket, socketTimeUTCOffset);
-
+      if (Math.abs(difference) < consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE) {
+        if (bestCluster === null || bestCluster.difference > Math.abs(difference)) {
+          bestCluster = {
+            difference: difference,
+            clusterIndex: i
+          }
         }
-
-        this._calculateBestCluster();
-
-        return cluster;
+      }
     }
 
-    deleteNAT(socket){
+    return bestCluster
+  }
 
-        let index = this._findNATClusterBySocket(socket);
+  _calculateBestCluster () {
+    let bestCluster = null
 
-        if (index === -1 )
-            return false;
-        else {
-
-            let cluster = this.clusters[index];
-            cluster.deleteSocket(socket);
-
-            if (cluster.sockets.length === 0)
-                this.clusters.splice(index, 1);
-        }
-
-        this._calculateBestCluster();
+    for (let i = 0; i < this.clusters.length; i++) {
+      if (bestCluster === null || this.clusters[i].sockets.length > bestCluster.sockets.length) {
+        bestCluster = this.clusters[i]
+      }
     }
 
-    _findNATClusterBySocket(socket){
+    if (this.clusterBest !== bestCluster) { this.clusterBest = bestCluster }
 
-        for (let i=0; i<this.clusters.length; i++) {
-            if (this.clusters[i].findSocketIncluded(socket) !== -1)
-                return i;
-        }
+    this._refreshClusterStatus()
+  }
 
-        return -1;
-    }
+  _refreshClusterStatus () {
+    if (!this._clusterInitialization) return
 
-    _findNATCluster(socketTimeUTCOffset){
+    if (this.clusterBest === null) { return StatusEvents.emit('blockchain/logs', { message: 'Network Adjusted Time Error', reason: 'ClusterBest is Empty' }) }
 
-        let bestCluster = null;
+    // if (Math.abs(this.clusterBest.meanTimeUTCOffset) > consts.BLOCKCHAIN.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE)
+    //     return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "Your timestamp is not set correctly. The UTC timestamp should have been: "+ this._timeConverter( new Date().getTime() + this.clusterBest.meanTimeUTCOffset ) });
 
-        for (let i=0; i<this.clusters.length; i++){
+    return StatusEvents.emit('blockchain/logs', { message: 'Network Adjusted Time Success' })
+  }
 
-            let difference = Math.abs( socketTimeUTCOffset - this.clusters[i].socketTimeUTCOffset );
-
-            if ( Math.abs( difference ) < consts.BLOCKCHAIN.TIMESTAMP.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE ){
-
-                if (bestCluster === null || bestCluster.difference > Math.abs(difference))
-                    bestCluster = {
-                        difference: difference,
-                        clusterIndex : i,
-                    }
-
-
-            }
-        }
-
-        return bestCluster;
-    }
-
-
-    _calculateBestCluster(){
-
-        let bestCluster = null;
-
-        for (let i=0; i<this.clusters.length; i++)
-            if ( bestCluster === null || this.clusters[i].sockets.length > bestCluster.sockets.length ){
-
-                bestCluster = this.clusters[i];
-
-            }
-
-
-        if (this.clusterBest !== bestCluster)
-            this.clusterBest = bestCluster;
-
-        this._refreshClusterStatus();
-    }
-
-    _refreshClusterStatus(){
-
-        if (!this._clusterInitialization) return;
-
-        if (this.clusterBest === null)
-            return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "ClusterBest is Empty"});
-
-
-        // if (Math.abs(this.clusterBest.meanTimeUTCOffset) > consts.BLOCKCHAIN.NETWORK_ADJUSTED_TIME_NODE_MAX_UTC_DIFFERENCE)
-        //     return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Error", reason: "Your timestamp is not set correctly. The UTC timestamp should have been: "+ this._timeConverter( new Date().getTime() + this.clusterBest.meanTimeUTCOffset ) });
-
-        return StatusEvents.emit("blockchain/logs", {message: "Network Adjusted Time Success"});
-
-    }
-
-    _timeConverter(UNIX_timestamp){
-
-        let a = new Date(UNIX_timestamp * 1000);
-        let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        let year = a.getFullYear();
-        let month = months[a.getMonth()];
-        let date = a.getDate();
-        let hour = a.getHours();
-        let min = a.getMinutes();
-        let sec = a.getSeconds();
-        let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
-        return time;
-    }
-
+  _timeConverter (UNIX_timestamp) {
+    let a = new Date(UNIX_timestamp * 1000)
+    let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    let year = a.getFullYear()
+    let month = months[a.getMonth()]
+    let date = a.getDate()
+    let hour = a.getHours()
+    let min = a.getMinutes()
+    let sec = a.getSeconds()
+    let time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec
+    return time
+  }
 }
 
 export default NetworkAdjustedTimeClusters

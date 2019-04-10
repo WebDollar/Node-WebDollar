@@ -1,107 +1,91 @@
-let assert = require('assert');
-
 import InterfaceRadixTree from 'common/trees/radix-tree/Interface-Radix-Tree'
 import IntefaceMerkleRadixTree from 'common/trees/radix-tree/merkle-tree/Interface-Merkle-Radix-Tree'
 
+let assert = require('assert')
+
 class InterfaceAccountantRadixTreeTestHelper {
+  constructor (className) {
+    this.className = className
+  }
 
-    constructor (className){
-        this.className = className;
-    }
+  testAdd (accountantData, accountantTree) {
+    if (accountantTree === undefined || accountantTree === null) accountantTree = new this.className()
 
-    testAdd (accountantData, accountantTree) {
+    accountantData.forEach((data, index) => {
+      accountantTree.add(new Buffer(data.text, 'ascii'), {
+        text: data.text,
+        balances: data.value.toString()
+      })
 
-        if ( accountantTree === undefined || accountantTree === null)  accountantTree = new this.className();
+      // console.log("accountant text", data.value.toString())
+      // accountantTree.printLevelSearch();
+      assert(accountantTree.validateRoot() === true, 'validate Tree was not passed at ' + index + ' because ' + JSON.stringify(data))
+      assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parents and Children Edges don't match")
 
-        accountantData.forEach((data, index) => {
+      assert(accountantTree.search(new Buffer(data.text, 'ascii')).result === true, "Accountant Tree couldn't find " + index + '   ' + data + ' although it was added')
 
-            accountantTree.add( new Buffer(data.text, "ascii"), {
-                text: data.text,
-                balances: data.value.toString()
-            });
+      accountantData.forEach((data2, index2) => {
+        let str2 = data2.text
 
-            //console.log("accountant text", data.value.toString())
-            //accountantTree.printLevelSearch();
-            assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
-            assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parents and Children Edges don't match");
+        let mustFind = false
+        if (index2 <= index) { mustFind = true }
 
-            assert(accountantTree.search(new Buffer(data.text, "ascii")).result === true, "Accountant Tree couldn't find " + index + "   " + data + " although it was added");
+        assert(accountantTree.search(new Buffer(str2, 'ascii')).result === mustFind, "Accountant Tree couldn't find or not find " + str2 + ' although it was added successfully')
+      }); ''
+    })
 
-            accountantData.forEach((data2, index2) => {
+    let result = accountantTree.levelSearch()
 
-                let str2 = data2.text;
+    let sum = 0
+    for (let i = 0; i < accountantData.length; i++) { sum += accountantData[i].value }
 
-                let mustFind = false;
-                if (index2 <= index)
-                    mustFind = true;
+    // console.log("Accountant Tree sums");
+    // console.log(sum);
+    // console.log(result[0][0].sum);
 
-                assert(accountantTree.search(new Buffer(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find " + str2 + " although it was added successfully");
+    assert(accountantTree.root.sum === sum, 'Accountant Tree Root Node Amount is different (it was not propagated up) ' + result[0][0].sum + '       ' + sum + '       diff: ' + (accountantTree.root.sum - sum).toString())
 
-            });""
-        });
+    // accountantTree.printLevelSearch();
 
-        let result = accountantTree.levelSearch();
+    return { tree: accountantTree, levels: result }
+  };
 
-        let sum = 0;
-        for (let i = 0; i < accountantData.length; i++)
-            sum += accountantData[i].value;
+  testDelete (accountantTree, accountantData, showDebug) {
+    accountantData.forEach((data, index) => {
+      let str = data.text
 
-        // console.log("Accountant Tree sums");
-        // console.log(sum);
-        // console.log(result[0][0].sum);
+      accountantTree.delete(new Buffer(str, 'ascii'))
 
-        assert(accountantTree.root.sum === sum, "Accountant Tree Root Node Amount is different (it was not propagated up) " + result[0][0].sum + "       " + sum + "       diff: " + (accountantTree.root.sum - sum).toString());
+      if (showDebug) {
+        console.log('deleted', str)
+        accountantTree.printLevelSearch()
+      }
 
-        //accountantTree.printLevelSearch();
+      assert(accountantTree.validateRoot() === true, 'Accountant after ' + str + ' is not Valid')
+      assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parent and Children Edges don't match")
 
-        return {tree: accountantTree, levels: result};
+      assert(!accountantTree.search(new Buffer(str, 'ascii')).result, "Radix Tree2 couldn't find " + index + '   ' + str + ' although it was added')
 
-    };
+      accountantData.forEach((data2, index2) => {
+        let str2 = data2.text
 
-    testDelete (accountantTree, accountantData, showDebug) {
+        let mustFind = true
+        if (index2 <= index) { mustFind = false }
 
-        accountantData.forEach((data, index) => {
+        if (accountantTree.search(new Buffer(str2, 'ascii')).result !== mustFind) {
+          console.log("accountant tree didn't work for deleting ", index, ' str ', str, 'and finding ', str2)
+          accountantTree.printLevelSearch()
+        }
 
-            let str = data.text;
+        assert(accountantTree.search(new Buffer(str2, 'ascii')).result === mustFind, "Accountant Tree couldn't find or not find '" + str2 + "' although it was added successfully")
+      })
+    })
 
-            accountantTree.delete(new Buffer(str, "ascii"));
+    let result = accountantTree.levelSearch()
 
-            if (showDebug) {
-                console.log("deleted", str);
-                accountantTree.printLevelSearch();
-            }
-
-            assert(accountantTree.validateRoot() === true, "Accountant after " + str + " is not Valid");
-            assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parent and Children Edges don't match");
-
-            assert(!accountantTree.search(new Buffer(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
-
-            accountantData.forEach((data2, index2) => {
-
-                let str2 = data2.text;
-
-                let mustFind = true;
-                if (index2 <= index)
-                    mustFind = false;
-
-                if (accountantTree.search( new Buffer(str2, "ascii")).result !== mustFind) {
-                    console.log("accountant tree didn't work for deleting ", index, " str ", str, "and finding ", str2)
-                    accountantTree.printLevelSearch();
-                }
-
-                assert(accountantTree.search( new Buffer(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find '" + str2 + "' although it was added successfully");
-
-            });
-
-        });
-
-        let result = accountantTree.levelSearch();
-
-        assert(result.length === 1, "result is not 1 level");
-        assert(result[0].length === 1, "root is not empty");
-
-    };
-
+    assert(result.length === 1, 'result is not 1 level')
+    assert(result[0].length === 1, 'root is not empty')
+  };
 }
 
-export default InterfaceAccountantRadixTreeTestHelper;
+export default InterfaceAccountantRadixTreeTestHelper

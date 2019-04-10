@@ -1,15 +1,13 @@
+import NodeWebPeer from 'node/webrtc/web-peer/node-web-peer'
 var assert = require('assert')
-import NodeWebPeer from 'node/webrtc/web-peer/node-web-peer';
 
-describe('test node WebPeer', async () =>{
+describe('test node WebPeer', async () => {
+  let webpeer = new NodeWebPeer()
 
-    let webpeer = new NodeWebPeer();
+  await webpeer.createPeer()
 
-    await webpeer.createPeer();
-
-    console.log("SIGNAL", await webpeer.createSignal());
-
-});
+  console.log('SIGNAL', await webpeer.createSignal())
+})
 
 // describe('test web peer', async ()=> {
 //

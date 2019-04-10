@@ -1,18 +1,18 @@
-import sinon from 'sinon';
-import { assert } from 'chai';
+import sinon from 'sinon'
+import { assert } from 'chai'
 
-import RpcMethod from '../../../../jsonRpc/RpcMethod';
-import GetBlockByHash from '../../Methods/GetBlockByHash';
+import RpcMethod from '../../../../jsonRpc/RpcMethod'
+import GetBlockByHash from '../../Methods/GetBlockByHash'
 
 describe('GetBlockByHashTest', () => {
-    it ('should inherit from JsonRpc\\RpcMethod', () => {
-        const oMethod = new GetBlockByHash('name');
-        assert.instanceOf(oMethod, RpcMethod);
-    });
+  it('should inherit from JsonRpc\\RpcMethod', () => {
+    const oMethod = new GetBlockByHash('name')
+    assert.instanceOf(oMethod, RpcMethod)
+  })
 
-    // !!!Important Keep this
-    afterEach(() => {
-        // Restore the default sandbox here
-        sinon.restore();
-    });
-});
+  // !!!Important Keep this
+  afterEach(() => {
+    // Restore the default sandbox here
+    sinon.restore()
+  })
+})

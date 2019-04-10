@@ -1,4 +1,4 @@
-import { expect, assert } from 'chai';
+import { expect, assert } from 'chai'
 
 describe('BlockRepositoryTest', () => {
-});
+})

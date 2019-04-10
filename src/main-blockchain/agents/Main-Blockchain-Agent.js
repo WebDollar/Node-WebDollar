@@ -6,23 +6,14 @@ import MiniBlockchainAgentLightNode from 'common/blockchain/mini-blockchain/agen
  * MainBlockchainAgent inherit the entire MiniBlockchainAgent
  */
 
-class MainBlockchainAgent{
+class MainBlockchainAgent {
+  createAgent (agentName, blockchain) {
+    if (agentName === 'headers-node') { return new MiniBlockchainAgentBlockHeaders(blockchain) } else
+    if (agentName === 'full-node') { return new MiniBlockchainAgentFullNode(blockchain) } else
+    if (agentName === 'light-node') { return new MiniBlockchainAgentLightNode(blockchain) }
 
-    createAgent(agentName, blockchain){
-
-        if (agentName === "headers-node")
-            return new MiniBlockchainAgentBlockHeaders(blockchain);
-        else
-        if (agentName === "full-node")
-            return new MiniBlockchainAgentFullNode(blockchain);
-        else
-        if (agentName === "light-node")
-            return new MiniBlockchainAgentLightNode(blockchain);
-
-        throw {message: "Couldn't create an agent"}
-    }
-
-
+    throw { message: "Couldn't create an agent" }
+  }
 }
 
-export default new MainBlockchainAgent();
+export default new MainBlockchainAgent()

@@ -1,27 +1,19 @@
-import PoolWorkValidation from "./Pool-Work-Validation";
+import PoolWorkValidation from './Pool-Work-Validation'
 
-class PoolWorkSharesValidation extends PoolWorkValidation{
+class PoolWorkSharesValidation extends PoolWorkValidation {
+  constructor (poolManagement, poolWorkManagement) {
+    super(poolManagement, poolWorkManagement)
 
-    constructor(poolManagement, poolWorkManagement){
+    this.shares = []
+  }
 
-        super(poolManagement, poolWorkManagement);
-
-        this.shares = [];
-
-    }
-
-
-    /**
+  /**
      * It will validate
      * @private
      */
-    _validateShares(){
+  _validateShares () {
 
-
-
-    }
-
-
+  }
 }
 
-export default PoolWorkSharesValidation;
+export default PoolWorkSharesValidation

@@ -1,26 +1,17 @@
-class NodeSignalingServerWaitlistObject{
+class NodeSignalingServerWaitlistObject {
+  constructor (socket, acceptWebPeers) {
+    this.socket = socket
 
-    constructor(socket, acceptWebPeers){
+    this.acceptWebPeers = acceptWebPeers
+  }
 
-        this.socket = socket;
+  set acceptWebPeers (acceptWebPeers) {
+    this._acceptWebPeers = acceptWebPeers
+  }
 
-        this.acceptWebPeers = acceptWebPeers;
-
-    }
-
-
-    set acceptWebPeers(acceptWebPeers){
-
-        this._acceptWebPeers = acceptWebPeers;
-
-    }
-
-    get acceptWebPeers(){
-
-        return this._acceptWebPeers;
-
-    }
-
+  get acceptWebPeers () {
+    return this._acceptWebPeers
+  }
 }
 
-export default NodeSignalingServerWaitlistObject;
+export default NodeSignalingServerWaitlistObject

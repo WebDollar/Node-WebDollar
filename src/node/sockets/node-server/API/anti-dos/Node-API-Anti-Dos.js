@@ -1,58 +1,43 @@
-class NodeAPIAntiDos{
+class NodeAPIAntiDos {
+  constructor () {
+    this.waitlist = []
 
-    constructor(){
+    this.totalWeights = {}
 
-        this.waitlist = [];
+    setInterval(this._reduceWeights.bind(this), 1000)
+  }
 
-        this.totalWeights = {};
-
-        setInterval(this._reduceWeights.bind(this), 1000);
-
+  allowIP (ip) {
+    if (this.waitlist.length > 0) {
+      for (let i = 0; i < this.waitlist.length; i++) {
+        if (this.waitlist[i] === ip) { return true }
+      }
     }
 
-    allowIP(ip){
+    return false
+  }
 
-        if (this.waitlist.length > 0){
-            for (let i=0; i<this.waitlist.length; i++)
-                if (this.waitlist[i] === ip)
-                    return true;
-        }
+  addRouteWeight (route, totalWeight) {
+    if (this.totalWeights[route] === undefined) { this.totalWeights[route] = { weight: 0, max: 0 } }
 
-        return false;
-    }
+    this.totalWeights[route].max = totalWeight || 1000
+  }
 
-    addRouteWeight(route, totalWeight){
+  _reduceWeights () {
+    for (let key in this.totalWeights) { this.totalWeights[key].weight = 0 }
+  }
 
-        if (this.totalWeights[route] === undefined)
-            this.totalWeights[route] = {weight:0, max: 0};
+  protectRoute (route, callback) {
+    let element = this.totalWeights[route]
 
-        this.totalWeights[route].max = totalWeight||1000;
+    if (element === undefined) return callback()
 
-    }
+    if (element.weight >= element.max) { return { result: false, message: 'TOO MANY REQUESTS' } }
 
-    _reduceWeights(){
+    element.weight++
 
-        for (let key in this.totalWeights)
-            this.totalWeights[key].weight = 0;
-
-    }
-
-    protectRoute(route, callback){
-
-        let element = this.totalWeights[route];
-
-        if (element === undefined) return callback();
-
-        if (element.weight >= element.max )
-            return {result:false, message: "TOO MANY REQUESTS"};
-
-        element.weight++;
-
-        return callback();
-
-
-    }
-
+    return callback()
+  }
 }
 
-export default new NodeAPIAntiDos();
+export default new NodeAPIAntiDos()

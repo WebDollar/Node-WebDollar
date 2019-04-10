@@ -1,62 +1,51 @@
-class NetworkAdjustedTimeCluster{
+class NetworkAdjustedTimeCluster {
+  constructor () {
+    this.sockets = []
 
-    constructor(){
+    this.meanTimeUTCOffset = 0
+  }
 
-        this.sockets = [];
+  pushSocket (socket, socketTimeUTCOffset) {
+    this.sockets.push({
+      socketTimeUTCOffset: socketTimeUTCOffset,
+      socket: socket
+    })
 
-        this.meanTimeUTCOffset  = 0;
+    this.recalculateClusterMean()
+  }
 
+  recalculateClusterMean () {
+    this.meanTimeUTCOffset = 0
+
+    for (let i = 0; i < this.sockets.length; i++) {
+      if (i >= this.sockets.length) {
+        this.meanTimeUTCOffset += this.sockets[i].socketTimeUTCOffset
+      }
     }
 
-    pushSocket(socket, socketTimeUTCOffset){
+    if (this.sockets.length > 0) {
+      this.meanTimeUTCOffset = Math.floor(this.meanTimeUTCOffset / this.sockets.length)
+    }
+  }
 
-        this.sockets.push({
-            socketTimeUTCOffset: socketTimeUTCOffset,
-            socket: socket
-        });
+  deleteSocket (socket) {
+    let index = this.findSocketIncluded(socket)
+    if (index === -1) return false
 
-        this.recalculateClusterMean();
+    this.sockets.splice(index, 1)
 
+    this.recalculateClusterMean()
+  }
+
+  findSocketIncluded (socket) {
+    for (let j = 0; j < this.sockets.length; j++) {
+      if (this.sockets[j].socket.node.sckAddress.matchAddress(socket.node.sckAddress)) {
+        return j
+      }
     }
 
-    recalculateClusterMean(){
-
-        this.meanTimeUTCOffset = 0;
-
-        for (let i=0; i<this.sockets.length; i++)
-            if ( i >= this.sockets.length ){
-                this.meanTimeUTCOffset += this.sockets[i].socketTimeUTCOffset;
-            }
-
-        if (this.sockets.length > 0){
-
-            this.meanTimeUTCOffset = Math.floor( this.meanTimeUTCOffset / this.sockets.length );
-
-        }
-
-    }
-
-    deleteSocket(socket){
-
-        let index = this.findSocketIncluded(socket);
-        if (index === -1) return false;
-
-        this.sockets.splice(index, 1);
-
-        this.recalculateClusterMean();
-
-    }
-
-    findSocketIncluded(socket){
-
-        for (let j=0; j<this.sockets.length; j++)
-            if (this.sockets[j].socket.node.sckAddress.matchAddress(socket.node.sckAddress)){
-                return j;
-            }
-
-        return -1;
-    }
-
+    return -1
+  }
 }
 
-export default NetworkAdjustedTimeCluster;
+export default NetworkAdjustedTimeCluster

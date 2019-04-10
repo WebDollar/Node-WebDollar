@@ -1,18 +1,15 @@
-import {Node, Blockchain} from './index.js';
-import global from "consts/global.js";
-import termination from "./termination";
+import { Node, Blockchain } from './index.js'
+import global from 'consts/global.js'
+import termination from './termination'
 
-console.log("BROWSER MODE");
+console.log('BROWSER MODE')
 
-//Blockchain.createBlockchain("headers-node");
-Blockchain.createBlockchain("light-node", ()=>{}, ()=>{
-    Node.NodeClientsService.startService();
-    Node.NodeWebPeersService.startService();
-});
+// Blockchain.createBlockchain("headers-node");
+Blockchain.createBlockchain('light-node', () => {}, () => {
+  Node.NodeClientsService.startService()
+  Node.NodeWebPeersService.startService()
+})
 
-window.onbeforeunload =  () => {
-
-     termination(Blockchain);
-
-};
-
+window.onbeforeunload = () => {
+  termination(Blockchain)
+}

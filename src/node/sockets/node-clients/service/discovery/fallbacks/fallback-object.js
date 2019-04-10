@@ -1,28 +1,23 @@
 class FallBackObject {
+  constructor (url) {
+    this.url = url
+    this.checked = false
 
-    constructor(url){
+    this.errorTrials = 0
+    this.lastTimeChecked = 0
+  }
 
-        this.url = url;
-        this.checked = false;
+  refreshLastTimeChecked () {
+    this.lastTimeChecked = new Date().getTime()
+  }
 
-        this.errorTrials = 0;
-        this.lastTimeChecked = 0;
-    }
+  checkLastTimeChecked (timeTryReconnectAgain) {
+    let time = new Date().getTime()
 
-    refreshLastTimeChecked(){
-        this.lastTimeChecked = new Date().getTime();
-    }
+    if ((time - this.lastTimeChecked) >= (timeTryReconnectAgain + this.errorTrials * 5000)) { return true }
 
-    checkLastTimeChecked(timeTryReconnectAgain){
-
-        let time = new Date().getTime();
-
-        if ( (time - this.lastTimeChecked) >= ( timeTryReconnectAgain + this.errorTrials*5000 ))
-            return true;
-
-        return false;
-    }
-
+    return false
+  }
 }
 
-export default FallBackObject;
+export default FallBackObject

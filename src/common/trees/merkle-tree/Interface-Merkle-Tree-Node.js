@@ -1,201 +1,159 @@
 import InterfaceTreeNode from 'common/trees/Interface-Tree-Node'
-import BufferExtended from "common/utils/BufferExtended"
+import BufferExtended from 'common/utils/BufferExtended'
 import WebDollarCryptoData from 'common/crypto/WebDollar-Crypto-Data'
-import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
+import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
 
-class InterfaceMerkleTreeNode extends InterfaceTreeNode{
+class InterfaceMerkleTreeNode extends InterfaceTreeNode {
+  // parent : Node
+  // value : data
+  // edges : [ of Edges]
+  // hash
 
-    // parent : Node
-    // value : data
-    // edges : [ of Edges]
-    // hash
+  constructor (root, parent, edges, value, hash) {
+    super(root, parent, edges, value)
 
-    constructor(root, parent, edges, value, hash){
+    if (!hash) hash = new Buffer(32)
+    this.hash = hash
+  }
 
-        super(root, parent,  edges, value);
+  serializeNodeData () {
+    return Buffer.concat([
+      this.hash,
+      InterfaceTreeNode.prototype.serializeNodeData.apply(this, arguments)
+    ])
+  }
 
-        if ( !hash ) hash = new Buffer(32);
-        this.hash = hash;
+  deserializeNodeData (buffer, offset) {
+    this.hash = BufferExtended.substr(buffer, offset, 32)
+    offset += 32
 
-    }
+    arguments[1] = offset
+    offset = InterfaceTreeNode.prototype.deserializeNodeData.apply(this, arguments)
 
-    serializeNodeData(){
+    return offset
+  }
 
-        return Buffer.concat ( [
-            this.hash,
-            InterfaceTreeNode.prototype.serializeNodeData.apply(this, arguments),
-        ]);
-
-    }
-
-
-    deserializeNodeData(buffer, offset){
-
-        this.hash =  BufferExtended.substr(buffer, offset, 32);
-        offset += 32;
-
-        arguments[1] = offset;
-        offset = InterfaceTreeNode.prototype.deserializeNodeData.apply( this, arguments );
-
-        return offset;
-    }
-
-
-
-    /**
+  /**
      * When an Operation is done to a done, let's calculate its hash
      * @param node
      */
-    _changedNode(){
+  _changedNode () {
+    if (this.root.autoMerklify) { this._refreshHash(true) }
+  }
 
-        if (this.root.autoMerklify)
-            this._refreshHash(true);
-    }
+  validateTreeNode (validateMerkleTree) {
+    if (!InterfaceTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false
 
+    if (!this.hash || !Buffer.isBuffer(this.hash) || this.hash.length !== 32) throw { message: 'hash is not a Buffer(32)' }
 
+    if (validateMerkleTree) { return this._validateHash() }
 
+    return true
+  }
 
-    validateTreeNode(validateMerkleTree){
-
-        if (!InterfaceTreeNode.prototype.validateTreeNode.apply(this, arguments)) return false;
-
-        if (!this.hash  ||  !Buffer.isBuffer(this.hash) || this.hash.length !== 32 ) throw {message: "hash is not a Buffer(32)"}
-
-        if (validateMerkleTree)
-            return this._validateHash();
-
-        return true;
-
-    }
-
-    /**
+  /**
      * check the hash of node ... it must have an initial hash
      * @param node
      * @returns {boolean}
      */
-    _validateHash(){
+  _validateHash () {
+    // validate to up
 
-        //validate to up
+    if (!this.hash) return false
 
-        if ( !this.hash ) return false;
+    let initialHash = this.hash
 
-        let initialHash = this.hash;
+    this._computeHash()
 
-        this._computeHash();
+    if (!initialHash && this.hash) return false // different hash
+    if (this.hash.length !== initialHash.length || initialHash.length !== 32) return false
+    if (!this.hash.equals(initialHash)) return false
 
-        if (!initialHash && this.hash) return false; // different hash
-        if (this.hash.length !== initialHash.length || initialHash.length !== 32) return false;
-        if ( !this.hash.equals(initialHash) ) return false;
+    return true
+  }
 
-        return true;
-    }
-
-    /**
+  /**
      * It returns the Value to be hashed
      * @param node
      * return buffer
      */
-    _getValueToHash(){
+  _getValueToHash () {
+    if (Buffer.isBuffer(this.value)) { return this.value } else { return WebDollarCryptoData.createWebDollarCryptoData(this.value, true).buffer }
+  }
 
-        if (Buffer.isBuffer(this.value) )
-            return this.value;
-        else
-            return WebDollarCryptoData.createWebDollarCryptoData(this.value, true).buffer;
-    }
-
-    /**
+  /**
      * compute the hash of a given node
      * @returns {*}
      */
-    _computeHash(){
-
-        if (this === this.root && this.edges.length === 0){
-            this.hash = new Buffer(32);
-            return this.hash;
-        }
-
-        // calculating the value to hash which must be a buffer
-        let valueToHash = this._getValueToHash(); //getting the node data
-
-        if (this.edges.length === 0){ //Leaf Node (terminal node)
-
-            if ( this.value === null)
-                throw {message: "Leaf nodes has not value"};
-            if ( !this.isLeaf() )
-                throw {message: "Node is not leaf"};
-
-            // Let's hash
-
-            this.hash = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( valueToHash ) )
-
-        } else
-        if (this.edges.length > 0){
-
-            let hashConcat = [];//it will be the hash
-
-            for (let i = 0; i < this.edges.length; i++){
-
-                // the hash was not calculated ....
-                if ( !this.edges[i].targetNode.hash )
-                    this.edges[i].targetNode._computeHash();
-
-                if (i === 0)
-                    hashConcat.push( new Buffer(this.edges[i].targetNode.hash) );
-                else
-                    hashConcat.push ( this.edges[i].targetNode.hash );
-            }
-
-            if (hashConcat.length === 0 )
-                throw {message: "Empty node with invalid hash"};
-
-            hashConcat = Buffer.concat(hashConcat);
-
-            this.hash = WebDollarCrypto.SHA256( WebDollarCrypto.SHA256( Buffer.concat ( [valueToHash, hashConcat]  ) ));
-
-            return this.hash;
-        }
-
-        return this.hash;
+  _computeHash () {
+    if (this === this.root && this.edges.length === 0) {
+      this.hash = new Buffer(32)
+      return this.hash
     }
 
-    /**
+    // calculating the value to hash which must be a buffer
+    let valueToHash = this._getValueToHash() // getting the node data
+
+    if (this.edges.length === 0) { // Leaf Node (terminal node)
+      if (this.value === null) { throw { message: 'Leaf nodes has not value' } }
+      if (!this.isLeaf()) { throw { message: 'Node is not leaf' } }
+
+      // Let's hash
+
+      this.hash = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(valueToHash))
+    } else
+    if (this.edges.length > 0) {
+      let hashConcat = []// it will be the hash
+
+      for (let i = 0; i < this.edges.length; i++) {
+        // the hash was not calculated ....
+        if (!this.edges[i].targetNode.hash) { this.edges[i].targetNode._computeHash() }
+
+        if (i === 0) { hashConcat.push(new Buffer(this.edges[i].targetNode.hash)) } else { hashConcat.push(this.edges[i].targetNode.hash) }
+      }
+
+      if (hashConcat.length === 0) { throw { message: 'Empty node with invalid hash' } }
+
+      hashConcat = Buffer.concat(hashConcat)
+
+      this.hash = WebDollarCrypto.SHA256(WebDollarCrypto.SHA256(Buffer.concat([valueToHash, hashConcat])))
+
+      return this.hash
+    }
+
+    return this.hash
+  }
+
+  /**
      * Recalculate the hash of a node if it is different and propagate the change to the root
      * @param node
      * @returns {boolean}
      */
-    _refreshHash(forced){
+  _refreshHash (forced) {
+    let result = false
+    let hashAlreadyComputed = false
 
-        let result = false;
-        let hashAlreadyComputed = false;
-
-        if ( !forced ) {
-            // in case it must recalculate the hash by force
-            hashAlreadyComputed = true;
-            result  = this._validateHash();
-        }
-
-        // no changes...
-        if (!result) {
-
-            result = true;
-
-            if (!hashAlreadyComputed)
-                this._computeHash();
-
-            if (this.root !== this) {
-
-                if ( !this.parent )
-                    throw {message: "Couldn't compute hash because Node parent is empty"};
-
-                result = result && this.parent._refreshHash(true);
-            }
-
-        }
-
-        return result;
+    if (!forced) {
+      // in case it must recalculate the hash by force
+      hashAlreadyComputed = true
+      result = this._validateHash()
     }
 
+    // no changes...
+    if (!result) {
+      result = true
 
+      if (!hashAlreadyComputed) { this._computeHash() }
+
+      if (this.root !== this) {
+        if (!this.parent) { throw { message: "Couldn't compute hash because Node parent is empty" } }
+
+        result = result && this.parent._refreshHash(true)
+      }
+    }
+
+    return result
+  }
 }
 
-export default InterfaceMerkleTreeNode;
+export default InterfaceMerkleTreeNode

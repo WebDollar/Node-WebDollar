@@ -1,8 +1,7 @@
-import AdvancedEmitter from "common/utils/Advanced-Emitter";
+import AdvancedEmitter from 'common/utils/Advanced-Emitter'
 
-class StatusEvents extends AdvancedEmitter{
-
+class StatusEvents extends AdvancedEmitter {
 
 }
 
-export default new StatusEvents();
+export default new StatusEvents()

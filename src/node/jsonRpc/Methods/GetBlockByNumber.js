@@ -1,34 +1,34 @@
-import {RpcMethod} from './../../../jsonRpc';
-import {defaults}  from 'lodash';
+import { RpcMethod } from './../../../jsonRpc'
+import { defaults } from 'lodash'
 
 /**
  * Th information about a block by block number.
  */
 class GetBlockByNumber extends RpcMethod {
-    constructor(name, oBlockRepository, oBlockTransformer) {
-        super(name);
-        this._oBlockRepository  = oBlockRepository;
-        this._oBlockTransformer = oBlockTransformer;
+  constructor (name, oBlockRepository, oBlockTransformer) {
+    super(name)
+    this._oBlockRepository = oBlockRepository
+    this._oBlockTransformer = oBlockTransformer
+  }
+
+  async getHandler (args) {
+    if (args.length < 1) {
+      throw new Error('Params must contain at least one entry, the block number/TAG')
     }
 
-    async getHandler(args) {
-        if (args.length < 1) {
-            throw new Error('Params must contain at least one entry, the block number/TAG');
-        }
-
-        const oTransformOptions = {
-            includeTransactions: args[1] || undefined,
-            processHardForks   : args[2] || undefined
-        };
-
-        const oBlock = await this._oBlockRepository.findByNumberOrTag(args[0]);
-
-        if (oBlock === null) {
-            return null;
-        }
-
-        return await this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true}));
+    const oTransformOptions = {
+      includeTransactions: args[1] || undefined,
+      processHardForks: args[2] || undefined
     }
+
+    const oBlock = await this._oBlockRepository.findByNumberOrTag(args[0])
+
+    if (oBlock === null) {
+      return null
+    }
+
+    return await this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, { includeTransactions: false, processHardForks: true }))
+  }
 }
 
-export default GetBlockByNumber;
+export default GetBlockByNumber

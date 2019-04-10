@@ -3,25 +3,16 @@ import NodesWaitlistConnecting from 'node/lists/waitlist/Nodes-Waitlist-Connecti
 import NodeDiscoveryService from 'node/sockets/node-clients/service/discovery/Node-Clients-Discovery-Service'
 import NodesList from 'node/lists/Nodes-List'
 
-
 class NodeClientsService {
+  constructor () {
+    console.log('NodeClientsService constructor')
+  }
 
-
-    constructor(){
-        console.log("NodeClientsService constructor");
-
-    }
-
-
-    startService(){
-        NodesWaitlist.initializeWaitlist();
-        NodeDiscoveryService.startDiscovery();
-        NodesWaitlistConnecting.startConnecting();
-    }
-
-
-
-
+  startService () {
+    NodesWaitlist.initializeWaitlist()
+    NodeDiscoveryService.startDiscovery()
+    NodesWaitlistConnecting.startConnecting()
+  }
 }
 
-export default new NodeClientsService();
+export default new NodeClientsService()

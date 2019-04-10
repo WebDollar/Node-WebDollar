@@ -1,19 +1,13 @@
-var zlib = require('zlib');
+var zlib = require('zlib')
 
-class GZip{
+class GZip {
+  zip (buffer) {
+    return zlib.deflateSync(buffer)
+  }
 
-    zip(buffer){
-
-        return zlib.deflateSync(buffer);
-
-    }
-
-    unzip(buffer){
-
-        return zlib.unzipSync(buffer);
-
-    }
-
+  unzip (buffer) {
+    return zlib.unzipSync(buffer)
+  }
 }
 
 export default new GZip()

@@ -1,120 +1,107 @@
-import AdvancedEmitter from "common/utils/Advanced-Emitter";
+import AdvancedEmitter from 'common/utils/Advanced-Emitter'
 
-class MinerPoolStatistics{
+class MinerPoolStatistics {
+  constructor (minerPoolManagement) {
+    this.emitter = new AdvancedEmitter(100)
 
-    constructor(minerPoolManagement){
+    this.minerPoolManagement = minerPoolManagement
 
-        this.emitter = new AdvancedEmitter(100);
+    this._poolHashes = 0
+    this._poolMinersOnline = 0
+    this._poolBlocksBeingConfirmed = 0
+    this._poolBlocksConfirmed = 0
+    this._poolBlocksConfirmedAndPaid = 0
+    this._poolBlocksUnconfirmed = 0
+    this._poolTimeRemaining = 0
+  }
 
-        this.minerPoolManagement = minerPoolManagement;
+  set poolHashes (newValue) {
+    if (this._poolHashes === newValue) return
 
-        this._poolHashes = 0;
-        this._poolMinersOnline = 0;
-        this._poolBlocksBeingConfirmed = 0;
-        this._poolBlocksConfirmed = 0;
-        this._poolBlocksConfirmedAndPaid = 0;
-        this._poolBlocksUnconfirmed = 0;
-        this._poolTimeRemaining = 0;
+    this._poolHashes = newValue
+    this._emitNotification()
+  }
 
-    }
+  get poolHashes () {
+    return this._poolHashes
+  }
 
-    set poolHashes(newValue){
+  set poolMinersOnline (newValue) {
+    if (this._poolMinersOnline === newValue) return
 
-        if (this._poolHashes === newValue) return;
+    this._poolMinersOnline = newValue
+    this._emitNotification()
+  }
 
-        this._poolHashes = newValue;
-        this._emitNotification();
-    }
+  get poolMinersOnline () {
+    return this._poolMinersOnline
+  }
 
-    get poolHashes(){
-        return this._poolHashes;
-    }
+  set poolBlocksConfirmed (newValue) {
+    if (this._poolBlocksConfirmed === newValue) return
 
-    set poolMinersOnline(newValue){
+    this._poolBlocksConfirmed = newValue
+    this._emitNotification()
+  }
 
-        if (this._poolMinersOnline === newValue) return;
+  get poolBlocksConfirmed () {
+    return this._poolBlocksConfirmed
+  }
 
-        this._poolMinersOnline = newValue;
-        this._emitNotification();
-    }
+  set poolBlocksConfirmedAndPaid (newValue) {
+    if (this._poolBlocksConfirmedAndPaid === newValue) return
 
-    get poolMinersOnline(){
-        return this._poolMinersOnline;
-    }
+    this._poolBlocksConfirmedAndPaid = newValue
+    this._emitNotification()
+  }
 
-    set poolBlocksConfirmed(newValue){
+  get poolBlocksConfirmedAndPaid () {
+    return this._poolBlocksConfirmedAndPaid
+  }
 
-        if (this._poolBlocksConfirmed === newValue) return;
+  set poolBlocksBeingConfirmed (newValue) {
+    if (this._poolBlocksBeingConfirmed === newValue) return
 
-        this._poolBlocksConfirmed = newValue;
-        this._emitNotification();
-    }
+    this._poolBlocksBeingConfirmed = newValue
+    this._emitNotification()
+  }
 
-    get poolBlocksConfirmed(){
-        return this._poolBlocksConfirmed;
-    }
+  get poolBlocksBeingConfirmed () {
+    return this._poolBlocksBeingConfirmed
+  }
 
-    set poolBlocksConfirmedAndPaid(newValue){
+  set poolBlocksUnconfirmed (newValue) {
+    if (this._poolBlocksUnconfirmed === newValue) return
 
-        if (this._poolBlocksConfirmedAndPaid === newValue) return;
+    this._poolBlocksUnconfirmed = newValue
+    this._emitNotification()
+  }
 
-        this._poolBlocksConfirmedAndPaid = newValue;
-        this._emitNotification();
-    }
+  get poolBlocksUnconfirmed () {
+    return this._poolBlocksUnconfirmed
+  }
 
-    get poolBlocksConfirmedAndPaid(){
-        return this._poolBlocksConfirmedAndPaid;
-    }
+  set poolTimeRemaining (newValue) {
+    if (this._poolTimeRemaining === newValue) return
 
-    set poolBlocksBeingConfirmed(newValue){
+    this._poolTimeRemaining = newValue
+    this._emitNotification()
+  }
 
-        if (this._poolBlocksBeingConfirmed === newValue) return;
+  get poolTimeRemaining () {
+    return this._poolTimeRemaining
+  }
 
-        this._poolBlocksBeingConfirmed = newValue;
-        this._emitNotification();
-    }
-
-    get poolBlocksBeingConfirmed(){
-        return this._poolBlocksBeingConfirmed;
-    }
-
-    set poolBlocksUnconfirmed(newValue){
-
-        if (this._poolBlocksUnconfirmed === newValue) return;
-
-        this._poolBlocksUnconfirmed = newValue;
-        this._emitNotification();
-    }
-
-    get poolBlocksUnconfirmed(){
-        return this._poolBlocksUnconfirmed;
-    }
-
-    set poolTimeRemaining (newValue){
-
-        if (this._poolTimeRemaining === newValue) return;
-
-        this._poolTimeRemaining = newValue;
-        this._emitNotification();
-    }
-
-    get poolTimeRemaining(){
-        return this._poolTimeRemaining;
-    }
-
-    _emitNotification(){
-
-        this.emitter.emit("miner-pool/statistics/update", { poolHashes: this._poolHashes,
-            poolMinersOnline: this._poolMinersOnline,
-            poolBlocksBeingConfirmed: this._poolBlocksBeingConfirmed,
-            poolBlocksConfirmed: this._poolBlocksConfirmed,
-            poolBlocksConfirmedAndPaid: this._poolBlocksConfirmedAndPaid,
-            poolBlocksUnconfirmed: this._poolBlocksUnconfirmed,
-            poolTimeRemaining: this.poolTimeRemaining
-        });
-
-    }
-
+  _emitNotification () {
+    this.emitter.emit('miner-pool/statistics/update', { poolHashes: this._poolHashes,
+      poolMinersOnline: this._poolMinersOnline,
+      poolBlocksBeingConfirmed: this._poolBlocksBeingConfirmed,
+      poolBlocksConfirmed: this._poolBlocksConfirmed,
+      poolBlocksConfirmedAndPaid: this._poolBlocksConfirmedAndPaid,
+      poolBlocksUnconfirmed: this._poolBlocksUnconfirmed,
+      poolTimeRemaining: this.poolTimeRemaining
+    })
+  }
 }
 
-export default MinerPoolStatistics;
+export default MinerPoolStatistics

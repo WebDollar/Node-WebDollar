@@ -1,49 +1,41 @@
-import BansList from "./BansList";
+import BansList from './BansList'
 
-class BanObject{
+class BanObject {
+  constructor (sckAddress) {
+    this.sckAddress = sckAddress
 
-    constructor(sckAddress ){
+    this.timeStamp = new Date().getTime()
+    this.banTime = 0
+    this.banTimestamp = 0
+    this.banReasons = []
+  }
 
-        this.sckAddress = sckAddress;
+  isBanned () {
+    let timestamp = new Date().getTime()
 
-        this.timeStamp = new Date().getTime();
-        this.banTime = 0;
-        this.banTimestamp = 0;
-        this.banReasons = [];
+    if ((timestamp - this.banTimestamp) < this.banTime) { return true }
 
+    return false
+  }
+
+  increaseBanTrials (banTime, banReason) {
+    let timestamp = new Date().getTime()
+
+    if ((timestamp - this.banTimestamp) >= (1.5 * this.banTime)) { // no blocks for long time
+      this.upLiftBan()
     }
 
-    isBanned(){
+    if (this.banTimestamp === 0) { this.banTimestamp = timestamp }
 
-        let timestamp = new Date().getTime();
+    this.banTime = banTime
+    this.banReasons.push(banReason)
+  }
 
-        if ( (timestamp - this.banTimestamp) < this.banTime)
-            return true;
-
-        return false;
-    }
-
-    increaseBanTrials(banTime, banReason){
-
-        let timestamp = new Date().getTime();
-
-        if ( (timestamp - this.banTimestamp) >= ( 1.5*this.banTime )){ // no blocks for long time
-            this.upLiftBan();
-        }
-
-        if (this.banTimestamp === 0)
-            this.banTimestamp = timestamp;
-
-        this.banTime = banTime;
-        this.banReasons.push(banReason);
-    }
-
-    upLiftBan(){
-        this.timeStamp = 0;
-        this.banTimestamp = 0;
-        this.banReasons = [];
-    }
-
+  upLiftBan () {
+    this.timeStamp = 0
+    this.banTimestamp = 0
+    this.banReasons = []
+  }
 }
 
 export default BanObject

@@ -1,19 +1,18 @@
-import {RpcMethod} from './../../../jsonRpc';
+import { RpcMethod } from './../../../jsonRpc'
 
 /**
  * The current webdollar protocol version.
  */
-class ProtocolVersion extends RpcMethod
-{
-    constructor(name, version) {
-        super(name);
+class ProtocolVersion extends RpcMethod {
+  constructor (name, version) {
+    super(name)
 
-        this._sVersion = version;
-    }
+    this._sVersion = version
+  }
 
-    getHandler(args) {
-        return this._sVersion;
-    }
+  getHandler (args) {
+    return this._sVersion
+  }
 }
 
-export default ProtocolVersion;
+export default ProtocolVersion

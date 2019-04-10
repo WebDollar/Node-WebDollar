@@ -1,199 +1,146 @@
-const BigInteger = require('big-integer');
-
-import BufferExtended from "../utils/BufferExtended";
-import WebDollarCrypto from './WebDollar-Crypto';
-import Serialization from 'common/utils/Serialization';
+import BufferExtended from '../utils/BufferExtended'
+import WebDollarCrypto from './WebDollar-Crypto'
+import Serialization from 'common/utils/Serialization'
 import consts from 'consts/const_global'
 
+const BigInteger = require('big-integer')
+
 class WebDollarCryptoData {
+  static isWebDollarCryptoData (object) {
+    if (typeof object !== 'object' || object === null) { return false }
 
-    static isWebDollarCryptoData(object){
+    if (object instanceof WebDollarCryptoData) { return true }
 
-        if (typeof object !== 'object' || object === null )
-            return false;
+    return false
+  }
 
-        if (object instanceof WebDollarCryptoData)
-            return true;
+  static createWebDollarCryptoData (object, forceToCreate) {
+    // if it s WebDollarCryptoData, then return it
+    if (WebDollarCryptoData.isWebDollarCryptoData(object)) {
+      if (forceToCreate) { return new WebDollarCryptoData(new Buffer(object.buffer), 'buffer') }
 
-        return false;
+      return object
     }
 
-    static createWebDollarCryptoData(object, forceToCreate){
+    let cryptoData = new WebDollarCryptoData(object)
 
-        //if it s WebDollarCryptoData, then return it
-        if (WebDollarCryptoData.isWebDollarCryptoData(object)){
+    if (forceToCreate && cryptoData.buffer !== null) {
+      cryptoData.buffer = new Buffer(cryptoData.buffer)
+    }
 
-            if (forceToCreate)
-                return new WebDollarCryptoData( new Buffer(object.buffer), "buffer" );
+    return cryptoData
+  }
 
-            return object;
+  constructor (data, type) {
+    this.buffer = null
+
+    if ((data !== null && Buffer.isBuffer(data)) || (type === 'buffer')) { this.buffer = data } else
+    if (type === 'hex') { this.buffer = new Buffer(data, 'hex') } else
+    if (type === 'base') { this.buffer = new Buffer(BufferExtended.fromBase(data)) } // if it is string, it must be a Base string
+    else
+    if (type === 'utf-8') { this.buffer = new Buffer(data, 'utf-8') } else
+    if (type === 'ascii' || typeof data === 'string') { this.buffer = new Buffer(data, 'ascii') } else
+    if (type === 'byte' || Array.isArray(data)) // if it is array
+    {
+      if (data.length > 0 && typeof data[0] === 'object') { this.buffer = this.createBufferFromArray(data) } else // byte array
+      { this.buffer = new Buffer(data) }
+    } else
+    if (type === 'object' || typeof data === 'object') {
+      if (data instanceof BigInteger) {
+        // converting number value into a buffer
+        this.buffer = Serialization.serializeBigInteger(data)
+        return
+      }
+
+      if (typeof data === 'number') {
+        this.buffer = Serialization.serializeNumber7Bytes(data)
+        return
+      }
+
+      if (data === null) { this.buffer = new Buffer([0]) } else { this.buffer = this.createBufferFromArray(data) }
+    } else
+    if (typeof data === 'number') {
+      // converting number value into a buffer on 4 bytes
+      this.buffer = Serialization.serializeNumber4Bytes(data)
+    }
+  }
+
+  createBufferFromArray (data) {
+    let newValue = null
+    let i = 0
+
+    // console.log("Data", data);
+
+    for (let property in data) {
+      if (data.hasOwnProperty(property)) {
+        if (i === 0) { newValue = WebDollarCryptoData.createWebDollarCryptoData(data[property], true) } else {
+          if (Buffer.isBuffer(data[property])) { newValue.concat(data[property], false) } else { newValue.concat(WebDollarCryptoData.createWebDollarCryptoData(data[property], false)) }
         }
 
-        let cryptoData = new WebDollarCryptoData(object);
+        // console.log("newValue", newValue);
 
-        if (forceToCreate && cryptoData.buffer !== null) {
-            cryptoData.buffer = new Buffer(cryptoData.buffer);
-        }
-
-        return cryptoData;
+        i++
+      }
     }
 
-    constructor (data, type){
+    if (newValue !== null) { return newValue.buffer } else { return new Buffer([0]) }
+  }
 
-        this.buffer = null;
+  toHex () {
+    return this.buffer.toString('hex')
+  }
 
-        if ((data !== null && Buffer.isBuffer(data)) || (type==="buffer"))
-            this.buffer = data;
-        else
-        if (type === "hex")
-            this.buffer = new Buffer(data, "hex");
-        else
-        if (type === "base")
-            this.buffer = new Buffer(BufferExtended.fromBase(data)); //if it is string, it must be a Base string
-        else
-        if (type === "utf-8")
-            this.buffer = new Buffer(data, "utf-8");
-        else
-        if (type === "ascii" || typeof data === "string")
-            this.buffer = new Buffer(data, "ascii");
-        else
-        if (type === "byte" || Array.isArray(data)) //if it is array
-        {
-            if (data.length > 0 && typeof data[0] === "object" )
-                this.buffer = this.createBufferFromArray(data);
-            else // byte array
-                this.buffer = new Buffer(data);
-        }
-        else
-        if (type === "object" || typeof data === "object"){
+  toString (param) {
+    return this.buffer.toString(param)
+  }
 
-            if (data instanceof BigInteger) {
+  toBytes () {
+    let result = []
 
-                //converting number value into a buffer
-                this.buffer = Serialization.serializeBigInteger(data);
-                return;
-            }
-
-            if (typeof data === 'number'){
-                this.buffer = Serialization.serializeNumber7Bytes(data);
-                return;
-            }
-
-            if (data === null)
-                this.buffer = new Buffer ( [0] );
-            else
-                this.buffer = this.createBufferFromArray(data);
-
-        }
-        else
-        if (typeof data === "number"){
-
-            //converting number value into a buffer on 4 bytes
-            this.buffer = Serialization.serializeNumber4Bytes(data)
-        }
-
+    for (let i = 0; i < this.buffer.length; ++i) {
+      result.push(this.buffer[i])
     }
 
-    createBufferFromArray(data){
+    return result
+  }
 
-        let newValue = null;
-        let i = 0;
+  toUint8Array () {
+    let result = new Uint8Array(this.buffer.length)
 
-        //console.log("Data", data);
-
-        for (let property in data) {
-
-            if (data.hasOwnProperty(property)) {
-
-                if (i === 0)
-                    newValue = WebDollarCryptoData.createWebDollarCryptoData( data[property], true);
-                else {
-                    if (Buffer.isBuffer(data[property]))
-                        newValue.concat( data[property], false );
-                    else
-                        newValue.concat(WebDollarCryptoData.createWebDollarCryptoData(data[property], false));
-                }
-
-                //console.log("newValue", newValue);
-
-                i++;
-            }
-        }
-
-        if (newValue !== null)
-            return newValue.buffer;
-        else
-            return new Buffer( [0] );
+    for (let i = 0; i < this.buffer.length; ++i) {
+      result[i] = this.buffer[i]
     }
 
-    toHex(){
-        return this.buffer.toString('hex');
-    }
+    return result
+  }
 
-    toString(param){
-        
-        return this.buffer.toString(param);
-    }
+  toBase () {
+    return BufferExtended.toBase(this.buffer)
+  }
 
-    toBytes(){
+  substr (index, count) {
+    return BufferExtended.substr(this.buffer, index, count)
+  }
 
-        let result = [];
-        
-        for (let i = 0; i < this.buffer.length; ++i) {
-            result.push (this.buffer[i]);
-        }
-        
-        return result;
-    }
+  longestMatch (cryptoData2, startIndex) {
+    if (!WebDollarCryptoData.isWebDollarCryptoData(cryptoData2)) { return null }
 
-    toUint8Array(){
-        
-        let result = new Uint8Array(this.buffer.length);
-        
-        for (let i = 0; i < this.buffer.length; ++i) {
-            result[i] = this.buffer[i];
-        }
-        
-        return result;
-    }
+    return BufferExtended.longestMatch(this.buffer, cryptoData2.buffer, startIndex)
+  }
 
-    toBase(){
-        
-        return BufferExtended.toBase(this.buffer);
-    }
+  concat (data) {
+    data = WebDollarCryptoData.createWebDollarCryptoData(data)
 
-    substr(index, count){
-        return BufferExtended.substr(this.buffer, index, count);
-    }
+    this.buffer = Buffer.concat([this.buffer, data.buffer])
 
-    longestMatch(cryptoData2, startIndex){
+    return this
+  }
 
-        if (! WebDollarCryptoData.isWebDollarCryptoData(cryptoData2))
-            return null;
+  compare (data) {
+    if (!Buffer.isBuffer(data)) { data = WebDollarCryptoData.createWebDollarCryptoData(data) }
 
-        return BufferExtended.longestMatch(this.buffer, cryptoData2.buffer, startIndex );
-    }
-
-    concat(data){
-
-        data = WebDollarCryptoData.createWebDollarCryptoData(data);
-
-        this.buffer = Buffer.concat( [this.buffer, data.buffer] );
-
-        return this;
-    }
-
-
-
-    compare(data){
-
-        if (!Buffer.isBuffer(data))
-            data = WebDollarCryptoData.createWebDollarCryptoData(data);
-
-        return this.buffer.compare(data.buffer)
-    }
-
-
+    return this.buffer.compare(data.buffer)
+  }
 }
 
-export default WebDollarCryptoData;
+export default WebDollarCryptoData

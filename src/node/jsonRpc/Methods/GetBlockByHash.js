@@ -1,39 +1,39 @@
-import {RpcMethod} from './../../../jsonRpc';
-import {defaults}  from 'lodash';
+import { RpcMethod } from './../../../jsonRpc'
+import { defaults } from 'lodash'
 
 /**
  * The information about a block by hash.
  */
 class GetBlockByHash extends RpcMethod {
-    /**
+  /**
      * @param {string} name
      * @param {BlockRepository} oBlockRepository
      * @param {BlockTransformer} oBlockTransformer
      */
-    constructor(name, oBlockRepository, oBlockTransformer) {
-        super(name);
-        this._oBlockRepository  = oBlockRepository;
-        this._oBlockTransformer = oBlockTransformer;
+  constructor (name, oBlockRepository, oBlockTransformer) {
+    super(name)
+    this._oBlockRepository = oBlockRepository
+    this._oBlockTransformer = oBlockTransformer
+  }
+
+  async getHandler (args) {
+    if (args.length < 1) {
+      throw new Error('Params must contain at least one entry, the block hash')
     }
 
-    async getHandler(args) {
-        if (args.length < 1) {
-            throw new Error('Params must contain at least one entry, the block hash');
-        }
-
-        const oTransformOptions = {
-            includeTransactions: args[1] || undefined,
-            processHardForks   : args[2] || undefined
-        };
-
-        const oBlock = await this._oBlockRepository.findByHash(args[0]);
-
-        if (oBlock === null) {
-            return null;
-        }
-
-        return await this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, {includeTransactions: false, processHardForks: true}));
+    const oTransformOptions = {
+      includeTransactions: args[1] || undefined,
+      processHardForks: args[2] || undefined
     }
+
+    const oBlock = await this._oBlockRepository.findByHash(args[0])
+
+    if (oBlock === null) {
+      return null
+    }
+
+    return await this._oBlockTransformer.transform(oBlock, defaults(oTransformOptions, { includeTransactions: false, processHardForks: true }))
+  }
 }
 
-export default GetBlockByHash;
+export default GetBlockByHash

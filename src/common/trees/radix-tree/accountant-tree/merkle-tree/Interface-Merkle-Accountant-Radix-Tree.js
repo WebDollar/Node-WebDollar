@@ -3,48 +3,39 @@ import InterfaceAccountantRadixTree from 'common/trees/radix-tree/accountant-tre
 import InterfaceMerkleTree from 'common/trees/merkle-tree/Interface-Merkle-Tree'
 
 class InterfaceRadixMerkleTree extends InterfaceAccountantRadixTree {
+  constructor () {
+    super()
+  }
 
-    constructor(){
-        super();
-    }
+  _changedNode (node) {
+    // recalculate the balances
+    this.refreshAccount(node, true)
 
-    _changedNode(node){
+    InterfaceMerkleTree.prototype._changedNode.call(this, node) // computing hash
 
-        // recalculate the balances
-        this.refreshAccount(node, true);
+    InterfaceRadixTree.prototype._changedNode.call(this, node) // verifying hash and propagating it
+  }
 
-        InterfaceMerkleTree.prototype._changedNode.call(this, node); //computing hash
+  _checkInvalidNode (node) {
+    if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node)) { return false }
 
-        InterfaceRadixTree.prototype._changedNode.call(this, node); //verifying hash and propagating it
-    }
+    return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node)
+  }
 
-    _checkInvalidNode(node){
+  _validateHash (node) {
+    return InterfaceMerkleTree.prototype._validateHash.call(this, node)
+  }
 
-        if (!InterfaceAccountantRadixTree.prototype._checkInvalidNode.call(this, node))
-            return false;
-
-        return InterfaceMerkleTree.prototype._checkInvalidNode.call(this, node);
-    }
-
-    _validateHash(node){
-        return InterfaceMerkleTree.prototype._validateHash.call(this, node);
-    }
-
-
-    /*
+  /*
         inherited
      */
-    _computeHash(node) {
-        return InterfaceMerkleTree.prototype._computeHash.call(this, node);
-    }
+  _computeHash (node) {
+    return InterfaceMerkleTree.prototype._computeHash.call(this, node)
+  }
 
-    _refreshHash(node, forced){
-        return InterfaceMerkleTree.prototype._refreshHash.call(this, node,forced);
-    }
-
-
-
-
+  _refreshHash (node, forced) {
+    return InterfaceMerkleTree.prototype._refreshHash.call(this, node, forced)
+  }
 }
 
-export default InterfaceRadixMerkleTree;
+export default InterfaceRadixMerkleTree
