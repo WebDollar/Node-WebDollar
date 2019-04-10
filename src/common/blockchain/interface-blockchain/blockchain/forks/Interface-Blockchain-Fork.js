@@ -201,7 +201,10 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
 
                     Log.error("preFork raised an error", Log.LOG_TYPE.BLOCKCHAIN_FORKS, exception);
 
+                    //revert the new blocks by reverting everything
                     await revertActionsNewBlocks.revertOperations('', "all");
+
+                    //revert light miniblockchain
                     await revertActions.revertOperations('', "all");
 
                     let revertOldBlocksActions = new RevertActions(this.blockchain);
