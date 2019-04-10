@@ -3,7 +3,7 @@ import RevertActions from "../../../utils/Revert-Actions/Revert-Actions";
 
 class MiniBlockchainBlocks extends InterfaceBlockchainBlocks{
 
-    async spliceBlocks(after, showUpdate = true, revertActions){
+    async spliceBlocks(after, showUpdate = true, revertActions, removeTransactions=true){
 
         let oldLength = this.length ;
 
@@ -18,25 +18,27 @@ class MiniBlockchainBlocks extends InterfaceBlockchainBlocks{
             this.blockchain.accountantTree.clear();
 
         } else
-            for (let i = oldLength - 1; i >= after; i--) {
 
-                let block = await this.blockchain.getBlock( i );
-                removedBlocks.push(block);
+            if (removeTransactions)
+                for (let i = oldLength - 1; i >= after; i--) {
 
-                // remove transactions
-                for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
-                    block.data.transactions.transactions[j].processTransaction( -1, block.data.minerAddress, undefined, showUpdate );
+                    let block = await this.blockchain.getBlock( i );
+                    removedBlocks.push(block);
 
-                // remove reward
-                this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, undefined, showUpdate);
+                    // remove transactions
+                    for (let j=block.data.transactions.transactions.length-1; j>=0; j--)
+                        block.data.transactions.transactions[j].processTransaction( -1, block.data.minerAddress, undefined, showUpdate );
 
-                revertActions.push({
-                    name: "block-removed",
-                    height: block.height,
-                    data: block,
-                });
+                    // remove reward
+                    this.blockchain.accountantTree.updateAccount( block.data.minerAddress, - block.reward, undefined, undefined, showUpdate);
 
-            }
+                    revertActions.push({
+                        name: "block-removed",
+                        height: block.height,
+                        data: block,
+                    });
+
+                }
 
         await InterfaceBlockchainBlocks.prototype.spliceBlocks.apply(this, arguments);
 

@@ -174,7 +174,7 @@ class InterfaceBlockchainFork extends InterfaceBlockchainForkBasic{
                         if ( await this.saveIncludeBlock(index, revertActionsNewBlocks,  false) === false)
                             throw( { message: "fork couldn't be included in main Blockchain ", index: index });
 
-                        revertActionsNewBlocks.push( {name: "block-added", height: forkBlock.height } );
+                        revertActionsNewBlocks.push( {name: "block-added-new", height: forkBlock.height } );
 
                         if (!process.env.BROWSER && (!this.downloadBlocksSleep || (index > 0 && index % 10 !== 0)))
                             forkBlock.blockValidation.blockValidationType['skip-sleep'] = true;

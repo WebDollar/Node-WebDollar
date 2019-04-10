@@ -49,12 +49,15 @@ class RevertActions {
                         this.blockchain.lightPrevTimeStamps.splice(action.height);
                         this.blockchain.lightPrevDifficultyTargets.splice(action.height);
 
-                        let block = await this.blockchain.getBlock(action.height-1);
+                        let block = await this.blockchain.getBlock(action.height - 1);
                         this.blockchain.lightPrevHashPrevs[action.height] = block.hash;
                         this.blockchain.lightPrevTimeStamps[action.height] = block.timeStamp;
                         this.blockchain.lightPrevDifficultyTargets[action.height] = block.difficultyTarget;
 
                     }
+                } else if (action.name === "block-added-new" && (actionName === '' || actionName === action.name)) {
+
+                    await this.blockchain.blocks.spliceBlocks(action.height, true, undefined, false);
 
                 } else if (action.name === "breakpoint" && (actionName === '' || actionName === action.name)) {
 
