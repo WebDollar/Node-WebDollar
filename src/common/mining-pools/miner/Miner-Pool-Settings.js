@@ -231,6 +231,7 @@ class MinerPoolSettings {
         await this.addPoolList("/pool/1/2MooNPooL/0.02/3c9456990ea9d0595f3a438e46b656063a42e6ad7f4fb1316b4a2b4086bfe9b0/https:$$2moonPool.ddns.net:3335", undefined, true);
         await this.addPoolList("/pool/1/BACMpool/0.01/21dc1f57cb7338963ea159877b4ade97b71dd11ac17292e3852bdc33a26a17e4/https:$$pool.bacm.ro:443", undefined, true);
         await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
+        await this.addPoolList("pool/1/EuroPool/0.02/f06b4720a725eb4fe13c06b26fca4c862b2f2f2ddc831e411418aceefae8e6df/https:$$webd-europool.ddns.net:2222", undefined, true);
         await this.addPoolList("/pool/1/WMP/0.02/d02e26e60a5b0631a0b71e7dc72bb7492fd018dad64531498df369ec14f87962/https:$$server.webdollarminingpool.com:443", undefined, true);
         await this.addPoolList("/pool/1/WMP-ASIA/0.02/773a8d5f7ce3c0dba0b7216c35d2768b1a6abef716fa2a46d875d6ca0e2c115e/https:$$singapore.webdollarminingpool.com:443", undefined, true);
         await this.addPoolList("/pool/1/WebDollarPoolWin/0.01/60ba45707efcf2292e1c8d4c6a16b602a58aa8bee04d7d3645198afa4f8435e0/https:$$webdollarpool.win:80", undefined, true);
