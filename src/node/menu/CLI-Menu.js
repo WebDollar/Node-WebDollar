@@ -4,6 +4,7 @@ import NODES_CONSENSUS_TYPE from "../lists/types/Node-Consensus-Type";
 
 
 const FileSystem = require('fs');
+const readline = require('readline');
 import {JsonRpcServer} from './../jsonRpc';
 
 let NodeExpress, NodeServer;
@@ -23,6 +24,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import StatusEvents from "common/events/Status-Events";
 import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
+import AddressBanList from "common/utils/bans/AddressBanList";
 
 class CLI {
 
@@ -107,6 +109,15 @@ class CLI {
                 break;
             case '30':  // Set Password
                 await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
+                break;
+            case '53': // add banlist
+                await this.AddAddressBanList();
+                break;
+            case '54': // add banlist
+                await this.LoadAddressBanList();
+                break;
+            case '55': // add banlist
+                await this.SaveAddressBanList();
                 break;
             case 'exit':
                 this._exitMenu = true;
@@ -229,6 +240,59 @@ class CLI {
             return -1;
 
         return addressId;
+    }
+    
+       async AddAddressBanList() {
+
+       let addressWIF = await AdvancedMessages.input('Please input miner address: ');
+       if (addressWIF.length == 40) {
+           let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( addressWIF );
+           if (unencodedAddress) {
+               let duration = await AdvancedMessages.readNumber('Ban duration (hours): ');
+              let reason = await AdvancedMessages.input('Please input ban reason: ');
+               reason = reason.replace(';', '.,');
+               AddressBanList.addBan(unencodedAddress, duration * 3600 * 1000, reason);
+               AddressBanList.listBans();
+           }
+       }
+
+   }
+
+    async LoadAddressBanList() {
+	try {
+	    const rl = readline.createInterface({
+        	input: FileSystem.createReadStream('address-ban-list.txt'),
+        	crlfDelay: Infinity
+    	    });
+
+	    rl.on('line', (line) => {
+		let triplet = line.split(';');
+        	if (triplet.length == 3) {
+
+        	    let duration = parseFloat(triplet[0]);
+            	    let addressWIF = triplet[1];
+            	    let reason = triplet[2];
+            		
+            	    if (addressWIF && addressWIF.length == 40) {
+           		let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( addressWIF );
+                	if (unencodedAddress)
+                    	    AddressBanList.addBan(unencodedAddress, duration * 3600 * 1000, reason);
+            	    }
+        	}
+       	else console.log("Invalid line in address-ban-list.txt", line);
+    	    });
+
+    	    rl.on('close', () => {
+    		AddressBanList.listBans();
+    	    });
+   	}
+    	catch (exception) {
+    	    console.error("Error loading banlist: ", exception);
+       }
+    }
+
+    async SaveAddressBanList() {
+       AddressBanList.saveBans();
     }
 
     _showCommands() {
@@ -728,6 +792,9 @@ const commands = [
         '23. Disconnect all miner nodes',
         '24. Set Interval to disconnect all miner nodes',
         '30. Set Password for Mining Address',
+        '53. Add address to banlist',
+        '54. Load address banlist',
+        '55. Save address banlist',
     ];
 
 
