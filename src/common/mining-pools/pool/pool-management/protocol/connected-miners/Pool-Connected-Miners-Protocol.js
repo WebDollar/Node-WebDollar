@@ -10,6 +10,7 @@ import ed25519 from "common/crypto/ed25519";
 import Serialization from 'common/utils/Serialization';
 import Blockchain from "main-blockchain/Blockchain";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import AddressBanList from "common/utils/bans/AddressBanList";
 
 class PoolConnectedMinersProtocol extends PoolProtocolList{
 
@@ -78,6 +79,9 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                     for (let i=0; i < Math.min( 20, data.addresses.length); i++)
                         addresses.push( Buffer.from( data.addresses[i], "hex") );
 
+                // check BanList
+                if (AddressBanList.isBanned( unencodedAddress ))
+            	    throw {message: "MinerAddress is banned"};
 
                 // save minerPublicKey
                 let miner = await this.poolManagement.poolData.addMiner( unencodedAddress );
@@ -204,6 +208,10 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
 
             let minerInstance = socket.node.protocol.minerPool.minerInstance;
             if ( !minerInstance ) throw {message: "publicKey was not found"};
+            
+            // check BanList
+            if (AddressBanList.isBanned( minerInstance.address ))
+                throw {message: "MinerAddress is banned"};
 
             let work = await this.poolManagement.generatePoolWork(minerInstance, true);
             minerInstance.lastWork = work;
