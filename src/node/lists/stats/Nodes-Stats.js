@@ -7,6 +7,7 @@ import Blockchain from "main-blockchain/Blockchain"
 import NODE_TYPE from "../types/Node-Type";
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 import BansList from "common/utils/bans/BansList";
+import AddressBanList from "common/utils/bans/AddressBanList";
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
 
 class NodesStats {
@@ -96,7 +97,7 @@ class NodesStats {
         console.log("waitlist light node ", NodesWaitlist.waitListLightNodes.length);
 
         BansList.listBans();
-
+        AddressBanList.listBans();
     }
 
     _recalculateStats(nodesListObject, printStats = true){
