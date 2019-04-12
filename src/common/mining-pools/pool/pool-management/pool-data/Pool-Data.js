@@ -8,7 +8,11 @@ import Blockchain from 'main-blockchain/Blockchain';
 import Utils from "common/utils/helpers/Utils";
 import PoolDataConnectedMinerInstances from "./Pool-Data-Connected-Miner-Instances";
 import global from "consts/global"
+import InterfaceBlockchainAddressHelper from "common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
+import AddressBanList from "common/utils/bans/AddressBanList";
 
+const FileSystem = require('fs');
+const readline = require('readline');
 const uuid = require('uuid');
 
 class PoolData {
@@ -37,7 +41,7 @@ class PoolData {
         if (this.blocksInfo.length === 0)
             this.addBlockInformation();
 
-        return this.blocksInfo[this.blocksInfo.length-1];
+        return this.blocksInfo[this.blocksInfo.length - 1];
     }
 
     get confirmedBlockInformations(){
@@ -318,6 +322,9 @@ class PoolData {
         }
 
         console.info("SAVE DONE");
+        
+        // Saving also banlist
+        AddressBanList.saveBans();
 
         return lists;
     }
@@ -481,6 +488,7 @@ class PoolData {
         let answer2 = await this._loadBlockInformations();
 
         this._clearEmptyMiners();
+        await this.LoadAddressBanList();
 
         return answer1 && answer2;
     }
@@ -535,6 +543,39 @@ class PoolData {
         //     }
 
 
+    }
+    
+      async LoadAddressBanList() {
+        try {
+            const rl = readline.createInterface({
+                input: FileSystem.createReadStream('address-ban-list.txt'),
+                crlfDelay: Infinity
+           });
+
+            rl.on('line', (line) => {
+                let triplet = line.split(';');
+                if (triplet.length == 3) {
+
+                    let duration = parseFloat(triplet[0]);
+                    let addressWIF = triplet[1];
+                    let reason = triplet[2];
+
+                    if (addressWIF && addressWIF.length == 40) {
+                        let unencodedAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF( addressWIF );
+                        if (unencodedAddress)
+                            AddressBanList.addBan(unencodedAddress, duration * 3600 * 1000, reason);
+                    }
+                }
+                else console.log("Invalid line in address-ban-list.txt", line);
+            });
+
+            rl.on('close', () => {
+                AddressBanList.listBans();
+            });
+        }
+        catch (exception) {
+            console.error("Error loading banlist: ", exception);
+        }
     }
 
 }
