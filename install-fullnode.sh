@@ -65,95 +65,98 @@ export redhashtag
 export abortte
 export showport
 
-#### ROOT User Check
-function checkroot(){
-	if [[ $(id -u) = 0 ]]; then
-		echo -e "$showinfo Checking for ROOT: ${green}PASSED${stand}"
-	else
-		echo -e "$showinfo Checking for ROOT: $showerror\\n${red}This Script Needs To Run Under ROOT user!${stand}"
-		exit 0
-	fi
-}
-####
-#checkroot
+###
+function install_nvm()
+{
 
-### GENERAL VARS
-getiptpersist=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(sudo apt-cache policy iptables-persistent | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "NA"; fi)
-getgit=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(sudo apt-cache policy git | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list git | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then source ~/.profile; elif cat /etc/*release | grep -q -o -m 1 centos; then source ~/.bash_profile; fi
+nvm install 8.2.1
+nvm use 8.2.1
+nvm alias default 8.2.1
+
+}
 ###
 
-#### Dependencies START
-function deps() {
-if [[ "$getiptpersist" == "none" ]]; then
+### Look for iptables-persistent
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
 
-dep_iptp(){
+	if [[ $(sudo apt-cache policy iptables-persistent | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then
 
-	read -r -e -p "$showinput Do you want to install IPtables Persistent? This will make your IPtables rules persist after reboot: " yn_iptp
+		function dep_ipt_p(){
 
-	if [[ $yn_iptp == y ]]; then
+			read -r -e -p "$showinput Do you want to install IPtables Persistent? This will keep your IPtables rules after reboot (y or n): " yn_iptp
 
-		echo "$showinfo When asked, press YES to save your current IPtables settings."
-		echo "$showinfo IPtables Persistent keeps your IPT rules after a REBOOT."
-		if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y iptables-persistent; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y iptables-persistent; fi
+			if [[ $yn_iptp == y ]]; then
 
-	elif [[ $yn_iptp == n ]]; then
+				echo "$showinfo When asked, press YES to save your current IPtables settings."
+				sudo apt-get install -y iptables-persistent
 
-		echo "$showok We won't install iptables-persistent."
+			elif [[ $yn_iptp == n ]]; then
 
-	elif [[ $yn_iptp == * ]]; then
+				echo "$showok We won't install iptables-persistent."
 
-		echo "$showerror Possible options are y or n." && dep_iptp
-	fi
-}
-	dep_iptp
-else
-	if [[ "$getiptpersist" == NA ]]; then
-		echo "$showok IPtables Persistent is not available for CentOS"
+			elif [[ $yn_iptp == * ]]; then
+
+				echo "$showerror Possible options are y or n." && dep_ipt_p
+			fi
+		}
+		dep_ipt_p
 	else
-		if [[ "$getiptpersist" == * ]]; then
-			echo "$showok IPtables Persistent is already installed!"
-		fi
+		echo "$showok iptables-persistent is already installed!"
 	fi
-fi
 
-if [[ "$getgit" == "none" ]]; then
-	echo "$showinfo We need to install Git"
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y git; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y git; elif cat /etc/*release | grep -q -o -m 1 centos; then yum install -y git; fi
-else
-	if [[ "$getgit" == Installed ]]; then echo "$showok Git is already installed!"; elif [[ "$getgit" == * ]]; then echo "$showok Git is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+	echo "$showinfo iptables-persistent NA on CentOS"
+
 fi
+###
+
+### Look for git :)
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+        if [[ $(apt-cache policy git | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y git; else echo "$showok Git is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+        if [[ $(yum list git | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y git; else echo "$showok Git is already installed!"; fi
+
+fi
+###
+
+### System update
+function sys_update(){
+
+	read -r -e -p "$showinput Would you like to update your Linux System? It's recommended (y or n): " yn_update
+
+	if [[ $yn_update == y ]]; then
+
+		if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update -y && sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update -y && sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Raspbian; then sudo apt-get update -y && sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update -y; fi
+
+	elif [[ $yn_update == n ]]; then
+
+		echo "$showok We won't update your system."
+
+	elif [[ $yn_update == * ]]; then
+
+		echo "$showerror Possible options are y or n." && sys_update
+	fi
 }
-#### Dependencies check END
+###
+sys_update
 
-deps # call deps function
-
-read -r -e -p "$showinput Would you like to update your Linux System? It's recommended: " yn_update
-
-if [[ $yn_update == y ]]; then
-
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt update -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get update -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum update -y; fi
-	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt upgrade -y; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get upgrade -y; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum upgrade -y; fi
-
-elif [[ $yn_update == n ]]; then
-
-	echo "$showok We won't update your system."
-
-elif [[ $yn_update == * ]]; then
-
-	echo "$showerror Possible options are y or n." && yn_update
-fi
-
-
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -z $(apt-cache policy linuxbrew-wrapper | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok linuxbrew-wrapper is already installed"; else sudo apt-get install -y linuxbrew-wrapper; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y linuxbrew-wrapper; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -z $(apt-cache policy build-essential | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok build-essential is already installed"; else sudo apt-get install -y build-essential; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y build-essential; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(which clang) == "/usr/bin/clang" ]]; then echo "$showok clang is already installed"; else sudo apt-get install -y clang; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y clang; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
-elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi \
-elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" && [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" && source ~/.bash_profile && nvm install 8.2.1 && nvm use 8.2.1 && nvm alias default 8.2.1; fi fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ ! -z $(which node-gyp) ]]; then echo "$showok node-gyp is already installed!"; else npm install -g node-gyp; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install -g node-gyp; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install -g node-gyp; fi
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ ! -z $(which pm2) ]]; then echo "$showok pm2 is already installed!"; else npm install pm2 -g --unsafe-perm; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then npm install pm2 -g --unsafe-perm; elif cat /etc/*release | grep -q -o -m 1 centos; then npm install pm2 -g --unsafe-perm ; fi
-
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand"; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -z $(apt-cache policy linuxbrew-wrapper | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok linuxbrew-wrapper is already installed"; else sudo apt-get install -y linuxbrew-wrapper; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -z $(apt-cache policy build-essential | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok build-essential is already installed"; else sudo apt-get install -y build-essential; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(which clang) == "/usr/bin/clang" ]]; then echo "$showok clang is already installed"; else sudo apt-get install -y clang; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which node-gyp) ]]; then echo "$showok node-gyp is already installed!"; else npm install -g node-gyp; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which pm2) ]]; then echo "$showok pm2 is already installed!"; else npm install pm2 -g --unsafe-perm; fi fi
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok!"; else echo -e "$showwarning ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand\n$showinfo Start script again after command execution." && exit 0; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok!"; else echo -e "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand\n$showinfo Start script again after command execution."; fi fi
 
 function ftconfig()
 {
