@@ -32,6 +32,12 @@ class NodeProtocol {
 
     }
 
+    /**
+     * Validating Hello
+     * @param response
+     * @param validationDoubleConnectionsTypes
+     * @returns {boolean}
+     */
     processHello( response, validationDoubleConnectionsTypes ){
 
         if (!response || typeof response !== "object" ) {
@@ -125,6 +131,10 @@ class NodeProtocol {
         return true;
     }
 
+    /**
+     * Propagate last block
+     * @param callback
+     */
     sendLastBlock(callback){
 
         if ( !Blockchain.blockchain.blocks.last ) return;
@@ -138,6 +148,10 @@ class NodeProtocol {
         }, callback);
     }
 
+    /**
+     * calculate latency
+     * @returns {Promise<void>}
+     */
     async calculateLatency(){
 
         let maxLatency = consts.SETTINGS.PARAMS.MAX_ALLOWED_LATENCY;

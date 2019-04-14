@@ -6,6 +6,7 @@ import InterfaceBlockchainBlockValidation from "common/blockchain/interface-bloc
 import PoolPayouts from "./Payout/Pool-Payouts"
 import Log from 'common/utils/logging/Log';
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
+import AddressBanList from "common/utils/bans/AddressBanList";
 
 const LIGHT_SERVER_POOL_VALIDATION_BLOCK_CONFIRMATIONS = 50; //blocks
 const VALIDATION_BLOCK_CONFIRMATIONS_FAILS_START = 40; //blocks
@@ -90,7 +91,7 @@ class PoolRewardsManagement{
                                     penaltiesMinerInstancesCount++;
 
                                     console.info("penalty activated", blockInformationMinerInstance.addressWIF );
-
+                                    AddressBanList.addBan(blockInformationMinerInstance.minerInstance.address, 4 * 3600 * 1000, "4 Hours POS Penalty");
                                 }
 
                         }

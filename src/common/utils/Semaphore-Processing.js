@@ -1,5 +1,11 @@
 import global from 'consts/global';
 
+/**
+ *
+ * It is a ticker to enable Mutual Exclusion between multiple async functions to process only once a fork in the entire system.
+ *
+ */
+
 class SemaphoreProcessing{
 
     constructor(processingSemaphoreInterval = 50){
