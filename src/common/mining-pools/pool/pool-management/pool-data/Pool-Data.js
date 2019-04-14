@@ -555,11 +555,11 @@ class PoolData {
             });
 
             rl.on('error', function (err) {
-                console.error(err);
+                console.error('Address ban list was not found');
             });
 
             file.on('error', function (err) {
-                console.error(err);
+                console.error('Address ban list was not found');
             });
 
             rl.on('line', (line) => {

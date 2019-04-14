@@ -57,7 +57,7 @@ class TransactionsPendingQueue {
         };
 
         if (!avoidValidation)
-            if (!transaction.validateTransactionOnce(this.blockchain.blocks.length-1, blockValidationType ))
+            if (!transaction.validateTransactionOnce(undefined, blockValidationType ))
                 return false;
 
         await this._insertPendingTransaction(transaction,exceptSockets);

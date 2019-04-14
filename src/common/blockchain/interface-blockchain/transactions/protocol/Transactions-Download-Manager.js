@@ -393,7 +393,7 @@ class TransactionsDownloadManager{
             var blockValidationType = {};
             blockValidationType['skip-validation-transactions-from-values'] = true;
 
-            if (!transaction.isTransactionOK(true, false, blockValidationType))  //not good
+            if (!transaction.isTransactionOK(true, false, blockValidationType ))  //not good
                 throw {message: "transaction is invalid"};
 
             return await this.blockchain.transactions.pendingQueue.includePendingTransaction(transaction, socket, false);
