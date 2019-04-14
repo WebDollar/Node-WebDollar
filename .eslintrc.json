@@ -38,6 +38,9 @@
         ],
         "no-underscore-dangle": [
             "off"
-        ]
+        ],
+        "object-curly-newline": ["error", {
+            "ImportDeclaration": "never"
+        }]
     }
 }
