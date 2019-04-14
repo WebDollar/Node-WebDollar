@@ -6,11 +6,9 @@
         "node": true,
         "mocha": true
     },
-    "extends": "eslint:recommended",
-    "parserOptions": {
-        "ecmaVersion": 2017,
-        "sourceType": "module"
-    },
+    "extends": [
+        "airbnb"
+    ],
     "rules": {
         "indent": [
             "error",
@@ -19,21 +17,27 @@
                 "SwitchCase": 1
             }
         ],
-        "linebreak-style": [
+        "max-len": [
             "error",
-            "unix"
+            {
+                "code": 200
+            }
         ],
-        "quotes": [
+        "no-multi-spaces": [
             "error",
-            "single"
+            {
+                "exceptions": {
+                    "VariableDeclarator": true,
+                    "ImportDeclaration": true,
+                    "AssignmentExpression": true
+                }
+            }
         ],
-        "semi": [
-            "error",
-            "always"
+        "import/no-useless-path-segments": [
+            "off"
         ],
-        "no-unused-vars": [
-            "warn"
-        ],
-        "brace-style": ["error", "stroustrup"]
+        "no-underscore-dangle": [
+            "off"
+        ]
     }
 }
