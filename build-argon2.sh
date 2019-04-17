@@ -13,7 +13,7 @@ blue=$(tput setaf 4 && tput bold)
 magenta=$(tput setaf 5 && tput bold)
 cyan=$(tput setaf 6 && tput bold)
 white=$(tput setaf 7 && tput bold)
-blakbg=$(tput setab 0 && tput bold)
+blackbg=$(tput setab 0 && tput bold)
 redbg=$(tput setab 1 && tput bold)
 greenbg=$(tput setab 2 && tput bold)
 yellowbg=$(tput setab 3 && tput bold)
@@ -36,19 +36,200 @@ shownone="$magenta[none]$stand"
 redhashtag="$redbg$white#$stand"
 abortte="$cyan[abort to Exit]$stand"
 showport="$yellow[PORT]$stand"
+show_hint="$green[hint]$stand"
 ##
 
+###
+export black
+export red
+export green
+export yellow
+export blue
+export magenta
+export cyan
+export white
+export blackbg
+export redbg
+export greenbg
+export yellowbg
+export bluebg
+export magentabg
+export cyanbg
+export whitebg
+export stand
+export showinfo
+export showerror
+export showexecute
+export showok
+export showdone
+export showinput
+export showwarning
+export showremove
+export shownone
+export redhashtag
+export abortte
+export showport
+export show_hint
+###
+
 ### GENERAL_VARS
-is_Linux=$(expr substr $(uname -s) 1 5)
+is_Linux=$(expr substr "$(uname -s)" 1 5)
 get_const_global="src/consts/const_global.js"
+###
+
+###
 if [[ $is_Linux == Linux ]]; then
-get_libtool=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy libtool | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list libtool | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_autoconf=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy autoconf | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list autoconf | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_cmake=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if cmake --version | grep 3.10* || cmake --version | grep 3.12* > /dev/null; then echo "Installed"; elif ! cmake --version | grep 3.5* > /dev/null; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if which cmake > /dev/null; then echo "Installed"; elif ! which cmake; then echo "none"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list cmake | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_psmisc=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy psmisc | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list psmisc | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_openclheaders=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy opencl-headers | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list opencl-headers | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_libopencl=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy ocl-icd-libopencl1 | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list ocl-icd | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
-get_pciutils=$(if cat /etc/*release | grep -q -o -m 1 Ubuntu; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 Debian; then echo "$(apt-cache policy pciutils | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g')"; elif cat /etc/*release | grep -q -o -m 1 centos; then echo "$(if yum list pciutils | grep -q -o "Available Packages"; then echo "none"; else echo "Installed"; fi)"; fi)
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then # check libtool
+
+		if [[ $(apt-cache policy libtool | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo new We need to install ${blue}libtool$stand" && sudo apt-get install -y libtool; else echo "$showok ${blue}libtool$stand new is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if yum list libtool | grep -q -o "Available Packages"; then echo "$showinfo We need to install ${blue}libtool$stand" && sudo yum install -y libtool; else echo "$showok ${blue}libtool$stand is already installed!"; fi
+	fi
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then # check autoconf
+
+		if [[ $(apt-cache policy autoconf | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo We need to install ${blue}autoconf$stand" && sudo apt-get install -y autoconf; else echo "$showok ${blue}autoconf$stand is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if [[ $(yum list autoconf | grep -q -o "Available Packages") == none ]]; then echo "$showinfo We need to install ${blue}autoconf$stand" && sudo yum install -y autoconf; else echo "$showok ${blue}autoconf$stand is already installed!"; fi
+	fi
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then # check cmake
+
+		if cmake --version | grep "3.10.*" > /dev/null || cmake --version | grep "3.12.*" > /dev/null; then
+
+	                echo "$showok ${blue}cmake$stand is already installed!"
+
+		elif ! cmake --version | grep "3.5.*" > /dev/null; then
+
+			if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
+
+				echo "$showexecute Installing cmake..." && sudo apt install -y cmake
+
+			elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
+
+				echo "$showexecute Installing cmake..." && sudo apt install -y cmake
+
+			elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
+
+				echo "$showinfo CMAKE SETUP"
+				echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
+				echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+				echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
+				if cd cmake-3.12.1; then echo "$showexecute Entering ${yellow}cmake$stand folder"; else echo "$showerror Failed to enter cmake directory!"; fi
+				echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
+				echo "$showexecute Running make..." && make
+				echo "$showexecute Running sudo make install" && sudo make install
+				echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+				echo "$showexecute Going back to WebDollar folder..." && cd ..
+				echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+			fi
+		fi
+
+	elif cat /etc/*release | grep -q -o -m 1 Debian; then # check cmake
+
+		if which cmake > /dev/null; then
+
+	                echo "$showok ${blue}cmake$stand is already installed!"
+
+		 elif ! which cmake; then
+
+			if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
+
+				echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
+
+			elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
+
+				echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
+			fi
+		fi
+
+        elif cat /etc/*release | grep -q -o -m 1 Raspbian; then # check cmake
+
+                if which cmake > /dev/null; then
+
+                        echo "$showok ${blue}cmake$stand is already installed!"
+
+                 elif ! which cmake; then
+
+			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
+                fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then # check cmake
+
+		if yum list cmake | grep -q -o "Available Packages"; then
+
+			if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
+
+				function cmake_centos() {
+					echo "$showinfo CMAKE SETUP"
+					echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo yum remove cmake -y
+					echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
+					echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
+					if cd cmake-3.12.1; then echo "$showexecute Entering ${yellow}cmake$stand folder"; else echo "$showerror Failed to enter cmake directory!"; fi
+					echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
+					echo "$showexecute Running make..." && make
+					echo "$showexecute Running sudo make install" && sudo make install
+					echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
+					echo "$showexecute Going back to WebDollar folder..." && cd ..
+					echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
+				}
+				cmake_centos
+
+			elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
+
+				cmake_centos
+			fi
+
+		else
+	                echo "$showok ${blue}cmake$stand is already installed!"
+		fi
+	fi
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then # check psmisc
+
+		if [[ $(apt-cache policy psmisc | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo We need to install ${blue}psmisc$stand" && sudo apt install -y psmisc; else echo "$showok ${blue}psmisc$stand is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if yum list psmisc | grep -q -o "Available Packages"; then echo "$showinfo We need to install ${blue}psmisc$stand" && sudo yum install -y psmisc; else echo "$showok ${blue}psmisc$stand is already installed!"; fi
+
+	fi # check psmisc
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then # check opencl-headers
+
+		if [[ $(apt-cache policy opencl-headers | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo We need to install ${blue}opencl-headers$stand" && sudo apt-get install -y opencl-headers; else echo "$showok ${blue}opencl-headers$stand is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if yum list opencl-headers | grep -q -o "Available Packages"; then echo "$showinfo We need to install ${blue}opencl-headers$stand" && sudo yum install -y opencl-headers; else echo "$showok ${blue}opencl-headers$stand is already installed!"; fi
+
+	fi # check opencl-headers
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then # check libopencl
+
+		if [[ $(apt-cache policy ocl-icd-libopencl1 | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo We need to install ${blue}ocl-icd$stand" && sudo apt-get install -y ocl-icd-libopencl1; else echo "$showok ${blue}ocl-icd$stand is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if yum list ocl-icd | grep -q -o "Available Packages"; then echo "$showinfo We need to install ${blue}ocl-icd$stand" && sudo yum install -y ocl-icd; else echo "$showok ${blue}ocl-icd$stand is already installed!"; fi
+	fi # check libopencl
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then # check pciutils
+
+		if [[ $(apt-cache policy pciutils | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then echo "$showinfo We need to install ${blue}pciutils$stand" && sudo apt-get install -y pciutils; else echo "$showok ${blue}pciutils$stand is already installed!"; fi
+
+	elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+		if yum list pciutils | grep -q -o "Available Packages"; then echo "$showinfo We need to install ${blue}pciutils$stand" && sudo apt-get install -y pciutils; else echo "$showok ${blue}pciutils$stand is already installed!"; fi
+	fi
+
+	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -a /usr/lib/arm-linux-gnueabihf/libOpenCL.so.1 ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/arm-linux-gnueabihf/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib64/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi fi
+
 elif [[ $is_Linux == MINGW ]]; then
 	echo "$showwarning Windows Detected..."
 fi
@@ -56,134 +237,7 @@ fi
 
 #### Dependencies START
 function deps() {
-if [[ $is_Linux == Linux ]]; then
-
-if [[ "$get_libtool" == none ]]; then
-	echo "$showinfo We need to install ${blue}libtool$stand";
-	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
-		sudo apt install -y libtool; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y libtool; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y libtool;
-	fi
-else
-	if [[ "$get_libtool" == * ]]; then
-		echo "$showok ${blue}libtool$stand is already installed!";
-	fi
-fi
-if [[ "$get_autoconf" == none ]]; then
-	echo "$showinfo We need to install ${blue}autoconf$stand"
-        if cat /etc/*release | grep -q -o -m1 Ubuntu; then sudo apt install -y autoconf; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y autoconf; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y autoconf; fi
-else
-        if [[ "$get_autoconf" == * ]]; then
-                echo "$showok ${blue}autoconf$stand is already installed!"
-        fi
-fi
-if [[ "$get_cmake" == none ]]; then
-        echo "$showinfo We need to install ${blue}cmake$stand"
-
-        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
-
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
-
-			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
-
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 17* ]]; then
-
-			echo "$showexecute Installing cmake..." && sudo apt install -y cmake
-
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 16* ]]; then
-
-			echo "$showinfo CMAKE SETUP"
-			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
-			echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
-			echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
-			echo "$showexecute Entering ${yellow}cmake$stand folder" && cd cmake-3.12.1
-			echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
-			echo "$showexecute Running make..." && make
-			echo "$showexecute Running sudo make install" && sudo make install
-			echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
-			echo "$showexecute Going back to WebDollar folder..." && cd ..
-			echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
-		fi
-
-	elif cat /etc/*release | grep -q -o -m 1 Debian; then
-
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 9* ]]; then
-
-			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
-
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 8* ]]; then
-
-			echo "$showexecute Installing cmake..." && sudo apt-get install -y cmake
-		fi
-
-	elif cat /etc/*release | grep -q -o -m 1 centos; then
-
-		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 7* ]]; then
-
-			function cmake_centos() {
-				echo "$showinfo CMAKE SETUP"
-				echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo yum remove cmake -y
-				echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
-				echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
-				echo "$showexecute Entering ${yellow}cmake$stand folder" && cd cmake-3.12.1
-				echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
-				echo "$showexecute Running make..." && make
-				echo "$showexecute Running sudo make install" && sudo make install
-				echo "$showexecute Setting symlink for cmake executable..." && sudo ln -s "/usr/local/bin/cmake/bin/cmake" /usr/bin/cmake
-				echo "$showexecute Going back to WebDollar folder..." && cd ..
-				echo "$showexecute Running which cmake to make sure cmake is ok..." && which cmake
-			}
-			cmake_centos
-
-		elif [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 6* ]]; then
-
-			cmake_centos
-		fi
-	fi
-else
-        if [[ "$get_cmake" == * ]]; then
-                echo "$showok ${blue}cmake$stand is already installed!"
-        fi
-fi
-if [[ "$get_psmisc" == none ]]; then
-        echo "$showinfo We need to install ${blue}psmisc$stand"
-        if cat /etc/*release | grep -q -o -m 1 Ubuntu; then sudo apt install -y psmisc; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y psmisc; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y psmisc; fi
-else
-        if [[ "$get_psmisc" == * ]]; then
-                echo "$showok ${blue}psmisc$stand is already installed!"
-        fi
-fi
-if [[ "$get_openclheaders" == none ]]; then
-	echo "$showinfo We need to install ${blue}opencl-headers$stand";
-	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
-		sudo apt install -y opencl-headers; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y opencl-headers; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y opencl-headers;
-	fi
-else
-	if [[ "$get_openclheaders" == * ]]; then
-		echo "$showok ${blue}opencl-headers$stand is already installed!";
-	fi
-fi
-if [[ "$get_libopencl" == none ]]; then
-	echo "$showinfo We need to install ${blue}ocl-icd$stand";
-	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
-		sudo apt install -y ocl-icd-libopencl1; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y ocl-icd-libopencl1; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y ocl-icd;
-	fi
-else
-	if [[ "$get_libtool" == * ]]; then
-		echo "$showok ${blue}ocl-icd$stand is already installed!";
-	fi
-fi
-if [[ "$get_pciutils" == none ]]; then
-	echo "$showinfo We need to install ${blue}pciutils$stand";
-	if cat /etc/*release | grep -q -o -m1 Ubuntu; then
-		sudo apt install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 Debian; then sudo apt-get install -y pciutils; elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y pciutils;
-	fi
-else
-	if [[ "$get_pciutils" == * ]]; then
-		echo "$showok ${blue}pciutils$stand is already installed!";
-	fi
-fi
-
-if cat /etc/*release | grep -q -o -m 1 Ubuntu; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 Debian; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib/x86_64-linux-gnu/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -a /usr/lib/libOpenCL.so ]]; then echo "$showok ${blue}libOpenCL.so$stand found!"; else echo "$showexecute Creating libOpenCL.so symlink to /usr/lib/libOpenCL.so" && sudo ln -s /usr/lib64/libOpenCL.so.1 /usr/lib/libOpenCL.so; fi fi
+if [[ $is_Linux == Linux ]]; then # detect linux
 
 ### CUDA_INSTALLER_START
 read -r -e -p "$showinput Do you want to install CUDA drivers? y or n: " install_cuda_yn
@@ -200,12 +254,13 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 
 		if [[ $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') == 18* ]]; then
 			echo "$showok Ubuntu $(cat /etc/*release | grep -m 1 VERSION | cut -d '"' -f2 | awk '{print$1}') has CUDA support!"
-			if apt-cache policy nvidia-driver-390 | grep Installed | grep 390* > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep 3*;  then # check for NVIDIA drivers
+			if apt-cache policy nvidia-driver-390 | grep Installed | grep "390*" > /dev/null || apt-cache policy nvidia-modprobe | grep Installed | grep "3.*";  then # check for NVIDIA drivers
 				echo "$showok ${blue}nvidia-driver-390$stand and ${blue}nvidia-modprobe$stand already installed."
 			else
 				echo "$showexecute Installing nVidia Drivers..." && sudo apt-get install -y nvidia-driver-390 nvidia-modprobe
 			fi
-			if apt-cache policy nvidia-cuda-toolkit | grep Installed | grep 9* > /dev/null;  then # check for CUDA toolkit
+
+			if apt-cache policy nvidia-cuda-toolkit | grep Installed | grep "9.*" > /dev/null;  then # check for CUDA toolkit
 				echo "$showok ${blue}nvidia-cuda-toolkit$stand already installed."
 			else
 				echo "$showexecute Installing nVidia CUDA..." && sudo apt-get install -y nvidia-cuda-toolkit
@@ -228,7 +283,7 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu; then
 			echo "$showexecute We have to remove cmake old version to compile cmake v.3.12.1..." && sudo apt-get remove cmake -y
 			echo "$showexecute Downloading cmake v3.12.1..." && wget "https://cmake.org/files/v3.12/cmake-3.12.1.tar.gz"
 			echo "$showexecute Unzipping cmake archive..." && tar -zxvf "cmake-3.12.1.tar.gz" -C .
-			echo "$showexecute Entering ${yellow}cmake$stand folder" && cd cmake-3.12.1
+			if cd cmake-3.12.1; then echo "$showexecute Entering ${yellow}cmake$stand folder"; else echo "$showerror Failed to enter cmake directory!"; fi
 			echo "$showexecute Running ${yellow}cmake$stand configure..." && ./configure --prefix=/usr/local/bin/cmake
 			echo "$showexecute Running make..." && make
 			echo "$showexecute Running sudo make install" && sudo make install
@@ -278,6 +333,10 @@ elif cat /etc/*release | grep -q -o -m 1 Debian; then
 		echo "$showerror No NVIDIA GPU found! Proceeding..."
 	fi
 
+elif cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+	echo "$showerror Hmm...do you really have an nVidia card on your Raspberry Pi?"
+
 elif cat /etc/*release | grep -q -o -m 1 centos; then
 
 	if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA ]]; then
@@ -320,8 +379,7 @@ elif [[ $install_cuda_yn == * ]]; then
 	echo "$showerror Possible options are: y or n." && deps
 fi # skip CUDA install function END
 
-
-elif [[ $is_Linux == MINGW ]]; then
+elif [[ $is_Linux == MINGW ]]; then # detect windows
 	echo "$showwarning Windows Detected..."
 
 	if [[ $(wmic path win32_VideoController get name | grep -o -m 1 NVIDIA) == NVIDIA ]]; then
@@ -362,7 +420,8 @@ deps # call deps function
 
 ### CPU_THREADS_FUNCTION_END
 function set_cputhreads() {
-	read -r -e -p "$showinput How many ${green}CPU_THREADS$stand do you want to use? (your pc has ${green}$(nproc)$stand): " setcputhreads
+	echo "$show_hint Enter ${green}-100$stand to mine only using POS (Proof of Stake)"
+	read -r -e -p "$showinput How many ${green}CPU_THREADS$stand do you want to use? (your system has ${green}$(nproc)$stand): " setcputhreads
 
 	if [[ $setcputhreads == [nN] ]]; then
 		echo -e "$showinfo OK..."
@@ -531,7 +590,7 @@ function set_gpu_opencl() {
 ### ASK_USER_FUNCTION_START
 function ask_user() {
 ### Ask user if he wants to change MAX threads value and TERMINAL_WORKER TYPE
-if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 	if [[ ! -d $get_const_global ]]; then
 		echo "$showinfo ${yellow}const_global.js$stand found!"
@@ -564,7 +623,7 @@ fi
 ### ASK_USER_FUNCTION_END
 
 ### NODE_WEBDOLLAR_START
-if [[ $(cat package.json | grep "name" | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
 
 if [[ $is_Linux == Linux ]]; then
 
@@ -584,6 +643,9 @@ if [[ $is_Linux == Linux ]]; then
 		        #echo "$showexecute ${green}autoreconf -i$stand" && autoreconf -i
 			#echo "$showexecute ${green}./configure$stand" && ./configure
 			echo "$showexecute Compiling argon2..." && cmake -DCMAKE_BUILD_TYPE=Release . && make
+
+			if cat /etc/*release | grep -q -o -m 1 Raspbian; then echo -e "$showerror ${red}As you can see, argon2-cpp miner failes to compile because there is no support for ARM processors.\n$showinfo ${red}When asked if you want to use the CPU-CPP optimization, enter n$stand"; else echo ""; fi
+
 			echo "$showexecute Going back to Node-WebDollar folder..." && cd ..
 
 			if [[ -d dist_bundle/CPU  ]]; then
