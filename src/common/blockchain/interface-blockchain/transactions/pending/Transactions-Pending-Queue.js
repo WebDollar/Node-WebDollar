@@ -186,8 +186,7 @@ class TransactionsPendingQueue {
             let searchedNonceIsSmaller;
 
             //Binary search for address
-            while(Left <= Right)
-            {
+            while(Left <= Right) {
 
                 selected = Math.floor((Left+Right) / 2);
                 if(selected !== this.listArray.length)
@@ -201,10 +200,11 @@ class TransactionsPendingQueue {
                     return false;
                 }
 
-                if(compare === 0)
-                    break;
+                if(compare === 0) break;
+
                 if(compare > 0)
                     Left = selected+1;
+                else
                 if(compare < 0)
                     Right = selected-1;
             }
@@ -236,25 +236,22 @@ class TransactionsPendingQueue {
                     if(i<0) return false;
                 }
                 else if(!searchedNonceIsSmaller){
-                    if(i=>this.listArray.length) return false;
+                    if( i >= this.listArray.length ) return false;
                 }
 
                 if( this.listArray[i].from.addresses[0].unencodedAddress.compare(address) === 0 ){
-                    if( this.listArray[i].nonce === searchedNonce ){
-                        return this.listArray[i].txId;
-                    }else{
-                        if( this.listArray[i].nonce > searchedNonce ){
-                            if( searchedNonceIsSmaller ) continue;
-                            else break;
-                        }
-                        else if( this.listArray[i].nonce < searchedNonce ){
-                            if( searchedNonceIsSmaller ) continue;
-                        }
-                    }
 
-                }else{
+                    if ( this.listArray[i].nonce === searchedNonce ) {
+                        return this.listArray[i].txId;
+                    }
+                    else
+                        if( searchedNonceIsSmaller ) continue;
+                        else if (this.listArray[i].nonce > searchedNonce ) break;
+
+
+                }else
                     return false;
-                }
+
 
             }
 
