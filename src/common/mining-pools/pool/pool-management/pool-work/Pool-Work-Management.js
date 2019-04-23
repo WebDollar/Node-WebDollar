@@ -191,6 +191,8 @@ class PoolWorkManagement{
                     console.warn("----------------------------------------------------------------------------");
                     console.warn("----------------------------------------------------------------------------");
 
+                    this.blockchain.mining.timeMinedBlock = new Date().getTime();
+
                     prevBlock.hash = work.hash;
                     prevBlock.nonce = work.nonce;
 

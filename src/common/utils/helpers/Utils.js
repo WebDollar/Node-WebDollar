@@ -94,6 +94,17 @@ class Utils{
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 
+    timePassed(time){
+
+        let now = Math.floor( (new Date().getTime() - time)/1000);
+        let s = now % 60;  now = now / 60;
+        let m = now % 60;  now = now / 60;
+        let h = now % 24;  now = now / 24;
+        let d = now % 30; now = now / 30;
+
+        return { d, h, m, s }
+
+    }
 
 }
 

@@ -159,6 +159,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
                 console.warn( "difficulty prev: ", block.difficultyTargetPrev.toString("hex") );
                 console.warn( "----------------------------------------------------------------------------");
 
+                this.blockchain.mining.timeMinedBlock = new Date().getTime();
+
                 //check if I mined all the last K blocks
                 let i = this.blockchain.blocks.length-1;
                 let count = 0;
