@@ -55,7 +55,7 @@ class NodesStats {
 
         console.info(" v: ", consts.SETTINGS.NODE.VERSION);
 
-        time = Utils.timePassed(this._timeStart);
+        let time = Utils.timePassed(this._timeStart);
         console.info( `up time ${Math.floor(time.d) } d ${Math.floor(time.h) } h ${ Math.floor(time.m) } m` );
 
         console.log(" connected to: ", this.statsClients," , from: ", this.statsServer , " web peers WEBRTC", this.statsWebPeers," Network FullNodes:",this.statsWaitlistFullNodes, " Network LightNodes:",this.statsWaitlistLightNodes, "    GeoLocationContinents: ", GeoLocationLists.countGeoLocationContinentsLists );
