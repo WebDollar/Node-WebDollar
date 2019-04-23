@@ -1,14 +1,7 @@
-import {
-    isArray,
-    isObject,
-    isString,
-    isNumber,
-} from 'lodash';
-import {
-    authenticatedMethod,
-    RpcMethod,
-} from './../../../jsonRpc';
-import constGlobal from './../../../consts/const_global';
+import { isArray, isObject, isString, isNumber } from 'lodash';
+import { authenticatedMethod, RpcMethod }        from './../../../jsonRpc';
+import constGlobal                               from './../../../consts/const_global';
+import InterfaceBlockchainAddressHelper          from './../../../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 
 /**
  * Creates and sign an advanced transaction based on the provided parameters
@@ -156,6 +149,14 @@ class SendAdvancedTransaction extends RpcMethod {
 
             if (isNumber(value) === false || value <= 0) {
                 throw new Error('To Addresses: "Value" is invalid. Only numerical values greater than 0 are supported.');
+            }
+
+            try {
+                if (!InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address)) {
+                    throw new Error(`Address ${address} is invalid`);
+                }
+            } catch (e) {
+                throw e;
             }
 
             return {
