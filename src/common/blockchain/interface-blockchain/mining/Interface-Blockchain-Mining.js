@@ -1,8 +1,6 @@
 import MiningTransactionsSelector from "./transactions-selector/Mining-Transactions-Selector";
 import NodeBlockchainPropagation from "common/sockets/protocol/propagation/Node-Blockchain-Propagation";
 
-const BigInteger = require('big-integer');
-
 
 import consts from 'consts/const_global';
 import global from 'consts/global';
@@ -366,7 +364,8 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 }
 
-                await this.blockchain.sleep(1000);
+                //less than 1 second to be sure I will mine the next time
+                await this.blockchain.sleep( 500 );
 
             }
 
