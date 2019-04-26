@@ -68,7 +68,9 @@ class PoolWorkManagement{
             balances = [];
 
             for (let i=0; i < minerInstance.addresses.length; i++)
-                balances.push( await this._getMinerBalance( minerInstance.addresses[i] ));
+                balances.push( this._getMinerBalance(minerInstance.addresses[i]) );
+
+            balances = Promise.all(balances);
 
         }
 
