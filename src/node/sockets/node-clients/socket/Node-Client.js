@@ -45,10 +45,13 @@ class NodeClient {
 
         address = sckAddress.getAddress(true, true);
         port = sckAddress.port;
+        address = address.replace('::ffff:', '');
 
 
         return new Promise( async (resolve) => {
 
+            if (!waitlist.isFallback) return false;
+            
             let timeoutTotal =  8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
 
             try {
