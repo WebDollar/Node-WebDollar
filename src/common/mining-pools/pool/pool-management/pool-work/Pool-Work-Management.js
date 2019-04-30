@@ -202,7 +202,15 @@ class PoolWorkManagement{
                         prevBlock.posMinerPublicKey = work.pos.posMinerPublicKey;
                         prevBlock.timeStamp = work.pos.timestamp;
 
-                        await prevBlock._validateBlockTimeStamp();
+                        try{
+
+                            await prevBlock._validateBlockTimeStamp();
+
+                        }catch(exception){
+
+                            console.error("POOL: block timestamp raised an error", exception);
+                            throw exception;
+                        }
 
                         console.warn("POOL: A block passed timestamp validation", prevBlock.height);
 
