@@ -187,7 +187,7 @@ class PoolWorkManagement{
 
                 if ( wasBlockMined ){
 
-                    console.warn("POOL: A block could be mined", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex") );
+                    console.warn("POOL: A block could be mined", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), prevBlock.data.minerAddress.toString("hex") );
 
                     this.blockchain.mining.timeMinedBlock = new Date().getTime();
 
@@ -260,7 +260,6 @@ class PoolWorkManagement{
 
                         console.error("PoolWork include raised an exception", exception);
                         await revertActions.revertOperations();
-
 
                     }
 
