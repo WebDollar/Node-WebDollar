@@ -67,13 +67,10 @@ class PoolWorkManagement{
 
             balances = [];
 
-            // for (let i=0; i < minerInstance.addresses.length; i++)
-            //     balances.push( this._getMinerBalance(minerInstance.addresses[i]) );
-            //
-            // balances = Promise.all(balances);
-
             for (let i=0; i < minerInstance.addresses.length; i++)
-                balances.push( await this._getMinerBalance(minerInstance.addresses[i]) );
+                balances.push( this._getMinerBalance(minerInstance.addresses[i]) );
+
+            balances = await Promise.all(balances);
 
         }
 
@@ -353,9 +350,16 @@ class PoolWorkManagement{
 
         //must be reverted
         //console.log("2 Before Balance ", balance); let s = "";
-        for (let i = prevBlock.height-1; i >= 0 && i >= prevBlock.height -1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS; i--  ) {
 
-            let block = await this.blockchain.getBlock( i );
+        let blocks = [], end = Math.max( 0, prevBlock.height -1 - consts.BLOCKCHAIN.POS.MINIMUM_POS_TRANSFERS);
+
+        for (let i = prevBlock.height-1; i >= end; i--  )
+            blocks.push( this.blockchain.getBlock( i ) );
+
+        blocks = await Promise.all( blocks );
+
+        for (let block of blocks){
+
             if (!block) continue;
 
             //s += block.height + " ";
@@ -372,11 +376,9 @@ class PoolWorkManagement{
 
             }
 
-
         }
 
         //console.log("2 After Balance ", balance, s);
-
         return balance;
 
     }
