@@ -190,11 +190,7 @@ class PoolWorkManagement{
 
                 if ( wasBlockMined ){
 
-                    console.warn("----------------------------------------------------------------------------");
-                    console.warn("----------------------------------------------------------------------------");
-                    console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex"));
-                    console.warn("----------------------------------------------------------------------------");
-                    console.warn("----------------------------------------------------------------------------");
+                    console.warn("POOL: A block could be mined", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex") );
 
                     this.blockchain.mining.timeMinedBlock = new Date().getTime();
 
@@ -210,6 +206,8 @@ class PoolWorkManagement{
                         prevBlock.timeStamp = work.pos.timestamp;
 
                         await prevBlock._validateBlockTimeStamp();
+
+                        console.warn("POOL: A block passed timestamp validation", prevBlock.height);
 
                     }
 
@@ -241,6 +239,12 @@ class PoolWorkManagement{
 
                         //confirming transactions
                         await block.data.transactions.confirmTransactions(block.height);
+
+                        console.warn("----------------------------------------------------------------------------");
+                        console.warn("----------------------------------------------------------------------------");
+                        console.warn("WebDollar Block was mined in Pool 2 ", prevBlock.height, " nonce (", work.nonce + ")", work.hash.toString("hex"), " reward", (prevBlock.reward / WebDollarCoins.WEBD), "WEBD", prevBlock.data.minerAddress.toString("hex"));
+                        console.warn("----------------------------------------------------------------------------");
+                        console.warn("----------------------------------------------------------------------------");
 
                         let blockInformation = blockInformationMinerInstance.blockInformation;
 

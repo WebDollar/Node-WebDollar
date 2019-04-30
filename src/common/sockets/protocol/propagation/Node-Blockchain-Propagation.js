@@ -43,8 +43,7 @@ class NodeBlockchainPropagation{
 
             this._socketsAlreadyBroadcast = [];
 
-            if (! Array.isArray(socketsAvoidBroadcast) )
-                socketsAvoidBroadcast = [socketsAvoidBroadcast];
+            if (! Array.isArray(socketsAvoidBroadcast) ) socketsAvoidBroadcast = [socketsAvoidBroadcast];
 
             //avoid sending to those sockets
             for (let i=0; i < NodesList.nodes.length; i++)
@@ -77,45 +76,51 @@ class NodeBlockchainPropagation{
 
         let block = this._blockPropagating;
 
-        if (block && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
+        try{
 
-            let list = [];
-            for (let i=0; i<NodesList.nodes.length; i++)
-                if (!this._findSocket(NodesList.nodes[i].socket))
-                    list.push(NodesList.nodes[i].socket);
+            if (block && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP) {
+
+                let list = [];
+                for (let i=0; i<NodesList.nodes.length; i++)
+                    if (!this._findSocket(NodesList.nodes[i].socket))
+                        list.push(NodesList.nodes[i].socket);
 
 
-            while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP ) {
+                while ( list.length > 0 && this._socketsPropagating.length < consts.SETTINGS.PARAMS.CONNECTIONS.SOCKETS_TO_PROPAGATE_NEW_BLOCK_TIP ) {
 
-                let index = Math.floor( Math.random() * list.length );
+                    let index = Math.floor( Math.random() * list.length );
 
-                let socket = list[index];
-                list.splice(index,1);
+                    let socket = list[index];
+                    list.splice(index,1);
 
-                this._socketsPropagating.push(socket);
+                    this._socketsPropagating.push(socket);
 
-                //let send the block, but once we receive any kind of confirmation, we need to delete it from the socketsWaitlist
-                socket.node.protocol.sendLastBlock();
+                    //let send the block, but once we receive any kind of confirmation, we need to delete it from the socketsWaitlist
+                    socket.node.protocol.sendLastBlock();
 
-                setTimeout(()=>{
+                    setTimeout(()=>{
 
-                    if (block === this._blockPropagating){
+                        if (block === this._blockPropagating){
 
-                        if (socket.disconnected)
-                            return;
+                            if (socket.disconnected)
+                                return;
 
-                        this._socketsAlreadyBroadcast.push(socket);
-                    }
+                            this._socketsAlreadyBroadcast.push(socket);
+                        }
 
-                    //delete it from the list
-                    for (let i=this._socketsPropagating.length; i>=0; i-- )
-                        if (this._socketsPropagating[i] === socket)
-                            this._socketsPropagating.splice(i,1);
+                        //delete it from the list
+                        for (let i=this._socketsPropagating.length; i>=0; i-- )
+                            if (this._socketsPropagating[i] === socket)
+                                this._socketsPropagating.splice(i,1);
 
-                }, 100 + Math.random()*200 );
+                    }, 100 + Math.random()*200 );
+
+                }
+
 
             }
 
+        }catch(exception){
 
         }
 
