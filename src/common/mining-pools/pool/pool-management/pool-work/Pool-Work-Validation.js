@@ -46,11 +46,6 @@ class PoolWorkValidation{
 
             work.hashHex = work.hash.toString("hex");
 
-            if ( this._worksDuplicate[work.hashHex] )
-                return;
-
-            this._worksDuplicate [ work.hashHex ] = new Date().getTime();
-
             let isPOS = BlockchainGenesis.isPoSActivated(work.h);
 
             if ( !isPOS && typeof work.timeDiff === "number") {
@@ -86,6 +81,11 @@ class PoolWorkValidation{
                 await this._validateWork(workData);
 
             } else {
+
+                if ( this._worksDuplicate[work.hashHex] )
+                    return;
+
+                this._worksDuplicate [ work.hashHex ] = new Date().getTime();
 
                 this.addWork(workData);
 
@@ -159,9 +159,8 @@ class PoolWorkValidation{
             let time = new Date().getTime();
 
             for (let key in this._worksDuplicate)
-                if ( time - this._worksDuplicate[key] > 180000 ){
+                if ( time - this._worksDuplicate[key] > 180000 )
                     delete this._worksDuplicate[key];
-                }
 
         } catch (exception){
 
