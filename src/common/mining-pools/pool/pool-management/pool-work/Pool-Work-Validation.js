@@ -46,6 +46,9 @@ class PoolWorkValidation{
 
             work.hashHex = work.hash.toString("hex");
 
+            if ( this._worksDuplicate[work.hashHex] )
+                return;
+
             let isPOS = BlockchainGenesis.isPoSActivated(work.h);
 
             if ( !isPOS && typeof work.timeDiff === "number") {
@@ -74,18 +77,22 @@ class PoolWorkValidation{
                     return;
 
                 forced = true;
+            } else { //POW
+
+                this._worksDuplicate [ work.hashHex ] = new Date().getTime();
+
             }
 
             if ( work.result || forced  ){
 
-                await this._validateWork(workData);
+                const out = await this._validateWork(workData);
+
+                //marking the POS as a validated already solution
+                if (isPOS && out && out.result)
+                    this._worksDuplicate [ work.hashHex ] = new Date().getTime();
 
             } else {
 
-                if ( this._worksDuplicate[work.hashHex] )
-                    return;
-
-                this._worksDuplicate [ work.hashHex ] = new Date().getTime();
 
                 this.addWork(workData);
 
@@ -146,7 +153,7 @@ class PoolWorkValidation{
         let prevBlock = this.poolWorkManagement.poolWork.findBlockById( work.work.id, work.work.height );
 
         if ( prevBlock )
-            await this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
+            return this.poolWorkManagement.processWork( work.minerInstance, work.work, prevBlock );
         else
             Log.error("_validateWork didn't work as the block " + work.work.id + " was not found", Log.LOG_TYPE.POOLS, work.work );
 
