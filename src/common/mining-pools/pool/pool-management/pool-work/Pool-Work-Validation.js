@@ -37,6 +37,8 @@ class PoolWorkValidation{
 
     async pushWorkForValidation(minerInstance, work, forced ){
 
+        const time = new Date().getTime();
+
         if (Math.random() < 0.001)
             console.log("pushWorkForValidation", work);
 
@@ -45,8 +47,7 @@ class PoolWorkValidation{
             if (!work.hash) return;
 
             work.hashHex = work.hash.toString("hex");
-
-            if ( this._worksDuplicate[work.hashHex] )
+            if ( this._worksDuplicate[work.hashHex] >= time )
                 return;
 
             let isPOS = BlockchainGenesis.isPoSActivated(work.h);
@@ -61,7 +62,7 @@ class PoolWorkValidation{
 
             }
 
-            minerInstance.dateActivity = new Date().getTime() / 1000;
+            minerInstance.dateActivity = time / 1000;
 
             let workData = {
                 hashHex: work.hashHex,
@@ -70,6 +71,7 @@ class PoolWorkValidation{
             };
 
 
+            let timeToBan;
             if (isPOS) {
 
                 //avoid validating not signed POS
@@ -77,11 +79,13 @@ class PoolWorkValidation{
                     return;
 
                 forced = true;
+                timeToBan = 1000;
             } else { //POW
 
-                this._worksDuplicate [ work.hashHex ] = new Date().getTime();
-
+                timeToBan = 180000;
             }
+
+            this._worksDuplicate [ work.hashHex ] = time + timeToBan;
 
             if ( work.result || forced  ){
 
@@ -89,7 +93,7 @@ class PoolWorkValidation{
 
                 //marking the POS as a validated already solution
                 if (isPOS && out && out.result)
-                    this._worksDuplicate [ work.hashHex ] = new Date().getTime();
+                    this._worksDuplicate [ work.hashHex ] = time + 180000;
 
             } else {
 
@@ -166,7 +170,7 @@ class PoolWorkValidation{
             let time = new Date().getTime();
 
             for (let key in this._worksDuplicate)
-                if ( time - this._worksDuplicate[key] > 180000 )
+                if ( time - this._worksDuplicate[key] >= 0 )
                     delete this._worksDuplicate[key];
 
         } catch (exception){
