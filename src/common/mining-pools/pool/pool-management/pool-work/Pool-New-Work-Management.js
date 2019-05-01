@@ -96,7 +96,6 @@ class PoolNewWorkManagement{
                 bp: this.poolManagement.poolStatistics.poolBlocksConfirmedAndPaid,
                 ub: this.poolManagement.poolStatistics.poolBlocksUnconfirmed,
                 bc: this.poolManagement.poolStatistics.poolBlocksBeingConfirmed,
-                date: new Date().getTime(),
             } );
 
             blockInformationMinerInstance.lastWork = newWork;

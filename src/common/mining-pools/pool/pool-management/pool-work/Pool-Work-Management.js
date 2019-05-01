@@ -37,7 +37,6 @@ class PoolWorkManagement{
         this.poolWork.stopGarbageCollector();
     }
 
-
     async getWork(minerInstance,  blockInformationMinerInstance){
 
         if ( !minerInstance ) throw {message: "minerInstance is undefined"};
@@ -50,7 +49,6 @@ class PoolWorkManagement{
 
         await this.poolWork.lastBlockPromise; //it's a promise, let's wait
 
-        //if ( !this.poolWork.lastBlock || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  || ( this.poolWork.lastBlock.timeStamp + BlockchainGenesis.timeStampOffset < (new Date().getTime()/1000 - 300) ) )
         if ( !this.poolWork.lastBlock || ( this.poolWork.lastBlockNonce + hashes ) > 0xFFFFFFFF  )
             await this.poolWork.getNextBlockForWork();
         else if (!this.blockchain.semaphoreProcessing.processing && ( this.poolWork.lastBlock.height !==  this.blockchain.blocks.length || !this.poolWork.lastBlock.hashPrev.equals( this.blockchain.blocks.last.hash )))
@@ -81,7 +79,7 @@ class PoolWorkManagement{
             t: this.poolWork.lastBlock.difficultyTargetPrev,
             s: this.poolWork.lastBlockSerialization,
             I: this.poolWork.lastBlockId,
-            m: await this.blockchain.blocks.timestampBlocks.getMedianTimestamp( this.poolWork.lastBlock.height, this.poolWork.lastBlock.blockValidation),
+            m: this.poolWork.lastBlock.timeStamp,
 
             start: isPOS ? 0 : this.poolWork.lastBlockNonce,
             end: isPOS ? 0 : (this.poolWork.lastBlockNonce + hashes),

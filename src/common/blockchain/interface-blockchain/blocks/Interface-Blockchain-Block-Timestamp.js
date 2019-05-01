@@ -25,8 +25,15 @@ class InterfaceBlockchainBlockTimestamp {
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             no_blocks = 2;
 
+        let medianTimestamps = [];
+
         for (let i = height-1; i >= height - no_blocks; i--)
-            medianTimestamp += await callback.call(this.blockchain, i);
+            medianTimestamps.push( callback.call(this.blockchain, i) );
+
+        medianTimestamps = await Promise.all(medianTimestamps);
+
+        for (let i=0; i < medianTimestamps.length; i++)
+            medianTimestamp += medianTimestamps[i];
 
         return medianTimestamp / no_blocks;
     }
