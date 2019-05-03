@@ -164,10 +164,9 @@ class PoolWorkManagement{
             }
 
             //returning false, because a new fork was changed in the mean while
-            if ( !isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
-                throw {message: "pool: block is already too old"};
+            let blocksDifference = isPOS ? 5 : 3;
 
-            if ( isPos && this.blockchain.blocks.length-3 > prevBlock.height+1 )
+            if ( this.blockchain.blocks.length - blocksDifference > prevBlock.height+1 )
                 throw {message: "pool: block is already too old"};
 
             if ( work.result  ) { //it is a solution and prevBlock is undefined
@@ -366,8 +365,6 @@ class PoolWorkManagement{
         for (let block of blocks){
 
             if (!block) continue;
-
-            //s += block.height + " ";
 
             for (let tx of block.data.transactions.transactions ) {
 
