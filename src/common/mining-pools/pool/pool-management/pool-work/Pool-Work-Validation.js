@@ -39,7 +39,7 @@ class PoolWorkValidation{
 
         const time = new Date().getTime();
 
-        if (Math.random() < 0.001)
+        if (Math.random() < 0.0005)
             console.log("pushWorkForValidation", work);
 
         try{
@@ -124,7 +124,7 @@ class PoolWorkValidation{
 
         if (this.poolManagement.blockchain.semaphoreProcessing._list.length === 0 ) {
 
-            let index = -1;
+            let index = 0;
 
             let n = Math.min(PROCESS_COUNT, this._worksLength);
 
@@ -136,12 +136,10 @@ class PoolWorkValidation{
 
                 }
 
-                this._works[key] = undefined;
                 delete this._works[key];
 
                 index++;
-                if (index > n)
-                    break;
+                if (index > n) break;
             }
 
             this._worksLength -= n;
