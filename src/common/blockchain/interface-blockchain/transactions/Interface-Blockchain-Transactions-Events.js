@@ -142,7 +142,7 @@ class InterfaceBlockchainTransactionsEvents{
     async emitTransactionChangeEvent(transaction, deleted=false){
 
         if (deleted)
-            if (!await this.blockchain.mining.miningTransactionSelector.validateTransactionId(transaction.txId)) //I found a transaction already in Blockchain
+            if ( await this.blockchain.mining.miningTransactionSelector.validateTransactionId(transaction.txId) === false) //I found a transaction already in Blockchain
                 return false;
 
         transaction.from.addresses.forEach((address)=>{

@@ -110,7 +110,7 @@ class TransactionsDownloadManager{
 
         for (let txId in this._transactionsQueue){
 
-            if( ! await this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId)){
+            if( await this.blockchain.mining.miningTransactionSelector.validateTransactionId(txId) === false){
                 this.removeTransaction(txId);
                 continue;
             }
@@ -387,7 +387,7 @@ class TransactionsDownloadManager{
 
             transaction = this.blockchain.transactions._createTransactionFromBuffer( buffer ).transaction;
 
-            if (! await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction))
+            if ( await this.blockchain.mining.miningTransactionSelector.validateTransaction(transaction) === false)
                 throw {message: "Transsaction validation failed"};
 
             var blockValidationType = {};
