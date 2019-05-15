@@ -7,7 +7,9 @@ const atob = require('atob');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
 import Utils from "common/utils/helpers/Utils";
+import Browserizr from 'browserizr'
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
+pounchdb.plugin(require('pouchdb-adapter-websql'));
 
 class InterfaceSatoshminDB {
 
@@ -20,13 +22,15 @@ class InterfaceSatoshminDB {
     }
 
     _start(){
-
         try {
+        if (Browserizr.detect().isSafari()) {
+            this.db = new pounchdb(this._dbName, {revs_limit: 1, adapter: 'websql'});
+        } else {
             this.db = new pounchdb(this._dbName, {revs_limit: 1});
+        }
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
-
     }
 
     async restart(){
