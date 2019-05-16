@@ -170,7 +170,7 @@ class InterfaceBlockchainTransactionsWizard{
                 specifyOutputs[i] = true;
 
                 let outFee = this.calculateFeeWizzard( transaction._serializeTransaction(specifyOutputs )) ;
-                transaction.from.addresses[0].amount += Math.ceil( initialFee / txData.length) + outFee;
+                transaction.from.addresses[i].amount += Math.ceil( initialFee / txData.length) + outFee;
 
             }
 
