@@ -33,11 +33,9 @@ class InterfaceBlockchainTransactionsWizard{
                 amount: toAmount,
             }],
             fee,
-            currencyTokenId,
             password,
-            timeLock,
-            nonce
-        }], skipValidationNonce );
+
+        }], timeLock, currencyTokenId, nonce, skipValidationNonce );
 
         if ( propagateTransaction && process.result)
             return this.propagateTransaction( process.signature , process.transaction );
@@ -183,7 +181,7 @@ class InterfaceBlockchainTransactionsWizard{
 
 
             try{
-                let signature = await from.address.signTransaction( transaction, txData.password );
+                let signature = await from.address.signTransaction( transaction, from.password );
                 signatures.push(signature);
             } catch (exception){
                 console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
