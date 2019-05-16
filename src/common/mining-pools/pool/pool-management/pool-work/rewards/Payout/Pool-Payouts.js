@@ -247,7 +247,7 @@ class PoolPayouts{
 
                 try {
 
-                    let transaction = await Blockchain.Transactions.wizard.createTransactionSimple( this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
+                    let transaction = await Blockchain.Transactions.wizard.createWizardTransactionSimple( this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
                     if (!transaction.result) throw {message: "Transaction was not made"};
 
                     transactions.push(transaction);

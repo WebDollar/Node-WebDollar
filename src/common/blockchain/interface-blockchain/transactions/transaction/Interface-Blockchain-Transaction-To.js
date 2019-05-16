@@ -118,18 +118,19 @@ class InterfaceBlockchainTransactionTo{
     }
 
 
-    serializeTo(){
+    serializeTo(specifyOutputs){
 
-        let addressesBuffer = [];
+        let array = [];
 
-        addressesBuffer.push( Serialization.serializeNumber1Byte( this.addresses.length ) );
+        array.push( Serialization.serializeNumber1Byte( this.addresses.length ) );
 
-        for (let i = 0; i < this.addresses.length; i++){
-            addressesBuffer.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
-            addressesBuffer.push( Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
-        }
+        for (let i = 0; i < this.addresses.length; i++)
+            if (!specifyOutputs || specifyOutputs[i]){
+                array.push( Serialization.serializeToFixedBuffer( consts.ADDRESSES.ADDRESS.LENGTH, this.addresses[i].unencodedAddress ));
+                array.push( Serialization.serializeNumber7Bytes( this.addresses[i].amount ));
+            }
 
-        return Buffer.concat (addressesBuffer);
+        return Buffer.concat(array);
 
     }
 

@@ -24,110 +24,128 @@ class InterfaceBlockchainTransactionsWizard{
 
     }
 
-    async createTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock){
+    async createWizardTransactionSimple(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce, skipValidationNonce, propagateTransaction = true ){
 
-        let process = await this.validateTransaction( address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
+        let process = await this._createWizardTransaction( [{
+            address,
+            to: [{
+                unencodedAddress: toAddress,
+                amount: toAmount,
+            }],
+            fee,
+            currencyTokenId,
+            password,
+            timeLock,
+            nonce
+        }], skipValidationNonce );
 
-        if(process.result)
-            return await this.propagateTransaction( process.signature , process.transaction );
-        else
-            return process;
+        if ( propagateTransaction && process.result)
+            return this.propagateTransaction( process.signature , process.transaction );
+
+        return process;
 
     }
 
-    async validateTransaction(address, toAddress, toAmount, fee, currencyTokenId, password = undefined, timeLock, nonce, skipValidationNonce=false){
+    async _createWizardTransaction( txData, skipValidationNonce=false){
 
-        try {
+        const feeFound = !!txData[0].fee;
 
-            if (typeof toAmount === 'string')
-                toAmount = parseInt(toAmount);
-
-        } catch (exception){
-
-            if (typeof exception === "object" && exception.message !== undefined)
-                exception = exception.message;
-
-            return { result:false,  message: "Amount is not a valid number", reason: exception }
+        for (let from of txData){
+            if (from.fee === undefined && feeFound) return {result: false, message: "You either specify the fee or not"};
+            if (!from.fee && feeFound) return {result: false, message: "You either specify the fee or not"};
         }
 
-        try {
+        //validation
+        for (let from of txData ){
 
-            if (typeof fee ==='string')
-                fee = parseInt(fee);
+            for (let to of from.to) {
 
-        } catch (exception){
+                try {
 
-            if (typeof exception === "object" && exception.message !== undefined)
-                exception = exception.message;
+                    if (typeof to.amount === 'string') to.amount = parseInt( to.amount );
 
-            return { result:false,  message: "Fee is not a valid number", reason: exception }
+                } catch (exception) {
+
+                    if (typeof exception === "object" && exception.message !== undefined)
+                        exception = exception.message;
+
+                    return {result: false, message: "Amount is not a valid number", reason: exception}
+                }
+            }
+
+            try {
+
+                if (typeof from.fee === 'string') from.fee = parseInt(from.fee);
+
+            } catch (exception) {
+
+                if (typeof exception === "object" && exception.message !== undefined)
+                    exception = exception.message;
+
+                return {result: false, message: "Fee is not a valid number", reason: exception}
+            }
+
+            try {
+
+                from.address = this.wallet.getAddress(from.address);
+
+            } catch (exception) {
+
+                console.error("Creating a new transaction raised an exception - Getting Address", exception);
+
+                if (typeof exception === "object" && exception.message !== undefined)
+                    exception = exception.message;
+
+                return {result: false, message: "Get Address failed", reason: exception}
+
+            }
+
+
         }
 
-        try {
+        //create txFrom
+        let txFrom = {
+            addresses: [],
+            currencyTokenId: txData.currencyTokenId,
+        };
 
-            address = this.wallet.getAddress(address);
+        for (let from of txData ) {
 
-        } catch (exception){
+            from.toAmountTotal = 0;
 
-            console.error("Creating a new transaction raised an exception - Getting Address", exception);
+            for (let to of from.to)
+                from.toAmountTotal += to.amount;
 
-            if (typeof exception === "object" && exception.message !== undefined)
-                exception = exception.message;
-
-            return { result:false,  message: "Get Address failed", reason: exception }
+            txFrom.addresses.push({
+                addresses: [{
+                    unencodedAddress: from.address,
+                    publicKey: undefined,
+                    amount: from.toAmountTotal + (from.fee||0)
+                }]
+            });
 
         }
+
+        //create txTo
+        let txTo = [];
+        for (let from of txData )
+            for (let to of from.to){
+                txTo.push({
+                    unencodedAddress: to.unencodedAddress,
+                    amount: to.amount,
+                });
+            }
 
         let transaction = undefined;
 
         try {
 
-            let to;
-            let toAmountTotal;
-
-            if (toAddress !== undefined && typeof toAmount === "number"){
-
-                toAmountTotal = toAmount;
-
-                to = {
-                    addresses: [{
-                        unencodedAddress: toAddress,
-                        amount: toAmount
-                    },
-                ]};
-
-            } else if (Array.isArray(toAddress)) {
-
-                toAmountTotal = 0;
-
-                for (let i=0; i<toAddress.length; i++)
-                    toAmountTotal += toAddress[i].amount;
-
-                to = {
-                    addresses: toAddress
-                };
-
-
-            }
-
-            let from = {
-                addresses: [
-                    {
-                        unencodedAddress: address,
-                        publicKey: undefined,
-                        amount: toAmountTotal + (fee||0)
-                    }
-                ],
-                currencyTokenId: currencyTokenId
-            };
-
-
             transaction = await this.transactions._createTransaction(
 
-                from, //from
-                to, //to
-                nonce, //nonce
-                timeLock, //timeLock
+                txFrom, //from
+                txTo, //to
+                txData.nonce, //nonce
+                txData.timeLock, //timeLock
                 undefined, //version @FIXME This is not calculated if validateVersion === false,
                 undefined, //txId
                 false, false, true, true, true, false,
@@ -141,23 +159,39 @@ class InterfaceBlockchainTransactionsWizard{
             return { result:false,  message: "Failed Creating a transaction", reason: exception }
         }
 
+        //calculate the fee
+        if (!feeFound) {
 
-        if (fee === undefined) {
-            fee = this.calculateFeeWizzard( transaction.serializeTransaction(true)) ;
-            transaction.from.addresses[0].amount += fee;
+            let initialFee = this.calculateFeeWizzard( transaction._serializeTransaction({} )) ;
+
+            for (let i=0; i < txData.length; i++){
+
+                let specifyOutputs = {};
+                specifyOutputs[i] = true;
+
+                let outFee = this.calculateFeeWizzard( transaction._serializeTransaction(specifyOutputs )) ;
+                transaction.from.addresses[0].amount += Math.ceil( initialFee / txData.length) + outFee;
+
+            }
 
             // This is needed because the fromAmount is changing
             transaction.serializeTransaction(true);
         }
 
-        let signature;
-        try{
-            signature = await address.signTransaction(transaction, password);
-        } catch (exception){
-            console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
+        let signatures = [];
+        for (let from of txData){
 
-            if (typeof exception === "object" && exception.message ) exception = exception.message;
-            return { result:false,  message: "Wrong password", reason: exception }
+
+            try{
+                let signature = await from.address.signTransaction( transaction, txData.password );
+                signatures.push(signature);
+            } catch (exception){
+                console.error("Creating a new transaction raised an exception - Failed Signing the Transaction", exception);
+
+                if (typeof exception === "object" && exception.message ) exception = exception.message;
+                return { result:false,  message: "Wrong password", reason: exception }
+            }
+
         }
 
         try{
@@ -186,7 +220,7 @@ class InterfaceBlockchainTransactionsWizard{
 
             result: true,
             transaction: transaction,
-            signature: signature
+            signature: signatures.length === 1 ? signatures[0] : signatures,
 
         };
 

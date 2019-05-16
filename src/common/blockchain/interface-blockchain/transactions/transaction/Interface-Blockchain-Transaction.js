@@ -284,7 +284,7 @@ class InterfaceBlockchainTransaction{
 
     }
 
-    _serializeTransaction(){
+    _serializeTransaction(specifyOutputs){
 
         let array = [
 
@@ -295,7 +295,7 @@ class InterfaceBlockchainTransaction{
             Serialization.serializeNumber3Bytes( this.timeLock ), //16777216 it should be to 4 bytes afterwards
 
             this.from.serializeFrom(),
-            this.to.serializeTo(),
+            this.to.serializeTo(specifyOutputs),
 
         ];
 

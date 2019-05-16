@@ -169,7 +169,7 @@ class PoolRewardsManagement{
             let toAddresses = this._toAddresses.slice(index*255, (index+1)*255);
 
             try {
-                let transaction = await Blockchain.Transactions.wizard.createTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
+                let transaction = await Blockchain.Transactions.wizard.createWizardTransactionSimple(this.blockchain.mining.minerAddress, toAddresses, undefined, PAYOUT_FEE, );
                 if (!transaction.result) throw {message: "Transaction was not made"};
             } catch (exception){
                 Log.error("Payout: ERROR CREATING TRANSACTION", Log.LOG_TYPE.POOLS);

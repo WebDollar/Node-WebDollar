@@ -76,7 +76,7 @@ class SendTransaction extends RpcMethod {
     }
 
     async _sendTransaction(fromAddress, toAddress, value, fee, password) {
-        let aResponse = await this._oTransactionsManager.wizard.createTransactionSimple(
+        let aResponse = await this._oTransactionsManager.wizard.createWizardTransactionSimple(
             fromAddress,
             toAddress,
             value,
@@ -88,7 +88,7 @@ class SendTransaction extends RpcMethod {
         if (!aResponse.result) {
             if (typeof password !== 'undefined' && aResponse.message === 'Wrong password') {
                 // try also with the password as non-array
-                aResponse = await this._oTransactionsManager.wizard.createTransactionSimple(
+                aResponse = await this._oTransactionsManager.wizard.createWizardTransactionSimple(
                     fromAddress,
                     toAddress,
                     value,
