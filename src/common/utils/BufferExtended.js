@@ -25,10 +25,7 @@ class BufferExtended {
 
     }
 
-    longestMatch(buffer, buffer2, startIndex){
-
-        if (startIndex === undefined)
-            startIndex = 0;
+    longestMatch(buffer, buffer2, startIndex = 0){
 
         let i = 0;
         while (i + startIndex < buffer.length && i < buffer2.length ) {
@@ -39,11 +36,8 @@ class BufferExtended {
             i++;
         }
 
-        if (i !== 0){ //we have a match
+        if (i > 0) //we have a match
             return this.substr(buffer, startIndex, i);
-        }
-
-        return  null;
 
     }
     
