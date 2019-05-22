@@ -23,6 +23,7 @@ class NodeAPIPublicAddresses{
 
         let answer = [];
         let minedBlocks = [];
+        let resolvedBlocks = [];
         let balance;
         let last_block = Blockchain.blockchain.blocks.length;
 
@@ -31,7 +32,9 @@ class NodeAPIPublicAddresses{
         balance = balance ? (balance / WebDollarCoins.WEBD) : 0;
 
         // Get mined blocks and transactions
-        for (let i=0; i<Blockchain.blockchain.blocks.length; i++) {
+
+        let start = Blockchain.blockchain.blocks.length - 1200;
+        for (let i=start; i<Blockchain.blockchain.blocks.length; i++) {
 
             let block = await Blockchain.blockchain.getBlock(i);
             for (let j = 0; j < block.data.transactions.transactions.length; j++) {
@@ -66,10 +69,22 @@ class NodeAPIPublicAddresses{
                     timestamp: block.timeStamp + BlockchainGenesis.timeStamp,
                     transactions: block.data.transactions.transactions.length
                 });
+
+            if (block.posMinerAddress && block.posMinerAddress.equals(address))
+                resolvedBlocks.push({
+                    blockId: block.height,
+                    minerAddress: block.data.minerAddress.toString("hex"),
+                    timestamp: block.timeStamp + BlockchainGenesis.timeStamp,
+                    transactions: block.data.transactions.transactions.length
+                });
         }
 
-        return {result: true, last_block: last_block,
-            balance: balance, minedBlocks: minedBlocks,
+        return {
+            result: true,
+            last_block,
+            balance,
+            minedBlocks,
+            resolvedBlocks,
             transactions: answer
         };
 
@@ -85,12 +100,14 @@ class NodeAPIPublicAddresses{
             return {result: false, message: "Invalid Address"};
         }
 
+        let balance = 0;
         try {
 
+            balance = Blockchain.blockchain.accountantTree.getBalance(address);
+            balance = balance ? (balance / WebDollarCoins.WEBD) : 0;
         } catch (exception){
 
         }
-        let balance = Blockchain.blockchain.accountantTree.getBalance(address, undefined);
 
         return {result: true, balance: !balance ? 0 : (balance / WebDollarCoins.WEBD) };
 
