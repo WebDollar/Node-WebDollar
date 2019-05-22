@@ -24,7 +24,15 @@ class InterfaceSatoshminDB {
     _start(){
         try {
         if (Browserizr.detect().isSafari()) {
-            this.db = new pounchdb(this._dbName, {revs_limit: 1, adapter: 'websql'});
+            try {
+                // try to use localStorage - this is only possible if not in privacy mode
+                localStorage.probe = 2;        
+                this.db = new pounchdb(this._dbName, {revs_limit: 1, adapter: 'websql'});
+              } catch (e) {
+                // Privacy mode on safari devices
+                this.db = new pounchdb(this._dbName, {revs_limit: 1});
+              }
+            
         } else {
             this.db = new pounchdb(this._dbName, {revs_limit: 1});
         }
