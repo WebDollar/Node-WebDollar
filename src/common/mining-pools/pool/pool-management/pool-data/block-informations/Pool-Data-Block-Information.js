@@ -283,7 +283,7 @@ class PoolDataBlockInformation {
 
         let pos = minerInstance;
         if (typeof pos !== "number")
-            pos = this._findBlockInformationMinerInstance( minerInstance );
+            pos = this._findBlockInformationMinerInstance( minerInstance, true );
 
         if (typeof pos !== "number")
             return;
@@ -291,7 +291,10 @@ class PoolDataBlockInformation {
         this.blockInformationMinersInstances[pos].cancelReward();
         this.blockInformationMinersInstances[pos].cancelDifficulties();
 
-        this.blockInformationMinersInstancesPositionsFirst [minerInstance.address.toString("hex")] = undefined;
+        let address = this.blockInformationMinersInstances[pos].address.toString("hex");
+
+        if (this.blockInformationMinersInstancesPositionsFirst [ address] === pos)
+            delete this.blockInformationMinersInstancesPositionsFirst [ address ];
 
         this.blockInformationMinersInstances.splice(pos,1);
 
