@@ -77,6 +77,7 @@
     "node-gyp": "^3.6.2",
     "opn": "^5.2.0",
     "path": "^0.12.7",
+    "pouchdb-node": "^6.4.3",
     "pouchdb-browser": "^7.0.0",
     "public-ip": "^2.4.0",
     "raven": "^2.6.4",
