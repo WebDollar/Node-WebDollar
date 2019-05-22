@@ -7,9 +7,7 @@ const atob = require('atob');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
 import Utils from "common/utils/helpers/Utils";
-import Browserizr from 'browserizr'
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
-pounchdb.plugin(require('pouchdb-adapter-websql'));
 
 class InterfaceSatoshminDB {
 
@@ -23,18 +21,7 @@ class InterfaceSatoshminDB {
 
     _start(){
         try {
-        if (Browserizr.detect().isSafari()) {
-            try {
-                // try to use localStorage - this is only possible if not in privacy mode
-                localStorage.probe = 2;        
-                this.db = new pounchdb(this._dbName, {revs_limit: 1, adapter: 'websql'});
-              } catch (e) {
-                // Privacy mode on safari devices
-                this.db = new pounchdb(this._dbName, {revs_limit: 1});
-              }
-        } else {
             this.db = new pounchdb(this._dbName, {revs_limit: 1});
-        }
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
