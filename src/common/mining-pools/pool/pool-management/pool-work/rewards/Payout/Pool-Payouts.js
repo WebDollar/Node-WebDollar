@@ -272,8 +272,10 @@ class PoolPayouts{
 
                         //not paid
                         //move funds to confirmedOther
-                        if ( !paid )
+                        if ( !paid ) {
                             miner.rewardConfirmedOther += miner.__tempRewardConfirmedOther;
+                            miner.rewardConfirmed = 0; //as it was paid in the rewardConfirmedOther
+                        }
 
                         miner.__tempRewardConfirmedOther = 0;
 
