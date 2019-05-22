@@ -8,7 +8,7 @@ import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
 import Utils from "common/utils/helpers/Utils";
 import Browserizr from 'browserizr'
-let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
+let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
 pounchdb.plugin(require('pouchdb-adapter-websql'));
 
 class InterfaceSatoshminDB {
@@ -32,7 +32,6 @@ class InterfaceSatoshminDB {
                 // Privacy mode on safari devices
                 this.db = new pounchdb(this._dbName, {revs_limit: 1});
               }
-            
         } else {
             this.db = new pounchdb(this._dbName, {revs_limit: 1});
         }
