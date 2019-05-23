@@ -82,9 +82,7 @@ class SocketExtend{
         socket.node.protocol.penalty = {};
 
         socket.node.protocol.calculateLatency = NodeProtocol.prototype.calculateLatency.bind(socket) ;
-        socket.node.on("ping", ()=>{
-            socket.node.sendRequest("ping/pong", 'r' )
-        });
+        socket.node.on("ping", () => socket.node.sendRequest("ping/pong", 'r' ) );
 
         socket.node.protocol.propagation = {};
         socket.node.protocol.propagation.initializePropagation = () => NodePropagationProtocol.initializeSocketForPropagation(socket);

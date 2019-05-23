@@ -60,7 +60,7 @@ class InterfaceRadixTree extends InterfaceTree {
 
                     //console.log("match", match);
 
-                    if (match !== null){   //we found  a match in the edge
+                    if (match){   //we found  a match in the edge
 
                         //the match is smaller
 
@@ -387,7 +387,7 @@ class InterfaceRadixTree extends InterfaceTree {
 
                     //console.log("matchFound", nodeCurrent.edges[j].label.toString(), " in ", input.toString(), " i= ",i, match === null ? "null" : match.toString() );
 
-                    if (match !== null && match.length === nodeCurrent.edges[j].label.length) {   //we found  a match in the edge
+                    if (match && match.length === nodeCurrent.edges[j].label.length) {   //we found  a match in the edge
 
                         nodeCurrent = nodeCurrent.edges[j].targetNode;
 

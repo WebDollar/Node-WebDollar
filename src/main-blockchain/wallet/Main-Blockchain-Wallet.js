@@ -72,7 +72,7 @@ class MainBlockchainWallet {
     async _insertAddress(blockchainAddress){
 
         let answer = this.getAddress(blockchainAddress);
-        if (answer !== null)
+        if ( answer !== null )
             return false;
 
         this.addresses.push(blockchainAddress);
@@ -235,7 +235,7 @@ class MainBlockchainWallet {
     async isAddressEncrypted(address){
 
         address = this.getAddress(address);
-        if (address === null)
+        if ( !address )
             throw {message: "address not found", address:address};
 
         return address.isPrivateKeyEncrypted();
@@ -252,10 +252,8 @@ class MainBlockchainWallet {
 
             FileSystem.open(filePath, 'w', async (err, fd) => {
 
-                if (err){
-                    resolve(false);
-                    return;
-                }
+                if (err)
+                    return resolve(false);
 
                 let list = [ Serialization.serializeNumber1Byte(this.addresses.length) ];
 
@@ -268,10 +266,8 @@ class MainBlockchainWallet {
 
                 FileSystem.write(fd, buffer, 0, buffer.length, null, function (err) {
 
-                    if (err){
-                        resolve(false);
-                        return;
-                    }
+                    if (err)
+                        return resolve(false);
 
                     FileSystem.close(fd, function () {
                         resolve(true);
@@ -407,12 +403,10 @@ class MainBlockchainWallet {
         const nAddressIndex = this.getAddress(address, true);
 
         if (nAddressIndex === -1)
-        {
             return  {
                 result : false,
                 message: 'Address was not found'
             };
-        }
 
         return {
             result: true,
@@ -484,7 +478,7 @@ class MainBlockchainWallet {
         if (await this.isAddressEncrypted(address) && oldPassword === undefined) {
 
             oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
-            if (oldPassword === null)
+            if (!oldPassword )
                 return false;
         }
 
@@ -506,27 +500,20 @@ class MainBlockchainWallet {
     async deleteAddress(address, bIsInteractive = true, password = null){
 
         if (typeof address === 'object' && address.hasOwnProperty('address'))
-        {
             address = address.address;
-        }
 
         const index = this.getAddress(address, true);
 
         if (index === -1)
-        {
             return {
                 result : false,
                 message: 'Address was not found',
                 address: address
             };
-        }
 
-        if (await this.isAddressEncrypted(address))
-        {
-            if (bIsInteractive === false)
-            {
-                if (password === null)
-                {
+        if (await this.isAddressEncrypted(address)) {
+            if (bIsInteractive === false) {
+                if (!password ) {
                     return {
                         result : false,
                         message: 'Non-Interactive mode detected and a password was not provided'
@@ -535,30 +522,26 @@ class MainBlockchainWallet {
 
                 address = this.getAddress(address);
 
-                try
-                {
+                try {
                     InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(await address._getPrivateKey(password));
                 }
-                catch (exception)
-                {
+                catch (exception) {
                     return {
                         result : false,
                         message: 'Password is incorrect'
                     };
                 }
             }
-            else
-            {
-                for (let tries = 3; tries >= 1; --tries)
-                {
+            else {
+
+                for (let tries = 3; tries >= 1; --tries) {
+
                     await Blockchain.blockchain.sleep(100);
 
                     let oldPassword = await InterfaceBlockchainAddressHelper.askForPassword(`Please enter your last password (12 words separated by space). ${tries} tries left:`);
 
-                    if (oldPassword === null)
-                    {
-                        if (tries === 1)
-                        {
+                    if ( !oldPassword ) {
+                        if (tries === 1) {
                             return {
                                 result : false,
                                 message: 'Password is incorrect!'
@@ -571,24 +554,20 @@ class MainBlockchainWallet {
                     address        = this.getAddress(address);
                     let privateKey = await address._getPrivateKey(oldPassword);
 
-                    try
-                    {
+                    try {
                         if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
-                        {
                             break;
-                        }
+
                     }
                     catch (exception)
                     {
                         AdvancedMessages.alert('Your password is incorrect!', 'Password Error', 'error', 5000);
 
                         if (tries === 1)
-                        {
                             return {
                                 result: false,
                                 message: 'Password is incorrect!'
                             };
-                        }
                     }
                 }
             }
@@ -597,12 +576,9 @@ class MainBlockchainWallet {
         let ask = true;
 
         if (bIsInteractive)
-        {
             ask = await AdvancedMessages.confirm(`Are you sure you want to delete ${address}`);
-        }
 
-        if (ask)
-        {
+        if (ask) {
             let addressToDelete = this.addresses[index];
 
             this.addresses.splice(index, 1);
@@ -610,8 +586,7 @@ class MainBlockchainWallet {
             AdvancedMessages.log("Address deleted " + addressToDelete, "Address deleted " + addressToDelete.toString());
 
             //setting the next minerAddress
-            if (!this.blockchain.mining.minerAddress || BufferExtended.safeCompare(this.blockchain.mining.unencodedMinerAddress, addressToDelete.unencodedAddress))
-            {
+            if (!this.blockchain.mining.minerAddress || BufferExtended.safeCompare(this.blockchain.mining.unencodedMinerAddress, addressToDelete.unencodedAddress)) {
                 this.blockchain.mining.minerAddress = this.addresses.length > 0 ? this.addresses[0].address : undefined;
                 this.blockchain.mining.resetMining();
             }
@@ -626,8 +601,7 @@ class MainBlockchainWallet {
             };
 
         }
-        else
-        {
+        else {
             return {
                 result: false,
                 message: 'Action canceled by user'
