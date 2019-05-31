@@ -7,7 +7,7 @@ const atob = require('atob');
 import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
 import Utils from "common/utils/helpers/Utils";
-let pounchdb = (process.env.BROWSER) ? (require('pouchdb').default) : (require('pouchdb-node'));
+let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
 
 class InterfaceSatoshminDB {
 
@@ -20,13 +20,11 @@ class InterfaceSatoshminDB {
     }
 
     _start(){
-
         try {
             this.db = new pounchdb(this._dbName, {revs_limit: 1});
         } catch (exception){
             console.error("InterfaceSatoshminDB exception", pounchdb);
         }
-
     }
 
     async restart(){

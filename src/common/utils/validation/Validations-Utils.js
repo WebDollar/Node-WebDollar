@@ -6,7 +6,7 @@ import StatusEvents from "common/events/Status-Events";
 
 let PounchDB;
 
-if (process.env.BROWSER) PounchDB = require('pouchdb').default;
+if (process.env.BROWSER) PounchDB = require('pouchdb-browser').default;
 else PounchDB = require('pouchdb-node');
 
 const DATABASES = ["validateDB", "defaultDB", consts.DATABASE_NAMES.BLOCKCHAIN_DATABASE.FOLDER];
