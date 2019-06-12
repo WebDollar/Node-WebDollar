@@ -104,7 +104,6 @@ class NodeAPIPublicAddresses{
         try {
 
             balance = Blockchain.blockchain.accountantTree.getBalance(address);
-            balance = balance ? (balance / WebDollarCoins.WEBD) : 0;
         } catch (exception){
 
         }
