@@ -1,5 +1,5 @@
-import {authenticatedMethod, RpcMethod} from './../../../../jsonRpc';
-import WebDollarCoins                   from './../../../../common/utils/coins/WebDollar-Coins';
+import { authenticatedMethod, RpcMethod } from './../../../../jsonRpc';
+import WebDollarCoins                     from './../../../../common/utils/coins/WebDollar-Coins';
 
 /**
  * The list of addresses in the wallet.
@@ -11,10 +11,10 @@ class Accounts extends RpcMethod {
         this._oAddressBalanceProvider = oAddressBalanceProvider;
     }
 
-    getHandler(args) {
+    async getHandler(args) {
         const bAsObject = args[0] || false;
 
-        return this._oWallet.addresses.map((oAddress) => {
+        const aAddresses = this._oWallet.addresses.map(async (oAddress) => {
             if (bAsObject === false) {
                 return oAddress.address;
             }
@@ -31,9 +31,11 @@ class Accounts extends RpcMethod {
                 address: oAddress.address,
                 balance: nBalanceRaw / WebDollarCoins.WEBD,
                 balance_raw: nBalanceRaw,
-                isEncrypted: oAddress.isPrivateKeyEncrypted(),
+                isEncrypted: await oAddress.isPrivateKeyEncrypted(),
             };
         });
+
+        return Promise.all(aAddresses);
     }
 }
 
