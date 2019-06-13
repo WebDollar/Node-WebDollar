@@ -1,0 +1,19 @@
+WebDollar.io blockchainDB3 backups
+
+-----------
+
+Primary high speed backup source provided by VPN Romania:
+https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz *Currently Unavailable*
+
+Instructions: As per other tutorials
+
+-----------
+
+Secondary medium speed backup source provided by CryptoCoinGB:
+http://webd-blockchain.ddns.net:8080/blockchainDB3.tar.gz
+
+Instructions:
+
+delete the old blockchainDB3 directory if it exists (command: sudo rm -r blockchainDB3)
+use 'wget' to download the file from the link above (command: wget http://cryptocoingb.ddns.net:9000/blockchainDB3.tar.gz)
+extract the file - it will create the directory for you (command: tar -zxvf blockchainDB3.tar.gz -C .)
