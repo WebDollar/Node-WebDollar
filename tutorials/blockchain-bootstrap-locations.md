@@ -4,11 +4,11 @@
 
 #### Primary high speed backup source provided by akami:
 
-https://github.com/thelazyprogrammer/Webdollar-Blockchain
+https://github.com/thelazyprogrammer/blockchainDB3
 
 Instructions (from within your WebDollar folder):
 + delete the old blockchainDB3 directory if it exists (command: sudo rm -r blockchainDB3)
-+ clone the repository from Git (command: git clone https://github.com/thelazyprogrammer/Webdollar-Blockchain)
++ clone the repository from Git (command: git clone https://github.com/thelazyprogrammer/blockchainDB3)
 
 -----------
 
