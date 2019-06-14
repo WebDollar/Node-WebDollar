@@ -12,7 +12,7 @@ Instructions (from within your WebDollar folder):
 + make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
 + open the new directory (command: cd blockchainDB3)
 + use 'wget' to download the file from the link above (command: wget https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz)
-+ extract the file - it will create the directory for you (command: tar -zxvf blockchainDB3.tar.gz -C .)
++ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C .)
 
 -----------
 
@@ -27,7 +27,7 @@ Instructions (from within your WebDollar folder):
 + make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
 + open the new directory (command: cd blockchainDB3)
 + use 'wget' to download the file from the link above (command: wget http://webd-blockchain.ddns.net:8080/blockchainDB3.tar.gz)
-+ extract the file - it will create the directory for you (command: tar -zxvf blockchainDB3.tar.gz -C .)
++ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C .)
 
 -----------
 
@@ -42,6 +42,6 @@ Instructions (from within your WebDollar folder):
 + make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
 + open the new directory (command: cd blockchainDB3)
 + use 'wget' to download the file from the link above (command: wget http://cryptocoingb.ddns.net:9000/blockchainDB3.tar.gz)
-+ extract the file - it will create the directory for you (command: tar -zxvf blockchainDB3.tar.gz -C .)
++ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C .)
 
 -----------
