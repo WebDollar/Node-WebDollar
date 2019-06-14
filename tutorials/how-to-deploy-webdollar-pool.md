@@ -61,10 +61,9 @@ git pull origin MiningPools # for vue-Frontend
 ----
 ### Additional Info:
 
-#### Blockchain can be found and downloaded via ```curl``` or ```wget``` from: <a href="https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz">https://webdftp.vpnromania.ro/ftp/blockchainDB3.tar.gz</a>
-#### ^ These backups are made at every 6 hours.
-#### Create a folder named ```blockchainDB3``` inside Node-WebDollar1 and unpack the downloaded arhive to that folder. If the folder is already created, delete the contents inside it and download the backup inside.
-#### To unzip it, run: ```tar -zxvf blockchainDB3.tar.gz -C .``` -> always run this inside blockchainDB3 folder!
+#### It is recommended to download the blockchain bootstrap before starting your pool.
+#### Blockchain bootstrap locations and instructions can be found <a href="https://github.com/WebDollar/Node-WebDollar/blob/master/tutorials/blockchain-bootstrap-locations.md">HERE!</a>
+
 ----
 ### How to change default PORTS?
 
