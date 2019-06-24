@@ -12,7 +12,8 @@ class Accounts extends RpcMethod {
     }
 
     async getHandler(args) {
-        const bAsObject = args[0] || false;
+        const bAsObject        = args[0] || false;
+        const bEncryptedStatus = args[1] || false;
 
         const aAddresses = this._oWallet.addresses.map(async (oAddress) => {
             if (bAsObject === false) {
@@ -27,12 +28,15 @@ class Accounts extends RpcMethod {
                 nBalanceRaw = 0;
             }
 
-            return {
+            const oResponse = {
                 address: oAddress.address,
                 balance: nBalanceRaw / WebDollarCoins.WEBD,
                 balance_raw: nBalanceRaw,
-                isEncrypted: await oAddress.isPrivateKeyEncrypted(),
             };
+
+            if (bEncryptedStatus) {
+                oResponse.isEncrypted = await oAddress.isPrivateKeyEncrypted();
+            }
         });
 
         return Promise.all(aAddresses);
