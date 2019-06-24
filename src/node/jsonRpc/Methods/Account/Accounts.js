@@ -37,6 +37,8 @@ class Accounts extends RpcMethod {
             if (bEncryptedStatus) {
                 oResponse.isEncrypted = await oAddress.isPrivateKeyEncrypted();
             }
+
+            return oResponse;
         });
 
         return Promise.all(aAddresses);
