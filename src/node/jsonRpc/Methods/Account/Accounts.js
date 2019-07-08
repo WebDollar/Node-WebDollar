@@ -1,43 +1,47 @@
-import {authenticatedMethod, RpcMethod} from './../../../../jsonRpc';
-import WebDollarCoins                   from './../../../../common/utils/coins/WebDollar-Coins';
+import { authenticatedMethod, RpcMethod } from './../../../../jsonRpc';
+import WebDollarCoins                     from './../../../../common/utils/coins/WebDollar-Coins';
 
 /**
  * The list of addresses in the wallet.
  */
-class Accounts extends RpcMethod
-{
+class Accounts extends RpcMethod {
     constructor(name, oWallet, oAddressBalanceProvider) {
         super(name);
         this._oWallet                 = oWallet;
         this._oAddressBalanceProvider = oAddressBalanceProvider;
     }
 
-    getHandler(args) {
-        const bIncludeBalance = args[0] || false;
+    async getHandler(args) {
+        const bAsObject        = args[0] || false;
+        const bEncryptedStatus = args[1] || false;
 
-        return this._oWallet.addresses.map((oAddress) => {
-            if (bIncludeBalance === false)
-            {
+        const aAddresses = this._oWallet.addresses.map(async (oAddress) => {
+            if (bAsObject === false) {
                 return oAddress.address;
             }
 
             let nBalanceRaw = 0;
 
-            try
-            {
+            try {
                 nBalanceRaw = this._oAddressBalanceProvider.getBalance(oAddress);
-            }
-            catch (e)
-            {
+            } catch (e) {
                 nBalanceRaw = 0;
             }
 
-            return {
+            const oResponse = {
                 address: oAddress.address,
                 balance: nBalanceRaw / WebDollarCoins.WEBD,
                 balance_raw: nBalanceRaw,
             };
+
+            if (bEncryptedStatus) {
+                oResponse.isEncrypted = await oAddress.isPrivateKeyEncrypted();
+            }
+
+            return oResponse;
         });
+
+        return Promise.all(aAddresses);
     }
 }
 
