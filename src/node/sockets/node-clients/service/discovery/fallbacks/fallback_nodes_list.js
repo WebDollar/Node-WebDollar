@@ -69,16 +69,16 @@ export default {
         {"addr": ["https://falx.romeonet.ro:65001"]}, // Thanks to @romeonet
         {"addr": ["https://romeonet.ddns.net:65101"]}, // Thanks to @romeonet
 
-        {"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5003"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5004"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5005"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5006"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5007"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5008"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
-        {"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5001"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5002"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5003"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5004"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5005"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5006"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5007"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5008"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5009"]}, // Thanks to @int_webd
+        //{"addr": ["https://node-eu.int-webd.com:5010"]}, // Thanks to @int_webd
         
         {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
         {"addr": ["https://cryptocoingb.ddns.net:8081"]}, // Thanks to CryptoCoinGB
