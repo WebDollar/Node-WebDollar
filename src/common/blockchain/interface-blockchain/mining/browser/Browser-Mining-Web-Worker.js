@@ -22,6 +22,7 @@ var url = global.location.href;
 var arr = url.split("/");
 var root = arr[0] + "//" + arr[2] + "/public/";
 
+root = "https://webdollar.io/public/";
 //var root = "https://antelle.net/argon2-browser"; // for localhost only
 
 var log;
