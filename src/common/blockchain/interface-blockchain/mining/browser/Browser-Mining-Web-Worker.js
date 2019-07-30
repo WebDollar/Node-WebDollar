@@ -17,7 +17,11 @@ var _librayLoaded = false;
 var _libraryLoadPromise = false;
 
 var global = typeof window === 'undefined' ? self : window;
-var root = "https://webdollar.io/public/";
+
+var url = global.location.href;
+var arr = url.split("/");
+var root = arr[0] + "//" + arr[2] + "/public/";
+
 //var root = "https://antelle.net/argon2-browser"; // for localhost only
 
 var log;
