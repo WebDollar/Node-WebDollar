@@ -9,8 +9,8 @@
 var global =  typeof window === "undefined" ? self : window;
 //var root =  window === undefined ? '../' : '';
 
-//var root = "https://webdollar.io/public/";
-var root = "https://antelle.net/argon2-browser";
+var root = "https://webdollar.io/public";
+// var root = "https://antelle.net/argon2-browser";
 
 class Argon2BrowserWebAssemblyCalc{
 
