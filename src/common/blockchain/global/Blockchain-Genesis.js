@@ -48,8 +48,12 @@ class BlockchainGenesis{
 
             //0..19  pos
             //20..29 pow
-            if ( height % 30 < 20) return true;
-            else return false;
+            if( consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION_90 )
+                if ( height % 90 < 80) return true;
+            else
+                if ( height % 30 < 20) return true;
+
+            return false;
 
             //29,0..19  pos
             //20..29 pow
