@@ -25,6 +25,14 @@ import ImportAccount  from './Account/ImportAccount';
 import NewAccount     from './Account/NewAccount';
 
 /**
+ * METHODS Mining
+ */
+import GetMiningStatus  from './Mining/GetMiningStatus';
+import SetMiningAccount from './Mining/SetMiningAccount';
+import StartMining      from './Mining/StartMining';
+import StopMining       from './Mining/StopMining';
+
+/**
  * METHODS Other
  */
 import BlockNumber                         from './BlockNumber';
@@ -62,6 +70,14 @@ const oImportAccount  = new ImportAccount('importAccount', Blockchain.Wallet);
 const oNewAccount     = new NewAccount('newAccount', Blockchain.Wallet);
 
 /**
+ * Objects Mining
+ */
+const oGetMiningStatus  = new GetMiningStatus('getMiningStatus', Blockchain.Mining);
+const oSetMiningAccount = new SetMiningAccount('setMiningAccount', Blockchain.blockchain, Blockchain.Wallet);
+const oStartMining      = new StartMining('startMining', Blockchain);
+const oStopMining       = new StopMining('stopMining', Blockchain);
+
+/**
  * Objects Other
  */
 const oBlockNumber                         = new BlockNumber('blockNumber', Blockchain.blockchain);
@@ -96,6 +112,12 @@ export {
     oExportAccount,
     oImportAccount,
     oNewAccount,
+
+    // Mining
+    oGetMiningStatus,
+    oSetMiningAccount,
+    oStartMining,
+    oStopMining,
 
     // Other
     oBlockNumber,

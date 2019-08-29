@@ -33,23 +33,21 @@ class Argon2Browser{
 
     async hash(data){
 
-        let result;
+        let result = await Argon2BrowserWebAssembly.hash(data);
 
-        result = await Argon2BrowserWebAssembly.hash(data);
+        if (result)
+            return result;
 
-        if (result !== null) return result;
-
-        return await this.hashJavascript(data);
+        return this.hashJavascript(data);
     }
 
     async hashString(data){
-        let result;
 
-        result = await Argon2BrowserWebAssembly.hashString(data)
+        let result = await Argon2BrowserWebAssembly.hashString(data);
 
-        if (result !== null) return result;
+        if (result ) return result;
 
-        return await this.hashJavascriptString()
+        return this.hashJavascriptString()
     }
 
     async hashJavascript(data){
@@ -58,8 +56,6 @@ class Argon2Browser{
 
             let params = HASH_ARGON2_OPTIONS;
             params.pass = data;
-
-
 
             let result = await argon2.hash(params);
 
@@ -79,7 +75,7 @@ class Argon2Browser{
         try{
 
             let params = HASH_ARGON2_OPTIONS;
-            params.pass = data
+            params.pass = data;
 
             let result = await argon2.hash( params );
 
@@ -87,7 +83,7 @@ class Argon2Browser{
 
             //console.log("ARgon2Browser", result.encoded, hash);
 
-            return hash
+            return hash;
 
         } catch (Exception){
             console.log("Argon2 exception hashJavascriptString", Exception)
