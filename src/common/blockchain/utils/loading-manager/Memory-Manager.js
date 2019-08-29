@@ -108,24 +108,25 @@ class MemoryManager{
 
     deleteLoaded(height, data){
 
-        if (this._loaded[height]){
+        if (!this._loaded[height]) return;
 
-            let oldData = this._loaded[height].data;
+        let oldData = this._loaded[height].data;
 
-            if (!oldData){
-                delete this._loaded[height];
-            } else
-            if (Buffer.isBuffer(oldData)){
-                if ( !data.equals(oldData) ) delete this._loaded[height];
-            } else
-            if (oldData instanceof BigInteger  ){
+        if (!oldData)
+            delete this._loaded[height];
+        else {
+
+            if (Buffer.isBuffer(oldData)) {
                 if (!data.equals(oldData)) delete this._loaded[height];
-            } else
-            if (typeof oldData === "number" ){
-                if (data !== oldData) delete this._loaded[height];
             }
+            else if (oldData instanceof BigInteger){
+                if (!data.equals(oldData)) delete this._loaded[height];
+            }
+            else if (typeof oldData === "number" ) {
+                if (data !== oldData) delete this._loaded[height];
+            } else
             if ( typeof oldData  === "object" ) {
-                if (data !== oldData ) delete this._loaded[height];
+                if (data !== oldData) delete this._loaded[height];
             }
 
         }
