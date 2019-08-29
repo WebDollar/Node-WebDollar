@@ -19,6 +19,7 @@ class AdvancedEmitter{
     emit(){
 
         let answer;
+
         try{
             answer = this._emitter.emit.apply(this, arguments);
         } catch (exception){
@@ -31,30 +32,34 @@ class AdvancedEmitter{
 
     on(a, call){
 
-        this._emitter.on(a, (...args)=>{
+        const call2 = (...args)=>{
             try{
                 call(...args);
             }catch(exception){
                 if (consts.DEBUG)
                     console.error("On raised an error", exception);
             }
-        });
+        };
 
-        return ()=> this._emitter.removeListener(a, call);
+        this._emitter.on(a, call2 );
+
+        return ()=> this._emitter.removeListener(a, call2);
     }
 
     once(a, call){
 
-        this._emitter.once(a, (...args)=>{
+        const call2 = (...args)=>{
             try{
                 call(...args);
             }catch(exception){
                 if (consts.DEBUG)
                     console.error("Once raised an error", exception);
             }
-        });
+        };
 
-        return () => this._emitter.removeListener(a, call);
+        this._emitter.once(a, call2 );
+
+        return () => this._emitter.removeListener(a, call2);
     }
 
 }

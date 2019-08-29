@@ -8,7 +8,7 @@ const BigInteger = require('big-integer');
 
 let consts = {
 
-    DEBUG: false,
+    DEBUG: true,
     OPEN_SERVER: true,
 
 };
@@ -534,7 +534,7 @@ if ( consts.DEBUG === true ) {
 
     FallBackNodesList.nodes = [{
         "addr": ["http://testnet2.hoste.ro:8001"],
-        "addr": ["http://86.126.138.61:2024"],
+        //"addr": ["http://86.126.138.61:2024"],
     }];
 
 

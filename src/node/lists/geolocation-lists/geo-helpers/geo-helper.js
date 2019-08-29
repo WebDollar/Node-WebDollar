@@ -27,7 +27,7 @@ class GeoHelper {
         }
 
 
-        let result = {
+        const result = {
             country: '',
             countryCode: '',
             city: '',
@@ -71,7 +71,7 @@ class GeoHelper {
                 result.country = data.country || data.country_name;
                 result.countryCode = data.countryCode || data.country_code;
 
-                if (address === '')
+                if ( !address )
                     if (data.query ) result.address = address || data.query;
 
                 if (result.countryCode )

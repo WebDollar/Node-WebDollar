@@ -11,7 +11,7 @@ class MiniBlockchainBalances{
 
     listBalances(address){
 
-        if (address === '' || address === undefined || address === null) return null;
+        if ( !address ) return null;
 
         try{
 
@@ -26,7 +26,7 @@ class MiniBlockchainBalances{
     getNonce(address){
 
 
-        if (address === '' || address === undefined || address === null) return null;
+        if ( !address ) return null;
 
         try{
 
@@ -40,14 +40,14 @@ class MiniBlockchainBalances{
 
     subscribeBalancesChanges(addressWIF, callback){
 
-        if (addressWIF === '' || addressWIF === undefined || addressWIF === null || addressWIF==='') return {result: false, message: "address is invalid"};
+        if ( !addressWIF ) return {result: false, message: "address is invalid"};
 
         if (!Buffer.isBuffer(addressWIF) && typeof addressWIF === "string")
             addressWIF = BufferExtended.fromBase(addressWIF);
 
         let address = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(addressWIF);
 
-        if (address === null) return {result:false, message: "invalid address"};
+        if ( !address ) return {result:false, message: "invalid address"};
 
         let unsubscribe = this._blockchain.accountantTree.emitter.on("balances/changes/"+BufferExtended.toBase(address),callback);
 

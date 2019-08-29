@@ -15,7 +15,7 @@ class NodeAPICallbacks{
          */
         this._subscribers = [];
 
-        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject ) => { this._disconnectCallbacks(nodesListObject.socket, false ) });
+        NodesList.emitter.on("nodes-list/disconnected", nodesListObject => this._disconnectCallbacks(nodesListObject.socket, false ) );
 
 
     }
@@ -32,13 +32,9 @@ class NodeAPICallbacks{
             address = req.address;
 
             //subscribe to transactions changes
-            let data = Blockchain.Balances.subscribeBalancesChanges(address, (data)=>{
+            let data = Blockchain.Balances.subscribeBalancesChanges(address, data =>  callback( {result: true, balances: data.balances, nonce: data.nonce, _suffix: address } ) );
 
-                callback( {result: true, balances: data.balances, nonce: data.nonce, _suffix: address } );
-
-            });
-
-            if (data === null || !data.result) throw {message: "couldn't subscribe"};
+            if ( !data || !data.result) throw {message: "couldn't subscribe"};
 
             let unsubscribe = data.subscription;
             let balances = data.balances;
@@ -90,7 +86,7 @@ class NodeAPICallbacks{
 
             });
 
-            if (data === null || !data.result) throw {message: "couldn't subscribe"};
+            if ( !data || !data.result) throw {message: "couldn't subscribe"};
 
             let subscription = data.subscription;
 
