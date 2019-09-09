@@ -31,7 +31,7 @@ class NodeAPICallbacks{
             address = req.address;
 
             //subscribe to transactions changes
-            let data = Blockchain.Balances.subscribeBalancesChanges(address, data =>  callback( {result: true, balances: data.balances, nonce: data.nonce, _suffix: address } ), nodeApiType );
+            let data = Blockchain.Balances.subscribeBalancesChanges(address, data =>  callback( {result: true, balances: data.balances, nonce: data.nonce, _suffix: address } ));
 
             if ( !data || !data.result) throw {message: "couldn't subscribe"};
 
@@ -39,7 +39,7 @@ class NodeAPICallbacks{
             let balances = data.balances;
             let nonce = data.nonce;
 
-            this._addSubscribedEvent( unsubscribe, "addressBalancesSubscribe"+address, res, callback, nodeApiType );
+            this._addSubscribedEvent( unsubscribe, "addressBalancesSubscribe"+address, res, nodeApiType );
 
             return {result: true, address: address, balances: balances, nonce: nonce,  _suffix: address};
 
@@ -89,7 +89,7 @@ class NodeAPICallbacks{
 
             let subscription = data.subscription;
 
-            this._addSubscribedEvent(subscription, "addressTransactionsSubscribe"+address, res, callback, nodeApiType);
+            this._addSubscribedEvent(subscription, "addressTransactionsSubscribe"+address, res, nodeApiType);
 
             return {result: true, transactions: data.transactions, _suffix: address}
 
@@ -101,7 +101,7 @@ class NodeAPICallbacks{
 
     }
 
-    _addSubscribedEvent(unsubscribe, name, res, callback, nodeApiType){
+    _addSubscribedEvent(unsubscribe, name, res, nodeApiType){
 
         let object = {
             unsubscribe: unsubscribe,
