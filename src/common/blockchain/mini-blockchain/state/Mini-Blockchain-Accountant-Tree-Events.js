@@ -25,7 +25,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
 
         //not working
         //TODO .eventNames() is not working
-        let list = this.emitter._events;
+        const list = this.emitter._emitter._events;
 
         for (let key in list)
             if (key === name)
@@ -37,7 +37,7 @@ class MiniBlockchainAccountantTreeEvents extends InterfaceMerkleRadixTree {
     emitBalancesChanges(){
 
         //TODO .eventNames() is not working
-        let list = this.emitter._events;
+        const list = this.emitter._emitter._events;
 
         for (let key in list)
             if (key.indexOf("balances/changes/") === 0) {
