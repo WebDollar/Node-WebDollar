@@ -130,7 +130,7 @@ class InterfaceBlockchainTransactionsEvents{
 
         //not working
         //TODO .eventNames() is not working
-        let list = this.emitter._events;
+        const list = this.emitter._emitter._events;
 
         for (let key in list)
             if (key === name)

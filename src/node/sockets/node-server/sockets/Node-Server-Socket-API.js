@@ -23,7 +23,7 @@ class NodeServerSocketAPI{
 
             }
 
-            NodeAPIRouter.initializeRouter( this._socketRouteMiddleware.bind(socket), this._socketMiddleware.bind(socket), "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+            NodeAPIRouter.initializeRouter( this._socketRouteMiddleware.bind(socket), this._socketMiddleware.bind(socket), "api/" , NODE_API_TYPE.NODE_API_TYPE_SOCKET);
 
             socket.node.sendRequest("api/start/answer", {result: true} );
 
@@ -32,7 +32,7 @@ class NodeServerSocketAPI{
 
         socket.node.once("api/start-subscribers", ( data )=>{
 
-            NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback.bind(socket), "api/" , socket, NODE_API_TYPE.NODE_API_TYPE_SOCKET);
+            NodeAPIRouter.initializeRouterCallbacks( this._socketRouteMiddleware.bind(socket), this._socketMiddlewareCallback.bind(socket), "api/" , NODE_API_TYPE.NODE_API_TYPE_SOCKET);
 
             socket.node.sendRequest("api/start-subscribers/answer",{result: true});
 
@@ -69,14 +69,14 @@ class NodeServerSocketAPI{
         return this.node.sendRequest(req._route+"/answer"+suffix, answer,);
     }
 
-    async _socketMiddlewareCallback(req, send, callback){
+    async _socketMiddlewareCallback(req, send, callback, nodeApiType){
 
         let answer = await callback(req, this, dataSubscriber => {
 
             let suffix = (answer._suffix !== '' ? '/'+answer._suffix : '' );
 
             this.node.sendRequest( req._route+"/answer"+suffix, dataSubscriber);
-        } );
+        }, nodeApiType );
 
         let suffix = (answer._suffix !== '' ? '/'+answer._suffix : '' );
 
