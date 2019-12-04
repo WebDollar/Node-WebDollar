@@ -26,10 +26,11 @@ class NodesWaitlistConnecting {
 
 
         //mobiles usually use mobile internet are they mostly block non 80 blocks
-        this._connectedOnlyTo80 = false;
+        this._connectedOnlyToSafeNetwork = false;
+
 
         if (VersionCheckerHelper.detectMobile())
-            this._connectedOnlyTo80 = true;
+            this._connectedOnlyToSafeNetwork = true;
 
         this.connectingMaximum = {
             maximum_fallbacks: 0,
@@ -75,7 +76,9 @@ class NodesWaitlistConnecting {
 
             let pos = Math.floor ( Math.random() * NodesWaitlist.waitListFullNodes.length );
 
-            if (this._connectedOnlyTo80 && NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port !== "80") continue;
+            //allow only 80 and 443
+            if (this._connectedOnlyToSafeNetwork )
+                if (NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port != 80 && NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port != 443 )continue;
 
             this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[pos]);
 
