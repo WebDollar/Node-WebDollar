@@ -66,6 +66,8 @@ class NodesWaitlistConnecting {
 
     _connectNewNodesWaitlist(){
 
+        const used = {};
+
         for (let i=0; i < NodesWaitlist.waitListFullNodes.length; i++){
 
             // in case it is not synchronized, it should connect to the fallback node
@@ -74,13 +76,25 @@ class NodesWaitlistConnecting {
 
             // in case it needs to connect only to port 80
 
-            let pos = Math.floor ( Math.random() * NodesWaitlist.waitListFullNodes.length );
+            let pos;
 
-            //allow only 80 and 443
-            if (this._connectedOnlyToSafeNetwork )
-                if (NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port != 80 && NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port != 443 )continue;
+            do {
+                pos = Math.floor ( Math.random() * NodesWaitlist.waitListFullNodes.length );
+            } while (used[pos])
+            used[pos] = true;
 
-            this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[pos]);
+            try{
+
+                const port = Number.parseInt(NodesWaitlist.waitListFullNodes[pos].sckAddresses[0].port || '' );
+
+                //allow only 80 and 443
+                if (this._connectedOnlyToSafeNetwork && port !== 80 && port !== 443) continue;
+
+                this._tryToConnectNextNode(NodesWaitlist.waitListFullNodes[pos]);
+
+            }catch(err){
+                console.error("_connectNewNodesWaitlist raised an error", err);
+            }
 
         }
 
