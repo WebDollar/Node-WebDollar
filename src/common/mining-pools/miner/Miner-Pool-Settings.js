@@ -236,7 +236,7 @@ class MinerPoolSettings {
         await this.addPoolList("/pool/1/WMP/0.02/d02e26e60a5b0631a0b71e7dc72bb7492fd018dad64531498df369ec14f87962/https:$$server.webdollarminingpool.com:443", undefined, true);
         await this.addPoolList("/pool/1/WMP-ASIA/0.02/773a8d5f7ce3c0dba0b7216c35d2768b1a6abef716fa2a46d875d6ca0e2c115e/https:$$singapore.webdollarminingpool.com:443", undefined, true);
         await this.addPoolList("/pool/1/WebDollarPoolWin/0.01/60ba45707efcf2292e1c8d4c6a16b602a58aa8bee04d7d3645198afa4f8435e0/https:$$webdollarpool.win:80", undefined, true);
-
+        await this.addPoolList("/pool/1/Timi/0.001/228f7ab63884af5e86eca38ad08353170f57125336362bbe9bd3417f3ff2bae5/https:$$pool.timi.ro:443", undefined, true);
     }
 
     async _replacePoolURL(url = ''){
