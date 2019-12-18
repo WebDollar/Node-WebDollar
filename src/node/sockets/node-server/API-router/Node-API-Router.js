@@ -86,6 +86,8 @@ class NodeAPIRouter{
 
         this._addRoute( 'transactions/pending', NodeAPIPublicTransactions.pending, nodeApiType, 200 , app, prefix, middleWare );
 
+        this._addRoute( 'transactions/pending/object', NodeAPIPublicTransactions.pendingObject, nodeApiType, 200 , app, prefix, middleWare );
+
         this._addRoute( 'transactions/exists/:tx_id', NodeAPIPublicTransactions.checkTransactionExists, nodeApiType, 200 , app, prefix, middleWare );
 
         // respond with "hello"

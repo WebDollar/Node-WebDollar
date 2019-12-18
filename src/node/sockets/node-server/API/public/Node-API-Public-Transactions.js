@@ -8,6 +8,10 @@ class NodeAPIPublicTransactions {
     return Blockchain.Transactions.pendingQueue.listArray;
   }
 
+  pendingObject(req, res) {
+    return Blockchain.Transactions.pendingQueue.listObject;
+  }
+
   async checkTransactionExists(req, res){
 
     try{
