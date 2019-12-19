@@ -28,11 +28,11 @@ const JsonRpcServer = (oConfig) => {
     const app = express();
     app.use(cors({ methods: ['POST'] }));
 
-    if (isNil(oConfig.basicAuth) === false && oConfig.basicAuth.isEnabled) {
+    if (isNil(oConfig.basicAuth) === false && oConfig.basicAuth.isEnabled && oConfig.basicAuth.isEnabled !== '0' && oConfig.basicAuth.isEnabled !== 'false') {
         app.use(basicAuth(omit(oConfig.basicAuth, ['isEnabled'])));
     }
 
-    if (isNil(oConfig.rateLimit) === false && oConfig.rateLimit.isEnabled) {
+    if (isNil(oConfig.rateLimit) === false && oConfig.rateLimit.isEnabled && oConfig.rateLimit.isEnabled !== '0' && oConfig.rateLimit.isEnabled !== 'false') {
         app.use(rateLimit(omit(oConfig.rateLimit, ['isEnabled'])));
     }
 
