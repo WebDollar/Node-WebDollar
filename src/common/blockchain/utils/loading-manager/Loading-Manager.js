@@ -72,6 +72,8 @@ class LoadingManager{
         for (const key in this.blockManager._pendingBlocks){
             let block = this.blockManager._pendingBlocks[key];
 
+            if (!block) continue; // be sure block exists
+
             if (block instanceof Promise) block = await block;
 
             //it is a forkBlock, it is skipped
