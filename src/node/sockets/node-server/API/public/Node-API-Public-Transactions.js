@@ -19,7 +19,7 @@ class NodeAPIPublicTransactions {
       let txId = req.tx_id;
       if ( typeof txId !== "string" || txId.length !== 64 ) throw {message: "Invalid Tx Id"}
 
-      let answer = await Blockchain.Transactions.loadingManager.getTxBlockHeight( req.tx_id );
+      let answer = await Blockchain.blocks.loadingManager.getTxBlockHeight( req.tx_id );
       return {result: !!answer , height: !!answer ? answer : undefined };
 
     }catch(exception){
@@ -35,7 +35,7 @@ class NodeAPIPublicTransactions {
       let txId = req.tx_id;
       if ( typeof txId !== "string" || txId.length !== 64 ) throw {message: "Invalid Tx Id"}
 
-      let answer = await Blockchain.Transactions.loadingManager.getTxBlockHeight( req.tx_id );
+      let answer = await Blockchain.blocks.loadingManager.getTxBlockHeight( req.tx_id );
 
       if (!!answer){
 
