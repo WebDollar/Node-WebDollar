@@ -9,6 +9,7 @@ import BlockHashManager from "./apps/Block-Hash-Manager"
 import BlockTimestampManager from "./apps/Block-Timestamp-Manager"
 import ChainWorkManager from "./apps/ChainWork-Manager";
 import Log from "../../../utils/logging/Log";
+import Blockchain from "../../../../main-blockchain/Blockchain";
 
 class LoadingManager{
 
@@ -61,6 +62,31 @@ class LoadingManager{
 
     async getChainWork(height){
         return this.chainWorkManager.getData(height);
+    }
+
+    //it will check if the transaction is a new block that is being saved
+    //or it was already saved on HDD
+    async getTxBlockHeight( txId ){
+
+        //check if tx is in pending blocks
+        for (const key in this.savingManager.blockManager._pendingBlocks){
+            let block = this.savingManager.blockManager._pendingBlocks[key];
+
+            if (block instanceof Promise) block = await block;
+
+            //it is a forkBlock, it is skipped
+            if (block.isForkBlock) continue;
+
+            const txIndex = block.data.transactions.findTransactionInBlockData(txId);
+            if (txIndex !== -1)
+                return block.height;
+
+        }
+
+        //check if tx is stored already
+        const answer = await Blockchain.Transactions.checkVirtualizedTxId( txId );
+        return answer;
+
     }
 
 

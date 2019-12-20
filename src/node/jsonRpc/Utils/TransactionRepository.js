@@ -84,7 +84,7 @@ class TransactionRepository {
         });
 
         // find will return undefined in case the element is not found
-        if (typeof oTransaction !== 'undefined') {
+        if ( !oTransaction ) {
             oTransaction.__nIndex = null;
             oTransaction.__oBlock = null;
             return oTransaction;
@@ -98,7 +98,7 @@ class TransactionRepository {
 
         const oBlock = await this._oBlockRepository.findByNumberOrTag(nBlockNumber);
 
-        if (oBlock === null) {
+        if ( !oBlock ) {
             return null;
         }
 
