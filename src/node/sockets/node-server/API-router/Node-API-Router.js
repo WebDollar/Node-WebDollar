@@ -88,9 +88,9 @@ class NodeAPIRouter{
 
         this._addRoute( 'transactions/pending/object', NodeAPIPublicTransactions.pendingObject, nodeApiType, 200 , app, prefix, middleWare );
 
-        this._addRoute( 'transactions/exists/:tx_id', NodeAPIPublicTransactions.checkTransactionExists, nodeApiType, 200 , app, prefix, middleWare );
+        this._addRoute( 'transactions/exists/:tx_id', NodeAPIPublicTransactions.checkTransactionExists, nodeApiType, 100 , app, prefix, middleWare );
 
-        this._addRoute( 'transactions/get/:tx_id', NodeAPIPublicTransactions.getTransaction, nodeApiType, 200 , app, prefix, middleWare );
+        this._addRoute( 'transactions/get/:tx_id', NodeAPIPublicTransactions.getTransaction, nodeApiType, 500 , app, prefix, middleWare );
 
         // respond with "hello"
         this._addRoute( 'hello', NodeAPIPublic.helloWorld, nodeApiType, 1000, app, prefix, middleWare );
