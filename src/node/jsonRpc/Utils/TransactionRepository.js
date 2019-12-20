@@ -128,7 +128,7 @@ class TransactionRepository {
         const self = this;
 
         try {
-            return await self._oBlockchain.db.get('transactionID-' + sTransactionHash);
+            return await self._oBlockchain.blocks.loadingManager.getTxBlockHeight(sTransactionHash);
         }
         catch (e) {
             return null;
