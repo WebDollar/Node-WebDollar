@@ -69,8 +69,8 @@ class LoadingManager{
     async getTxBlockHeight( txId ){
 
         //check if tx is in pending blocks
-        for (const key in this.savingManager.blockManager._pendingBlocks){
-            let block = this.savingManager.blockManager._pendingBlocks[key];
+        for (const key in this.blockManager._pendingBlocks){
+            let block = this.blockManager._pendingBlocks[key];
 
             if (block instanceof Promise) block = await block;
 
