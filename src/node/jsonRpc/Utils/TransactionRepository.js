@@ -84,7 +84,7 @@ class TransactionRepository {
         });
 
         // find will return undefined in case the element is not found
-        if ( !oTransaction ) {
+        if ( oTransaction !== undefined) {
             oTransaction.__nIndex = null;
             oTransaction.__oBlock = null;
             return oTransaction;
