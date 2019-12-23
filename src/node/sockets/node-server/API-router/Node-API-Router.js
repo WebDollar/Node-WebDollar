@@ -95,7 +95,7 @@ class NodeAPIRouter{
         // respond with "hello"
         this._addRoute( 'hello', NodeAPIPublic.helloWorld, nodeApiType, 1000, app, prefix, middleWare );
 
-        this._addRoute( 'top', NodeAPIPublic.top, nodeApiType, 1000, app, prefix, middleWare );
+        this._addRoute( 'top', NodeAPIPublic.top, nodeApiType, 100, app, prefix, middleWare );
 
 
         // respond with "ping"
