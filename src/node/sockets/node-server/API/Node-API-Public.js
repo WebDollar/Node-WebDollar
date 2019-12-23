@@ -64,6 +64,29 @@ class NodeAPIPublic{
         };
     }
 
+    top(){
+
+        let is_synchronized    = false;
+        let currentTimestamp   = new Date().getTime();
+        let oDate              = new Date((Blockchain.blockchain.blocks.last.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
+        let blockTimestamp     = oDate.getTime();
+        let nSecondsBehind     = currentTimestamp - blockTimestamp;
+
+        const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
+
+        if (nSecondsBehind < UNSYNC_THRESHOLD) {
+            is_synchronized = true;
+        }
+
+        return {
+
+            top: Blockchain.blockchain.blocks.length,
+            is_synchronized: is_synchronized,
+            secondsBehind  : nSecondsBehind / 1000
+
+        }
+
+    }
 
     helloWorld(req, res){
         return {hello: "world" };
