@@ -179,7 +179,7 @@ class TransactionsDownloadManager{
         }else{
 
             if(topPriority)
-                if(typeof this._transactionsQueue[txId] !== "undefined")
+                if(this._transactionsQueue[txId] )
                     this._transactionsQueue[txId].fails=0;
 
             //Add socket in tx socketsList if is from different socket

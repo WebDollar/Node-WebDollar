@@ -20,7 +20,7 @@ class AdvancedMessages{
                 prompt: 'WEBD_CLI:> '
             });
 
-            this.WEBD_CLI.on("SIGINT", function () {
+            this.WEBD_CLI.on("SIGINT",  () =>  {
 
                 termination(Blockchain);
 

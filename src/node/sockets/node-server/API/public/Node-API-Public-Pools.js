@@ -121,7 +121,7 @@ class NodeAPIPublicPools {
         };
       }
 
-      let element = {
+      const element = {
         miningHeights: miningHeights,
         instances: instances,
       };

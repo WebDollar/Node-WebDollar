@@ -269,11 +269,11 @@ class CLI {
                 crlfDelay: Infinity
             });
 
-            rl.on('error', function (err) {
+            rl.on('error',  (err) => {
                 console.error('Address ban list was not found');
             });
 
-            file.on('error', function (err) {
+            file.on('error',  (err) => {
                 console.error('Address ban list was not found');
             });
 

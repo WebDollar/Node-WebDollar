@@ -98,7 +98,7 @@ class NodeExpress{
                 if (caBundle === '') throw {message: "HTTPS server couldn't be started because certificate ca_bundle.crt was not found"};
 
                 try {
-                    if (this.domain === undefined || this.domain === "undefined") this.domain = this._extractDomain(cert);
+                    if ( !this.domain ) this.domain = this._extractDomain(cert);
                 } catch (exception){
                     console.error("Couldn't determine the SSL Certificate Host Name");
                 }
