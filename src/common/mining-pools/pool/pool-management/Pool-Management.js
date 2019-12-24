@@ -129,7 +129,7 @@ class PoolManagement{
 
                 await Blockchain.MinerPoolManagement.setMinerPoolStarted(false);
 
-                if (Blockchain.ServerPoolManagement !== undefined)
+                if (Blockchain.ServerPoolManagement)
                     await Blockchain.ServerPoolManagement.setServerPoolStarted(false);
 
             }

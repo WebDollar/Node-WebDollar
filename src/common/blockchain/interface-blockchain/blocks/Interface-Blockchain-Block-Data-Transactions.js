@@ -85,9 +85,9 @@ class InterfaceBlockchainBlockDataTransactions {
 
         for (let i=0; i<this.transactions.length; i++) {
 
-            if (typeof blockValidationType === 'undefined') {
+            if (  !blockValidationType )
                 blockValidationType = {};
-            }
+
 
             blockValidationType['take-transactions-list-in-consideration'] = {
                 validation  : true,
@@ -199,14 +199,14 @@ class InterfaceBlockchainBlockDataTransactions {
         return offset;
     }
 
-    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress = undefined, revertActions = undefined, showUpdate) {
+    _processBlockDataTransaction(blockHeight, transaction, multiplicationFactor = 1 , minerAddress , revertActions , showUpdate) {
 
         //skipping checking the Transaction in case it requires reverting
-        if (multiplicationFactor === 1) {
-            if (!transaction.validateTransactionOnce(blockHeight)) {
+        if (multiplicationFactor === 1)
+            if (!transaction.validateTransactionOnce(blockHeight))
                 throw {message: 'couldn\'t process the transaction ', transaction: transaction.txId };
-            }
-        }
+
+
 
         transaction.processTransaction(multiplicationFactor, minerAddress, revertActions, showUpdate);
 

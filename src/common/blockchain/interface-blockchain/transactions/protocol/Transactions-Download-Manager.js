@@ -129,7 +129,7 @@ class TransactionsDownloadManager{
                     if( this._transactionsQueue[txId].fails <= 2 ){
 
                         //Check if tx has socket and is still valid
-                        if ( this._transactionsQueue[txId].socket !== undefined )
+                        if ( this._transactionsQueue[txId].socket )
                             return {id:txId };
                         else
                             this.removeTransaction(txId);

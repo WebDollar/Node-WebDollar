@@ -200,7 +200,7 @@ class NodeWebPeerRTC {
 
                             },
                             (error) => {
-                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +(error !== undefined ? error.toString() : '')});
+                                resolve({result:false, message: "Generating Initiator - Error Setting Local Description " +(error ? error.toString() : '')});
                                 console.error("Generating Initiator - Error Setting Local Description ", error);
                             }
                         );
@@ -350,7 +350,7 @@ class NodeWebPeerRTC {
 
         this.peer.oniceconnectionstatechange = function() {
 
-            if (this.peer !== undefined && this.peer.iceConnectionState === 'disconnected') {
+            if (this.peer && this.peer.iceConnectionState === 'disconnected') {
 
                 console.log('iceConnection Disconnected');
                 if (this.peer.connected === true) {
@@ -399,7 +399,7 @@ class NodeWebPeerRTC {
                         done = true;
 
                         for (let i=0; i < chunks; i++)
-                            if (message.chunks[i] === undefined){
+                            if ( !message.chunks[i] ){
                                 done = false;
                                 break;
                             }
