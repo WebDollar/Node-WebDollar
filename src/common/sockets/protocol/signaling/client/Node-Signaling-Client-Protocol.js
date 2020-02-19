@@ -31,10 +31,10 @@ class NodeSignalingClientProtocol {
                 throw {message: "remoteUUID was not specified"};
 
             //search if the new protocol was already connected in the past
-            if ( NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', {"uuid": true} ) !== null) //already connected in the past
+            if ( NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', {"uuid": true} ) ) //already connected in the past
                 throw {message: "Already connected"};
 
-            if ( SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) !== null)
+            if ( SignalingClientList.searchWebPeerSignalingClientList(undefined, undefined, data.remoteUUID) )
                 throw {message: "Already connected"};
 
             if ( SignalingClientList.countConnectedByType("initiator") > SignalingClientList.computeMaxWebPeersConnected( data.remoteUUID ) )
@@ -72,7 +72,7 @@ class NodeSignalingClientProtocol {
 
             let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
 
-            if (webPeerSignalingClientListObject === null) throw { message: "WebRTC Client was not found"};
+            if ( !webPeerSignalingClientListObject ) throw { message: "WebRTC Client was not found"};
 
             let answer = await webPeerSignalingClientListObject.webPeer.joinAnswer(data.answerSignal);
 
@@ -96,7 +96,7 @@ class NodeSignalingClientProtocol {
 
             let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
 
-            if ( webPeerSignalingClientListObject === null ) throw { message: "WebRTC Client was not found"};
+            if ( !webPeerSignalingClientListObject ) throw { message: "WebRTC Client was not found"};
 
             let answer = await webPeerSignalingClientListObject.webPeer.createSignal(data.iceCandidate);
 
@@ -123,7 +123,7 @@ class NodeSignalingClientProtocol {
             if (NodesList.searchNodeSocketByAddress(data.remoteUUID, 'all', {"uuid":true}) !== null) //already connected in the past
                 throw {message: "Already connected"};
 
-            if (SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID) !== null)
+            if (SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID) )
                 throw {message: "Already connected"};
 
             let webPeer = await this._searchWebPeerSignalingClientList2(socket, data);
