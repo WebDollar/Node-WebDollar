@@ -31,7 +31,7 @@ class WebDollarCryptoData {
 
         let cryptoData = new WebDollarCryptoData(object);
 
-        if (forceToCreate && cryptoData.buffer !== null) {
+        if (forceToCreate && cryptoData.buffer ) {
             cryptoData.buffer = new Buffer(cryptoData.buffer);
         }
 
@@ -42,7 +42,7 @@ class WebDollarCryptoData {
 
         this.buffer = null;
 
-        if ((data !== null && Buffer.isBuffer(data)) || (type==="buffer"))
+        if ((data && Buffer.isBuffer(data)) || (type==="buffer"))
             this.buffer = data;
         else
         if (type === "hex")
@@ -79,7 +79,7 @@ class WebDollarCryptoData {
                 return;
             }
 
-            if (data === null)
+            if ( !data )
                 this.buffer = new Buffer ( [0] );
             else
                 this.buffer = this.createBufferFromArray(data);
@@ -120,7 +120,7 @@ class WebDollarCryptoData {
             }
         }
 
-        if (newValue !== null)
+        if (newValue )
             return newValue.buffer;
         else
             return new Buffer( [0] );

@@ -66,7 +66,7 @@ class InterfaceBlockchainProtocol {
 
     _validateBlockchainHeader(data){
 
-        if ( data === undefined || data === null) throw {message: "data is not defined"};
+        if ( !data  ) throw {message: "data is not defined"};
 
         // validating data
         if (typeof data.chainLength !== 'number') throw {message: 'chainLength is not specified'};
