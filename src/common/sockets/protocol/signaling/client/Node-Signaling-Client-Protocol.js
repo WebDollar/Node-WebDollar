@@ -68,7 +68,7 @@ class NodeSignalingClientProtocol {
 
             if (consts.DEBUG) console.warn("WEBRTC# 1_2");
 
-            if (data.remoteUUID === undefined || data.remoteUUID === null) throw { message: "remoteUUID was not specified" };
+            if ( !data.remoteUUID ) throw { message: "remoteUUID was not specified" };
 
             let webPeerSignalingClientListObject = SignalingClientList.searchWebPeerSignalingClientList(data.initiatorSignal, undefined, data.remoteUUID);
 
@@ -116,7 +116,7 @@ class NodeSignalingClientProtocol {
 
             if (consts.DEBUG) console.warn("WEBRTC# 2");
 
-            if (data.remoteUUID === undefined || data.remoteUUID === null)
+            if ( !data.remoteUUID )
                 throw {message: "data.remoteUUID 2 was not specified"}
 
             //search if the new protocol was already connected in the past

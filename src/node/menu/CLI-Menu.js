@@ -210,7 +210,7 @@ class CLI {
 
         Log.info('CLI menu started', Log.LOG_TYPE.CLI_MENU);
 
-        if (Blockchain !== undefined)
+        if (Blockchain )
             await Blockchain.loadWallet();
 
         this._showCommands();
@@ -325,7 +325,7 @@ class CLI {
         console.info('\nWallet addresses:');
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
-        if (miningAddress === undefined)
+        if (miningAddress )
             miningAddress = 'not specified';
 
         console.log(addressHeader);
@@ -349,7 +349,7 @@ class CLI {
             balance = Blockchain.blockchain.accountantTree.getBalance(miningAddress, undefined);
             balance = (balance === null) ? 0 : balance;
 
-            if (Blockchain.MinerPoolManagement !== undefined && Blockchain.MinerPoolManagement.minerPoolStarted)
+            if (Blockchain.MinerPoolManagement && Blockchain.MinerPoolManagement.minerPoolStarted)
                 balance += Blockchain.MinerPoolManagement.minerPoolReward.total;
 
             balance /= WebDollarCoins.WEBD;

@@ -45,14 +45,14 @@ class Argon2BrowserWebAssembly{
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcWasm, params);
-            if (result !== null) return result;
+            if (result ) return result;
         } catch (ex){
 
         }
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcAsmJs, params);
-            if (result !== null) return result;
+            if (result ) return result;
         } catch (ex){
 
         }
@@ -60,21 +60,21 @@ class Argon2BrowserWebAssembly{
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenSexpr, params);
-            if (result !== null) return result;
+            if (result ) return result;
         } catch (ex){
 
         }
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyCalc.calcBinaryenBin, params);
-            if (result !== null) return result;
+            if (result ) return result;
         } catch (ex){
 
         }
 
         try {
             result = await this._calculateHash(Argon2WebAssemblyMain.calcPNaCl, params);
-            if (result !== null) return result;
+            if (result ) return result;
         } catch (ex){
 
         }

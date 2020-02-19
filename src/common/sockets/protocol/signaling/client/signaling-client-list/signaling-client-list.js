@@ -51,7 +51,7 @@ class SignalingClientList {
 
         //previous established connection
         for (let i = 0; i < this.connected.length; i++)
-            if (this.connected[i].webPeer.peer !== null && this.connected[i].webPeer.peer !== undefined ) {
+            if (this.connected[i].webPeer.peer && this.connected[i].webPeer.peer ) {
 
                 if ( signalInitiator && JSON.stringify(this.connected[i].webPeer.peer.signalInitiatorData) === JSON.stringify(signalInitiator))
                     return i;

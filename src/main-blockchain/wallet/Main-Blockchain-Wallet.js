@@ -359,7 +359,7 @@ class MainBlockchainWallet {
             if (typeof publicKey === "string") publicKey = Buffer.from(publicKey, "hex");
 
 
-            if (address === undefined && publicKey === undefined) {
+            if ( !address && !publicKey ) {
                 await blockchainAddress.createNewAddress(undefined, privateKey);
 
             } else {

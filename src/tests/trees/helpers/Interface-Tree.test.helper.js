@@ -14,8 +14,8 @@ class InterfaceTreeTestHelper {
 
     testAdd (radixData, radixTree, createValue) {
 
-        if ( radixTree === undefined || radixTree === null)  radixTree = new this.className();
-        if ( createValue === undefined) createValue = true;
+        if ( !radixTree  )  radixTree = new this.className();
+        if ( !createValue ) createValue = true;
 
         radixData.forEach((str) => {
             radixTree.add(new Buffer(str, "ascii"), createValue ? {address: str} : undefined );

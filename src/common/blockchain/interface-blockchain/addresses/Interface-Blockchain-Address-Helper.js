@@ -191,7 +191,7 @@ class InterfaceBlockchainAddressHelper{
             address = InterfaceBlockchainAddressHelper._generateAddressFromPublicKey(publicKey, false);
 
             try {
-                if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address.address) !== null)
+                if (InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(address.address) )
                     invalidAddress = false;
             } catch (exception){
                 console.error("Address is invalid", address.address, address.address.length);
