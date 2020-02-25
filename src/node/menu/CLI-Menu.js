@@ -325,7 +325,7 @@ class CLI {
         console.info('\nWallet addresses:');
 
         let miningAddress = Blockchain.blockchain.mining.minerAddress;
-        if (miningAddress )
+        if ( !miningAddress )
             miningAddress = 'not specified';
 
         console.log(addressHeader);
