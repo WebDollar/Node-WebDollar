@@ -42,9 +42,12 @@ class BlockchainGenesis{
 
         if (typeof height === "string") height = Number.parseInt(height);
 
+        // no pos activated
         if (height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION)
             return false;
-        else {
+
+        // pos 66% activated
+        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS90_ACTIVATION){
 
             //0..19  pos
             //20..29 pow
@@ -55,6 +58,20 @@ class BlockchainGenesis{
             //20..29 pow
 
         }
+
+        //0..9 pos
+        //9..19 pos
+        //19..29 pos
+        //29..39 pos
+        //39..49 pos
+        //49..59 pos
+        //59..69 pos
+        //69..79 pos
+        //79..89 pos
+
+        //89..99 pow
+        if (height % 100 < 90) return true;
+        else return false;
 
     }
 

@@ -77,6 +77,8 @@ consts.BLOCKCHAIN = {
         TRANSACTIONS_INCLUDING_ONLY_HEADER: 567698, // SAME AS POS
         POS_ACTIVATION: 567810,
 
+        POS90_ACTIVATION: 1500000, //it needs to be % 30 === 0
+
     }
 
 };
