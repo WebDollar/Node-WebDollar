@@ -59,17 +59,22 @@ class BlockchainGenesis{
 
         }
 
-        //0..9 pos
-        //9..19 pos
-        //19..29 pos
-        //29..39 pos
-        //39..49 pos
-        //49..59 pos
-        //59..69 pos
-        //69..79 pos
-        //79..89 pos
+        //0..9 pos          -10%
+        //9..19 pos         -10%
+        //19..29 pos        -10%
+        //29..39 pos        -10%
+        //39..49 pos        -10%
+        //49..59 pos        -10%
+        //59..69 pos        -10%
+        //69..79 pos        -10%
+        //79..89 pos        -10%
 
-        //89..99 pow
+        //89..99 pow        -10%
+
+        // total 90 + 10
+        // pos = 90 / 100
+        // pow = 10 / 100
+
         if (height % 100 < 90) return true;
         else return false;
 
