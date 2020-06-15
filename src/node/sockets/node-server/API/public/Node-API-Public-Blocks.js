@@ -9,9 +9,9 @@ class NodeAPIPublicBlocks{
 
         try {
 
-            const MAX_BLOCKS = 100;
+            const LIMIT_BLOCKS = 25;
 
-            const startMin = Math.max(0, Blockchain.blockchain.blocks.length - MAX_BLOCKS);
+            const startMin = Math.max(0, Blockchain.blockchain.blocks.length - LIMIT_BLOCKS);
             const endMax = Blockchain.blockchain.blocks.length;
 
             let block_start = req.block_start || startMin;
@@ -19,6 +19,8 @@ class NodeAPIPublicBlocks{
 
             if (block_start < 0 || block_start >= endMax) throw {message: "block start is not correct: " + block_start};
             if (block_end < 0 || block_end >= endMax ) throw {message: "block end is not correct: " + block_start};
+
+            if (block_end - block_start > LIMIT_BLOCKS) throw {message: "requested too many blocks: " + block_end - block_start  };
 
             const blocks_to_send = [];
             for (let i=block_start; i<block_end; i++)
