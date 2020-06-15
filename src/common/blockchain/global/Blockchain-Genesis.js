@@ -38,6 +38,16 @@ class BlockchainGenesis{
         return 0;
     }
 
+    PoSModulo(height){
+        if (typeof height === "string") height = Number.parseInt(height);
+
+        // no pos activated
+        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) return 0;
+
+        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS90_ACTIVATION) return 30;
+        else return 100;
+    }
+
     isPoSActivated(height){
 
         if (typeof height === "string") height = Number.parseInt(height);
@@ -57,26 +67,30 @@ class BlockchainGenesis{
             //29,0..19  pos
             //20..29 pow
 
+        } else {
+
+            //0..9 pos          -10%
+            //9..19 pos         -10%
+            //19..29 pos        -10%
+            //29..39 pos        -10%
+            //39..49 pos        -10%
+            //49..59 pos        -10%
+            //59..69 pos        -10%
+            //69..79 pos        -10%
+            //79..89 pos        -10%
+
+            //89..99 pow        -10%
+
+            // total 90 + 10
+            // pos = 90 / 100
+            // pow = 10 / 100
+
+            if (height % 100 < 90) return true;
+            else return false;
+
         }
 
-        //0..9 pos          -10%
-        //9..19 pos         -10%
-        //19..29 pos        -10%
-        //29..39 pos        -10%
-        //39..49 pos        -10%
-        //49..59 pos        -10%
-        //59..69 pos        -10%
-        //69..79 pos        -10%
-        //79..89 pos        -10%
 
-        //89..99 pow        -10%
-
-        // total 90 + 10
-        // pos = 90 / 100
-        // pow = 10 / 100
-
-        if (height % 100 < 90) return true;
-        else return false;
 
     }
 
