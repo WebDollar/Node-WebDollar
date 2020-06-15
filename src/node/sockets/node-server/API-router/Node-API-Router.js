@@ -43,8 +43,8 @@ class NodeAPIRouter{
         this._addRoute('', NodeAPIPublic.info, nodeApiType, 200, app, prefix, middleWare );
 
         // Return blocks information
-        this._addRoute('blocks/between/:blocks', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
-
+        this._addRoute('blocks/between/:block_start', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
+        this._addRoute('blocks/between/:block_start/:block_end', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
 
         // Return block information
         this._addRoute( 'blocks/at/:block', NodeAPIPublicBlocks.block, nodeApiType, 20, app, prefix, middleWare );
