@@ -17,8 +17,8 @@ class NodeAPIPublicBlocks{
             let block_start = req.block_start || startMin;
             let block_end = req.block_end || endMax;
 
-            if (block_start < 0 || block_start >= endMax) throw {message: "block start is not correct: " + block_start};
-            if (block_end < 0 || block_end >= endMax ) throw {message: "block end is not correct: " + block_start};
+            if (block_start < 0 || block_start > endMax) throw {message: "block start is not correct: " + block_start};
+            if (block_end < 0 || block_end > endMax ) throw {message: "block end is not correct: " + block_start};
 
             if (block_end - block_start > LIMIT_BLOCKS) throw {message: "requested too many blocks: " + block_end - block_start  };
 
