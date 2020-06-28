@@ -122,8 +122,13 @@ class InterfaceBlockchainFork {
         if (height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1) {
 
             //calculating the virtualization of the POS
-            if (height % 30 === 29) height = height - 10;  //first POS, get the last proof of Stake
-            else if (height % 30 === 19) height = height - 20; //first POW, get the last proof of Work
+            if (height < consts.BLOCKCHAIN.HARD_FORKS.POS90_ACTIVATION) {
+                if (height % 30 === 29) height = height - 10;  //first POS, get the last proof of Stake
+                else if (height % 30 === 19) height = height - 20; //first POW, get the last proof of Work
+            } else {
+                if (height % 100 === 99) height = height - 10; //first POS, get the last proof of Stake
+                else if (height % 100 === 89) height = height - 90; //first POW, get the last proof of work
+            }
 
             forkHeight = height - this.forkStartingHeight;
         }
