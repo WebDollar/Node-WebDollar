@@ -37,11 +37,11 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         let serializedBuffer = block._serializeInterlink();
         block._deserializeInterlink(serializedBuffer, 0);
 
-        assert(block.interlink.length === interlink.length, "Interlink length differ: " + block.interlink.length + "!==" + interlink.length);
+        assert(block.interlink.length === interlink.length, "Interlink length diffent: " + block.interlink.length + "!==" + interlink.length);
 
         for (let i = 0; i < interlink.length; ++i) {
-            assert(block.interlink[i].height === interlink[i].height, "Interlink height differ: " + block.interlink[i].height + "!==" + interlink[i].height);
-            assert(block.interlink[i].blockId.equals(interlink[i].blockId), "Interlink blockId differ: " + block.interlink[i].blockId.toString("hex") + "!==" + interlink[i].blockId.toString("hex") + "i = " + i);
+            assert(block.interlink[i].height === interlink[i].height, "Interlink height diffent: " + block.interlink[i].height + "!==" + interlink[i].height);
+            assert(block.interlink[i].blockId.equals(interlink[i].blockId), "Interlink blockId diffent: " + block.interlink[i].blockId.toString("hex") + "!==" + interlink[i].blockId.toString("hex") + "i = " + i);
         }
 
     });
