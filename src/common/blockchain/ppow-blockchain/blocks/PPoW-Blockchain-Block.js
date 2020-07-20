@@ -303,7 +303,7 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
             for (let i = 0; i < interlink.length; i++) {
 
                 if (interlink[i].height !== this.interlink[i].height)
-                    throw {message: "interlink height is different"};
+                    throw {message: "interlink height is different", interlink:i , height: this.height};
 
                 if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId))
                     throw {message: "interlink prevBlock height is different"};
