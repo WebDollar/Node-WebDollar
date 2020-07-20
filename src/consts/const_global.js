@@ -77,7 +77,7 @@ consts.BLOCKCHAIN = {
         TRANSACTIONS_INCLUDING_ONLY_HEADER: 567698, // SAME AS POS
         POS_ACTIVATION: 567810,
 
-        POS90_ACTIVATION: 1500000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
+        POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
 
     }
 
@@ -267,7 +267,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.220.0",
+        VERSION: "1.3.0",
 
         VERSION_COMPATIBILITY: "1.220.0",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.220.0",
