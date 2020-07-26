@@ -9,7 +9,7 @@ export default {
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
 
-        {"addr": ["https://webd.5q.ro:3333"]}, // Thanks to Sorin M
+        {"addr": ["https://webd.5q.ro:8443"]}, // Thanks to Sorin M
 
         //{"addr": ["https://ez.cnbacolt.com:443"]},
         //{"addr": ["https://server.cnbacolt.com:443"]},
