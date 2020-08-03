@@ -81,6 +81,10 @@ consts.BLOCKCHAIN = {
 
         POS100_ACTIVATION: 1750000, //it needs to be % 100 === 0
 
+        //TODO MUST BE REMOVED FOR MAIN NET!!!!
+        POS100_POW_LOWER_DIFFICULTY_HEIGHT: 1749990, // lower the difficulty of the forked chain. It must be % 90 === 0 and first POW block after the hard fork
+        POS100_POW_LOWER_DIFFICULTY: new Buffer ( "00000112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ), //hard difficulty
+
     }
 
 };

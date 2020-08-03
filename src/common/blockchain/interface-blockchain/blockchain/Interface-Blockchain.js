@@ -181,6 +181,9 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
         if (height === -1) return BlockchainGenesis.difficultyTarget;
         if ( height === consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1) return BlockchainGenesis.difficultyTargetPOS;
 
+        //TODO MUST BE REMOVED FOR MAIN NET!!!!
+        if (height === consts.BLOCKCHAIN.HARD_FORKS.POS100_POW_LOWER_DIFFICULTY_HEIGHT ) return consts.BLOCKCHAIN.HARD_FORKS.POS100_POW_LOWER_DIFFICULTY;
+
         if (POSRecalculation && height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1){
 
             if (height < consts.BLOCKCHAIN.HARD_FORKS.POS90_ACTIVATION) {
