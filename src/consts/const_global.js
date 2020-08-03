@@ -79,7 +79,7 @@ consts.BLOCKCHAIN = {
 
         POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
 
-        POS100_ACTIVATION: 1750000, //it needs to be % 100 === 0, better it should be % 100 = 0 && % 30  === 0
+        POS100_ACTIVATION: 1750000, //it needs to be % 100 === 0
 
     }
 
