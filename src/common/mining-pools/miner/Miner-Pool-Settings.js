@@ -228,6 +228,7 @@ class MinerPoolSettings {
     }
 
     async _addPoolsList(){
+        await this.addPoolList("/pool/1/LOFT/0.01/777b64f4425cf319cd6f178d890178e6c5d5d367d65f100a3c8d71d815fef0d4/https:$$pool.maison:8443", undefined, true);
         await this.addPoolList("/pool/1/CanadianStakePool/0/b96ebf01cefa08edae50a5bf495a8f61261bc918fa4e62c4cbbe3ebe6bacde21/https:$$webdollarpool.ca:443", undefined, true);
         await this.addPoolList("/pool/1/ImperiumStake/0/bf883f6f0e7c68c415e791eb77ddf55e43e352fa673fc35536937d074178dd80/https:$$webdollarpool.eu:443", undefined, true);
         await this.addPoolList("/pool/1/2MooNPooL/0.02/3c9456990ea9d0595f3a438e46b656063a42e6ad7f4fb1316b4a2b4086bfe9b0/https:$$2moonPool.ddns.net:3335", undefined, true);
