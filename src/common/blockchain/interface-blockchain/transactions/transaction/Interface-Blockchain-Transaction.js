@@ -42,7 +42,9 @@ class InterfaceBlockchainTransaction{
                 if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES ) version = 0x00;
                 else
                 if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION ) version = 0x01;
-                else version = 0x02;
+                else
+                if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_EXTRA_DATA ) version = 0x02;
+                else version = 0x03;
 
             }
 
@@ -186,10 +188,12 @@ class InterfaceBlockchainTransaction{
             if (this.timeLock >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
 
             if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x01) throw {message: "version is invalid", version: this.version};
-            if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
-
+            if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_OPTIMIZATION && blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_EXTRA_DATA && this.version !== 0x02) throw {message: "version is invalid", version: this.version};
+            if (blockHeight >= consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_EXTRA_DATA && this.version !== 0x03) throw {message: "version is invalid", version: this.version};
         }
 
+        if (this.version <= 0x02)
+            if (this.extra.length) throw {message: "extra must be empty"};
 
         if (this.nonce > 0xFFFF) throw {message: "nonce is invalid", nonce : this.nonce};
         if (this.timeLock > 0xFFFFFF || this.timeLock < 0) throw {message: "version is invalid", version: this.version};
@@ -293,7 +297,7 @@ class InterfaceBlockchainTransaction{
 
     _serializeTransaction(){
 
-        let array = [
+        const array = [
 
             Serialization.serializeNumber1Byte( this.version ),
 
@@ -303,10 +307,12 @@ class InterfaceBlockchainTransaction{
 
             this.from.serializeFrom(),
             this.to.serializeTo(),
-
-            Serialization.serializeNumber1Byte( this.extra.length ),
-            this.extra,
         ];
+
+        if ( this.version === 0x03 ){
+            array.push( Serialization.serializeNumber1Byte( this.extra.length ) );
+            array.push( this.extra );
+        }
 
         return Buffer.concat (array);
     }
@@ -336,11 +342,13 @@ class InterfaceBlockchainTransaction{
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
 
-            const extraLength = Serialization.deserializeNumber1Bytes( buffer, offset );
-            offset += 1;
+            if (this.version === 0x03){
+                const extraLength = Serialization.deserializeNumber1Bytes( buffer, offset );
+                offset += 1;
 
-            this.extra  = BufferExtended.substr(buffer, offset, extraLength );
-            offset += extraLength;
+                this.extra  = BufferExtended.substr(buffer, offset, extraLength );
+                offset += extraLength;
+            }
 
         } catch (exception){
 
