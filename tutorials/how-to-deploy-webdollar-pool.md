@@ -46,7 +46,7 @@ npm run commands # better use screen command or open another terminal - Run this
 #### vue-Frontend - Running by default on PORT 9094!
 ```shell
 cd vue-Frontend
-npm run dev # better use screen command or open another terminal - Run this command after step 3
+npm run start # better use screen command or open another terminal - Run this command after step 3
 ```
 ### 5. Configuring your WebDollar Pool (run commands in Node Window)
 ```shell

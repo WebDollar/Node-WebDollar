@@ -228,14 +228,14 @@ class MinerPoolSettings {
     }
 
     async _addPoolsList(){
-        await this.addPoolList("/pool/1/CanadianStakePool/0/b96ebf01cefa08edae50a5bf495a8f61261bc918fa4e62c4cbbe3ebe6bacde21/https:$$webdollarpool.ca:443", undefined, true);
-        await this.addPoolList("/pool/1/ImperiumStake/0/bf883f6f0e7c68c415e791eb77ddf55e43e352fa673fc35536937d074178dd80/https:$$webdollarpool.eu:443", undefined, true);
-        await this.addPoolList("/pool/1/2MooNPooL/0.02/3c9456990ea9d0595f3a438e46b656063a42e6ad7f4fb1316b4a2b4086bfe9b0/https:$$2moonPool.ddns.net:3335", undefined, true);
+        await this.addPoolList("/pool/1/CanadianStakePool/0.02/cf9eb743548122226de9f4b7ed536520c2d84af146014edf49055be96e9e9988/https:$$webdollarpool.ca:443", undefined, true);
+        await this.addPoolList("/pool/1/WEBD-Splashpool-USA/0.02/61761896b4d958b3cc9073ae3c724a127b4ee5b31f6b8dcafd29643cf20a796a/https:$$splashpool.myvnc.com:8080", undefined, true);
+        await this.addPoolList("/pool/1/LOFT/0.01/777b64f4425cf319cd6f178d890178e6c5d5d367d65f100a3c8d71d815fef0d4/https:$$pool.maison:8443", undefined, true);
         await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
         await this.addPoolList("pool/1/EuroPool/0.02/f06b4720a725eb4fe13c06b26fca4c862b2f2f2ddc831e411418aceefae8e6df/https:$$webd-europool.ddns.net:2222", undefined, true);
         await this.addPoolList("/pool/1/WMP/0.02/d02e26e60a5b0631a0b71e7dc72bb7492fd018dad64531498df369ec14f87962/https:$$server.webdollarminingpool.com:443", undefined, true);
+        await this.addPoolList("/pool/1/Timi/0.001/7d863060bc5bf81695f53c5e61c79677ad6cb3b5fd48dafebbabb25f7dca8797/https:$$pool.timi.ro:443", undefined, true);
         await this.addPoolList("/pool/1/WMP-ASIA/0.02/773a8d5f7ce3c0dba0b7216c35d2768b1a6abef716fa2a46d875d6ca0e2c115e/https:$$singapore.webdollarminingpool.com:443", undefined, true);
-        await this.addPoolList("/pool/1/Timi/0.001/48bfe934cc6cec36c58e3f8468a24a495cd38d77cd4a9af0e9a6e9f13741fcd7/https:$$pool.timi.ro:443", undefined, true);
     }
 
     async _replacePoolURL(url = ''){
