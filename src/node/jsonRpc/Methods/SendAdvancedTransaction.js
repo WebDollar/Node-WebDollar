@@ -49,8 +49,9 @@ class SendAdvancedTransaction extends RpcMethod {
             undefined, // nonce
             undefined, // timeLock
             undefined, // version @FIXME This is not calculated if validateVersion === false,
+            undefined, // extra
             undefined, // txId
-            false, false, true, true, true, false,
+            false, false, true, true, true, false, false,
         );
 
         const fee = this._oTransactionsManager.wizard.calculateFeeWizzard(oTransaction.serializeTransaction(true));

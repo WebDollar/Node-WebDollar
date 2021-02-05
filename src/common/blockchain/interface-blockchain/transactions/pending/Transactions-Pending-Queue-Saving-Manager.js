@@ -79,7 +79,7 @@ class TransactionsPendingQueueSavingManager{
             for (let i = 0; i < count; i++) {
 
 
-                let transaction = new MiniBlockchainTransaction(this.blockchain);
+                const transaction = new MiniBlockchainTransaction(this.blockchain);
                 offset = transaction.deserializeTransaction(buffer, offset);
 
                 try {

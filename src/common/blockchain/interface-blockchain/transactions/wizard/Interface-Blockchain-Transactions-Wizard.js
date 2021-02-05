@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async deserializeValidateTransaction(transaction){
 
-        let myTransaction = new MiniBlockchainTransaction(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
+        const myTransaction = new MiniBlockchainTransaction(this.blockchain,undefined,undefined,0,undefined,undefined, undefined, undefined,false,false,false,false,false,false, false);
 
         await myTransaction.deserializeTransaction(transaction.data,0,true);
 
@@ -129,8 +129,9 @@ class InterfaceBlockchainTransactionsWizard{
                 nonce, //nonce
                 timeLock, //timeLock
                 undefined, //version @FIXME This is not calculated if validateVersion === false,
+                undefined, // extra
                 undefined, //txId
-                false, false, true, true, true, false,
+                false, false, true, true, true, false, false,
             );
 
         } catch (exception) {

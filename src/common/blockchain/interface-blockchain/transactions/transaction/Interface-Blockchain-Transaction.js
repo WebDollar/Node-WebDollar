@@ -22,7 +22,7 @@ class InterfaceBlockchainTransaction{
      * @param txId - usually null
      */
 
-    constructor( blockchain, from, to, nonce, timeLock, version, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, validateTxId = true ){
+    constructor( blockchain, from, to, nonce, timeLock, version, extra, txId, validateFrom=true, validateTo=true, validateNonce=true,validateTimeLock=true, validateVersion=true, validateExtra = true, validateTxId = true ){
 
         this.blockchain = blockchain;
         this.from = null;
@@ -47,6 +47,12 @@ class InterfaceBlockchainTransaction{
             }
 
         this.version = version; //version
+
+        if (validateExtra)
+            if (!extra)
+                extra = Buffer.alloc(0);
+
+        this.extra = extra;
 
         try {
 
@@ -168,6 +174,7 @@ class InterfaceBlockchainTransaction{
         if (typeof this.nonce !== 'number') throw {message: 'nonce is empty', nonce: this.nonce};
         if (typeof this.version  !== "number") throw {message: 'version is empty', version:this.version};
         if (typeof this.timeLock !== "number") throw {message: 'timeLock is empty', timeLock:this.timeLock};
+        if (!Buffer.isBuffer(this.extra) || this.extra.length > 255 ) throw {message: 'invalid extra', extra:this.extra};
 
         if (this.timeLock < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
         if (blockHeight < consts.BLOCKCHAIN.HARD_FORKS.TRANSACTIONS_BUG_2_BYTES && this.version !== 0x00) throw {message: "version is invalid", version: this.version};
@@ -297,6 +304,8 @@ class InterfaceBlockchainTransaction{
             this.from.serializeFrom(),
             this.to.serializeTo(),
 
+            Serialization.serializeNumber1Byte( this.extra.length ),
+            this.extra,
         ];
 
         return Buffer.concat (array);
@@ -327,6 +336,12 @@ class InterfaceBlockchainTransaction{
             offset = this.from.deserializeFrom(buffer, offset);
             offset = this.to.deserializeTo(buffer, offset);
 
+            const extraLength = Serialization.deserializeNumber1Bytes( buffer, offset );
+            offset += 1;
+
+            this.extra  = BufferExtended.substr(buffer, offset, extraLength );
+            offset += extraLength;
+
         } catch (exception){
 
             console.error("error deserializing a transaction ", exception);
@@ -351,6 +366,7 @@ class InterfaceBlockchainTransaction{
             version: this.version,
             timeLock: this.timeLock,
             confirmed: this.confirmed,
+            extra: this.extra.toString("hex"),
         };
 
         if (!dontIncludeTxId )
