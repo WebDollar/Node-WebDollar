@@ -147,7 +147,32 @@ If you are under a **router/firewall**, you need to port forward the port used b
 npm run commands
 ```
 
-#### 5.2 Running Full Node
+#### 5.2 Run terminal non-interactive menu
+
+After building the terminal project
+
+```shell
+npm run build_terminal_menu
+npm run build_terminal_worker
+```
+
+it is possible to run the terminal project as a non-interactive script:
+
+```shell
+node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js -- --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here
+```
+
+the first part of the command (`node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js`) launches the terminal project.
+
+The next portion of the command (`--`) starts it in non-interactive mode.
+Without `--`, the terminal menu defaults to interactive.
+
+The next parts are the commands to run in order.
+
+Mining should be the last command used, as mining stops processing additional arguments since it starts the mining process.
+This is useful for programmatically executing a mining task (such as in a container).
+
+#### 5.3 Running Full Node
 
 Install pm2.
 ```shell
