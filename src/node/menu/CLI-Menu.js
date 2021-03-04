@@ -147,7 +147,7 @@ class CLI {
         if (Blockchain)
             await Blockchain.loadWallet();
 
-        this._showCommands();
+        CLI.CORE.showCommands();
         AdvancedMessages.WEBD_CLI.prompt();
 
         JsonRpcServer(consts.JSON_RPC);
