@@ -41,4 +41,12 @@ RUN cp -a ../argon2/* dist_bundle/CPU/
 
 ENV PYTHON /usr/bin/python2
 
+# this container runs as root, add a dummy sudo
+# creates a tiny script that just runs the command passed to it.
+#> eval "$@"
+#
+# this is needed since many of the scripts in this project use sudo.
+RUN echo "#!/bin/bash\\neval \"\$@\"" > /usr/bin/sudo && \
+    chmod +x /usr/bin/sudo
+
 CMD [ "/bin/bash" ]
