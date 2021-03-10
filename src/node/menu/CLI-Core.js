@@ -8,7 +8,6 @@ import WebDollarCoins from 'common/utils/coins/WebDollar-Coins';
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 import Blockchain from 'main-blockchain/Blockchain';
 import StatusEvents from 'common/events/Status-Events';
-import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
 import AddressBanList from 'common/utils/bans/AddressBanList';
 
@@ -627,23 +626,6 @@ export class CLICore {
 
     }
 
-    decryptWallet(password) {
-        // var triesLeft = 3
-        new Promise((resolve, reject) => {
-            StatusEvents.once("miner-pool/connection-established", (data) => {
-                if (data.connected) {
-                    Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password);
-                    resolve();
-                }
-                else {
-                    console.error('Failed to unlock the wallet.')
-                    reject();
-                }
-                // console.error('Failed to unlock the wallet, will retry %o times', triesLeft);
-            });
-        }).finally(() => console.info('Done importing password protected wallet.'));
-    }
-
     async setIntervalDisconnectAllMinersNodes(interval) {
 
         let intervalTime = !!interval || interval === 0 ? interval : await AdvancedMessages.readNumber('Enter the interval time: \n 0 - disable interval \n x - minutes');
@@ -659,6 +641,30 @@ export class CLICore {
 
         }
 
+    }
+
+    /**
+     * Asynchronously starts decrypting the active wallet.
+     * @param password - the 12 word array of strings
+     */
+    decryptWallet(password) {
+        new Promise((resolve, reject) => {
+            Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password)
+                .then(() => resolve())
+                .catch(() => reject());
+        }).then(() => console.info('Done unlocking password protected wallet.'))
+            .catch(err => console.error(`Failed to unlock password protected wallet. ${err}`));
+    }
+
+    /**
+     * Read the password from a file and then decrypt the active wallet with it.
+     * @param filename
+     */
+    decryptWalletFromFile(filename) {
+        FileSystem.readFile(filename, 'utf8', (err, password) => {
+            if (err) throw err;
+            this.decryptWallet(password.trim().split(' '));
+        });
     }
 
     showCommands() {
@@ -696,7 +702,7 @@ const commands = [
     '22. Disconnect from all consensus nodes',
     '23. Disconnect all miner nodes',
     '24. Set Interval to disconnect all miner nodes',
-    '30. Set Password for Mining Address',
+    '30. Set Password for Mining Address (--set-password \'{quoted password}\', --set-password-file {path to password.txt}',
     '53. Add address to banlist',
     '54. Load address banlist',
     '55. Save address banlist',
