@@ -281,7 +281,7 @@ export class CLICore {
         console.info('Import address.');
 
         return new Promise(async (resolve) => {
-            path = !!path ? path : AdvancedMessages.input('Enter address path: ');
+            path = !!path ? path : await AdvancedMessages.input('Enter address path: ');
 
             FileSystem.readFile(path, 'utf8', async (err, content) => {
 
