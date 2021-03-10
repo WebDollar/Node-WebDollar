@@ -169,8 +169,17 @@ Without `--`, the terminal menu defaults to interactive.
 
 The next parts are the commands to run in order.
 
-Mining should be the last command used, as mining stops processing additional arguments since it starts the mining process.
-This is useful for programmatically executing a mining task (such as in a container).
+Alternatively, you can use the `./webd` command in the root of this project. The cli must be built first.
+`./webd` assumes non-interactive, so `--` can be omitted from the command.  To run interactively `npm run commands` works best.
+
+```shell
+./webd --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here --set-password 'my 12 word password'
+```
+
+To display the list of commands, run:
+```shell
+./webd (-h|--help)
+```
 
 #### 5.3 Running Full Node
 

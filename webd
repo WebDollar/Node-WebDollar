@@ -13,6 +13,8 @@ function check_args {
 if [ $# -eq 0 ]
 then
     echo -e "${RED}No arguments supplied${NC}"
+    # print help
+    node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js --
     exit 7
 fi
 }
