@@ -1,5 +1,7 @@
 /* eslint-disable */
 import CLICore from './CLI-Core';
+import Blockchain from 'main-blockchain/Blockchain';
+
 
 class CLIRunner {
 
@@ -115,7 +117,15 @@ class CLIRunner {
                 break;
             case '30':  // Set Password
             case '--set-password':
-                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
+                const actualPassword = rest.shift();
+                // console.info('Password will be imported after the blockchain is initialized!');
+                CLIRunner.CORE.decryptWallet(actualPassword.trim().split(' '));
+                // await Blockchain.Mining.setPrivateKeyAddressForMiningAddress(actualPassword);
+                break;
+            case '--set-password-file':
+                const passwordFile = rest.shift();
+                // TODO: read from file.
+                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress(passwordFile);
                 break;
             case '53': // add banlist
             case '--add-to-banlist':

@@ -128,16 +128,6 @@ export class CLICore {
         return addressId;
     }
 
-    async _chooseAddressNonInteractive(pos) {
-        console.log(`Choosing Address ${pos} from addresses:`)
-        await this.listAddresses();
-
-        if (isNaN(pos) || pos < 0 || Blockchain.Wallet.addresses.length <= pos)
-            return -1;
-
-        return pos;
-    }
-
     async AddAddressBanList() {
 
         let addressWIF = await AdvancedMessages.input('Please input miner address: ');
@@ -468,64 +458,6 @@ export class CLICore {
 
     }
 
-    async nonInteractiveMineInPool(url) {
-        Log.info('Mining inside a POOL: ' + url, Log.LOG_TYPE.POOLS);
-
-        consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
-
-        await this._callCallbackBlockchainSync(undefined, async () => {
-
-            try {
-
-                let getNewLink = !!url;
-
-                if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== '') {
-
-                    Log.info('Your current mining pool is: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolName + " " + Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite, Log.LOG_TYPE.error);
-
-                    if (!getNewLink) {
-                        console.log('A new link was not provided. This will be used.');
-                        url = Blockchain.MinerPoolManagement.minerPoolSettings.poolURL
-                    } else {
-                        console.log('A new link was provided. It will overwrite the old link.');
-                    }
-                }
-
-                StatusEvents.on("miner-pool/connection-established", (data) => {
-                    if (data.connected)
-                        Blockchain.Mining.startMining();
-                    else
-                        Blockchain.Mining.stopMining();
-                });
-
-                Blockchain.MinerPoolManagement.startMinerPool(url, true);
-
-            } catch (exception) {
-
-                Log.error("There is a problem starting to mine in this pool", Log.LOG_TYPE.POOLS, exception);
-
-            }
-
-        }, undefined, undefined, false);
-
-        let mining = true;
-
-        process.on('SIGTERM', () => {
-            console.log('SIGTERM received. Shutting down.');
-            mining = false;
-        });
-
-        process.on('SIGINT', () => {
-            console.log('SIGINT received. Shutting down.');
-            mining = false;
-        });
-
-        while (mining) {
-            // still mining, no sigterm received
-            await new Promise(resolve => setTimeout(resolve, 10000));
-        }
-    }
-
     async createMiningPool() {
 
         Log.info('Create Mining Pool', Log.LOG_TYPE.info);
@@ -693,6 +625,23 @@ export class CLICore {
         let NodesList = require('node/lists/Nodes-List').default;
         NodesList.disconnectAllNodesByConsensusType(NODES_CONSENSUS_TYPE.NODE_CONSENSUS_MINER_POOL);
 
+    }
+
+    decryptWallet(password) {
+        // var triesLeft = 3
+        new Promise((resolve, reject) => {
+            StatusEvents.once("miner-pool/connection-established", (data) => {
+                if (data.connected) {
+                    Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password);
+                    resolve();
+                }
+                else {
+                    console.error('Failed to unlock the wallet.')
+                    reject();
+                }
+                // console.error('Failed to unlock the wallet, will retry %o times', triesLeft);
+            });
+        }).finally(() => console.info('Done importing password protected wallet.'));
     }
 
     async setIntervalDisconnectAllMinersNodes(interval) {
