@@ -169,8 +169,17 @@ Without `--`, the terminal menu defaults to interactive.
 
 The next parts are the commands to run in order.
 
-Mining should be the last command used, as mining stops processing additional arguments since it starts the mining process.
-This is useful for programmatically executing a mining task (such as in a container).
+Alternatively, you can use the `./webd` command in the root of this project. The cli must be built first.
+`./webd` assumes non-interactive, so `--` can be omitted from the command.  To run interactively `npm run commands` works best.
+
+```shell
+./webd --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here --set-password 'my 12 word password'
+```
+
+To display the list of commands, run:
+```shell
+./webd (-h|--help)
+```
 
 #### 5.3 Running Full Node
 
@@ -235,6 +244,29 @@ npm run start
 #### 5.8 PM2 to run the Node run indefinitely
 
 Follow the tutorial: [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
+
+## Development Environment
+
+### Dockerized
+It is possible to run the development environment in a docker container.
+This is useful if you are unable to configure and install the custom argon2
+flavor required by this project. The docker container has this project set up to be
+built in it, and comes pre-installed with the tools you need for this project.
+
+#### Building
+
+Run `docker-compose build` to build the workspace container.
+
+To force a rebuild, you can either remove the previous workspace (`docker rm webdollar-dev-env`)
+or you can run `docker-compose build --no-cache`.
+
+#### Running
+
+Once you've build the workspace container, simply run it to launch an interactive shell with all the tools you need to develop.
+
+`docker-compose run webdollar-dev-env`
+
+This entire folder is mounted into the container, so any files you change in the workspace will be available to the container immediately.
 
 # To do:
 

@@ -8,7 +8,6 @@ import WebDollarCoins from 'common/utils/coins/WebDollar-Coins';
 import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
 import Blockchain from 'main-blockchain/Blockchain';
 import StatusEvents from 'common/events/Status-Events';
-import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
 import AddressBanList from 'common/utils/bans/AddressBanList';
 
@@ -126,16 +125,6 @@ export class CLICore {
             return -1;
 
         return addressId;
-    }
-
-    async _chooseAddressNonInteractive(pos) {
-        console.log(`Choosing Address ${pos} from addresses:`)
-        await this.listAddresses();
-
-        if (isNaN(pos) || pos < 0 || Blockchain.Wallet.addresses.length <= pos)
-            return -1;
-
-        return pos;
     }
 
     async AddAddressBanList() {
@@ -468,64 +457,6 @@ export class CLICore {
 
     }
 
-    async nonInteractiveMineInPool(url) {
-        Log.info('Mining inside a POOL: ' + url, Log.LOG_TYPE.POOLS);
-
-        consts.SETTINGS.NODE.PORT = consts.SETTINGS.NODE.MINER_POOL_PORT;
-
-        await this._callCallbackBlockchainSync(undefined, async () => {
-
-            try {
-
-                let getNewLink = !!url;
-
-                if (typeof Blockchain.MinerPoolManagement.minerPoolSettings.poolURL === "string" && Blockchain.MinerPoolManagement.minerPoolSettings.poolURL !== '') {
-
-                    Log.info('Your current mining pool is: ' + Blockchain.MinerPoolManagement.minerPoolSettings.poolName + " " + Blockchain.MinerPoolManagement.minerPoolSettings.poolWebsite, Log.LOG_TYPE.error);
-
-                    if (!getNewLink) {
-                        console.log('A new link was not provided. This will be used.');
-                        url = Blockchain.MinerPoolManagement.minerPoolSettings.poolURL
-                    } else {
-                        console.log('A new link was provided. It will overwrite the old link.');
-                    }
-                }
-
-                StatusEvents.on("miner-pool/connection-established", (data) => {
-                    if (data.connected)
-                        Blockchain.Mining.startMining();
-                    else
-                        Blockchain.Mining.stopMining();
-                });
-
-                Blockchain.MinerPoolManagement.startMinerPool(url, true);
-
-            } catch (exception) {
-
-                Log.error("There is a problem starting to mine in this pool", Log.LOG_TYPE.POOLS, exception);
-
-            }
-
-        }, undefined, undefined, false);
-
-        let mining = true;
-
-        process.on('SIGTERM', () => {
-            console.log('SIGTERM received. Shutting down.');
-            mining = false;
-        });
-
-        process.on('SIGINT', () => {
-            console.log('SIGINT received. Shutting down.');
-            mining = false;
-        });
-
-        while (mining) {
-            // still mining, no sigterm received
-            await new Promise(resolve => setTimeout(resolve, 10000));
-        }
-    }
-
     async createMiningPool() {
 
         Log.info('Create Mining Pool', Log.LOG_TYPE.info);
@@ -712,6 +643,30 @@ export class CLICore {
 
     }
 
+    /**
+     * Asynchronously starts decrypting the active wallet.
+     * @param password - the 12 word array of strings
+     */
+    decryptWallet(password) {
+        new Promise((resolve, reject) => {
+            Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password)
+                .then(() => resolve())
+                .catch(() => reject());
+        }).then(() => console.info('Done unlocking password protected wallet.'))
+            .catch(err => console.error(`Failed to unlock password protected wallet. ${err}`));
+    }
+
+    /**
+     * Read the password from a file and then decrypt the active wallet with it.
+     * @param filename
+     */
+    decryptWalletFromFile(filename) {
+        FileSystem.readFile(filename, 'utf8', (err, password) => {
+            if (err) throw err;
+            this.decryptWallet(password.trim().split(' '));
+        });
+    }
+
     showCommands() {
 
         console.info('\nChoose one of the following commands:');
@@ -747,7 +702,7 @@ const commands = [
     '22. Disconnect from all consensus nodes',
     '23. Disconnect all miner nodes',
     '24. Set Interval to disconnect all miner nodes',
-    '30. Set Password for Mining Address',
+    '30. Set Password for Mining Address (--set-password \'{quoted password}\', --set-password-file {path to password.txt}',
     '53. Add address to banlist',
     '54. Load address banlist',
     '55. Save address banlist',

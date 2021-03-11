@@ -17,8 +17,15 @@ class CLIRunner {
     }
 
     async run() {
+        // process all args, then wait for mining if applicable.
+        this.miningProcessStarted = false;
+
         while (this.args.length > 0) {
             this.args = await this.runCommand(this.args);
+        }
+
+        if (this.miningProcessStarted) {
+            await this.waitForMiningToStop();
         }
     }
 
@@ -64,18 +71,18 @@ class CLIRunner {
             case '8': //  Start Mining
             case '--mine':
                 await CLIRunner.CORE.startMining();
-                await this.waitForMiningToStop();
+                this.miningProcessStarted = true;
                 break;
             case '9': //  Start Mining Instantly
             case '--mine-now':
                 await CLIRunner.CORE.startMining(true);
-                await this.waitForMiningToStop();
+                this.miningProcessStarted = true;
                 break;
             case '10': // Mining Pool: Start Mining in a Pool
             case '--mine-in-pool':
                 let url = rest.shift();
                 await CLIRunner.CORE.startMiningInsidePool(url, false);
-                await this.waitForMiningToStop();
+                this.miningProcessStarted = true;
                 break;
             case '11-1':  // Mining Pool: Create a New Pool
             case '--process-payments':
@@ -115,7 +122,12 @@ class CLIRunner {
                 break;
             case '30':  // Set Password
             case '--set-password':
-                await Blockchain.Mining.setPrivateKeyAddressForMiningAddress();
+                const actualPassword = rest.shift();
+                CLIRunner.CORE.decryptWallet(actualPassword.trim().split(' '));
+                break;
+            case '--set-password-file':
+                const passwordFile = rest.shift();
+                CLIRunner.CORE.decryptWalletFromFile(passwordFile);
                 break;
             case '53': // add banlist
             case '--add-to-banlist':
