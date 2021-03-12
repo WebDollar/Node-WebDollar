@@ -228,7 +228,7 @@ class MinerPoolSettings {
     }
 
     async _addPoolsList(){
-        await this.addPoolList("/pool/1/CanadianStakePool/0.02/cf9eb743548122226de9f4b7ed536520c2d84af146014edf49055be96e9e9988/https:$$webdollarpool.ca:443", undefined, true);
+        await this.addPoolList("/pool/1/CanadianStakePool/0.02/ea115a560322c557d3617732145a837af9992d729e5f8165d3b7077b22ee12a4/https:$$webdollarpool.ca:443", undefined, true);
         await this.addPoolList("/pool/1/WEBD-Splashpool-USA/0.02/61761896b4d958b3cc9073ae3c724a127b4ee5b31f6b8dcafd29643cf20a796a/https:$$splashpool.myvnc.com:8080", undefined, true);
         await this.addPoolList("/pool/1/LOFT/0.01/777b64f4425cf319cd6f178d890178e6c5d5d367d65f100a3c8d71d815fef0d4/https:$$pool.maison:8443", undefined, true);
         await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);

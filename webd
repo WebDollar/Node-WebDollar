@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+###
+### This provides a ./webd command for running
+### The web-dollar CLI in non-interactive mode.
+###
+
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+function check_args {
+if [ $# -eq 0 ]
+then
+    echo -e "${RED}No arguments supplied${NC}"
+    # print help
+    node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js --
+    exit 7
+fi
+}
+
+function cli {
+    if test -f "./dist_bundle/terminal-menu-bundle.js"; then
+        check_args "$@"
+        node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js -- "$@"
+    else
+        echo
+        echo -e "${RED}Couldn't find the CLI bundle."
+        echo -e "${RED}Be sure to build it first!"
+        echo
+        echo -e "${CYAN}npm run build_terminal_menu && npm run build_terminal_worker${NC}"
+        echo
+        exit 7
+    fi
+}
+
+cli "$@"

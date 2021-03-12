@@ -147,7 +147,41 @@ If you are under a **router/firewall**, you need to port forward the port used b
 npm run commands
 ```
 
-#### 5.2 Running Full Node
+#### 5.2 Run terminal non-interactive menu
+
+After building the terminal project
+
+```shell
+npm run build_terminal_menu
+npm run build_terminal_worker
+```
+
+it is possible to run the terminal project as a non-interactive script:
+
+```shell
+node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js -- --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here
+```
+
+the first part of the command (`node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js`) launches the terminal project.
+
+The next portion of the command (`--`) starts it in non-interactive mode.
+Without `--`, the terminal menu defaults to interactive.
+
+The next parts are the commands to run in order.
+
+Alternatively, you can use the `./webd` command in the root of this project. The cli must be built first.
+`./webd` assumes non-interactive, so `--` can be omitted from the command.  To run interactively `npm run commands` works best.
+
+```shell
+./webd --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here --set-password 'my 12 word password'
+```
+
+To display the list of commands, run:
+```shell
+./webd (-h|--help)
+```
+
+#### 5.3 Running Full Node
 
 Install pm2.
 ```shell
@@ -210,6 +244,29 @@ npm run start
 #### 5.8 PM2 to run the Node run indefinitely
 
 Follow the tutorial: [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
+
+## Development Environment
+
+### Dockerized
+It is possible to run the development environment in a docker container.
+This is useful if you are unable to configure and install the custom argon2
+flavor required by this project. The docker container has this project set up to be
+built in it, and comes pre-installed with the tools you need for this project.
+
+#### Building
+
+Run `docker-compose build` to build the workspace container.
+
+To force a rebuild, you can either remove the previous workspace (`docker rm webdollar-dev-env`)
+or you can run `docker-compose build --no-cache`.
+
+#### Running
+
+Once you've build the workspace container, simply run it to launch an interactive shell with all the tools you need to develop.
+
+`docker-compose run webdollar-dev-env`
+
+This entire folder is mounted into the container, so any files you change in the workspace will be available to the container immediately.
 
 # To do:
 
