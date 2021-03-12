@@ -20,18 +20,18 @@ whitebg=$(tput setab 7 && tput bold)
 stand=$(tput sgr0)
 
 ### System dialog VARS
-showinfo="$green[info]$stand"
-showerror="$red[error]$stand"
-showexecute="$yellow[running]$stand"
-showok="$magenta[OK]$stand"
-showdone="$blue[DONE]$stand"
-showinput="$cyan[input]$stand"
-showwarning="$red[warning]$stand"
-showremove="$green[removing]$stand"
-shownone="$magenta[none]$stand"
-redhashtag="$redbg$white#$stand"
-abortte="$cyan[abort to Exit]$stand"
-showport="$yellow[PORT]$stand"
+showinfo="${green}[info]$stand"
+showerror="${red}[error]$stand"
+showexecute="${yellow}[running]$stand"
+showok="${magenta}[OK]$stand"
+showdone="${blue}[DONE]$stand"
+showinput="${cyan}[input]$stand"
+showwarning="${red}[warning]$stand"
+showremove="${green}[removing]$stand"
+shownone="${magenta}[none]$stand"
+redhashtag="${redbg}$white#$stand"
+abortte="${cyan}[abort to Exit]$stand"
+showport="${yellow}[PORT]$stand"
 ###
 
 ###
@@ -68,11 +68,14 @@ export showport
 
 function install_nvm()
 {
-
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+# shellcheck source=/dev/null
 export NVM_DIR="$HOME/.nvm"
+# shellcheck source=/dev/null
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# shellcheck source=/dev/null
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# shellcheck source=/dev/null
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then source ~/.profile; elif cat /etc/*release | grep -q -o -m 1 centos; then source ~/.bash_profile; fi
 nvm install 8.2.1
 nvm use 8.2.1
@@ -80,7 +83,7 @@ nvm alias default 8.2.1
 
 }
 
-### Look for git :)
+### Look after git :)
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
 
 	if [[ $(apt-cache policy git | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y git; else echo "$showok Git is already installed!"; fi
@@ -88,6 +91,30 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o 
 elif cat /etc/*release | grep -q -o -m 1 centos; then
 
 	if [[ $(yum list git | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y git; else echo "$showok Git is already installed!"; fi
+
+fi
+###
+
+### Look after curl :)
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+        if [[ $(apt-cache policy curl | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y curl; else echo "$showok Curl is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+        if [[ $(yum list git | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y curl; else echo "$showok Curl is already installed!"; fi
+
+fi
+###
+
+### Look after python2.7 - yeah, blame node-gyp for that.
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+        if [[ $(apt-cache policy python2.7 | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+        if [[ $(yum list python2.7 | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
 
 fi
 ###
@@ -121,7 +148,9 @@ if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-w
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -z $(apt-cache policy build-essential | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok build-essential is already installed"; else sudo apt-get install -y build-essential; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(which clang) == "/usr/bin/clang" ]]; then echo "$showok clang is already installed"; else sudo apt-get install -y clang; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi fi
+	# shellcheck disable=SC2236
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which node-gyp) ]]; then echo "$showok node-gyp is already installed!"; else npm install -g node-gyp; fi fi
+	# shellcheck disable=SC2236
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which pm2) ]]; then echo "$showok pm2 is already installed!"; else npm install pm2 -g --unsafe-perm; fi fi
 	echo "$showexecute Running npm install..." && npm install
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand"; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok..."; else echo "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand"; fi fi

@@ -68,9 +68,10 @@ class NodeAPIPrivate{
           to = req.to;
         }
 
-        let amount = parseInt(req.amount) ? parseInt(req.amount) * WebDollarCoins.WEBD : undefined;
-        let fee = parseInt(req.fee) * WebDollarCoins.WEBD;
-
+        let amount = parseFloat(req.amount) ? parseFloat(req.amount) * WebDollarCoins.WEBD : undefined;
+        let fee = parseFloat(req.fee) * WebDollarCoins.WEBD;
+        amount = Math.round(amount)
+        fee = Math.round(fee)
         let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 
         return result;
