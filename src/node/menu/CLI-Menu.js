@@ -33,19 +33,21 @@ class CLI {
         // parse cli args
         this.cliArgs = process.argv;
 
-        if (!this.cliArgs.includes('--')) {
-            this._startInteractive();
-        } else {
-            console.log("Non-interactive activated.  Args will be read from left to right.");
-            this.cliArgs = this.cliArgs.splice(this.cliArgs.indexOf('--'));
-            if (this.cliArgs.length <= 0) {
-                CLI.CORE.showCommands();
+        Blockchain.loadWallet().then((answer)=>{
+            if (!this.cliArgs.includes('--')) {
+                this._startInteractive();
+            } else {
+                console.log("Non-interactive activated.  Args will be read from left to right.");
+                this.cliArgs = this.cliArgs.splice(this.cliArgs.indexOf('--'));
+                if (this.cliArgs.length <= 0) {
+                    CLI.CORE.showCommands();
+                }
+                console.log('Working with args: %o', this.cliArgs);
+                this.runner = new CLIRunner(this.cliArgs);
+                this.runner.run()
+                    .then(() => process.exit());
             }
-            console.log('Working with args: %o', this.cliArgs);
-            this.runner = new CLIRunner(this.cliArgs);
-            this.runner.run()
-                .then(() => process.exit());
-        }
+        })
 
     }
 
@@ -143,9 +145,6 @@ class CLI {
     async _startInteractive() {
 
         Log.info('CLI menu started', Log.LOG_TYPE.CLI_MENU);
-
-        if (Blockchain)
-            await Blockchain.loadWallet();
 
         CLI.CORE.showCommands();
         AdvancedMessages.WEBD_CLI.prompt();
