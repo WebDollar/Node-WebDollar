@@ -61,7 +61,6 @@ consts.BLOCKCHAIN = {
 
         //forks larger than this will not be accepted
         IMMUTABILITY_LENGTH: 60,
-
     },
 
     HARD_FORKS : {
@@ -267,7 +266,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.3.10",
+        VERSION: "1.3.11",
 
         VERSION_COMPATIBILITY: "1.200.3",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
