@@ -62,7 +62,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock = true, revertActions, showUpdate){
 
-        if (!block.reward ) block.reward = BlockchainMiningReward.getReward(block.height);
+        if (!block.reward ) block.reward = BlockchainMiningReward.getFinalReward(block.height);
 
         if (!block.blockValidation )
             block.blockValidation = this.createBlockValidation();

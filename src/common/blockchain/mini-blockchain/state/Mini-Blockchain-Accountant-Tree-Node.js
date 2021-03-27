@@ -425,7 +425,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             if (!bIncludeMiningReward) {
                 for (let i = 1; i <= 40; i++)
-                    if (balance === BlockchainMiningReward.getReward(i))
+                    if (balance === BlockchainMiningReward.getFinalReward(i))
                         return;
             }
 

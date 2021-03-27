@@ -113,8 +113,8 @@ class InterfaceBlockchainBlock {
 
         await this._validateBlockTimeStamp();
 
-        if (this.reward !== BlockchainMiningReward.getReward(this.height) )
-            throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getReward( this.height ) };
+        if (this.reward !== BlockchainMiningReward.getFinalReward(this.height) )
+            throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getFinalReward( this.height ) };
 
         if ( await this._supplementaryValidation() === false)
             throw {message: "supplementaryValidation failed"};
@@ -341,7 +341,7 @@ class InterfaceBlockchainBlock {
 
         if ( height )  this.height = height||0;
         if (reward ) this.reward = reward;
-        else this.reward = BlockchainMiningReward.getReward(this.height);
+        else this.reward = BlockchainMiningReward.getFinalReward(this.height);
 
         if (difficultyTargetPrev ) this.difficultyTargetPrev = difficultyTargetPrev;
 
