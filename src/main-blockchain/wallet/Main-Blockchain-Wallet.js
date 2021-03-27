@@ -576,7 +576,7 @@ class MainBlockchainWallet {
         let ask = true;
 
         if (bIsInteractive)
-            ask = await AdvancedMessages.confirm(`Are you sure you want to delete ${address}`);
+            ask = await AdvancedMessages.confirm(`Are you sure you want to delete ${address} , Did you backed it up?`);
 
         if (ask) {
             let addressToDelete = this.addresses[index];
