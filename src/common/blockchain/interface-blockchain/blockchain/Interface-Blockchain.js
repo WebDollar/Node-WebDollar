@@ -64,6 +64,8 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (!block.reward ) block.reward = BlockchainMiningReward.getFinalReward(block.height);
 
+        console.warn("!!!!!block.reward", block.height, block.reward )
+
         if (!block.blockValidation )
             block.blockValidation = this.createBlockValidation();
         else {

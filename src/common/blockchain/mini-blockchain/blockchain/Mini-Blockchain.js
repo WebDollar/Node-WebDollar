@@ -50,7 +50,7 @@ class MiniBlockchain extends  inheritBlockchain{
             if ( !block.blockValidation.blockValidationType['skip-mini-blockchain-simulation'] ) {
 
                 //updating reward
-                console.log("block.reward", block.reward )
+                console.warn("!!!!!block.reward", block.reward )
                 let result = this.accountantTree.updateAccount( block.data.minerAddress, block.reward, undefined, revertActions, showUpdate);
 
                 //reward
