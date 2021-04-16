@@ -60,7 +60,6 @@ class BlockchainMiningReward{
             height = initialHeight - consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING
             cycle = Math.trunc( height / blocksPerCycle ) + 1;
             if (cycle > 1   ) {
-                //cycle -=1
                 if ( (height % blocksPerCycle) === blocksPerCycle-1 ) {
                     cycle += 1
                 }
