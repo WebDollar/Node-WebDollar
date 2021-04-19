@@ -37,7 +37,7 @@ export class CLICore {
 
         return new Promise(async (resolve) => {
 
-            let addressId = await this._chooseAddress(id);
+            let addressId = await this._chooseAddress();
 
             if (addressId < 0) {
                 console.warn("You must enter a valid number.");
@@ -52,10 +52,8 @@ export class CLICore {
             let addressPath = await AdvancedMessages.input('Enter path for saving the transaction:');
             let wantToPropagate = await AdvancedMessages.input('Do you want to propagate now y/n?:');
 
-            if (wantToPropagate.toUpperCase().trim() === 'Y' ? true : false)
-                wantToPropagate = true;
-            else
-                wantToPropagate = false;
+            if (wantToPropagate.toUpperCase().trim() === 'Y') wantToPropagate = true;
+            else wantToPropagate = false;
 
             let feeToSend = Blockchain.Transactions.wizard.calculateFeeSimple(amountToSend);
 
@@ -115,7 +113,7 @@ export class CLICore {
 
     }
 
-    async _chooseAddress(id = undefined) {
+    async _chooseAddress(id ) {
 
         await this.listAddresses();
 
