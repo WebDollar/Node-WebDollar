@@ -1,7 +1,7 @@
 # How to mine WebDollar with Windows Terminal
  Mine WebDollar with Windows Terminal
 
-####  a. Download and install latest version of Nodejs <a href="https://nodejs.org/en/download/">Latest version of Node.js</a> <- ctrl + click to open in a new window
+####  a. Download and install Nodejs 8.12 <a href="https://nodejs.org/dist/v8.12.0/">Node.js 8</a> <- ctrl + click to open in a new window
 ####  b. Download and install Python
 ##### <a href="https://www.python.org/ftp/python/2.7.15/python-2.7.15.amd64.msi">Python 2.7 64bit</a> <- ctrl + click to open in a new window
 ##### <a href="https://www.python.org/ftp/python/2.7.15/python-2.7.15.msi">Python 2.7 32bit</a> <- ctrl + click to open in a new window

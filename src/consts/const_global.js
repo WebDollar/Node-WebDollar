@@ -61,7 +61,6 @@ consts.BLOCKCHAIN = {
 
         //forks larger than this will not be accepted
         IMMUTABILITY_LENGTH: 60,
-
     },
 
     HARD_FORKS : {
@@ -78,6 +77,7 @@ consts.BLOCKCHAIN = {
         POS_ACTIVATION: 567810,
 
         POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
+        FORCED_HALVING:   2158000,
 
         POS100_ACTIVATION: 1750000, //it needs to be % 100 === 0
 
@@ -273,7 +273,7 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.3.1",
+        VERSION: "1.3.11",
 
         VERSION_COMPATIBILITY: "1.3.1",
         VERSION_COMPATIBILITY_POOL_MINERS: "1.3.1",

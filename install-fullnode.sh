@@ -38,18 +38,18 @@ export whitebg
 export stand
 
 ### System dialog VARS
-showinfo="$green[info]$stand"
-showerror="$red[error]$stand"
-showexecute="$yellow[running]$stand"
-showok="$magenta[OK]$stand"
-showdone="$blue[DONE]$stand"
-showinput="$cyan[input]$stand"
-showwarning="$red[warning]$stand"
-showremove="$green[removing]$stand"
-shownone="$magenta[none]$stand"
-redhashtag="$redbg$white#$stand"
-abortte="$cyan[abort to Exit]$stand"
-showport="$yellow[PORT]$stand"
+showinfo="${green}[info]$stand"
+showerror="${red}[error]$stand"
+showexecute="${yellow}[running]$stand"
+showok="${magenta}[OK]$stand"
+showdone="${blue}[DONE]$stand"
+showinput="${cyan}[input]$stand"
+showwarning="${red}[warning]$stand"
+showremove="${green}[removing]$stand"
+shownone="${magenta}[none]$stand"
+redhashtag="${redbg}$white#$stand"
+abortte="${cyan}[abort to Exit]$stand"
+showport="${yellow}[PORT]$stand"
 ##
 
 export showinfo
@@ -71,8 +71,11 @@ function install_nvm()
 
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
+# shellcheck source=/dev/null
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# shellcheck source=/dev/null
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+# shellcheck source=/dev/null
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then source ~/.profile; elif cat /etc/*release | grep -q -o -m 1 centos; then source ~/.bash_profile; fi
 nvm install 8.2.1
 nvm use 8.2.1
@@ -129,6 +132,30 @@ elif cat /etc/*release | grep -q -o -m 1 centos; then
 fi
 ###
 
+### Look after curl :)
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+        if [[ $(apt-cache policy curl | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y curl; else echo "$showok Curl is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+        if [[ $(yum list git | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y curl; else echo "$showok Curl is already installed!"; fi
+
+fi
+###
+
+### Look after python2.7 - yeah, blame node-gyp for that.
+if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
+
+        if [[ $(apt-cache policy python2.7 | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
+
+elif cat /etc/*release | grep -q -o -m 1 centos; then
+
+        if [[ $(yum list python2.7 | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
+
+fi
+###
+
 ### System update
 function sys_update(){
 
@@ -154,7 +181,9 @@ if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o 
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -z $(apt-cache policy build-essential | grep Installed | grep none | awk '{print$2}' | sed s'/[()]//g') ]]; then echo "$showok build-essential is already installed"; else sudo apt-get install -y build-essential; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum group install -y "Development Tools"; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(which clang) == "/usr/bin/clang" ]]; then echo "$showok clang is already installed"; else sudo apt-get install -y clang; fi elif cat /etc/*release | grep -q -o -m 1 centos; then sudo yum install -y clang; fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ -d $HOME/.nvm ]]; then echo "$showok NVM is already installed!"; elif [[ ! -d $HOME/.nvm ]]; then install_nvm; fi fi
+# shellcheck disable=SC2236
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which node-gyp) ]]; then echo "$showok node-gyp is already installed!"; else npm install -g node-gyp; fi fi
+# shellcheck disable=SC2236
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian || cat /etc/*release | grep -q -o -m 1 centos; then if [[ ! -z $(which pm2) ]]; then echo "$showok pm2 is already installed!"; else npm install pm2 -g --unsafe-perm; fi fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok!"; else echo -e "$showwarning ${red}MANDATORY$stand: execute ${yellow}source ~/.profile$stand\n$showinfo Start script again after command execution." && exit 0; fi elif cat /etc/*release | grep -q -o -m 1 centos; then if [[ $(node --version) ]]; then echo "$showok NVM sourced ok!"; else echo -e "$showinfo ${red}MANDATORY$stand: execute ${yellow}source ~/.bash_profile$stand\n$showinfo Start script again after command execution."; fi fi
 
@@ -187,8 +216,8 @@ read -r -e -p "$showinput How many nodes do you want to deploy? " readnrofnodes 
 		for ((nodes=1; nodes<=readnrofnodes; nodes++));
 		do
 			if [[ ! -d Node-WebDollar1 ]]; then
-				git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar$nodes
-				cd Node-WebDollar$nodes && npm install && cd ..
+				git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar"$nodes"
+				cd Node-WebDollar"$nodes" && npm install && cd ..
 				echo "$showok Node-WebDollar$nodes Deployed successfully!"
 			else
 				echo "$showwarning Node-WebDollar1 is already deployed!"
@@ -230,8 +259,8 @@ elif [[ "$readft" == 2 ]]; then
 				cd .. && echo "$showinfo Location changed to $(pwd)"
 				for ((i=countcurrentnodes+1; i<=countcurrentnodes+readnrofnodesdeploy; i++));
 				do
-					git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar$i
-					cd Node-WebDollar$i && npm install && cd ..
+					git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar"$i"
+					cd Node-WebDollar"$i" && npm install && cd ..
 					echo "$showok Node-WebDollar$i Deployed successfully!"
 				done
 			else
@@ -240,8 +269,8 @@ elif [[ "$readft" == 2 ]]; then
 
 					for ((i=countcurrentnodes+1; i<=countcurrentnodes+readnrofnodesdeploy; i++));
 					do
-						git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar$i
-						cd Node-WebDollar$i && npm install && if cd "$crnt_dir"; then echo "$showinfo Current DIR changed to $(pwd)"; else echo "$showerror Couldn't change DIR to $crnt_dir!"; fi
+						git clone https://github.com/WebDollar/Node-WebDollar.git Node-WebDollar"$i"
+						cd Node-WebDollar"$i" && npm install && if cd "$crnt_dir"; then echo "$showinfo Current DIR changed to $(pwd)"; else echo "$showerror Couldn't change DIR to $crnt_dir!"; fi
 						echo "$showok Node-WebDollar$i Deployed successfully!"
 					done
 				fi
@@ -318,8 +347,8 @@ elif [[ "$readft" == 3 ]]; then
 
 					for ((i=countcurrentnodes+1; i<=countcurrentnodes+deployclones; i++));
 					do
-						cp -r "$nodewebdloc" Node-WebDollar$i
-						ls -la Node-WebDollar$i
+						cp -r "$nodewebdloc" Node-WebDollar"$i"
+						ls -la Node-WebDollar"$i"
 						echo "$showok Node-WebDollar$i Deployed successfully @ $nodewebdloc/Node-WebDollar$i!"
 					done
 				else
@@ -342,8 +371,8 @@ elif [[ "$readft" == 3 ]]; then
 
 						for ((i=countcurrentnodes+1; i<=countcurrentnodes+deployclones; i++));
 						do
-							cp -r "$nodewebdloc" Node-WebDollar$i
-							ls -la Node-WebDollar$i
+							cp -r "$nodewebdloc" Node-WebDollar"$i"
+							ls -la Node-WebDollar"$i"
 							echo "$showok Node-WebDollar$i Deployed successfully @ $nodewebdloc/Node-WebDollar$i!"
 						done
 					else

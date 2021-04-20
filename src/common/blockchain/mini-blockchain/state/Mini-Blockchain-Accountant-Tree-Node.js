@@ -158,14 +158,14 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     _serializeBalance(balance){
 
         return Buffer.concat([
-                Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH),
-                Serialization.serializeNumber7Bytes(balance.amount)
-            ]);
+            Serialization.serializeToFixedBuffer(consts.MINI_BLOCKCHAIN.TOKENS.OTHER_TOKENS.LENGTH, balance.id),
+            Serialization.serializeNumber7Bytes(balance.amount)
+        ]);
     }
 
     _serializeBalanceWEBDToken(balance){
         return Buffer.concat([
-            Serialization.serializeToFixedBuffer(balance.id, consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH),
+            Serialization.serializeToFixedBuffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH, balance.id),
             Serialization.serializeNumber7Bytes(balance.amount)
         ]);
     }
@@ -425,7 +425,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             if (!bIncludeMiningReward) {
                 for (let i = 1; i <= 40; i++)
-                    if (balance === BlockchainMiningReward.getReward(i))
+                    if (balance === BlockchainMiningReward.getFinalReward(i))
                         return;
             }
 

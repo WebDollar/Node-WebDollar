@@ -48,7 +48,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock = await this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
             nextBlock.timeStamp = await nextBlock.getTimestampForMining();
-            nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
+            nextBlock.reward = BlockchainMiningReward.getFinalReward(nextBlock.height);
             await nextBlock.updateInterlink();
 
         } catch (Exception){

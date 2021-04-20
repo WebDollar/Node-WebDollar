@@ -1,6 +1,6 @@
 /* eslint-disable */
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
+import MiniBlockchainTransaction from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
 import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 
@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async deserializeValidateTransaction(transaction){
 
-        let myTransaction = new MiniBlockchainTransactions(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
+        let myTransaction = new MiniBlockchainTransaction(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
 
         await myTransaction.deserializeTransaction(transaction.data,0,true);
 
