@@ -79,11 +79,7 @@ consts.BLOCKCHAIN = {
         POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
         FORCED_HALVING:   2158000,
 
-        POS100_ACTIVATION: 1750000, //it needs to be % 100 === 0
-
-        //TODO MUST BE REMOVED FOR MAIN NET!!!!
-        POS100_POW_LOWER_DIFFICULTY_HEIGHT: 1749990, // lower the difficulty of the forked chain. It must be % 90 === 0 and first POW block after the hard fork
-        POS100_POW_LOWER_DIFFICULTY: new Buffer ( "00000112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" ), //hard difficulty
+        POS100_ACTIVATION: 2167000, //it needs to be % 100 === 0
 
     }
 
@@ -273,10 +269,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.3.11",
+        VERSION: "2.0.0",
 
-        VERSION_COMPATIBILITY: "1.3.1",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.3.1",
+        VERSION_COMPATIBILITY: "2.0.0",
+        VERSION_COMPATIBILITY_POOL_MINERS: "2.0.0",
 
         VERSION_COMPATIBILITY_UPDATE: "",
 
