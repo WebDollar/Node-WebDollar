@@ -123,11 +123,11 @@ class CLIRunner {
             case '30':  // Set Password
             case '--set-password':
                 const actualPassword = rest.shift();
-                CLIRunner.CORE.decryptWallet(actualPassword.trim().split(' '));
+                await CLIRunner.CORE.decryptWallet(actualPassword.trim().split(' '));
                 break;
             case '--set-password-file':
                 const passwordFile = rest.shift();
-                CLIRunner.CORE.decryptWalletFromFile(passwordFile);
+                await CLIRunner.CORE.decryptWalletFromFile(passwordFile);
                 break;
             case '53': // add banlist
             case '--add-to-banlist':
