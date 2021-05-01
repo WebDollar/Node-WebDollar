@@ -431,7 +431,7 @@ export class CLICore {
 
                 if (getNewLink) {
 
-                    miningPoolLink = !!url ? url : await AdvancedMessages.input('Enter the new mining pool link: ');
+                    miningPoolLink = !!url ? url : await AdvancedMessages.input('Pool URLs should look like:\n  https://webdollar.io/pool/1/1/MyPoolName/<pool public key>/https:$$mybigpool.com\nEnter the new mining pool link: ');
                     Log.info('Your new MiningPool is : ' + miningPoolLink, Log.LOG_TYPE.info);
 
                 }
