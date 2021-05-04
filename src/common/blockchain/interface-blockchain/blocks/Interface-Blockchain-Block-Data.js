@@ -119,9 +119,16 @@ class InterfaceBlockchainBlockData {
     }
 
     toJSON(){
+
+        const transactions = [];
+        for (const tx of this.transactions.transactions ){
+            transactions.push(tx.txId.toString('hex'))
+        }
+
         return {
             minerAddress: Buffer.isBuffer(this.minerAddress) ?  this.minerAddress.toString("hex") : '',
             hashData: Buffer.isBuffer(this.hashData) ?  this.hashData.toString("hex") : '',
+            transactions,
         };
     }
 
