@@ -522,7 +522,6 @@ class InterfaceBlockchainBlock {
     getBlockHeader(){
 
         return {
-
             version: this.version,
             height: this.height,
             hash: this.hash,
