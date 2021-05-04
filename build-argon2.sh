@@ -734,7 +734,7 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 				echo "$showok GPU folder inside dist_bundle exists!"
 				echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 				if [ -d argon2-gpu/.libs ]; then
-					cp -a argon2gpu/.libs dist_bundle/GPU/
+					cp -a argon2-gpu/.libs dist_bundle/GPU/
 				fi
 			else
 				if [[ ! -d dist_bundle/GPU ]]; then
@@ -742,7 +742,7 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 					echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
 					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 					if [ -d argon2-gpu/.libs ]; then
-						cp -a argon2gpu/.libs dist_bundle/GPU/
+						cp -a argon2-gpu/.libs dist_bundle/GPU/
 					fi
 				fi
 			fi
@@ -769,7 +769,7 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 					echo "$showok GPU folder inside dist_bundle exists!"
 					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 					if [ -d argon2-gpu/.libs ]; then
-						cp -a argon2gpu/.libs dist_bundle/GPU/
+						cp -a argon2-gpu/.libs dist_bundle/GPU/
 					fi
 				else
 					if [[ ! -d dist_bundle/GPU ]]; then
@@ -777,7 +777,7 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 						echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
 						echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
 						if [ -d argon2-gpu/.libs ]; then
-							cp -a argon2gpu/.libs dist_bundle/GPU/
+							cp -a argon2-gpu/.libs dist_bundle/GPU/
 						fi
 					fi
 				fi
