@@ -266,7 +266,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
     toJSON(){
-        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this);
+
+        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this, ...arguments );
 
         answer.interlinks = this._interlinksToJSON(this.interlink);
 
