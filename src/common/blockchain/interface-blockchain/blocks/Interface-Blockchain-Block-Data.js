@@ -118,11 +118,15 @@ class InterfaceBlockchainBlockData {
 
     }
 
-    toJSON(){
+    toJSON(includeTransactions){
 
         const transactions = [];
         for (const tx of this.transactions.transactions ){
-            transactions.push(tx.txId.toString('hex'))
+            if (!includeTransactions) {
+                transactions.push( tx.txId.toString('hex') )
+            } else {
+                transactions.push( tx.toJSON() )
+            }
         }
 
         return {
