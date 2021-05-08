@@ -28,8 +28,9 @@ class InterfaceBlockchainTransactionsWizard{
 
         let process = await this.validateTransaction( address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
 
-        if(process.result)
-            return await this.propagateTransaction( process.signature , process.transaction );
+        if (process.result) {
+            return this.propagateTransaction(process.signature, process.transaction);
+        }
         else
             return process;
 
@@ -209,6 +210,7 @@ class InterfaceBlockchainTransactionsWizard{
             result: true,
             message: "Your transaction is pending...",
             signature: signature,
+            txId: transaction.txId,
             transaction: transaction,
         }
 
