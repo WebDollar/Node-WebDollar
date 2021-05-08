@@ -80,7 +80,7 @@ class NodeAPIPrivate{
             out.txId = out.txId.toString('hex')
         }
 
-        return result;
+        return out;
 
     }
 
