@@ -497,6 +497,35 @@ class MainBlockchainWallet {
 
     }
 
+    async removeEncryptionAddress(address, oldPassword ){
+        if (typeof address === "object" && address.hasOwnProperty("address"))
+            address = address.address;
+
+        address = this.getAddress(address);
+
+        if (await this.isAddressEncrypted(address) === false )
+            return false
+
+        if ( oldPassword === undefined) {
+            oldPassword = await InterfaceBlockchainAddressHelper.askForPassword();
+            if (!oldPassword )
+                return false;
+        }
+
+        let privateKey = await address._getPrivateKey(oldPassword);
+
+        try {
+
+            if (InterfaceBlockchainAddressHelper.validatePrivateKeyWIF(privateKey))
+                return (await address.savePrivateKey(privateKey, undefined));
+
+        } catch (exception) {
+
+            AdvancedMessages.alert('Your old password is incorrect!', "Password Error", "error", 5000);
+            return false;
+        }
+    }
+
     async deleteAddress(address, bIsInteractive = true, password = null){
 
         if (typeof address === 'object' && address.hasOwnProperty('address'))
