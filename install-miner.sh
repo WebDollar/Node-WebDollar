@@ -111,11 +111,11 @@ fi
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then
 
         if [[ $(apt-cache policy python2.7 | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
+        if [[ $(apt-cache policy python-is-python2 | grep none | awk '{print$2}' | sed s'/[()]//g') == none ]]; then sudo apt-get install -y python-is-python2; else echo "$showok python-is-python2 is already installed!"; fi
 
 elif cat /etc/*release | grep -q -o -m 1 centos; then
 
         if [[ $(yum list python2.7 | grep -o "Available Packages") == "Available Packages" ]]; then yum install -y python2.7; else echo "$showok python2.7 is already installed!"; fi
-
 fi
 ###
 
