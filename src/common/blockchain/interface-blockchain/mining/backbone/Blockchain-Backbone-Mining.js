@@ -80,8 +80,10 @@ class BlockchainBackboneMining extends InterfaceBlockchainMining {
         this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
         this.bestHashNonce = -1;
 
-        if ( BlockchainGenesis.isPoSActivated( height ) )
+        if ( BlockchainGenesis.isPoSActivated( height ) ) {
+        	this._workers.stopMining();
             return this._minePOS(block, difficulty)  ;
+        }
 
         if (consts.TERMINAL_WORKERS.CPU_MAX === -100) // NO POW MINING
             return undefined;

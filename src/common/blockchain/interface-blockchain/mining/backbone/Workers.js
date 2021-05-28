@@ -152,12 +152,17 @@ class Workers {
 
         try {
 
-            console.log("Stop Mining!");
+            if (this.workers_list.length === 0)
+                return;
+
+            console.log("Stop POW Mining!");
 
             for (let i = 0; i < this.workers_list.length; i++){
                 if (this.workers_list[i] !== undefined && typeof this.workers_list[i].kill === "function")
                     this.workers_list[i].kill('SIGINT');
             }
+
+            this.workers_list = [];
 
         } catch (exception){
 
