@@ -182,8 +182,15 @@ class PoolsUtils {
         url = this.substrNext(url);
 
         if (version !== "") version = parseInt(version);
+	
 
         let poolName = this.substr(url) ;
+	// In the latest (4/2021) version of webdollar UI, the version is listed
+	//   twice which offsets this parser incorrectly.
+	if (poolName == version) {
+	    url = this.substrNext(url);
+	    poolName = this.substr(url);
+	}
         poolName = decodeURIComponent(poolName);
         url = this.substrNext(url);
 

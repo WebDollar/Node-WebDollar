@@ -214,7 +214,7 @@ class InterfaceBlockchainBlock {
             version: this.version,
             hashPrev: this.hashPrev ? this.hashPrev.toString("hex") : '',
             hashChainPrev: this.hashChainPrev ? this.hashChainPrev.toString("hex") : '',
-            data: this.data ? this.data.toJSON() : '',
+            data: this.data ? this.data.toJSON(...arguments) : '',
             nonce: this.nonce,
             timeStamp: this.timeStamp,
             difficulty: this.difficultyTarget ? this.difficultyTarget.toString("hex") : '',
@@ -522,7 +522,6 @@ class InterfaceBlockchainBlock {
     getBlockHeader(){
 
         return {
-
             version: this.version,
             height: this.height,
             hash: this.hash,

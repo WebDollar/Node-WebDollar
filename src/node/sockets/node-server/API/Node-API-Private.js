@@ -49,7 +49,7 @@ class NodeAPIPrivate{
     }
 
     async walletCreateTransaction(req, res){
-        
+
         var from;
         var to;
 
@@ -72,10 +72,15 @@ class NodeAPIPrivate{
         let fee = parseFloat(req.fee) * WebDollarCoins.WEBD;
         amount = Math.round(amount)
         fee = Math.round(fee)
-        let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 
-        return result;
+        let out = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 
+        if (out && out.result ) {
+            out.signature = out.signature.toString('hex')
+            out.txId = out.txId.toString('hex')
+        }
+
+        return out;
 
     }
 

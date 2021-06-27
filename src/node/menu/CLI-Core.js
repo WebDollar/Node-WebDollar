@@ -431,7 +431,7 @@ export class CLICore {
 
                 if (getNewLink) {
 
-                    miningPoolLink = !!url ? url : await AdvancedMessages.input('Enter the new mining pool link: ');
+                    miningPoolLink = !!url ? url : await AdvancedMessages.input('Pool URLs should look like:\n  https://webdollar.io/pool/1/1/MyPoolName/<pool public key>/https:$$mybigpool.com\nEnter the new mining pool link: ');
                     Log.info('Your new MiningPool is : ' + miningPoolLink, Log.LOG_TYPE.info);
 
                 }
@@ -646,11 +646,8 @@ export class CLICore {
      * @param password - the 12 word array of strings
      */
     decryptWallet(password) {
-        new Promise((resolve, reject) => {
-            Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password)
-                .then(() => resolve())
-                .catch(() => reject());
-        }).then(() => console.info('Done unlocking password protected wallet.'))
+        return Blockchain.Mining.setPrivateKeyAddressForMiningAddress(password)
+            .then(() => console.info('Done unlocking password protected wallet.'))
             .catch(err => console.error(`Failed to unlock password protected wallet. ${err}`));
     }
 
@@ -659,10 +656,9 @@ export class CLICore {
      * @param filename
      */
     decryptWalletFromFile(filename) {
-        FileSystem.readFile(filename, 'utf8', (err, password) => {
-            if (err) throw err;
-            this.decryptWallet(password.trim().split(' '));
-        });
+        console.warn(`Reading password from ${filename}`)
+        const password = FileSystem.readFileSync(filename, 'utf8');
+        return this.decryptWallet(password.trim().split(' '));
     }
 
     showCommands() {
