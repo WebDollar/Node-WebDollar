@@ -79,7 +79,7 @@ consts.BLOCKCHAIN = {
         POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
         FORCED_HALVING:   2158000,
 
-        POS100_ACTIVATION: 2295800, //it needs to be % 100 === 0
+        POS100_ACTIVATION: 2296100, //it needs to be % 100 === 0
 
     }
 
