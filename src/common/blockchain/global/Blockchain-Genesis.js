@@ -69,7 +69,9 @@ class BlockchainGenesis{
             //29,0..19  pos
             //20..29 pow
 
-        } else if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) {
+        } else
+        // pos 90% activated
+        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) {
 
             //0..9 pos          -10%
             //9..19 pos         -10%
@@ -90,7 +92,8 @@ class BlockchainGenesis{
             if (height % 100 < 90) return true;
             else return false;
 
-        } else return true; // pos 100%
+        } else
+            return true; // pos 100%
 
 
 
