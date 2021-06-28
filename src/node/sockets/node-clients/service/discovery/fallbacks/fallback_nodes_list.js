@@ -11,6 +11,7 @@ export default {
 
         {"addr": ["http://helloworldx.ddns.net:8080"]},
         {"addr": ["http://mryoung79.de:3333"]},
+        {"addr": ["http://188.24.107.165:8080"]},
 
         // {"addr": ["https://webd.5q.ro:8443"]}, // Thanks to Sorin M
         //
