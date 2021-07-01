@@ -128,8 +128,6 @@ class InterfaceBlockchainFork {
             } else if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) {
                 if (height % 100 === 99) height = height - 10; //first POS, get the last proof of Stake
                 else if (height % 100 === 89) height = height - 90; //first POW, get the last proof of work
-            } else {
-                height = height - 10
             }
 
             forkHeight = height - this.forkStartingHeight;

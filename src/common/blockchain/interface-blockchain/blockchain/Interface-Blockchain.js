@@ -189,8 +189,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             } else if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) { //90% POS
                 if (height % 100 === 99) height = height - 10; //first POS, get the last proof of Stake
                 else if (height % 100 === 89) height = height - 90; //first POW, get the last proof of work
-            } else{//100% POS
-                height = height - 10
             }
 
         }
