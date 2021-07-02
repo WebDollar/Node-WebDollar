@@ -79,7 +79,7 @@ consts.BLOCKCHAIN = {
         POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
         FORCED_HALVING:   2158000,
 
-        POS100_ACTIVATION: 2296110, //it needs to be % 110 === 0
+        POS100_ACTIVATION: 2348110, //it needs to be % 110 === 0
 
     }
 
@@ -269,10 +269,10 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "6.0.0",
+        VERSION: "1.3.2",
 
-        VERSION_COMPATIBILITY: "6.0.0",
-        VERSION_COMPATIBILITY_POOL_MINERS: "6.0.0",
+        VERSION_COMPATIBILITY: "1.200.3",
+        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
 
         VERSION_COMPATIBILITY_UPDATE: "",
 
