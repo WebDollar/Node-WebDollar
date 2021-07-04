@@ -12,8 +12,10 @@ export default {
 
         {"addr": ["https://webd.5q.ro:8443"]}, // Thanks to Sorin M
 
-        //{"addr": ["https://ez.cnbacolt.com:443"]},
-        //{"addr": ["https://server.cnbacolt.com:443"]},
+        {"addr": ["https://daniuda.ddns.net:8080"]}, // Thanks to Sorin M
+        {"addr": ["https://doris.webdollarpool.ca:443"]}, // Thanks to Sorin M
+        {"addr": ["https://webd-europool.ddns.net:2222"]}, // Thanks to Sorin M
+        {"addr": ["https://pool.bacm.ro:2053"]}, // Thanks to Sorin M
 
         //{"addr": ["https://webdollar-vps1.ddns.net:80"]},
 

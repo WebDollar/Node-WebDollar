@@ -220,6 +220,7 @@ class InterfaceBlockchainBlock {
             difficulty: this.difficultyTarget ? this.difficultyTarget.toString("hex") : '',
             hash: this.hash ? this.hash.toString("hex"): "",
             hashChain: this.hashChain ? this.hashChain.toString("hex") : '',
+            reward: this.reward,
         }
 
     }

@@ -293,6 +293,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
 
     }
 
+    toJSON(){
+        const json = super.toJSON()
+        json.posMinerAddress = Buffer.isBuffer(this.posMinerAddress) ?  this.posMinerAddress.toString("hex") : '';
+        return json
+    }
+
 }
 
 export default MiniBlockchainBlock
