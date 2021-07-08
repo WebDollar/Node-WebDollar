@@ -15,8 +15,12 @@ export default {
         {"addr": ["https://daniuda.ddns.net:8080"]}, // Thanks to Sorin M
         {"addr": ["https://doris.webdollarpool.ca:443"]}, // Thanks to Sorin M
         {"addr": ["https://webd-europool.ddns.net:2222"]}, // Thanks to Sorin M
-        {"addr": ["https://pool.bacm.ro:2053"]}, // Thanks to Sorin M
-
+        
+        {"addr": ["https://us-est.webdmine.io:8443"]}, // USA WEBDmine pools ( free nodes forever )
+        {"addr": ["https://webdmine.io:8443"]}, // USA WEBDmine pools ( free nodes forever )
+        {"addr": ["https://pool.maison:8443"]}, // EUROPE WEBDmine pools ( free nodes forever )
+        {"addr": ["https://europe.pool.maison:8443"]}, // EUROPE WEBDmine pools ( free nodes forever )
+        
         //{"addr": ["https://webdollar-vps1.ddns.net:80"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
@@ -86,7 +90,7 @@ export default {
         {"addr": ["https://cryptocoingb.ddns.net:8080"]}, // Thanks to CryptoCoinGB
         {"addr": ["https://cryptocoingb.ddns.net:8081"]}, // Thanks to CryptoCoinGB
 
-        //{"addr": ["https://bacm.ro:443"]}, //Thanks to @jigodia
+        {"addr": ["https://bacm.ro:2053"]}, // Thanks to @jigOdia
 
 
         //---------------------------------------------------------
