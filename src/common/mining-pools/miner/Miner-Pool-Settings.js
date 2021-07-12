@@ -228,6 +228,7 @@ class MinerPoolSettings {
     }
 
     async _addPoolsList(){
+        await this.addPoolList("/pool/1/MartinCanto/0.02/f2406eea8d43bc17ac9f4d126d8baa56b0ffd0be28f2a76ae35b4e4ef6f67064/https:$$pool.martincanto.com:443", undefined, true);        
         await this.addPoolList("/pool/1/MOFTpool/0.01/ca771a8a192c7f23b11a6b409732ab1f5e30949205a13e81a4580921ec5ae295/https:$$us-est.webdmine.io:8443", undefined, true);
         await this.addPoolList("/pool/1/CanadianStakePool/0.02/ea115a560322c557d3617732145a837af9992d729e5f8165d3b7077b22ee12a4/https:$$webdollarpool.ca:443", undefined, true);
         await this.addPoolList("/pool/1/WEBD-Splashpool-USA/0.02/61761896b4d958b3cc9073ae3c724a127b4ee5b31f6b8dcafd29643cf20a796a/https:$$splashpool.myvnc.com:8080", undefined, true);
