@@ -294,7 +294,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
     }
 
     toJSON(){
-        const json = super.toJSON()
+        const json = super.toJSON(...arguments)
         json.posMinerAddress = Buffer.isBuffer(this.posMinerAddress) ?  this.posMinerAddress.toString("hex") : '';
         return json
     }
