@@ -326,8 +326,8 @@ consts.SETTINGS = {
 
                 CLIENT: {
 
-                    MAX_SOCKET_CLIENTS_WAITLIST: 5,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 5,
+                    MAX_SOCKET_CLIENTS_WAITLIST: 10,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 10,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
                     MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
