@@ -138,6 +138,12 @@ class NodeClient {
 
                 });
 
+                socket.once("error", response =>{
+
+                    resolve(false);
+
+                })
+
                 socket.once("connect_failed", response =>{
 
                     //console.log("Client error connecting (connect_failed) ", address, response);
@@ -191,6 +197,13 @@ class NodeClient {
             await NodesList.disconnectSocket(this.socket);
 
         });
+
+        this.socket.on("error", async () => {
+
+            console.warn("Client error ", this.socket.node.sckAddress.getAddress(true));
+            await NodesList.disconnectSocket(this.socket);
+
+        })
 
 
         this.socket.node.protocol.propagation.initializePropagation();
