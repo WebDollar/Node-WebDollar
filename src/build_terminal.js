@@ -11,6 +11,10 @@ process.on('uncaughtException', (err) => {
     console.error(`Caught exception: ${err}`);
 });
 
+process.on('unhandledRejection', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
 //                            light-node
 Blockchain.createBlockchain('full-node', () => {}, async () => {
 
