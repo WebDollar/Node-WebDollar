@@ -97,6 +97,9 @@ class NodeClient {
 
                     });
 
+                    socket.on("error", response =>{
+                    })
+
                 }  catch (Exception){
                     console.error("Error Connecting Node to ", address," ", Exception);
                     return resolve(false);
@@ -139,9 +142,7 @@ class NodeClient {
                 });
 
                 socket.once("error", response =>{
-
                     resolve(false);
-
                 })
 
                 socket.once("connect_failed", response =>{
@@ -177,6 +178,13 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
+        this.socket.on("error", async () => {
+
+            console.warn("Client error ", this.socket.node.sckAddress.getAddress(true));
+            await NodesList.disconnectSocket(this.socket);
+
+        })
+
         if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
             console.error("socket disconnected by not being minerPool");
             return false;
@@ -197,14 +205,6 @@ class NodeClient {
             await NodesList.disconnectSocket(this.socket);
 
         });
-
-        this.socket.on("error", async () => {
-
-            console.warn("Client error ", this.socket.node.sckAddress.getAddress(true));
-            await NodesList.disconnectSocket(this.socket);
-
-        })
-
 
         this.socket.node.protocol.propagation.initializePropagation();
 
