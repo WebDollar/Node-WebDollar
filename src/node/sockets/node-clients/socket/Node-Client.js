@@ -52,7 +52,7 @@ class NodeClient {
 
             //if (!waitlist.isFallback) return false;
             
-            let timeoutTotal =  8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
+            let timeoutTotal =  Math.floor(  8*1000 + Math.random()*10*1000 + ( !process.env.BROWSER ) ? 10*1000+Math.random()*30*1000 : 0  );
 
             try {
 
@@ -97,13 +97,36 @@ class NodeClient {
 
                     });
 
-                    socket.on("error", response =>{
-                    })
-
                 }  catch (Exception){
                     console.error("Error Connecting Node to ", address," ", Exception);
                     return resolve(false);
                 }
+
+
+                socket.on("error", response =>{
+                })
+
+                socket.on("connect_error", response =>{
+
+                    //console.log("Client error connecting", address, response);
+                    resolve(false);
+
+                });
+
+                socket.on("error", response =>{
+                    resolve(false);
+                })
+
+                socket.on("connect_failed", response =>{
+
+                    //console.log("Client error connecting (connect_failed) ", address, response);
+                    resolve(false);
+
+                });
+
+                socket.on("disconnect", ()=>{
+                    resolve(false);
+                });
 
                 if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
                     throw {message: "You switched to pool"};
@@ -114,7 +137,6 @@ class NodeClient {
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
                     console.warn("Client connected to " + socket.node.sckAddress.address);
                 });
-
 
                 socket.once("HelloNode", async (data) => {
 
@@ -132,28 +154,6 @@ class NodeClient {
 
                     }
 
-                });
-
-                socket.once("connect_error", response =>{
-
-                    //console.log("Client error connecting", address, response);
-                    resolve(false);
-
-                });
-
-                socket.once("error", response =>{
-                    resolve(false);
-                })
-
-                socket.once("connect_failed", response =>{
-
-                    //console.log("Client error connecting (connect_failed) ", address, response);
-                    resolve(false);
-
-                });
-
-                socket.on("disconnect", ()=>{
-                   resolve(false);
                 });
 
                 socket.connect();
