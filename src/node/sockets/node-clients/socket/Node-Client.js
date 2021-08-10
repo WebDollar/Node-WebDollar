@@ -78,7 +78,7 @@ class NodeClient {
                     this.socket = socket = io( address, {
 
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
-                        maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
+                        maxHttpBufferSize: consts.SETTINGS.PARAMS.MAX_SIZE.SOCKET_MAX_SIZE_BYRES,
 
                         connection_timeout : timeoutTotal,
                         timeout: timeoutTotal,
@@ -104,25 +104,19 @@ class NodeClient {
 
 
                 socket.on("error", response =>{
+                    //console.log("Client error",  response);
+                    resolve(false);
                 })
 
                 socket.on("connect_error", response =>{
-
                     //console.log("Client error connecting", address, response);
                     resolve(false);
-
                 });
-
-                socket.on("error", response =>{
-                    resolve(false);
-                })
 
                 socket.on("connect_failed", response =>{
-
                     //console.log("Client error connecting (connect_failed) ", address, response);
                     resolve(false);
-
-                });
+                })
 
                 socket.on("disconnect", ()=>{
                     resolve(false);
