@@ -1,5 +1,6 @@
 /* eslint-disable */
 import {JsonRpcServer} from './../jsonRpc';
+var process = require('process');
 
 let NodeExpress, NodeServer;
 
@@ -16,6 +17,19 @@ import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
 import CLICore from "./CLI-Core";
 import CLIRunner from './CLI-Menu-non-interactive';
+import process from "process";
+
+process.on('error', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
 
 class CLI {
 
