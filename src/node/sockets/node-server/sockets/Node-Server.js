@@ -132,7 +132,7 @@ class NodeServer {
 
 
                 if ( (Blockchain.PoolManagement && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
-                     (Blockchain.ServerPoolManagement && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
+                        (Blockchain.ServerPoolManagement && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
 
                     if (Math.random() < 0.1)
                         console.error("disconnecting user for being simple node", nodeConsensusType);
@@ -183,12 +183,12 @@ class NodeServer {
 
 
                 else if (NODE_TYPE.NODE_WEB_PEER === nodeType && this._rooms.browsers.serverSits <= 0)
-                        if (new Date().getTime() - this._rooms.browsers.timeLastConnected >= ROOMS.BROWSERS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT) {
+                    if (new Date().getTime() - this._rooms.browsers.timeLastConnected >= ROOMS.BROWSERS.TIME_TO_PASS_TO_CONNECT_NEW_CLIENT) {
 
-                            this._rooms.browsers.serverSits = (Blockchain.isPoolActivated ? 10 : 1 )  * ROOMS.BROWSERS.SERVER_FREE_ROOM;
-                            this._rooms.browsers.timeLastConnected = new Date().getTime();
+                        this._rooms.browsers.serverSits = (Blockchain.isPoolActivated ? 10 : 1 )  * ROOMS.BROWSERS.SERVER_FREE_ROOM;
+                        this._rooms.browsers.timeLastConnected = new Date().getTime();
 
-                        } else return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
+                    } else return NodePropagationList.propagateWaitlistSimple(socket, nodeType, true); //it will also disconnect the socket
 
 
                 //check if it is a unique connection, add it to the list
@@ -288,8 +288,6 @@ class NodeServer {
             return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + await publicIp.v4() + ":" + NodeExpress.port;
 
         return 'http' + ( NodeExpress.SSL ? 's' : '') + '://' + NodeExpress.domain  + ":" + NodeExpress.port;
-
-
     }
 
     _disconnectOldSockets() {

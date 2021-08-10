@@ -7,6 +7,10 @@ import {JsonRpcServer} from './node/jsonRpc';
 
 JsonRpcServer(consts.JSON_RPC);
 
+process.on('error', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
 process.on('uncaughtException', (err) => {
     console.error(`Caught exception: ${err}`);
 });
