@@ -24,7 +24,7 @@ class WebDollarCryptoData {
         if (WebDollarCryptoData.isWebDollarCryptoData(object)){
 
             if (forceToCreate)
-                return new WebDollarCryptoData( Buffer.from(object.buffer) );
+                return new WebDollarCryptoData( Buffer.from(object.buffer), "buffer" );
 
             return object;
         }

@@ -194,18 +194,18 @@ class Serialization{
 
     deserializeHashOptimized(buffer,offset){
 
-        let hashPrefix = [];
+        let zeros = 0
 
         let hashLength = this.deserializeNumber1Bytes(buffer, offset);
         offset += 1;
 
-        for (let i = 0; i < 32 - hashLength; i++) hashPrefix.push(0);
+        for (let i = 0; i < 32 - hashLength; i++) zeros += 1
 
         let hashLeadingZero = BufferExtended.substr(buffer, offset, hashLength);
         offset += hashLength;
 
         let deserializedHash = Buffer.concat([
-            Buffer.from(hashPrefix),
+            Buffer.alloc(zeros),
             hashLeadingZero
         ]);
 

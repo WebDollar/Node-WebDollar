@@ -136,7 +136,7 @@ class InterfaceSatoshminDB {
         if (process.env.BROWSER && Buffer.isBuffer(value))
             attachment = new Blob([value.toString('hex')]);
         else  //we are in node
-            attachment = Buffer.from( value.toString('hex'), "hex" );
+            attachment = Buffer.from( value );
 
         try {
 
