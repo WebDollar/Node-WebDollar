@@ -18,7 +18,7 @@ export default {
         });
 
         if (typeof data === "string" ) result.hash
-        if (Buffer.isBuffer(data) )  return Buffer.from(result.hash);
+        if (Buffer.isBuffer(data) )  return Buffer.from(result.hash, "hex");
 
     },
 
