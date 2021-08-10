@@ -106,7 +106,7 @@ class InterfaceBlockchainAddressHelper{
         if (showDebug)
             console.log("pubKey", pubKey);
 
-        return new Buffer(pubKey);
+        return Buffer.from(pubKey);
     }
 
     static verifySignedData(msg, signature, pubKey){

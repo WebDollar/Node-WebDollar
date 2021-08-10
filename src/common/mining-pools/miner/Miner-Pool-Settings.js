@@ -32,7 +32,7 @@ class MinerPoolSettings {
         this.poolWebsite = "";
         this.poolDescription = "";
         this.poolServers = [];
-        this.poolPublicKey = new Buffer(0);
+        this.poolPublicKey = Buffer.alloc(0);
         this.poolUseSignatures = false;
         this.poolURLReferral = '';
 
@@ -181,7 +181,7 @@ class MinerPoolSettings {
         for (let key in this.poolsList)
             list[key] = this.poolsList[key];
 
-        let result = await this._db.save("minerPool_poolsList", new Buffer( JSON.stringify( list ), "ascii") );
+        let result = await this._db.save("minerPool_poolsList",  Buffer.from( JSON.stringify( list ), "ascii") );
         return result;
 
     }

@@ -116,7 +116,7 @@ class MinerPoolMining extends InheritedPoolMining {
 
         }
 
-        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, new Buffer(32), new Buffer(32), new Buffer(32), new Buffer(32), 0, 0, undefined, work.h,   );
+        let block = new this.blockchain.blockCreator.blockClass( this.blockchain, undefined, 0, Buffer.alloc(32), Buffer.alloc(32), Buffer.alloc(32), Buffer.alloc(32), 0, 0, undefined, work.h,   );
         block.deserializeBlock( work.block, work.h, undefined, work.t, undefined, undefined, true, true );
 
         //required data
@@ -131,7 +131,7 @@ class MinerPoolMining extends InheritedPoolMining {
         this._miningWork.height = work.h;
         this._miningWork.blockId = work.I||work.h;
 
-        this._miningWork.blockLastSignature = work.lsig || new Buffer(0 );
+        this._miningWork.blockLastSignature = work.lsig || Buffer.alloc(0 );
 
         this._miningWork.difficultyTarget = work.t;
         this._miningWork.serializedHeader = work.s;

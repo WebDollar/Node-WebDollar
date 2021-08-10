@@ -8,7 +8,7 @@ import PoolLeaderProtocol from 'common/mining-pools/pool/pool-management/protoco
 
 describe('test pool leader protocol', () => {
 
-    let testTargetHash = new Buffer("00098112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" );
+    let testTargetHash = Buffer.from("00098112ca1bbdcafac231b39a23dc4da786eff8147c4e72b9807785afee48bb", "hex" );
     
     let testMinersList = [
         {

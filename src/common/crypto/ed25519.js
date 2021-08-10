@@ -19,7 +19,7 @@ class ED25519{
         else privateKey = nacl.sign.keyPair.fromSecretKey(fromSecret).secretKey;
 
         if ( ! Buffer.isBuffer(privateKey) )
-            privateKey = new Buffer(privateKey);
+            privateKey = Buffer.from(privateKey);
 
         return privateKey;
     }
@@ -31,7 +31,7 @@ class ED25519{
         let publicKey = nacl.sign.keyPair.fromSecretKey(secretKey).publicKey;
 
         if (!Buffer.isBuffer(publicKey))
-            publicKey = new Buffer(publicKey);
+            publicKey = Buffer.from(publicKey);
 
         return publicKey;
 
@@ -45,7 +45,7 @@ class ED25519{
         let signature = nacl.sign.detached( data, secretKey );
 
         if ( !Buffer.isBuffer(signature) )
-            signature = new Buffer(signature);
+            signature = Buffer.from(signature);
 
 
         return signature;

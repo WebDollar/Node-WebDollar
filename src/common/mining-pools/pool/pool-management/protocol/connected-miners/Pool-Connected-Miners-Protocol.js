@@ -114,7 +114,7 @@ class PoolConnectedMinersProtocol extends PoolProtocolList{
                 //generate a message for confirming pool Owner
                 let messageAddressConfirmation = undefined;
                 if ( Blockchain.Wallet.getAddress(unencodedAddress) )
-                    messageAddressConfirmation = new Buffer(32);
+                    messageAddressConfirmation = Buffer.alloc(32);
 
                 let work = await this.poolManagement.generatePoolWork(minerInstance, true);
                 minerInstance.lastWork = work;

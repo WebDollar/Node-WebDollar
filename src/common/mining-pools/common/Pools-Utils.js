@@ -209,7 +209,7 @@ class PoolsUtils {
         let poolPublicKey = this.substr(url);
         url = this.substrNext(url);
 
-        poolPublicKey = new Buffer(poolPublicKey, "hex");
+        poolPublicKey = Buffer.from(poolPublicKey, "hex");
 
         let poolWebsite = '';
 

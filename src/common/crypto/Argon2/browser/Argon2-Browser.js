@@ -60,7 +60,7 @@ class Argon2Browser{
             let result = await argon2.hash(params);
 
             //console.log("ARgon2Browser", result.hash);
-            return new Buffer(result.hash);
+            return Buffer.from(result.hash);
 
         } catch (Exception){
             console.log("Argon2 exception hashJavascript", Exception)

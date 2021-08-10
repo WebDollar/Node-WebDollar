@@ -91,25 +91,6 @@ env CXX=g++-5 npm install argon2
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
 
-
-### Install x509 on Windows
-Open a powershell terminal
-```shell
-npm install --python=python2.7
-git clone https://github.com/ReadyTalk/win32.git
-mkdir C:\OpenSSL-Win64\lib\
-cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
-rm -r -fo .\win32\
-```
-Or a command prompt (``cmd.exe``): 
-```shell
-npm install --python=python2.7
-git clone https://github.com/ReadyTalk/win32.git
-md C:\OpenSSL-Win64\lib\
-copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
-rd /s /q .\win32\
-```
-
 ## 4. SSL (Secure Socket Layer) Certificate
 
 WebDollar uses SSL (Secured Socket Layer) and in order to generate your SSL Certificate you need a Domain or to generate your own SSL Certificate for your IP

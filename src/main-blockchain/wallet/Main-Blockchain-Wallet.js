@@ -353,7 +353,7 @@ class MainBlockchainWallet {
                 privateKey = Buffer.from(inputData, "hex");
 
             if (Buffer.isBuffer(inputData))
-                privateKey = new Buffer(inputData);
+                privateKey = Buffer.from(inputData);
 
             if (typeof privateKey === "string") privateKey = Buffer.from(privateKey, "hex");
             if (typeof publicKey === "string") publicKey = Buffer.from(publicKey, "hex");

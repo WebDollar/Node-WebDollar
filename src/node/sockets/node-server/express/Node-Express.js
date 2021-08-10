@@ -30,16 +30,14 @@ class NodeExpress{
 
     _extractDomain( fileName ){
 
-        const x509 = require('x509');
-        let subject = x509.getSubject( fileName );
+        const x509 = require('@ghaiklor/x509');
+        const subject = x509.getSubject( fileName );
 
         let domain = subject.commonName;
 
-        if (domain === undefined) domain = '';
+        if (!domain) domain = '';
 
-        domain = domain.replace( "*.", "" );
-
-        return domain;
+        return domain.replace( "*.", "" );
     }
 
     async startExpress(){
@@ -154,7 +152,9 @@ class NodeExpress{
 
                     resolve(true);
 
-                }).on('error', (err) => {
+                })
+
+                this.server.on('error', (err) => {
 
                     this.domain = '';
 

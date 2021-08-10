@@ -14,7 +14,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
         super(root, parent, edges);
 
         //console.log("value", value);
-        this.hash = new Buffer(32);
+        this.hash = Buffer.alloc(32);
         this.total = 0;
 
         if ( value ) {
@@ -37,7 +37,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     updateBalanceToken(value, tokenId){
 
         if ( !tokenId ) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
@@ -96,7 +96,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
     getBalance(tokenId){
 
         if ( !tokenId ) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
@@ -176,9 +176,9 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
 
             let hash = InterfaceMerkleRadixTreeNode.prototype.serializeNodeDataHash.call(this, includeHashes);
 
-            if ( !hash ) hash = new Buffer(0);
+            if ( !hash ) hash = Buffer.alloc(0);
 
-            let dataBuffer = new Buffer(0);
+            let dataBuffer = Buffer.alloc(0);
 
             if ( this.isLeaf() ) {
 
@@ -197,7 +197,7 @@ class MiniBlockchainAccountantTreeNode extends InterfaceMerkleRadixTreeNode{
                     if (WEBDTokenIndex === null) {
 
                         if (this.balances.length > 0) {
-                            let idWEBD = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+                            let idWEBD = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
                             idWEBD[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
 
                             balancesBuffers.push(this._serializeBalanceWEBDToken({id: idWEBD, amount: 0}));

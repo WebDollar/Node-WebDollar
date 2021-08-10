@@ -397,7 +397,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         if (start < 0 || end < 0 || start > end)
             return {
                 result: false,
-                hash: new Buffer(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
+                hash: Buffer.from(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
                 nonce: -1,
             };
 

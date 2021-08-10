@@ -130,7 +130,7 @@ class Argon2BrowserWebAssembly{
 
             //console.log("result", result)
 
-            return new Buffer(result.hash);
+            return Buffer.from(result.hash);
 
         } catch (Exception){
             console.error("Argon2 exception hash", Exception)

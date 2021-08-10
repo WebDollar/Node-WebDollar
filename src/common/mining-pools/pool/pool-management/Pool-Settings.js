@@ -30,7 +30,7 @@ class PoolSettings {
         this._poolReferralFee = 0;
 
         this._poolPrivateKey = WebDollarCrypto.getBufferRandomValues(64);
-        this.poolPublicKey = new Buffer(0);
+        this.poolPublicKey = Buffer.alloc(0);
         this.poolAddress = '';
 
         this.poolURL = '';

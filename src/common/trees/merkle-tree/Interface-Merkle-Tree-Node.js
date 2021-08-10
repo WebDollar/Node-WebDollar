@@ -14,7 +14,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
 
         super(root, parent,  edges, value);
 
-        if ( !hash ) hash = new Buffer(32);
+        if ( !hash ) hash = Buffer.alloc(32);
         this.hash = hash;
 
     }
@@ -110,7 +110,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
     _computeHash(){
 
         if (this === this.root && this.edges.length === 0){
-            this.hash = new Buffer(32);
+            this.hash = Buffer.alloc(32);
             return this.hash;
         }
 
@@ -140,7 +140,7 @@ class InterfaceMerkleTreeNode extends InterfaceTreeNode{
                     this.edges[i].targetNode._computeHash();
 
                 if (i === 0)
-                    hashConcat.push( new Buffer(this.edges[i].targetNode.hash) );
+                    hashConcat.push( Buffer.from(this.edges[i].targetNode.hash) );
                 else
                     hashConcat.push ( this.edges[i].targetNode.hash );
             }

@@ -42,7 +42,7 @@ class InterfaceBlockchainTransactions extends InterfaceBlockchainTransactionsEve
 
     _createTransactionFromBuffer(buffer, offset = 0){
 
-        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, new Buffer(32), false, false, false, false, false, false );
+        let transaction = this._createTransaction ( undefined, undefined, 0, 0xFFFFFFFF, 0x00, Buffer.alloc(32), false, false, false, false, false, false );
         offset = transaction.deserializeTransaction(buffer, offset);
         return {transaction: transaction, offset: offset};
     }

@@ -71,13 +71,13 @@ class InterfaceBlockchainTransactionFrom {
             }
 
             if (typeof fromObject.publicKey === "string")
-                fromObject.publicKey = new Buffer(fromObject.publicKey, "hex");
+                fromObject.publicKey = Buffer.from(fromObject.publicKey, "hex");
 
             if (typeof fromObject.signature === "string")
-                fromObject.signature = new Buffer(fromObject.signature, "hex");
+                fromObject.signature = Buffer.from(fromObject.signature, "hex");
 
             if ( !fromObject.signature )
-                fromObject.signature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
+                fromObject.signature = Buffer.alloc(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH);
 
             if (typeof fromObject.amount === "string")
                 fromObject.amount = parseInt(fromObject.amount);
@@ -93,7 +93,7 @@ class InterfaceBlockchainTransactionFrom {
         }
 
         if ( !currencyTokenId ) {
-            currencyTokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            currencyTokenId = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             currencyTokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 

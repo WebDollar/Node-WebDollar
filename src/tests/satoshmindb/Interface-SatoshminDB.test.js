@@ -94,7 +94,7 @@ describe('interfaceSatoshminDB', () => {
     it('save/remove/get sample Buffer', async() => {
 
         key = Math.floor(Math.random() * 10000).toString();
-        value = new Buffer('44FF00234561217fdeca', 'hex');
+        value =  Buffer.from('44FF00234561217fdeca', 'hex');
         db = new InterfaceSatoshminDB();
         
         response = await db.save(key, value);
@@ -111,8 +111,8 @@ describe('interfaceSatoshminDB', () => {
     it('save/save/get sample Buffer test', async () => {
 
         key = Math.floor(Math.random() * 10000).toString();
-        value = new Buffer('744Fagfe4578ab', 'hex');
-        let new_value = new Buffer('7444caed', 'hex');
+        value = Buffer.from('744Fagfe4578ab', 'hex');
+        let new_value =  Buffer.from('7444caed', 'hex');
         
         db = new InterfaceSatoshminDB();
         
@@ -141,7 +141,7 @@ describe('interfaceSatoshminDB', () => {
     it('save/get sample Array', async () => {
 
         key = Math.floor(Math.random() * 10000).toString();
-        value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        value = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);
@@ -156,7 +156,7 @@ describe('interfaceSatoshminDB', () => {
 
         key = Math.floor(Math.random() * 10000).toString();
         value = 'my string value';
-        let new_value = new Buffer([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        let new_value = Buffer.from([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
         db = new InterfaceSatoshminDB();
 
         response = await db.save(key, value);

@@ -316,7 +316,7 @@ class Workers {
                 let hash;
 
                 if (msg.hash.length === 64) hash = Buffer.from(msg.hash, "hex");
-                else hash = new Buffer(msg.hash);
+                else hash = Buffer.from(msg.hash);
 
                 let nonce = parseInt(msg.nonce);
 
@@ -326,7 +326,7 @@ class Workers {
 
                 this._stopAndResolve(true, hash, nonce);
 
-                // console.log("sol",new Buffer(msg.hash).toString("hex"));
+                // console.log("sol",Buffer.from(msg.hash).toString("hex"));
 
                 return true;
             }
@@ -341,7 +341,7 @@ class Workers {
                 let bestHash;
 
                 if (msg.bestHash.length === 64) bestHash = Buffer.from(msg.bestHash, "hex");
-                else bestHash = new Buffer(msg.bestHash);
+                else bestHash = Buffer.from(msg.bestHash);
 
                 let change = false;
                 for (let i = 0, l = this.ibb.bestHash.length; i < l; i++)
@@ -378,7 +378,7 @@ class Workers {
 
         if (consts.TERMINAL_WORKERS.TYPE === "cpu-cpp" || consts.TERMINAL_WORKERS.TYPE === "gpu") {
             //validate hash
-            let nonceBuffer = new Buffer([nonce >> 24 & 0xff, nonce >> 16 & 0xff, nonce >> 8 & 0xff, nonce & 0xff]);
+            let nonceBuffer = Buffer.from([nonce >> 24 & 0xff, nonce >> 16 & 0xff, nonce >> 8 & 0xff, nonce & 0xff]);
             let block = Buffer.concat([this.block, nonceBuffer]);
 
             let hash = await Argon2.hash(block);

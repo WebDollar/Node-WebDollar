@@ -239,7 +239,7 @@ class InterfaceBlockchainBlock {
             Serialization.serializeNumber2Bytes( this.version ),
             Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
             Serialization.serializeNumber4Bytes( this.timeStamp ),
-            (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChainPrev ) : new Buffer(0),
+            (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChainPrev ) : Buffer.alloc(0),
             //data contains addressMiner, transactions history, contracts, etc
             this.data.serializeData(requestHeader),
 
@@ -338,7 +338,7 @@ class InterfaceBlockchainBlock {
     deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
-            buffer = new Buffer(buffer, "hex");
+            buffer = Buffer.from(buffer, "hex");
 
         if ( height )  this.height = height||0;
         if (reward ) this.reward = reward;

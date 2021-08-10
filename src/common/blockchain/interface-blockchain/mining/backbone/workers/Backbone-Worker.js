@@ -49,23 +49,23 @@ var sendMessage = (msg) => {
  * @return {Boolean}
  */
 
-var difficulty = new Buffer(32);
+var difficulty = Buffer.alloc(32);
 var start = 0;
 var end = 0;
 var blockId = 0;
 var length = 0;
 var buffer = 0;
-var bestHash = new Buffer(32);
+var bestHash = Buffer.alloc(32);
 var bestNonce = 0;
 
 var mineNoncesBatch = (myBlock, myDifficulty, myStart, myBatch, myBlockId) => {
 
-    myBlock = new Buffer(myBlock);
-    difficulty = new Buffer(myDifficulty);
+    myBlock = Buffer.from(myBlock);
+    difficulty = Buffer.from(myDifficulty);
 
     // pool mining
     length = myBlock.length;
-    buffer = Buffer.concat([myBlock, new Buffer(4) ]);
+    buffer = Buffer.concat([myBlock, Buffer.alloc(4) ]);
 
     start = parseInt(myStart);
     end = parseInt(myStart) + parseInt(myBatch);
