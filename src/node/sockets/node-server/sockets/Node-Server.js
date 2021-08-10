@@ -232,23 +232,16 @@ class NodeServer {
 
             });
 
-            try {
-                //multiple ports, but doesn't work
+            //multiple ports, but doesn't work
 
-                server.listen (NodeExpress.server).on('error',  (err) => {
+            server.listen (NodeExpress.server).on('error',  (err) => {
 
-                    console.error( "Couldn't open server on port ", NodeExpress.port, " try next port") ;
-                    this.loaded = false;
+                console.error( "Couldn't open server on port ", NodeExpress.port, " try next port") ;
+                this.loaded = false
 
-                    throw err;
+            });
 
-                });
-
-                this.loaded = true;
-
-            } catch(Exception){
-                console.error("Error Calling node_server.listen", Exception);
-            }
+            this.loaded = true;
 
         }
         catch(Exception){
@@ -285,12 +278,8 @@ class NodeServer {
 
     async getServerHTTPAddress(getIP) {
 
-
         if ( !NodeExpress ) return '';
-
-        if ( !this.loaded )
-            await NodeExpress.startExpress();
-
+        if ( !this.loaded ) return ''
 
         if (NodeExpress.port === 0) return '';
         if (NodeExpress.domain  === '') return '';
