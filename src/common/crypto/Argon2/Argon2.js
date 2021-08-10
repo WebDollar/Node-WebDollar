@@ -17,9 +17,14 @@ export default {
             pass: data,
         });
 
-        if (typeof data === "string" ) result.hash
-        if (Buffer.isBuffer(data) )  return Buffer.from(result.hash, "hex");
+        if (!Buffer.isBuffer(result.hash)) return Buffer.from(result.hash)
+        return result.hash;
 
+    },
+
+    async hashString(data){
+        const hash = await this.hash(data)
+        return hash.toString('hex')
     },
 
     async verify (initialHash, data) {
@@ -28,7 +33,7 @@ export default {
         //console.log("verify", myHash, initialHash)
 
         if (Buffer.isBuffer(initialHash))  return BufferExtended.safeCompare(initialHash, myHash);
-        if (typeof initialHash === 'string') return myHash === initialHash
+        if (typeof initialHash === 'string') return myHash.toString("hex") === initialHash
 
         return false
     }

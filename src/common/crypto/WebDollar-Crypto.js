@@ -157,7 +157,6 @@ class WebDollarCrypto {
      * @returns {Promise.<Buffer>}
      */
     static hashPOW(data){
-
        return Argon2.hash(data);
     }
 
@@ -167,7 +166,6 @@ class WebDollarCrypto {
      * @returns {Promise.<String>}
      */
     static hashPOW_String(data){
-
         return Argon2.hashString(data);
     }
 
