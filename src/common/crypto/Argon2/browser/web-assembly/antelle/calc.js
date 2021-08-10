@@ -6,7 +6,7 @@
     Removed setTimeOut... because we need it to be synchronized through promises
  */
 
-var global =  typeof window === "undefined" ? self : window;
+var global =  typeof window === "undefined" ? {} : window;
 //var root =  window === undefined ? '../' : '';
 
 var root = "https://webdollar.io/public";

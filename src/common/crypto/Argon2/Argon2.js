@@ -1,17 +1,6 @@
 import BufferExtended from 'common/utils/BufferExtended';
 
-let Argon2 = null;
-
-if (process.env.BROWSER) {
-
-    //tutorial based on https://github.com/ranisalt/node-argon2
-    Argon2 = require('./browser/Argon2-Browser').default
-}
-else {
-
-    //tutorial based on https://www.npmjs.com/package/argon2
-    Argon2 = require('./node/Argon2-Node').default
-}
+const Argon2 = require('./browser/Argon2-Browser').default
 
 /**
  * Verify Argon2 Hash
