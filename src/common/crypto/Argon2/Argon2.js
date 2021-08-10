@@ -17,10 +17,8 @@ export default {
             pass: data,
         });
 
-        if (Buffer.isBuffer(data) )
-            return Buffer.from(result.hash);
-        else if (typeof data === "string" )
-            result.hash
+        if (typeof data === "string" ) result.hash
+        if (Buffer.isBuffer(data) )  return Buffer.from(result.hash);
 
     },
 
@@ -29,10 +27,8 @@ export default {
         const myHash = await this.hash(data);
         //console.log("verify", myHash, initialHash)
 
-        if (Buffer.isBuffer(initialHash))
-            return BufferExtended.safeCompare(initialHash, myHash);
-        if (typeof initialHash === 'string')
-            return myHash === initialHash
+        if (Buffer.isBuffer(initialHash))  return BufferExtended.safeCompare(initialHash, myHash);
+        if (typeof initialHash === 'string') return myHash === initialHash
 
         return false
     }
