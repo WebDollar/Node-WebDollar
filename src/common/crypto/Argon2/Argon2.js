@@ -17,16 +17,26 @@ export default {
             pass: data,
         });
 
-        return Buffer.from(result.hash);
+        if (Buffer.isBuffer(data) )
+            return Buffer.from(result.hash);
+        else if (typeof data === "string" )
+            result.hash
+
     },
 
     async verify (initialHash, data) {
 
         const myHash = await this.hash(data);
-
         //console.log("verify", myHash, initialHash)
 
-        return BufferExtended.safeCompare(initialHash, myHash);
+        if (Buffer.isBuffer(initialHash))
+            return BufferExtended.safeCompare(initialHash, myHash);
+        if (typeof initialHash === 'string')
+            return myHash === initialHash
+
+        return false
     }
+
+
 
 }
