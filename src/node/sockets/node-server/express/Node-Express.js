@@ -30,13 +30,14 @@ class NodeExpress{
 
     _extractDomain( fileName ){
 
-        const x509 = require('@ghaiklor/x509');
-        const subject = x509.getSubject( fileName );
+        const { Certificate } = require('@sardinefish/x509')
 
-        let domain = subject.commonName;
+        const file = fs.readFileSync(fileName)
+        const cert = Certificate.fromPEM(file)
+
+        let domain = cert.subject.CN;
 
         if (!domain) domain = '';
-
         return domain.replace( "*.", "" );
     }
 

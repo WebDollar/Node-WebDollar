@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
-    "@ghaiklor/x509": "^1.1.0",
+    "@sardinefish/x509": "^1.2.1",
     "argon2": "^0.28.2",
     "argon2-browser": "1.1.0",
     "atob": "^2.0.3",
