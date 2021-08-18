@@ -14,9 +14,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 source ~/.profile
-nvm install 8.2.1
-nvm use 8.2.1
-nvm alias default 8.2.1
+nvm install 16
+nvm use 16
+nvm alias default 16
 npm install -g node-gyp && npm install pm2 -g --unsafe-perm
 ```
 ##### Note: it is recommended to clone WebDollar repo in your home user folder, eg: /home/YOUR_USER/

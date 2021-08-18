@@ -77,9 +77,9 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 # shellcheck source=/dev/null
 if cat /etc/*release | grep -q -o -m 1 Ubuntu || cat /etc/*release | grep -q -o -m 1 Debian || cat /etc/*release | grep -q -o -m 1 Raspbian; then source ~/.profile; elif cat /etc/*release | grep -q -o -m 1 centos; then source ~/.bash_profile; fi
-nvm install 8.2.1
-nvm use 8.2.1
-nvm alias default 8.2.1
+nvm install 16
+nvm use 16
+nvm alias default 16
 
 }
 

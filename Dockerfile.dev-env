@@ -10,7 +10,7 @@ WORKDIR /workspace/
 ENV HOME /workspace/
 
 ENV NVM_DIR /workspace/.nvm
-ENV NODE_VERSION 8.2.1
+ENV NODE_VERSION 16
 
 RUN apt-get update && apt-get install -y git curl wget build-essential software-properties-common clang cmake libtool autoconf psmisc opencl-headers ocl-icd-libopencl1 pciutils python2
 
