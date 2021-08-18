@@ -62,34 +62,14 @@ npm install --global --production windows-build-tools
 npm install
 ```
 
-#### 3.2 node-gyp on Linux
-
-Installing Argon2 node.js
-```shell
-sudo apt install linuxbrew-wrapper
-```
-In case you receive some errors, try ```sudo apt-get -f install```
-
-To check the version `gcc --version`
-In case the GCC is not installed, install gcc `brew install gcc`
-
-```shell
-sudo apt-get install clang
-npm install -g node-gyp
-```
-
-`gcc --version` will help you to find the version of GCC you have installed. Webdollar is known to work on GCC 5 and GCC 6.
-
-Replace `g++-5` with your version
-Verify if you can access `g++-5` or whatever version you have.
-then install
-```shell
-env CXX=g++-5 npm install
-env CXX=g++-5 npm install argon2
-```
+#### 3.2 Error for updating to 1.3.21
 
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
+Install node v16 via nvm
+`nvm install 16`
+`nvm use 16`
+`nvm use default 16`
 
 ## 4. SSL (Secure Socket Layer) Certificate
 
