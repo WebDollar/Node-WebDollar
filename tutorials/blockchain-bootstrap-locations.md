@@ -4,6 +4,8 @@
 
 #### High speed backup source provided by CryptoCoinGB:
 http://webd-blockchain.ddns.net:9001/blockchainDB3.tar.gz
+or HTTPS:
+https://webd-blockchain.ddns.net/blockchainDB3.tar.gz
 
 Backups are created at 00:00, 06:00, 12:00 and 18:00 UTC.
 If your download is initiated at these times it may fail due to the file being updated.
