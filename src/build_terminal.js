@@ -1,4 +1,4 @@
-var process = require('process');
+const process = require('process');
 
 import {Node, Blockchain} from './index';
 import consts from 'consts/const_global';

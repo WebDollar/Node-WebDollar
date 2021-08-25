@@ -80,7 +80,7 @@ class InterfaceBlockchainAddress{
             return data;
         else {
 
-            let decr = null;
+            let decr;
 
             if (Array.isArray(password))
                 decr = MultiSig.getMultiAESDecrypt(data, password);

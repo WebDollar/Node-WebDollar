@@ -62,15 +62,12 @@ class BlockchainGenesis{
 
             //0..19  pos
             //20..29 pow
-            if ( height % 30 < 20) return true;
-            else return false;
+            return height % 30 < 20;
 
             //29,0..19  pos
             //20..29 pow
 
-        } else
-        // pos 90% activated
-        if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) {
+        } else  if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) { // pos 90% activated
 
             //0..9 pos          -10%
             //9..19 pos         -10%
@@ -88,8 +85,7 @@ class BlockchainGenesis{
             // pos = 90 / 100
             // pow = 10 / 100
 
-            if (height % 100 < 90) return true;
-            else return false;
+            return height % 100 < 90;
 
         } else
             return true; // pos 100%

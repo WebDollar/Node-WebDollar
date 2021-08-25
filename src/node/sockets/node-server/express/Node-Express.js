@@ -35,9 +35,8 @@ class NodeExpress{
         const file = fs.readFileSync(fileName)
         const cert = Certificate.fromPEM(file)
 
-        let domain = cert.subject.CN;
+        const domain = cert.subject.CN || '';
 
-        if (!domain) domain = '';
         return domain.replace( "*.", "" );
     }
 
@@ -55,9 +54,7 @@ class NodeExpress{
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
             } catch (exception){
-
                 console.error("Couldn't read the SSL certificates");
-
             }
 
             let options = {};

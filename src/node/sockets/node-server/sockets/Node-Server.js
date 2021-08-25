@@ -293,7 +293,7 @@ class NodeServer {
 
     _disconnectOldSockets() {
 
-        let time = new Date().getTime();
+        const time = new Date().getTime();
 
         let isPoolActivated = Blockchain.isPoolActivated;
 

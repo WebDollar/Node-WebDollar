@@ -92,7 +92,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (!nextBlock){
                     console.warn("nextBlock couldn't be created");
-                    await Utils.sleep(1000);
+                    await Utils.sleep(100);
                     continue;
                 }
 

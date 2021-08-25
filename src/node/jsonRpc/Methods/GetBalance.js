@@ -17,9 +17,8 @@ class GetBalance extends RpcMethod {
             sAddress = InterfaceBlockchainAddressHelper.getUnencodedAddressFromWIF(sAddress);
 
             if (sAddress === null)
-            {
                 throw new Error('Address cannot be decoded');
-            }
+
         }
         catch (exception) {
             console.error(exception);

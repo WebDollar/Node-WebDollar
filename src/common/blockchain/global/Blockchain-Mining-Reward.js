@@ -122,11 +122,10 @@ class BlockchainMiningReward{
         if (typeof height !== "number")
             throw {message: 'height is not defined'};
 
-        if (height <= consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING ){
+        if (height <= consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING )
             return this._getReward(height)
-        } else {
+        else
             return this._getRewardHalving(height)
-        }
 
     }
 

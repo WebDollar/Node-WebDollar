@@ -55,6 +55,8 @@ class NodeAPIRouter{
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
+            this._addRoute( process.env.WALLET_SECRET_URL+'/list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
+
             this._addRoute( process.env.WALLET_SECRET_URL+'/blocks_complete/at/:block', NodeAPIPublicBlocks.blockComplete, nodeApiType, 20, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
@@ -103,7 +105,6 @@ class NodeAPIRouter{
         // respond with "ping"
         this._addRoute( 'ping', NodeAPIPublic.ping, nodeApiType, 1000, app, prefix, middleWare );
 
-        this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
 
     }
 

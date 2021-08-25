@@ -10,16 +10,14 @@ class NodeAPIPublicNodes{
 
         try{
 
-            let clients = [], servers=[];
+            const clients = [], servers = [];
             for (let i=0; i<NodesList.nodes.length; i++ ) {
 
                 let geoLocation = NodesList.nodes[i].socket.node.sckAddress.geoLocation;
 
-                let obj = {
-
+                const obj = {
                     adr: NodesList.nodes[i].socket.node.sckAddress.getAddress(true, true),
                     geo: geoLocation.isFulfilled() ? this._getCity ( await geoLocation ) : 'not ready',
-
                 };
 
                 if ( NodesList.nodes[i].socket.node.protocol.connectionType === CONNECTIONS_TYPE.CONNECTION_CLIENT_SOCKET) clients.push(obj);

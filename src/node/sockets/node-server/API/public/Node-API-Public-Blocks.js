@@ -38,9 +38,9 @@ class NodeAPIPublicBlocks{
 
     async block(req, res){
 
-        let index = req.block;
-
         try {
+
+            let index = req.block;
 
             if (index < Blockchain.blockchain.blocksStartingPoint) throw {message: "Invalid index."};
             if (index > Blockchain.blockchain.blocks.length)       throw {message: "Block not found."};
@@ -55,9 +55,9 @@ class NodeAPIPublicBlocks{
 
     async blockComplete(req, res){
 
-        let index = req.block;
-
         try {
+
+            let index = req.block;
 
             if (index < Blockchain.blockchain.blocksStartingPoint) throw {message: "Invalid index."};
             if (index > Blockchain.blockchain.blocks.length)       throw {message: "Block not found."};

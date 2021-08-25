@@ -81,7 +81,6 @@ class NodeAPIPublicPools {
     });
 
     return miners;
-
   }
 
   poolData(req, res) {

@@ -12,7 +12,7 @@ class NodeWebPeersService {
     startService(){
 
         //after
-        Blockchain.onLoaded.then((answer)=>{
+        Blockchain.onLoaded.then( (answer)=>{
 
             // in case the Blockchain was not loaded, I will not be interested in transactions
 
