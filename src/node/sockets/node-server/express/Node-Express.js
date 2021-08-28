@@ -243,8 +243,8 @@ class NodeExpress{
 
     close(){
 
-        if (this.app)
-            this.app.close();
+        if (this.server)
+            this.server.close();
     }
 
 }
