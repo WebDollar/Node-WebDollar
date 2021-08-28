@@ -2,7 +2,6 @@
  * Copyright (c) Silviu Stroe 2018.
 */
 const BitcoinJS = require('bitcoinjs-lib');
-const Bigi = require('bigi');
 const Crypto = require('crypto');
 
 import WebDollarCrypto from 'common/crypto/WebDollar-Crypto';
