@@ -17,7 +17,6 @@ import NodeServer from 'node/sockets/node-server/sockets/Node-Server';
 import Log from 'common/utils/logging/Log';
 import CLICore from "./CLI-Core";
 import CLIRunner from './CLI-Menu-non-interactive';
-import process from "process";
 
 process.on('error', (err) => {
     console.error(`Caught exception: ${err}`);
