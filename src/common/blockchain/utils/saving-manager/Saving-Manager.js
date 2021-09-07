@@ -61,9 +61,6 @@ class SavingManager{
 
                     await block.saveBlock();
 
-                    if (block.height % 5000 === 0)
-                        await this.blockchain.db.restart();
-
                 } catch (exception){
 
                     Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);

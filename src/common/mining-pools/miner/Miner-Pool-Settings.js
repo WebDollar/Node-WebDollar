@@ -181,9 +181,7 @@ class MinerPoolSettings {
         for (let key in this.poolsList)
             list[key] = this.poolsList[key];
 
-        let result = await this._db.save("minerPool_poolsList",  Buffer.from( JSON.stringify( list ), "ascii") );
-        return result;
-
+        return (await this._db.save("minerPool_poolsList",  Buffer.from( JSON.stringify( list ), "ascii")  ))
     }
 
     async _getMinerPoolList(){

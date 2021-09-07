@@ -4,9 +4,7 @@
 import consts from 'consts/const_global'
 
 const atob = require('atob');
-import MainBlockchain from 'main-blockchain/Blockchain';
 import StatusEvents from "common/events/Status-Events";
-import Utils from "common/utils/helpers/Utils";
 let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
 
 class InterfaceSatoshminDB {
@@ -14,7 +12,6 @@ class InterfaceSatoshminDB {
     constructor(databaseName = consts.DATABASE_NAMES.DEFAULT_DATABASE) {
 
         this._dbName = databaseName;
-        this._beingRestarted = false;
 
         this._start();
     }
@@ -27,20 +24,6 @@ class InterfaceSatoshminDB {
         }
     }
 
-    async restart(){
-
-        if ( this._beingRestarted )
-            return await Utils.sleep ( 1500);
-
-        this._beingRestarted = true;
-
-        this.close();
-        await Utils.sleep(1500);
-        this._start();
-
-        this._beingRestarted = false;
-
-    }
 
     async _createDocument(key, value) {
 
@@ -275,9 +258,6 @@ class InterfaceSatoshminDB {
             if (out)
                 return out;
 
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
             i++;
         }
 
@@ -319,9 +299,6 @@ class InterfaceSatoshminDB {
             if (out)
                 return out.result;
 
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
             i++;
         }
 
@@ -340,11 +317,7 @@ class InterfaceSatoshminDB {
             if (out)
                 return out;
 
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
             i++;
-
         }
 
         return null;

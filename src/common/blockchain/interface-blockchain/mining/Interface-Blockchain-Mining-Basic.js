@@ -89,7 +89,7 @@ class InterfaceBlockchainMiningBasic {
 
         try {
 
-            return (await this.walletDB.save(key, minerAddress));
+            return ( await this.walletDB.save(key, minerAddress) );
         }
         catch(err) {
             console.error('ERROR on SAVE miner address: ', err);

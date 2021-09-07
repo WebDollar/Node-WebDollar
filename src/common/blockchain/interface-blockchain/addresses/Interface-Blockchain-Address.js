@@ -121,9 +121,7 @@ class InterfaceBlockchainAddress{
 
         try {
             value = this.encrypt(value, password);
-            let result = await this.db.save(key, value);
-
-            return  result;
+            return ( await this.db.save(key, value) );
         }
         catch(err) {
             return 'ERROR on SAVE privateKey: ' + err;
@@ -409,7 +407,7 @@ class InterfaceBlockchainAddress{
         let value = await this.serializeAddress();
 
         try {
-            return (await this.db.save(key, value));
+            return this.db.save(key, value);
         }
         catch(err) {
             return 'ERROR on SAVE blockchain address: ' + err;

@@ -192,7 +192,7 @@ class PPoWBlockchainProvesCalculated{
 
         console.log("Save proof creator "+key);
 
-        return (await this.db.save( key, buffer ));
+        return (await this.db.save( key, buffer ) )
 
     }
 

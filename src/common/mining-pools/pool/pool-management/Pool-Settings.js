@@ -152,7 +152,7 @@ class PoolSettings {
         this._poolWebsite = newValue;
 
         if (!skipSaving)
-            if (false === await await this._db.save("pool_website", this._poolWebsite)) throw {message: "PoolWebsite couldn't be saved"};
+            if (false === await this._db.save("pool_website", this._poolWebsite)) throw {message: "PoolWebsite couldn't be saved"};
 
         this._generatePoolURL();
     }
