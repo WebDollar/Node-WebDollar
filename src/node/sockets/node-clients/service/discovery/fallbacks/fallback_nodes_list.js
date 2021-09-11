@@ -8,7 +8,8 @@ export default {
         //---------------------------------------------------------
         //--------------Community FallBack Nodes-------------------
         //---------------------------------------------------------
-
+        
+        {"addr": ["https://webd.serverworks.ro:443"]}, // Thanks to TomCat @javra_the_mutt
 
         {"addr": ["https://webd.5q.ro:8443"]}, // Thanks to Sorin M
 
