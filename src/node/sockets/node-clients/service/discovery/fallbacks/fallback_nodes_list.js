@@ -20,7 +20,8 @@ export default {
         {"addr": ["https://webdmine.io:8443"]}, // USA WEBDmine pools ( free nodes forever )
         {"addr": ["https://pool.maison:8443"]}, // EUROPE WEBDmine pools ( free nodes forever )
         {"addr": ["https://europe.pool.maison:8443"]}, // EUROPE WEBDmine pools ( free nodes forever )
-        
+        {"addr": ["https://node.spyclub.ro:8080/"]}, // @emsici
+
         //{"addr": ["https://webdollar-vps1.ddns.net:80"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
