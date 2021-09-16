@@ -32,7 +32,7 @@ build:
         code: npm run build_terminal_menu
     - script:
         name: build worker
-        code: npm run build_terminal_worker
+        code: npm run build_terminal
 
 deploy_branch:
   steps:

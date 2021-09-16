@@ -30,8 +30,10 @@ docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -
 
 ## 0. Node.js
 
-**Required: v8.x**
-It doesn't work with the new version 9.x
+**Required: v16.x**
+
+[nvm](https://github.com/nvm-sh/nvm) is the recommended tooling to get the right version. Simply run `nvm use` from the root of this project.
+
 
 **Windows**: You can download Node.js from this URL: https://nodejs.org/en/download/
 
