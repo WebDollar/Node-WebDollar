@@ -1,8 +1,8 @@
-FROM node:8-alpine
+FROM node:16-alpine
 
 # Install build packages and npm global packages
 RUN apk update && \
-    apk add --no-cache make gcc g++ python certbot && \
+    apk add --no-cache make gcc g++ python2 certbot && \
     npm install -g cross-env webpack webpack-cli pm2
 
 # Copy files
@@ -15,7 +15,7 @@ RUN npm install
 RUN npm run build_terminal
 
 # Clean Everything
-RUN apk del make gcc g++ python && \
+RUN apk del make gcc g++ python2 && \
 	rm -rf /tmp/* /var/cache/apk/* && \
 	npm cache clean --force
 
