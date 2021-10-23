@@ -14,7 +14,6 @@ class InterfaceSatoshminDB {
     constructor(databaseName = consts.DATABASE_NAMES.DEFAULT_DATABASE) {
 
         this._dbName = databaseName;
-        this._beingRestarted = false;
 
         this._start();
     }
@@ -119,14 +118,12 @@ class InterfaceSatoshminDB {
         let attachment = value;
         // we need blob in browser
         if (process.env.BROWSER && Buffer.isBuffer(value))
-            attachment = new Blob([value.toString('hex')]);
-        else  //we are in node
-            attachment = Buffer.from(value.toString('hex'));
+            attachment = new Blob([value.toString('hex')] );
+        else{ //we are in node
+            if (!Buffer.isBuffer(attachment)) attachment = Buffer.from(value);
+        }
 
         try {
-
-            let deletion = await this._deleteDocument( key );
-            if (!deletion) return false;
 
             let result = await this.db.put({
                 _id: key,
@@ -141,29 +138,6 @@ class InterfaceSatoshminDB {
             return result && result.ok;
 
         } catch (err) {
-
-
-            if (err.status === 409) {
-                return await this._updateDocumentAttachment(key, attachment);
-            } else {
-                if (err.status === 404) {
-
-                    //if document not exist, create it and recall attachment
-                    try {
-
-                        let response = this._createDocument(key, null);
-                        return await this._saveDocumentAttachment(key, value);
-
-                    } catch (exception) {
-
-                        console.error('_saveDocumentAttachment raised an error for key ' + key, exception);
-                    }
-
-                } else {
-                    console.error('_saveDocumentAttachment 222 raised an error for key ' + key, err);
-                    throw err;
-                }
-            }
 
         }
 
