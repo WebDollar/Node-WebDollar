@@ -88,6 +88,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             let save = async () => {
 
+                console.info("accountant tree saveMiniBlockchain called!");
+
                 let length = this.blocks.length;
                 let serialization = this.accountantTree.serializeMiniAccountant(true, );
 
