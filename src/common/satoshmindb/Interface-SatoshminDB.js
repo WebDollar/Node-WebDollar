@@ -55,7 +55,7 @@ class InterfaceSatoshminDB {
     async _getDocument(key) {
 
         try {
-            let response = await this.db.get(key, {attachments: true});
+            let response = await this.db.get(key, {attachments: true, binary: true });
 
             if (!response ) return null;
             if ( !response._attachments ) return response.value;
@@ -78,7 +78,7 @@ class InterfaceSatoshminDB {
         let _rev, force
 
         try{
-            let response = await this.db.get(key, {attachments: true});
+            let response = await this.db.get(key);
             if (response){
                 _rev = response._rev
                 force = true
