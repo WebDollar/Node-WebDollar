@@ -59,7 +59,8 @@ class InterfaceSatoshminDB {
 
             if (!response ) return null;
             if ( !response._attachments ) return response.value;
-            return Buffer.from( Buffer.from( response._attachments.key.data, 'base64').toString(), "hex");  //get attachment
+            if ( response._attachments.key ) return Buffer.from( Buffer.from( response._attachments.key.data, 'base64').toString(), "hex");  //get attachment
+            return Buffer.from( response._attachments.myBlob  //get attachment
 
         } catch (err) {
 
@@ -93,13 +94,13 @@ class InterfaceSatoshminDB {
         if (Buffer.isBuffer(value)){
 
             if (process.env.BROWSER)
-                value = new Blob([value.toString('hex')] );
+                value = new Blob([value] );
 
             result = await this.db.put({
                 _id: key,
                 _attachments: {
-                    key: {
-                        content_type: 'application/octet-binary',
+                    myBlob: {
+                        content_type: 'text/plain',
                         data: value
                     }
                 },
