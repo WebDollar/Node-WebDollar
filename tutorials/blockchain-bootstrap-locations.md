@@ -12,10 +12,9 @@ If your download is initiated at these times it may fail due to the file being u
 
 Instructions (from within your WebDollar folder): 
 + delete the old blockchainDB3 directory if it exists (command: sudo rm -r blockchainDB3)
-+ make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
-+ open the new directory (command: cd blockchainDB3)
 + use 'wget' to download the file from the link above (command: wget http://webd-blockchain.ddns.net:9001/blockchainDB3.tar.gz)
-+ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C .)
++ make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
++ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C blockchainDB3)
 
 -----------
 
@@ -27,9 +26,8 @@ If your download is initiated at these times it may fail due to the file being u
 
 Instructions (from within your WebDollar folder): 
 + delete the old blockchainDB3 directory if it exists (command: sudo rm -r blockchainDB3)
-+ make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
-+ open the new directory (command: cd blockchainDB3)
 + use 'wget' to download the file from the link above (command: wget http://blockchain.timi.ro/blockchainDB3.tar.gz)
-+ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C .)
++ make a new empty blockchainDB3 directory (command: mkdir blockchainDB3)
++ extract the file (command: tar -zxvf blockchainDB3.tar.gz -C blockchainDB3)
 
 -----------
