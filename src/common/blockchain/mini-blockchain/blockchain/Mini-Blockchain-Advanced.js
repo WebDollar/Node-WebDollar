@@ -99,7 +99,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
                 console.info("accountant tree", this.accountantTree.root.edges.length, serialization.length );
 
-                await Utils.sleep(1000);
+                await Utils.sleep(5000);
 
                 if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
                     throw {message: "saveMiniAccountant couldn't be saved"};
@@ -111,7 +111,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
                 console.info("accountant tree saving profs");
 
-                await Utils.sleep(1000);
+                await Utils.sleep(5000);
 
                 if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
                     throw { message: "save proves calculated couldn't be saved" };
