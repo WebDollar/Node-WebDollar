@@ -125,13 +125,8 @@ class InterfaceSatoshminDB {
 
         try {
 
-            let doc = await this.db.get(key, {attachments: true});
-
-            const rev = {}
-            if (doc && doc.ok){
-                rev._rev = doc._rev
-                rev.force = true
-            }
+            let deletion = await this._deleteDocument( key );
+            if (!deletion) return false;
 
             let result = await this.db.put({
                 _id: key,
@@ -140,15 +135,63 @@ class InterfaceSatoshminDB {
                         content_type: 'application/octet-binary',
                         data: attachment
                     }
-                },
-                _rev: rev._rev,
-                force: rev.force,
+                }
             });
 
             return result && result.ok;
 
         } catch (err) {
-            return false
+
+
+            if (err.status === 409) {
+                return await this._updateDocumentAttachment(key, attachment);
+            } else {
+                if (err.status === 404) {
+
+                    //if document not exist, create it and recall attachment
+                    try {
+
+                        let response = this._createDocument(key, null);
+                        return await this._saveDocumentAttachment(key, value);
+
+                    } catch (exception) {
+
+                        console.error('_saveDocumentAttachment raised an error for key ' + key, exception);
+                    }
+
+                } else {
+                    console.error('_saveDocumentAttachment 222 raised an error for key ' + key, err);
+                    throw err;
+                }
+            }
+
+        }
+
+    }
+
+    async _updateDocumentAttachment(key, value) {
+
+        try {
+
+            let doc = await this.db.get(key, {attachments: true});
+            if (!doc || !doc.ok) throw "db.get didn't work";
+
+            let result = await this.db.put({
+                _id: doc._id,
+                _attachments: {
+                    key: {
+                        content_type: 'application/octet-binary',
+                        data: value
+                    }
+                },
+                _rev: doc._rev
+            });
+
+            return result && result.ok;
+
+        } catch (err) {
+            console.error("error _updateDocumentAttachment2  " + key, err);
+            throw err;
         }
     }
 
