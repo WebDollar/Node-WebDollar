@@ -3,6 +3,7 @@ import MiniBlockchain from "./Mini-Blockchain";
 import MiniBlockchainAccountantTree from '../state/Mini-Blockchain-Accountant-Tree'
 import global from "consts/global"
 import Log from 'common/utils/logging/Log';
+import Utils from "../../../utils/helpers/Utils";
 
 class MiniBlockchainAdvanced extends  MiniBlockchain{
 
@@ -98,6 +99,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
                 console.info("accountant tree", this.accountantTree.root.edges.length, serialization.length );
 
+                await Utils.sleep(1000);
+
                 if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
                     throw {message: "saveMiniAccountant couldn't be saved"};
 
@@ -107,6 +110,8 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                     throw {message: "save blockchain length couldn't be saved"};
 
                 console.info("accountant tree saving profs");
+
+                await Utils.sleep(1000);
 
                 if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
                     throw { message: "save proves calculated couldn't be saved" };
