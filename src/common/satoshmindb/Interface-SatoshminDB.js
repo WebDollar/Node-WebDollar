@@ -60,7 +60,7 @@ class InterfaceSatoshminDB {
             if (!response ) return null;
             if ( !response._attachments ) return response.value;
             if ( response._attachments.key ) return Buffer.from( Buffer.from( response._attachments.key.data, 'base64').toString(), "hex");  //get attachment
-            return Buffer.from( response._attachments.myBlob  //get attachment
+            return Buffer.from( response._attachments.myBlob.data )  //get attachment
 
         } catch (err) {
 
