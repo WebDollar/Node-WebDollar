@@ -27,21 +27,6 @@ class InterfaceSatoshminDB {
         }
     }
 
-    async restart(){
-
-        if ( this._beingRestarted )
-            return await Utils.sleep ( 1500);
-
-        this._beingRestarted = true;
-
-        this.close();
-        await Utils.sleep(1500);
-        this._start();
-
-        this._beingRestarted = false;
-
-    }
-
     async _createDocument(key, value) {
 
         try {
@@ -265,21 +250,9 @@ class InterfaceSatoshminDB {
 
     async save( key, value, timeout, trials = 10){
 
-        //if (!trials) trials = 1;
-        trials = 1000000;
-
-        let i=0;
-        while ( i < trials){
-
-            let out = await this._save(key, value, timeout);
-            if (out)
-                return out;
-
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
-            i++;
-        }
+        let out = await this._save(key, value, timeout);
+        if (out)
+            return out;
 
         return null;
     }
@@ -310,42 +283,19 @@ class InterfaceSatoshminDB {
     async get(key, timeout=7000, trials = 20) {
 
         //if ( !trials ) trials = 1;
-        trials = 1000000;
 
-        let i = 0;
-        while (i < trials) {
-
-            let out = await this._get(key, timeout );
-            if (out)
-                return out.result;
-
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
-            i++;
-        }
+        let out = await this._get(key, timeout );
+        if (out)
+            return out.result;
 
         return null;
-
     }
 
     async remove(key, trials = 10) {
 
-        trials = 1000000;
-
-        let i=0;
-        while ( i < trials){
-
-            let out = await this._deleteDocument(key);
-            if (out)
-                return out;
-
-            if (i > 0 && i % 5 === 0 )
-                await this.restart();
-
-            i++;
-
-        }
+        let out = await this._deleteDocument(key);
+        if (out)
+            return out;
 
         return null;
     }
