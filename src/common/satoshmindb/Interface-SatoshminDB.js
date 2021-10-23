@@ -58,8 +58,8 @@ class InterfaceSatoshminDB {
             let response = await this.db.get(key, {attachments: true});
 
             if (!response ) return null;
-            else if ( !response._attachments ) return response.value;
-            else return Buffer.from( response._attachments.key.data, 'base64');  //get attachment
+            if ( !response._attachments ) return response.value;
+            return Buffer.from( Buffer.from( response._attachments.key.data, 'base64').toString(), "hex");  //get attachment
 
         } catch (err) {
 
@@ -161,7 +161,6 @@ class InterfaceSatoshminDB {
 
             this._getDocument(key).then( answer =>{
 
-                console.log("KEY", key, answer )
                 resolve({result: answer } );
 
             }).catch(exception => {
