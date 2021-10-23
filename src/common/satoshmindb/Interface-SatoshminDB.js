@@ -125,6 +125,14 @@ class InterfaceSatoshminDB {
 
         try {
 
+            let doc = await this.db.get(key, {attachments: true});
+
+            let rev = {}
+            if (!doc || !doc.ok){
+                rev._rev = doc._rev
+                rev.force = true
+            }
+
             let result = await this.db.put({
                 _id: key,
                 _attachments: {
@@ -133,15 +141,14 @@ class InterfaceSatoshminDB {
                         data: attachment
                     }
                 },
-                force: true,
+                ...rev,
             });
 
             return result && result.ok;
 
         } catch (err) {
-
+            return false
         }
-
     }
 
     async _deleteDocumentAttachment(key) {
