@@ -132,41 +132,16 @@ class InterfaceSatoshminDB {
                         content_type: 'application/octet-binary',
                         data: attachment
                     }
-                }
-            });
-
-            return result && result.ok;
-
-        } catch (err) {
-
-        }
-
-    }
-
-    async _updateDocumentAttachment(key, value) {
-
-        try {
-
-            let doc = await this.db.get(key, {attachments: true});
-            if (!doc || !doc.ok) throw "db.get didn't work";
-
-            let result = await this.db.put({
-                _id: doc._id,
-                _attachments: {
-                    key: {
-                        content_type: 'application/octet-binary',
-                        data: value
-                    }
                 },
-                _rev: doc._rev
+                force: true,
             });
 
             return result && result.ok;
 
         } catch (err) {
-            console.error("error _updateDocumentAttachment2  " + key, err);
-            throw err;
+
         }
+
     }
 
     async _deleteDocumentAttachment(key) {
