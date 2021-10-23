@@ -74,7 +74,7 @@ class InterfaceSatoshminDB {
 
             if (!response ) return null;
             else if ( !response._attachments ) return response.value;
-            else return Buffer.from(atob(response._attachments.key.data).toString('hex'), 'hex');  //get attachment
+            else return Buffer.from( atob(response._attachments.key.data) );  //get attachment
 
         } catch (Exception) {
 
