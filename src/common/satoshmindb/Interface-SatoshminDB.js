@@ -127,8 +127,8 @@ class InterfaceSatoshminDB {
 
             let doc = await this.db.get(key, {attachments: true});
 
-            let rev = {}
-            if (!doc || !doc.ok){
+            const rev = {}
+            if (doc && doc.ok){
                 rev._rev = doc._rev
                 rev.force = true
             }
@@ -141,7 +141,8 @@ class InterfaceSatoshminDB {
                         data: attachment
                     }
                 },
-                ...rev,
+                _rev: rev._rev,
+                force: rev.force,
             });
 
             return result && result.ok;
