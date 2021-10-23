@@ -202,7 +202,7 @@ class PPoWBlockchainProvesCalculated{
 
         try{
 
-            let buffer = await this.db.get(key, 20000, 20, true);
+            let buffer = await this.db.get(key);
 
             if ( !buffer || !Buffer.isBuffer(buffer)) {
                 console.error("Proof for key "+key+" was not found");
