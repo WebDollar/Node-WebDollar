@@ -14,7 +14,16 @@ export default {
         //{"addr": ["https://ez.cnbacolt.com:443"]},
         //{"addr": ["https://server.cnbacolt.com:443"]},
 
-        //{"addr": ["https://webdollar-vps1.ddns.net:80"]},
+        {"addr": ["https://webdollarpool.ca:443"]},
+        {"addr": ["https://us-est.webdmine.io:8443"]},
+        {"addr": ["https://webdollarpool.ca:443"]},
+        {"addr": ["http://176.223.140.228:8080"]},
+        {"addr": ["http://188.166.149.223:80"]},
+        {"addr": ["http://136.243.71.47:8080"]},
+        {"addr": ["http://51.75.162.234:8080"]},
+        {"addr": ["http://94.130.34.84:8080"]},
+        {"addr": ["https://webd.pool.coffee:8443"]},
+        {"addr": ["http://80.211.238.51:8080"]},
 
         {"addr": ["https://node1.petreus.ro:443"]}, // Thanks to Dani Petreus
         {"addr": ["https://node2.petreus.ro:443"]}, // Thanks to Dani Petreus
