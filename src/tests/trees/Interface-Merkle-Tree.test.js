@@ -24,7 +24,7 @@ describe('interfaceMerkleTree', () => {
 
             let parent = merkleTree.root.edges[ 0 ].targetNode;
 
-            merkleTree.add( new Buffer(str, "ascii") , parent);
+            merkleTree.add(  Buffer.from(str, "ascii") , parent);
 
             assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
         });
@@ -54,7 +54,7 @@ describe('interfaceMerkleTree', () => {
             let edgeIndex = merkleTree.root.edges.length;
             let parent = merkleTree.root.edges[ Math.floor( Math.random() * edgeIndex) ].targetNode;
 
-            merkleTree.add( new Buffer(str, "ascii"), parent);
+            merkleTree.add( Buffer.from(str, "ascii"), parent);
 
             assert(merkleTree.validateRoot() === true, "Merkle Tree is invalid!!!");
 

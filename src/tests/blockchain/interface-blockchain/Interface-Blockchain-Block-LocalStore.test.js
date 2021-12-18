@@ -11,9 +11,9 @@ describe('test Interface-Block save/load/remove to/from local storage', () => {
 
     let db = new InterfaceSatoshminDB();
     let version = consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION;
-    let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
-    let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let hashChainPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
+    let hash = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
+    let hashPrev = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
+    let hashChainPrev = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
     let timeStamp = Math.trunc(Math.random() * 100000);
     let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;

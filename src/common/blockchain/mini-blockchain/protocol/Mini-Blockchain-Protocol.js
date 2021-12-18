@@ -24,7 +24,7 @@ class MiniBlockchainProtocol extends inheritProtocol{
         if (typeof data.header.data.hashAccountantTree === 'string')
             data.header.data.hashAccountantTree = Serialization.fromBase(data.header.data.hashAccountantTree);
         else
-            data.header.data.hashAccountantTree = new Buffer(data.header.data.hashAccountantTree);
+            data.header.data.hashAccountantTree = Buffer.from(data.header.data.hashAccountantTree);
     }
 
     _initializeNewSocket(nodesListObject) {

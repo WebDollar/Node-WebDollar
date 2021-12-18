@@ -30,8 +30,10 @@ docker run -d --restart=always -v /webdollar/data:/blockchainDB3 -e NOSSL=true -
 
 ## 0. Node.js
 
-**Required: v8.x**
-It doesn't work with the new version 9.x
+**Required: v16.x**
+
+[nvm](https://github.com/nvm-sh/nvm) is the recommended tooling to get the right version. Simply run `nvm use` from the root of this project.
+
 
 **Windows**: You can download Node.js from this URL: https://nodejs.org/en/download/
 
@@ -62,53 +64,14 @@ npm install --global --production windows-build-tools
 npm install
 ```
 
-#### 3.2 node-gyp on Linux
-
-Installing Argon2 node.js
-```shell
-sudo apt install linuxbrew-wrapper
-```
-In case you receive some errors, try ```sudo apt-get -f install```
-
-To check the version `gcc --version`
-In case the GCC is not installed, install gcc `brew install gcc`
-
-```shell
-sudo apt-get install clang
-npm install -g node-gyp
-```
-
-`gcc --version` will help you to find the version of GCC you have installed. Webdollar is known to work on GCC 5 and GCC 6.
-
-Replace `g++-5` with your version
-Verify if you can access `g++-5` or whatever version you have.
-then install
-```shell
-env CXX=g++-5 npm install
-env CXX=g++-5 npm install argon2
-```
+#### 3.2 Error for updating to 1.3.21
 
 Tutorial based on https://github.com/ranisalt/node-argon2/issues/29
 
-
-
-### Install x509 on Windows
-Open a powershell terminal
-```shell
-npm install --python=python2.7
-git clone https://github.com/ReadyTalk/win32.git
-mkdir C:\OpenSSL-Win64\lib\
-cp .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
-rm -r -fo .\win32\
-```
-Or a command prompt (``cmd.exe``): 
-```shell
-npm install --python=python2.7
-git clone https://github.com/ReadyTalk/win32.git
-md C:\OpenSSL-Win64\lib\
-copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
-rd /s /q .\win32\
-```
+Install node v16 via nvm
+`nvm install 16`
+`nvm use 16`
+`nvm use default 16`
 
 ## 4. SSL (Secure Socket Layer) Certificate
 
@@ -147,7 +110,41 @@ If you are under a **router/firewall**, you need to port forward the port used b
 npm run commands
 ```
 
-#### 5.2 Running Full Node
+#### 5.2 Run terminal non-interactive menu
+
+After building the terminal project
+
+```shell
+npm run build_terminal_menu
+npm run build_terminal_worker
+```
+
+it is possible to run the terminal project as a non-interactive script:
+
+```shell
+node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js -- --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here
+```
+
+the first part of the command (`node --max_old_space_size=10240 dist_bundle/terminal-menu-bundle.js`) launches the terminal project.
+
+The next portion of the command (`--`) starts it in non-interactive mode.
+Without `--`, the terminal menu defaults to interactive.
+
+The next parts are the commands to run in order.
+
+Alternatively, you can use the `./webd` command in the root of this project. The cli must be built first.
+`./webd` assumes non-interactive, so `--` can be omitted from the command.  To run interactively `npm run commands` works best.
+
+```shell
+./webd --import-address wallet.json --list-addresses --mining-address 0 --mine-in-pool https://webdollar.io/pool/url/here --set-password 'my 12 word password'
+```
+
+To display the list of commands, run:
+```shell
+./webd (-h|--help)
+```
+
+#### 5.3 Running Full Node
 
 Install pm2.
 ```shell
@@ -210,6 +207,29 @@ npm run start
 #### 5.8 PM2 to run the Node run indefinitely
 
 Follow the tutorial: [PM2 to run the Node Indefinitely](/docs/PM2-Tutorial.md)
+
+## Development Environment
+
+### Dockerized
+It is possible to run the development environment in a docker container.
+This is useful if you are unable to configure and install the custom argon2
+flavor required by this project. The docker container has this project set up to be
+built in it, and comes pre-installed with the tools you need for this project.
+
+#### Building
+
+Run `docker-compose build` to build the workspace container.
+
+To force a rebuild, you can either remove the previous workspace (`docker rm webdollar-dev-env`)
+or you can run `docker-compose build --no-cache`.
+
+#### Running
+
+Once you've build the workspace container, simply run it to launch an interactive shell with all the tools you need to develop.
+
+`docker-compose run webdollar-dev-env`
+
+This entire folder is mounted into the container, so any files you change in the workspace will be available to the container immediately.
 
 # To do:
 

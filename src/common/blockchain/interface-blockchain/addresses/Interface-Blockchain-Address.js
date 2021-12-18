@@ -57,16 +57,15 @@ class InterfaceBlockchainAddress{
 
         if ( !password )
             return data;
-        else {
-            let encr = null;
 
-            if (Array.isArray(password))
-                encr = MultiSig.getMultiAESEncrypt(data, password);
-            else
-                encr = WebDollarCrypto.encryptAES(data, password);
+        let encr ;
 
-            return Buffer.from(encr);
-        }
+        if (Array.isArray(password))
+            encr = MultiSig.getMultiAESEncrypt(data, password);
+        else
+            encr = WebDollarCrypto.encryptAES(data, password);
+
+        return Buffer.from(encr);
     }
 
     /**
@@ -81,7 +80,7 @@ class InterfaceBlockchainAddress{
             return data;
         else {
 
-            let decr = null;
+            let decr;
 
             if (Array.isArray(password))
                 decr = MultiSig.getMultiAESDecrypt(data, password);

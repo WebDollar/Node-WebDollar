@@ -228,7 +228,7 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
             ];
 
             if ( this.posMinerAddress === undefined)
-                buffers.push(new Buffer(1));
+                buffers.push( Buffer.alloc(1));
             else {
 
                 buffers.push(Serialization.serializeNumber1Byte(this.posMinerAddress.length));
@@ -291,6 +291,12 @@ class MiniBlockchainBlock extends inheritBlockchainBlock {
         else
             return InterfaceBlockchainBlock.prototype.calculateChainHash.call(this);
 
+    }
+
+    toJSON(){
+        const json = super.toJSON(...arguments)
+        json.posMinerAddress = Buffer.isBuffer(this.posMinerAddress) ?  this.posMinerAddress.toString("hex") : '';
+        return json
     }
 
 }

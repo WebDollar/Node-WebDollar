@@ -68,7 +68,7 @@ class PPoWBlockchainProtocol extends InterfaceBlockchainProtocol{
                 if (serialization.length - 1 - data.starting > 0)
                     serialization = BufferExtended.substr(serialization, data.starting, Math.min(data.length, serialization.length - data.starting));
                 else
-                    serialization = new Buffer(0);
+                    serialization =  Buffer.alloc(0);
 
                 return socket.node.sendRequest("get/nipopow-blockchain/headers/get-proofs/pi-gzip/answer", {
                     result: true,

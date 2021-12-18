@@ -24,19 +24,19 @@ whitebg=$(tput setab 7 && tput bold)
 stand=$(tput sgr0)
 
 ### System dialog VARS
-showinfo="$green[info]$stand"
-showerror="$red[error]$stand"
-showexecute="$yellow[running]$stand"
-showok="$magenta[OK]$stand"
-showdone="$blue[DONE]$stand"
-showinput="$cyan[input]$stand"
-showwarning="$red[warning]$stand"
-showremove="$green[removing]$stand"
-shownone="$magenta[none]$stand"
-redhashtag="$redbg$white#$stand"
-abortte="$cyan[abort to Exit]$stand"
-showport="$yellow[PORT]$stand"
-show_hint="$green[hint]$stand"
+showinfo="${green}[info]$stand"
+showerror="${red}[error]$stand"
+showexecute="${yellow}[running]$stand"
+showok="${magenta}[OK]$stand"
+showdone="${blue}[DONE]$stand"
+showinput="${cyan}[input]$stand"
+showwarning="${red}[warning]$stand"
+showremove="${green}[removing]$stand"
+shownone="${magenta}[none]$stand"
+redhashtag="${redbg}${white}#$stand"
+abortte="${cyan}[abort to Exit]$stand"
+showport="${yellow}[PORT]$stand"
+show_hint="${green}[hint]$stand"
 ##
 
 ###
@@ -73,6 +73,7 @@ export show_hint
 ###
 
 ### GENERAL_VARS
+# shellcheck disable=SC2003
 is_Linux=$(expr substr "$(uname -s)" 1 5)
 get_const_global="src/consts/const_global.js"
 ###
@@ -100,9 +101,13 @@ if [[ $is_Linux == Linux ]]; then
 
 	if cat /etc/*release | grep -q -o -m 1 Ubuntu; then # check cmake
 
-		if cmake --version | grep "3.10.*" > /dev/null || cmake --version | grep "3.12.*" > /dev/null; then
+		if cmake --version | grep "3.*.*" > /dev/null || cmake --version | grep "3.12.*" > /dev/null; then
 
 	                echo "$showok ${blue}cmake$stand is already installed!"
+
+		elif ! which cmake; then
+
+				echo "$showexecute Installing cmake..." && sudo apt install -y cmake
 
 		elif ! cmake --version | grep "3.5.*" > /dev/null; then
 
@@ -623,7 +628,7 @@ fi
 ### ASK_USER_FUNCTION_END
 
 ### NODE_WEBDOLLAR_START
-if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') == node-webdollar ]]; then
+if [[ $(grep "name" package.json | sed s'/[",]//g' | awk '{print $2}') =~ [node-webdollarwebdollar] ]]; then
 
 if [[ $is_Linux == Linux ]]; then
 
@@ -652,11 +657,17 @@ if [[ $is_Linux == Linux ]]; then
 
 				echo "$showok CPU folder inside dist_bundle exists!"
 				echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+				if [ -d argon2/.libs ]; then
+					cp -a argon2/.libs dist_bundle/CPU/
+				fi
 			else
 				if [[ ! -d dist_bundle/CPU ]]; then
 					echo "$showerror CPU folder inside dist_bundle not found!"
 					echo "$showexecute Creating one now..." && mkdir dist_bundle/CPU
 					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+					if [ -d argon2/.libs ]; then
+						cp -a argon2/.libs dist_bundle/CPU/
+					fi
 				fi
 			fi
 
@@ -684,11 +695,17 @@ if [[ $is_Linux == Linux ]]; then
 
 					echo "$showok CPU folder inside dist_bundle exists!"
 					echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+					if [ -d argon2/.libs ]; then
+						cp -a argon2/.libs dist_bundle/CPU/
+					fi
 				else
 					if [[ ! -d dist_bundle/CPU ]]; then
 						echo "$showerror CPU folder inside dist_bundle not found!"
 						echo "$showexecute Creating one now..." && mkdir dist_bundle/CPU
 						echo "$showexecute Copying argon2/* files to dist_bundle/CPU" && cp -a argon2/* dist_bundle/CPU/
+						if [ -d argon2/.libs ]; then
+							cp -a argon2/.libs dist_bundle/CPU/
+						fi
 					fi
 				fi
 			else
@@ -721,11 +738,18 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 
 				echo "$showok GPU folder inside dist_bundle exists!"
 				echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+				if [ -d argon2-gpu/.libs ]; then
+					cp -a argon2-gpu/.libs dist_bundle/GPU/
+				fi
+
 			else
 				if [[ ! -d dist_bundle/GPU ]]; then
 					echo "$showerror GPU folder inside dist_bundle not found!"
 					echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
 					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+					if [ -d argon2-gpu/.libs ]; then
+						cp -a argon2-gpu/.libs dist_bundle/GPU/
+					fi
 				fi
 			fi
 
@@ -750,11 +774,17 @@ if [[ $(lspci | grep VGA | grep -m 1 "controller:" | awk '{print$5}') == NVIDIA 
 
 					echo "$showok GPU folder inside dist_bundle exists!"
 					echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+					if [ -d argon2-gpu/.libs ]; then
+						cp -a argon2-gpu/.libs dist_bundle/GPU/
+					fi
 				else
 					if [[ ! -d dist_bundle/GPU ]]; then
 						echo "$showerror GPU folder inside dist_bundle not found!"
 						echo "$showexecute Creating one now..." && mkdir dist_bundle/GPU
 						echo "$showexecute Copying argon2-gpu/* files to dist_bundle/GPU" && cp -a argon2-gpu/* dist_bundle/GPU/
+						if [ -d argon2-gpu/.libs ]; then
+							cp -a argon2-gpu/.libs dist_bundle/GPU/
+						fi
 					fi
 				fi
 			else
@@ -798,7 +828,7 @@ else ### Node
 	else
 	        if [[ ! $(ls -d argon2) == argon2 ]]; then
 	       	        echo "$showerror You are not inside ${yellow}Node-WebDollar$stand folder."
-	               	echo "$showinfo Run this script inside ${yellow}Node-WebDollar$stand folder to compile ${yellow}argon2$stand."
+	               	echo -e "$showinfo Run this script inside ${yellow}Node-WebDollar$stand folder to compile ${yellow}argon2$stand"
 	        fi
 	fi
 fi ### NODE_WEBDOLLAR_END

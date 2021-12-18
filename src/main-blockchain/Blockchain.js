@@ -59,7 +59,7 @@ class Blockchain{
         this.onPoolsCreated = new Promise((resolve)=>{
             this._onPoolsCreatedResolver = resolve;
         });
-        
+
         this._loaded = false;
         this._poolsLoaded = false;
 
@@ -175,7 +175,7 @@ class Blockchain{
      */
     async synchronizeBlockchain(firstTime, synchronizeComplete=false){
 
-        if ( this.synchronized === false) return;
+        if ( !!this.synchronized ) return;
 
         this.synchronized = false;
         console.warn("################### RESYNCHRONIZATION STARTED ##########");
@@ -208,7 +208,7 @@ class Blockchain{
                 else
                     StatusEvents.emit('blockchain/status', {message: "No Internet Access"});
 
-                if (NodesList.nodes.length === 0)
+                if ( !NodesList.nodes.length)
                     NodesWaitlist.resetWaitlist(NODE_TYPE.NODE_WEB_PEER);
 
                 this.Agent.initializeAgentPromise();
@@ -216,13 +216,13 @@ class Blockchain{
 
         }
 
-        this.synchronized = true;
-        console.warn( "Blockchain Ready to Mine" );
-
         if (suspendMining) {
-            this.startMining();
+            await this.startMining();
             StatusEvents.emit('blockchain/status', {message: "Blockchain Ready to Mine"});
         }
+
+        this.synchronized = true;
+        console.warn( "Blockchain Ready to Mine" );
 
     }
 

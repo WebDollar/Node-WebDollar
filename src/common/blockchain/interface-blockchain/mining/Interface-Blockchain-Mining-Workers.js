@@ -212,7 +212,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
 
 
-                    this.bestHash = new Buffer(event.data.hash);
+                    this.bestHash = Buffer.from(event.data.hash);
                     this.bestHashNonce = event.data.nonce;
 
                     if (this.bestHash.compare(this.difficulty) <= 0) {
@@ -222,7 +222,7 @@ class InterfaceBlockchainMiningWorkers extends InterfaceBlockchainMining {
 
                         this._workerResolve({
                             result: true,
-                            hash: new Buffer(event.data.hash),
+                            hash: Buffer.from(event.data.hash),
                             nonce: event.data.nonce,
                         });
 

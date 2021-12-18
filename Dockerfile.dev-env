@@ -1,0 +1,52 @@
+FROM ubuntu:20.04
+
+ENV TERM xterm
+ENV TZ UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN mkdir -p /workspace/.nvm
+RUN mkdir -p /workspace/Node-WebDollar
+WORKDIR /workspace/
+ENV HOME /workspace/
+
+ENV NVM_DIR /workspace/.nvm
+ENV NODE_VERSION 16
+
+RUN apt-get update && apt-get install -y git curl wget build-essential software-properties-common clang cmake libtool autoconf psmisc opencl-headers ocl-icd-libopencl1 pciutils python2
+
+# Install nvm with node and npm
+RUN curl https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
+ENV PATH      $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+#RUN git clone https://github.com/WebDollar/Node-WebDollar.git miner
+
+# Build the custom argon2 package
+RUN git clone https://github.com/WebDollar/argon2
+WORKDIR /workspace/argon2
+RUN autoreconf -i
+RUN bash configure
+RUN cmake -DCMAKE_BUILD_TYPE=Release .
+RUN make
+
+ENV NODE_TLS_REJECT_UNAUTHORIZED 0
+WORKDIR /workspace/Node-WebDollar
+RUN mkdir -p ./dist_bundle/CPU/
+RUN cp -a ../argon2/* dist_bundle/CPU/
+
+ENV PYTHON /usr/bin/python2
+
+# this container runs as root, add a dummy sudo
+# creates a tiny script that just runs the command passed to it.
+#> eval "$@"
+#
+# this is needed since many of the scripts in this project use sudo.
+RUN echo "#!/bin/bash\\neval \"\$@\"" > /usr/bin/sudo && \
+    chmod +x /usr/bin/sudo
+
+CMD [ "/bin/bash" ]

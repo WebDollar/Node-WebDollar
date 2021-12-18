@@ -1,44 +1,43 @@
 import BufferExtended from 'common/utils/BufferExtended';
+import consts from "../../../consts/const_global";
 
-let Argon2 = null;
+const argon2 = require("argon2-browser");
 
-if (process.env.BROWSER) {
+export default {
 
-    //tutorial based on https://github.com/ranisalt/node-argon2
-    Argon2 = require('./browser/Argon2-Browser').default
-}
-else {
+    async hash (data) {
 
-    //tutorial based on https://www.npmjs.com/package/argon2
-    Argon2 = require('./node/Argon2-Node').default
-}
+        let result = await argon2.hash({
+            salt: consts.HASH_ARGON2_PARAMS.salt,
+            time: consts.HASH_ARGON2_PARAMS.time,
+            mem: consts.HASH_ARGON2_PARAMS.memBytes,
+            parallelism: consts.HASH_ARGON2_PARAMS.parallelism,
+            type: consts.HASH_ARGON2_PARAMS.algoBrowser,
+            hashLen: consts.HASH_ARGON2_PARAMS.hashLen,
+            pass: data,
+        });
 
-/**
- * Verify Argon2 Hash
- * @param data
- * @param initialHash
- * @returns {Promise.<boolean>}
- */
-Argon2.verify = async (initialHash, data) => {
+        if (!Buffer.isBuffer(result.hash)) return Buffer.from(result.hash)
+        return result.hash;
 
-    let myHash;
+    },
 
-    if (Buffer.isBuffer(initialHash)) {
-        myHash = await Argon2.hash(data);
+    async hashString(data){
+        const hash = await this.hash(data)
+        return hash.toString('hex')
+    },
 
+    async verify (initialHash, data) {
+
+        const myHash = await this.hash(data);
         //console.log("verify", myHash, initialHash)
 
-        return BufferExtended.safeCompare(initialHash, myHash);
-    }
-    else
-    if (typeof initialHash === 'string') {
-        myHash = await Argon2.hashString(data);
+        if (Buffer.isBuffer(initialHash))  return BufferExtended.safeCompare(initialHash, myHash);
+        if (typeof initialHash === 'string') return myHash.toString("hex") === initialHash
 
-        return myHash === initialHash;
+        return false
     }
 
-    return false;
+
 
 }
-
-export default Argon2

@@ -55,7 +55,7 @@ class InterfaceTreeNode {
             buffers.push(Serialization.serializeNumber2Bytes(this.value.length));
             buffers.push( this.value );
         } else
-            buffers.push ( new Buffer(2) );
+            buffers.push ( Buffer.alloc(2) );
 
         return Buffer.concat(buffer);
     }

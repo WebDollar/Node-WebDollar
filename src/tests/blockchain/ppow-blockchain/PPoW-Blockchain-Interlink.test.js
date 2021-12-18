@@ -21,7 +21,7 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         let height = [];
         let blockId = [];
         let blockchain = new MiniBlockcain();
-        let block = new MiniBlockcainBlock( blockchain, blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
+        let block = new MiniBlockcainBlock( blockchain, blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, Buffer.alloc(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), Buffer.alloc(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, 0, blockchain.db );
 
         for (let i = 0; i < logLen; ++i) {
             height.push(i);
@@ -37,11 +37,11 @@ describe('test PPoW-Blockchain interlink data structure', () => {
         let serializedBuffer = block._serializeInterlink();
         block._deserializeInterlink(serializedBuffer, 0);
 
-        assert(block.interlink.length === interlink.length, "Interlink length differ: " + block.interlink.length + "!==" + interlink.length);
+        assert(block.interlink.length === interlink.length, "Interlink length diffent: " + block.interlink.length + "!==" + interlink.length);
 
         for (let i = 0; i < interlink.length; ++i) {
-            assert(block.interlink[i].height === interlink[i].height, "Interlink height differ: " + block.interlink[i].height + "!==" + interlink[i].height);
-            assert(block.interlink[i].blockId.equals(interlink[i].blockId), "Interlink blockId differ: " + block.interlink[i].blockId.toString("hex") + "!==" + interlink[i].blockId.toString("hex") + "i = " + i);
+            assert(block.interlink[i].height === interlink[i].height, "Interlink height diffent: " + block.interlink[i].height + "!==" + interlink[i].height);
+            assert(block.interlink[i].blockId.equals(interlink[i].blockId), "Interlink blockId diffent: " + block.interlink[i].blockId.toString("hex") + "!==" + interlink[i].blockId.toString("hex") + "i = " + i);
         }
 
     });
@@ -69,8 +69,8 @@ describe('test PPoW-Blockchain interlink data structure', () => {
 
         for (let i = 0; i < serialized.length; ++i) {
 
-            let block = new MiniBlockcainBlock( blockchain, blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), new Buffer(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, blockchain.db );
-            let buffer = new Buffer(serialized[i], 'hex');
+            let block = new MiniBlockcainBlock( blockchain, blockchain.createBlockValidation(), consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION, Buffer.alloc(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), Buffer.alloc(consts.BLOCKCHAIN.BLOCKS_POW_LENGTH), undefined, undefined, undefined, i, blockchain.db );
+            let buffer =  Buffer.from(serialized[i], 'hex');
 
             block.deserializeBlock(buffer);
 

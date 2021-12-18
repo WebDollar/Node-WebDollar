@@ -25,12 +25,4 @@ call npm install -g node-gyp
 call npm install pm2 -g --unsafe-perm                              
 call npm install
 
-::Install x509
-::(dir 2>&1 *`|(echo CMD);&<# rem #>echo PowerShell
-call npm install --python=python2.7
-git clone https://github.com/ReadyTalk/win32.git
-call md C:\OpenSSL-Win64\lib\
-call copy /y .\win32\msvc\lib\libeay32.lib C:\OpenSSL-Win64\lib\
-call rd /s /q .\win32\
-
 cd %CRT_DIR%

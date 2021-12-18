@@ -96,16 +96,22 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
                 Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
 
                 console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
-                console.info("accountant tree", this.accountantTree.root.edges.length);
+                console.info("accountant tree", this.accountantTree.root.edges.length, serialization.length );
 
                 if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
                     throw {message: "saveMiniAccountant couldn't be saved"};
 
+                console.info("accountant tree saving blockchain length", length );
+
                 if ( !(await this.blocks.saveBlockchainLength(length)) )
                     throw {message: "save blockchain length couldn't be saved"};
 
+                console.info("accountant tree saving profs");
+
                 if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
                     throw { message: "save proves calculated couldn't be saved" };
+
+                console.info("accountant tree profs saved");
 
                 this._miniBlockchainSaveBlocks = length;
 

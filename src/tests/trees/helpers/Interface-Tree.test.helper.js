@@ -18,7 +18,7 @@ class InterfaceTreeTestHelper {
         if ( !createValue ) createValue = true;
 
         radixData.forEach((str) => {
-            radixTree.add(new Buffer(str, "ascii"), createValue ? {address: str} : undefined );
+            radixTree.add( Buffer.from(str, "ascii"), createValue ? {address: str} : undefined );
 
             assert(radixTree.validateRoot() === true, "Radix Tree after " + str + " is not Valid");
             assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
@@ -27,7 +27,7 @@ class InterfaceTreeTestHelper {
         //radixTree.printLevelSearch();
 
         radixData.forEach((str) => {
-            let result = radixTree.search(new Buffer(str, "ascii"));
+            let result = radixTree.search( Buffer.from(str, "ascii"));
             assert(result.result === true, "result " + str + " was not found");
         });
 
@@ -39,7 +39,7 @@ class InterfaceTreeTestHelper {
     testSearch (radixData, radixTree, needToBeFound) {
 
         radixData.forEach((str) => {
-            let result = radixTree.search(new Buffer(str, "ascii"));
+            let result = radixTree.search( Buffer.from(str, "ascii"));
             assert(result.result === needToBeFound, "result " + str + " was not found");
         });
 
@@ -49,18 +49,18 @@ class InterfaceTreeTestHelper {
 
         radixData.forEach((str, index) => {
 
-            let deleteResult = radixTree.delete(new Buffer(str, "ascii"));
+            let deleteResult = radixTree.delete( Buffer.from(str, "ascii"));
             assert(deleteResult === true, "delete " + str + " didn't work");
 
             assert(radixTree.validateRoot() === true, "Radix Tree deleted after " + str + " is not Valid");
             assert(radixTree.validateParentsAndChildrenEdges() === true, "Radix Parents and Children Edges don't match");
 
-            let searchResult = radixTree.search(new Buffer(str, "ascii"));
+            let searchResult = radixTree.search( Buffer.from(str, "ascii"));
             assert(!searchResult.result, "result " + str + " was actually found...");
 
             // the radix sort still, should detect all remaining strings
             for (let j = index + 1; j < radixData.length; j++) {
-                let searchResult = radixTree.search(new Buffer(radixData[j], "ascii"));
+                let searchResult = radixTree.search( Buffer.from(radixData[j], "ascii"));
                 assert(searchResult.result === true, "result " + str + " was not found after " + str + " was deleted...");
             }
 

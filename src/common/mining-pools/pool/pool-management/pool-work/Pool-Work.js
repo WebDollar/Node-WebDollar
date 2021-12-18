@@ -62,10 +62,10 @@ class PoolWork {
             this.lastBlockNonce = 0;
 
             //fill with blank info
-            this.lastBlock.hash = new Buffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH );
+            this.lastBlock.hash =  Buffer.alloc( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH );
             if (BlockchainGenesis.isPoSActivated(this.lastBlock.height)) {
-                this.lastBlock.posMinerPublicKey = new Buffer(consts.ADDRESSES.PUBLIC_KEY.LENGTH );
-                this.lastBlock.posSignature = new Buffer(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH );
+                this.lastBlock.posMinerPublicKey = Buffer.alloc(consts.ADDRESSES.PUBLIC_KEY.LENGTH );
+                this.lastBlock.posSignature = Buffer.alloc(consts.TRANSACTIONS.SIGNATURE_SCHNORR.LENGTH );
             }
 
             let error = false;

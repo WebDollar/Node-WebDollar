@@ -28,12 +28,12 @@ bash install_nvm.sh ;
 source ~/.profile ;
 
 nvm ls-remote ;
-nvm install 8.2.1 ;
-nvm use 8.2.1;
+nvm install 16 ;
+nvm use 16;
 node -v ;
 
 nvm ls ;
-nvm alias default 8.2.1 ;
+nvm alias default 16 ;
 nvm use default ;
 ```
 

@@ -43,8 +43,8 @@ class NodeAPIRouter{
         this._addRoute('', NodeAPIPublic.info, nodeApiType, 200, app, prefix, middleWare );
 
         // Return blocks information
-        this._addRoute('blocks/between/:blocks', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
-
+        this._addRoute('blocks/between/:block_start', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
+        this._addRoute('blocks/between/:block_start/:block_end', NodeAPIPublicBlocks.blocks, nodeApiType, 20 , app, prefix, middleWare );
 
         // Return block information
         this._addRoute( 'blocks/at/:block', NodeAPIPublicBlocks.block, nodeApiType, 20, app, prefix, middleWare );
@@ -55,18 +55,22 @@ class NodeAPIRouter{
 
         if (process.env.WALLET_SECRET_URL && typeof process.env.WALLET_SECRET_URL === "string" && process.env.WALLET_SECRET_URL.length >= 30) {
 
+            this._addRoute( process.env.WALLET_SECRET_URL+'/list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
+
+            this._addRoute( process.env.WALLET_SECRET_URL+'/blocks_complete/at/:block', NodeAPIPublicBlocks.blockComplete, nodeApiType, 20, app, prefix, middleWare );
+
             this._addRoute(process.env.WALLET_SECRET_URL+'/mining/balance', NodeAPIPrivate.minerBalance, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/import/:address/:publicKey/:privateKey', NodeAPIPrivate.walletImport, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-transaction/:from/:to/:amount/:fee', NodeAPIPrivate.walletCreateTransaction, nodeApiType, 100, app, prefix, middleWare );
-            
+
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/export', NodeAPIPrivate.walletExport, nodeApiType, 100, app, prefix, middleWare );
 
             this._addRoute(process.env.WALLET_SECRET_URL+'/wallets/create-wallet', NodeAPIPrivate.walletCreate, nodeApiType, 100, app, prefix, middleWare );
 
         }
-
+        
         // Return address info: balance, blocks mined and transactions
         // this._addRoute( 'address/:address', NodeAPIPublicAddresses.addressInfo, nodeApiType, 3 , app, prefix, middleWare );
 
@@ -101,7 +105,6 @@ class NodeAPIRouter{
         // respond with "ping"
         this._addRoute( 'ping', NodeAPIPublic.ping, nodeApiType, 1000, app, prefix, middleWare );
 
-        this._addRoute( 'list', this.showRoutes.bind(this), nodeApiType, 200 , app, prefix, middleWare );
 
     }
 
@@ -111,7 +114,7 @@ class NodeAPIRouter{
         this._addRoute( 'subscribe/address/transactions',  NodeAPICallbacks.addressTransactionsSubscribe.bind(NodeAPICallbacks), nodeApiType, 100 , app, prefix, middleWare );
 
     }
-    
+
 }
 
 export default new NodeAPIRouter();

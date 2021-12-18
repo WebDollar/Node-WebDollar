@@ -90,7 +90,7 @@ class InterfaceSatoshminDB {
 
             if (!response ) return null;
             else if ( !response._attachments ) return response.value;
-            else return new Buffer(atob(response._attachments.key.data).toString('hex'), 'hex');  //get attachment
+            else return Buffer.from(atob(response._attachments.key.data).toString('hex'), 'hex');  //get attachment
 
         } catch (Exception) {
 
@@ -136,7 +136,7 @@ class InterfaceSatoshminDB {
         if (process.env.BROWSER && Buffer.isBuffer(value))
             attachment = new Blob([value.toString('hex')]);
         else  //we are in node
-            attachment = new Buffer(value.toString('hex'));
+            attachment = Buffer.from(value.toString('hex'));
 
         try {
 

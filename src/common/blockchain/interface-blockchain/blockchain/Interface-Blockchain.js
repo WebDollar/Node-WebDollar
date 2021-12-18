@@ -62,7 +62,7 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
      */
     async includeBlockchainBlock(block, resetMining, socketsAvoidBroadcast, saveBlock = true, revertActions, showUpdate){
 
-        if (!block.reward ) block.reward = BlockchainMiningReward.getReward(block.height);
+        if (!block.reward ) block.reward = BlockchainMiningReward.getFinalReward(block.height);
 
         if (!block.blockValidation )
             block.blockValidation = this.createBlockValidation();
@@ -183,8 +183,13 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
         if (POSRecalculation && height >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION-1){
 
-            if (height % 30 === 29 ) height = height - 10;  //first POS, get the last proof of Stake
-            else if (height % 30 === 19 ) height = height - 20; //first POW, get the last proof of Work
+            if (height < consts.BLOCKCHAIN.HARD_FORKS.POS90_ACTIVATION) { //66% POS
+                if (height % 30 === 29) height = height - 10;  //first POS, get the last proof of Stake
+                else if (height % 30 === 19) height = height - 20; //first POW, get the last proof of Work
+            } else if (height < consts.BLOCKCHAIN.HARD_FORKS.POS100_ACTIVATION) { //90% POS
+                if (height % 100 === 99) height = height - 10; //first POS, get the last proof of Stake
+                else if (height % 100 === 89) height = height - 90; //first POW, get the last proof of work
+            }
 
         }
 

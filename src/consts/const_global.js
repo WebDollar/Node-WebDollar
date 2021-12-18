@@ -61,7 +61,6 @@ consts.BLOCKCHAIN = {
 
         //forks larger than this will not be accepted
         IMMUTABILITY_LENGTH: 60,
-
     },
 
     HARD_FORKS : {
@@ -76,6 +75,11 @@ consts.BLOCKCHAIN = {
 
         TRANSACTIONS_INCLUDING_ONLY_HEADER: 567698, // SAME AS POS
         POS_ACTIVATION: 567810,
+
+        POS90_ACTIVATION: 1650000, //it needs to be % 30 === 0, better it should be % 100 = 0 && % 30 === 0
+        FORCED_HALVING:   2158000,
+
+        POS100_ACTIVATION: 2348110, //it needs to be % 110 === 0
 
     }
 
@@ -265,10 +269,9 @@ consts.SETTINGS = {
 
     NODE: {
 
-        VERSION: "1.212.0",
+        VERSION: "1.3.22",
 
-        VERSION_COMPATIBILITY: "1.200.3",
-        VERSION_COMPATIBILITY_POOL_MINERS: "1.200.1",
+        VERSION_COMPATIBILITY: "1.3.2",
 
         VERSION_COMPATIBILITY_UPDATE: "",
 
@@ -322,15 +325,15 @@ consts.SETTINGS = {
 
                 CLIENT: {
 
-                    MAX_SOCKET_CLIENTS_WAITLIST: 5,
-                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 5,
+                    MAX_SOCKET_CLIENTS_WAITLIST: 10,
+                    MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 10,
 
                     MIN_SOCKET_CLIENTS_WAITLIST: 0,
                     MIN_SOCKET_CLIENTS_WAITLIST_FALLBACK: 2,
 
                     SERVER_OPEN:{
-                        MAX_SOCKET_CLIENTS_WAITLIST: 5,
-                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 3,
+                        MAX_SOCKET_CLIENTS_WAITLIST: 10,
+                        MAX_SOCKET_CLIENTS_WAITLIST_FALLBACK: 10,
                     },
 
                     SSL:{
@@ -541,7 +544,6 @@ if ( consts.DEBUG === true ) {
 
     consts.SETTINGS.NODE.VERSION = "1.210.9" ;
     consts.SETTINGS.NODE.VERSION_COMPATIBILITY = "1.210.9";
-    consts.SETTINGS.NODE.VERSION_COMPATIBILITY_POOL_MINERS = "1.210.9";
 
 }
 

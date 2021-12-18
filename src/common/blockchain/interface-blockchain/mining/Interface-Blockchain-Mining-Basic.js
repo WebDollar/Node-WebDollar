@@ -229,13 +229,13 @@ class InterfaceBlockchainMiningBasic {
     }
 
     // if it is in terminal asking for the password (required in POS)
-    async setPrivateKeyAddressForMiningAddress(){
+    async setPrivateKeyAddressForMiningAddress(actualPassword) {
 
         let foundAddress = Blockchain.Wallet.getAddress(this.minerAddress);
 
-        let password = await foundAddress.getPrivateKey();
+        const password = await foundAddress.getPrivateKey(actualPassword);
 
-        if (password){
+        if (password) {
 
             foundAddress._privateKeyForMining = password;
             console.warn("Mining Address ready for mining" + this.minerAddress );

@@ -52,7 +52,7 @@ class NodeClient {
 
             //if (!waitlist.isFallback) return false;
             
-            let timeoutTotal =  8*1000 + Math.floor( Math.random()*10*1000) + ( !process.env.BROWSER ? 10*1000+Math.random()*30*1000 : 0 );
+            let timeoutTotal =  Math.floor(  8*1000 + Math.random()*10*1000 + ( !process.env.BROWSER ) ? 10*1000+Math.random()*30*1000 : 0  );
 
             try {
 
@@ -78,7 +78,7 @@ class NodeClient {
                     this.socket = socket = io( address, {
 
                         reconnection: false, //no reconnection because it is managed automatically by the WaitList
-                        maxHttpBufferSize: consts.SOCKET_MAX_SIZE_BYRES,
+                        maxHttpBufferSize: consts.SETTINGS.PARAMS.MAX_SIZE.SOCKET_MAX_SIZE_BYRES,
 
                         connection_timeout : timeoutTotal,
                         timeout: timeoutTotal,
@@ -102,6 +102,26 @@ class NodeClient {
                     return resolve(false);
                 }
 
+
+                socket.on("error", response =>{
+                    //console.log("Client error",  response);
+                    resolve(false);
+                })
+
+                socket.on("connect_error", response =>{
+                    //console.log("Client error connecting", address, response);
+                    resolve(false);
+                });
+
+                socket.on("connect_failed", response =>{
+                    //console.log("Client error connecting (connect_failed) ", address, response);
+                    resolve(false);
+                })
+
+                socket.on("disconnect", ()=>{
+                    resolve(false);
+                });
+
                 if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)
                     throw {message: "You switched to pool"};
 
@@ -111,7 +131,6 @@ class NodeClient {
                     SocketExtend.extendSocket( socket, socket.io.opts.hostname || sckAddress.getAddress(false),  socket.io.opts.port||sckAddress.port, undefined, level );
                     console.warn("Client connected to " + socket.node.sckAddress.address);
                 });
-
 
                 socket.once("HelloNode", async (data) => {
 
@@ -129,24 +148,6 @@ class NodeClient {
 
                     }
 
-                });
-
-                socket.once("connect_error", response =>{
-
-                    //console.log("Client error connecting", address, response);
-                    resolve(false);
-
-                });
-
-                socket.once("connect_failed", response =>{
-
-                    //console.log("Client error connecting (connect_failed) ", address, response);
-                    resolve(false);
-
-                });
-
-                socket.on("disconnect", ()=>{
-                   resolve(false);
                 });
 
                 socket.connect();
@@ -171,6 +172,13 @@ class NodeClient {
 
         //it is not unique... then I have to disconnect
 
+        this.socket.on("error", async () => {
+
+            console.warn("Client error ", this.socket.node.sckAddress.getAddress(true));
+            await NodesList.disconnectSocket(this.socket);
+
+        })
+
         if ( Blockchain.MinerPoolManagement.minerPoolStarted && waitlist.nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) {
             console.error("socket disconnected by not being minerPool");
             return false;
@@ -191,7 +199,6 @@ class NodeClient {
             await NodesList.disconnectSocket(this.socket);
 
         });
-
 
         this.socket.node.protocol.propagation.initializePropagation();
 

@@ -12,7 +12,7 @@ describe("Interface Merkle + Radix Tree", () => {
     it('creating merkle tree simple test', ()=>{
 
         let radixTree = new InterfaceMerkleRadixTree();
-        radixTree.add( new Buffer("aaa", "ascii"), {address: "aaa"} );
+        radixTree.add( Buffer.from("aaa", "ascii"), {address: "aaa"} );
 
         assert(radixTree.validateRoot() === true, "Radix Tree after " + "aaa" + " is not Valid");
 
@@ -23,12 +23,12 @@ describe("Interface Merkle + Radix Tree", () => {
 
         ["romanus"].forEach( (str)=>{
 
-            radixTree.add( new Buffer(str, "ascii") , {address: str} );
+            radixTree.add(  Buffer.from(str, "ascii") , {address: str} );
             //radixTree.printLevelSearch();
 
             assert(radixTree.validateRoot() === true, "Merkle Tree is invalid!!!");
 
-            radixTree.delete( new Buffer("romane", "ascii"))
+            radixTree.delete( Buffer.from("romane", "ascii"))
 
             //radixTree.printLevelSearch();
             assert(radixTree.validateRoot() === true, "Merkle Tree is invalid after deletion!!!");

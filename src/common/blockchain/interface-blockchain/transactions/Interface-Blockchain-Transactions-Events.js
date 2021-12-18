@@ -59,7 +59,7 @@ class InterfaceBlockchainTransactionsEvents{
                     if (this._searchAddressInTransaction(unencodedAddress, transaction)) {
 
                         let txId = transaction.txId.toString("hex");
-                        result[txId.toString("hex")] = transaction.toJSON();
+                        result[txId] = transaction.toJSON();
                     }
 
 

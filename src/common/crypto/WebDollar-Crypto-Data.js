@@ -24,7 +24,7 @@ class WebDollarCryptoData {
         if (WebDollarCryptoData.isWebDollarCryptoData(object)){
 
             if (forceToCreate)
-                return new WebDollarCryptoData( new Buffer(object.buffer), "buffer" );
+                return new WebDollarCryptoData( Buffer.from(object.buffer), "buffer" );
 
             return object;
         }
@@ -32,7 +32,7 @@ class WebDollarCryptoData {
         let cryptoData = new WebDollarCryptoData(object);
 
         if (forceToCreate && cryptoData.buffer ) {
-            cryptoData.buffer = new Buffer(cryptoData.buffer);
+            cryptoData.buffer = Buffer.from(cryptoData.buffer);
         }
 
         return cryptoData;
@@ -46,23 +46,23 @@ class WebDollarCryptoData {
             this.buffer = data;
         else
         if (type === "hex")
-            this.buffer = new Buffer(data, "hex");
+            this.buffer = Buffer.from(data, "hex");
         else
         if (type === "base")
-            this.buffer = new Buffer(BufferExtended.fromBase(data)); //if it is string, it must be a Base string
+            this.buffer = Buffer.from(BufferExtended.fromBase(data)); //if it is string, it must be a Base string
         else
         if (type === "utf-8")
-            this.buffer = new Buffer(data, "utf-8");
+            this.buffer = Buffer.from(data, "utf-8");
         else
         if (type === "ascii" || typeof data === "string")
-            this.buffer = new Buffer(data, "ascii");
+            this.buffer = Buffer.from(data, "ascii");
         else
         if (type === "byte" || Array.isArray(data)) //if it is array
         {
             if (data.length > 0 && typeof data[0] === "object" )
                 this.buffer = this.createBufferFromArray(data);
             else // byte array
-                this.buffer = new Buffer(data);
+                this.buffer = Buffer.from(data);
         }
         else
         if (type === "object" || typeof data === "object"){
@@ -80,7 +80,7 @@ class WebDollarCryptoData {
             }
 
             if ( !data )
-                this.buffer = new Buffer ( [0] );
+                this.buffer = Buffer.from ( [0] );
             else
                 this.buffer = this.createBufferFromArray(data);
 
@@ -123,7 +123,7 @@ class WebDollarCryptoData {
         if (newValue )
             return newValue.buffer;
         else
-            return new Buffer( [0] );
+            return Buffer.from( [0] );
     }
 
     toHex(){

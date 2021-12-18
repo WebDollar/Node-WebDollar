@@ -21,7 +21,7 @@ class Serialization{
         }
         list.reverse();
 
-        let buffer = new Buffer( list.length );
+        let buffer = Buffer.alloc( list.length );
 
         for (let i = 0; i < list.length; i++)
             buffer[i] = list[i];
@@ -44,7 +44,7 @@ class Serialization{
     convertBigNumber( bigNumber, length ){
         //converting number value into a buffer
 
-        let buffer = new Buffer(length);
+        let buffer = Buffer.alloc(length);
         let count = length-1;
 
         while (bigNumber.isGreaterThan(0)){
@@ -60,7 +60,7 @@ class Serialization{
     
     serializeNumber1Byte(data){
         //converting number value into a buffer
-        let buffer = Buffer(1);
+        let buffer = Buffer.alloc(1);
         buffer[0] = (data & 0xff);
 
         return  buffer;
@@ -68,7 +68,7 @@ class Serialization{
 
     serializeNumber2Bytes(data){
         //converting number value into a buffer
-        let buffer = Buffer(2);
+        let buffer = Buffer.alloc(2);
         buffer[1] = data & 0xff;
         buffer[0] = data>>8 & 0xff;
 
@@ -77,7 +77,7 @@ class Serialization{
 
     serializeNumber3Bytes(data){
         //converting number value into a buffer
-        let buffer = Buffer(3);
+        let buffer = Buffer.alloc(3);
         buffer[2] = data & 0xff;
         buffer[1] = data>>8 & 0xff;
         buffer[0] = data>>16 & 0xff;
@@ -87,7 +87,7 @@ class Serialization{
 
     //converting number value into a buffer
     serializeNumber4Bytes(data){
-        let buffer = Buffer(4);
+        let buffer = Buffer.alloc(4);
         buffer[3] = data & 0xff;
         buffer[2] = data>>8 & 0xff;
         buffer[1] = data>>16 & 0xff;
@@ -127,7 +127,7 @@ class Serialization{
     serializeNumber7Bytes(long){
 
         // we want to represent the input as a 8-bytes array
-        var byteArray = new Buffer(7);
+        var byteArray = Buffer.alloc(7);
 
         for ( let index = 0; index < byteArray.length; index ++ ) {
             let byte = long & 0xff;
@@ -170,11 +170,11 @@ class Serialization{
     serializeToFixedBuffer(noBytes, buffer){
 
         if (buffer === undefined || buffer === null)
-            return new Buffer(noBytes);
+            return Buffer.alloc(noBytes);
         if (buffer.length === noBytes) // in case has the same number of bits as output
             return buffer;
 
-        let result = new Buffer(noBytes);
+        let result = Buffer.alloc(noBytes);
 
         let c = 0;
         for (let i = buffer.length-1; i >= 0; i--){
@@ -194,18 +194,18 @@ class Serialization{
 
     deserializeHashOptimized(buffer,offset){
 
-        let hashPrefix = [];
+        let zeros = 0
 
         let hashLength = this.deserializeNumber1Bytes(buffer, offset);
         offset += 1;
 
-        for (let i = 0; i < 32 - hashLength; i++) hashPrefix.push(0);
+        for (let i = 0; i < 32 - hashLength; i++) zeros += 1
 
         let hashLeadingZero = BufferExtended.substr(buffer, offset, hashLength);
         offset += hashLength;
 
         let deserializedHash = Buffer.concat([
-            new Buffer(hashPrefix),
+            Buffer.alloc(zeros),
             hashLeadingZero
         ]);
 
@@ -223,7 +223,7 @@ class Serialization{
         while (count < buffer.length && buffer[count] === 0)
             count++;
 
-        let result = new Buffer(1 + buffer.length - count );
+        let result = Buffer.alloc(1 + buffer.length - count );
         result [0] = buffer.length - count;
 
         for (let i = count; i < buffer.length; i++)
@@ -284,7 +284,7 @@ class Serialization{
         if ( data.c.length === 0 )
             throw "data is 0 and can't be ";
 
-        let buffer = new Buffer( 1 + 1 + data.c.length*6 );
+        let buffer = Buffer.alloc( 1 + 1 + data.c.length*6 );
 
         buffer[0] = Math.abs(data.e) % 128 + (data.e >= 0 ? 0 : 1)*128;
         buffer[1] = data.c.length % 128 + (data.s >= 0? 0 : 1)*128;

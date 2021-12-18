@@ -5,25 +5,22 @@ import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockc
 class NodeAPIPrivate{
 
     constructor(){
-
     }
 
     minerBalance(req, res){
-
         let addressString = Blockchain.blockchain.mining.minerAddress;
         let balance = Blockchain.blockchain.accountantTree.getBalance(addressString, undefined);
 
         balance = (balance === null) ? 0 : (balance / WebDollarCoins.WEBD);
 
         return {address: addressString, balance: balance};
-
     }
 
     async walletImport(req, res){
 
-        let address = req.address;
-        let publicKey = req.publicKey;
-        let privateKey = req.privateKey;
+        const address = req.address;
+        const publicKey = req.publicKey;
+        const privateKey = req.privateKey;
 
         let content = {
             version: '0.1',
@@ -49,32 +46,38 @@ class NodeAPIPrivate{
     }
 
     async walletCreateTransaction(req, res){
-        
+
         var from;
         var to;
 
-        if (req.from && req.from != 'null' &&
-          req.to && req.to != 'null' &&
-          req.amount && req.amount != 'null') {
+        if (req.from && req.from !== 'null' &&
+          req.to && req.to !== 'null' &&
+          req.amount && req.amount !== 'null') {
           from = req.from;
           to = req.to;
-        } else if(req.from && req.from != 'null') {
+        } else if(req.from && req.from !== 'null') {
           // fan out
           from = req.from;
           to = req.multiple_to;
-        } else if(req.to && req.to != 'null') {
+        } else if(req.to && req.to !== 'null') {
           // fan in
           from = req.multiple_from;
           to = req.to;
         }
 
-        let amount = parseInt(req.amount) ? parseInt(req.amount) * WebDollarCoins.WEBD : undefined;
-        let fee = parseInt(req.fee) * WebDollarCoins.WEBD;
+        let amount = parseFloat(req.amount) ? parseFloat(req.amount) * WebDollarCoins.WEBD : undefined;
+        let fee = parseFloat(req.fee) * WebDollarCoins.WEBD;
+        amount = Math.round(amount)
+        fee = Math.round(fee)
 
-        let result = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
+        let out = await Blockchain.Transactions.wizard.createTransactionSimple(from, to, amount, fee);
 
-        return result;
+        if (out && out.result ) {
+            out.signature = out.signature.toString('hex')
+            out.txId = out.txId.toString('hex')
+        }
 
+        return out;
 
     }
 

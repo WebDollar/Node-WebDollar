@@ -110,7 +110,7 @@ class SocketProtocol {
                         data[prop] = Buffer.from(data[prop]);
                     else
                     if (prop === "type" && data.type === "Buffer" && data.hasOwnProperty("data")) {
-                        data = new Buffer(data);
+                        data = Buffer.from(data);
                         return data;
                     }
                     else

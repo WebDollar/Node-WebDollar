@@ -92,7 +92,7 @@ class PoolRewardsManagement{
 
 
 
-        poolCurrentBalance -= BlockchainMiningReward.getReward(this.blockchain.blocks.length-1) * this.poolData.confirmedBlockInformations.length;
+        poolCurrentBalance -= BlockchainMiningReward.getFinalReward(this.blockchain.blocks.length-1) * this.poolData.confirmedBlockInformations.length;
 
         let remainingAmount = Math.floor( poolCurrentBalance - (poolCurrentBalance + poolRewardSCO) * this.poolFeePercent - this.totalRewardConfirmOther );
 

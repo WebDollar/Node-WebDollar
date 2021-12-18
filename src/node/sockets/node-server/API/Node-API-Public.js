@@ -28,9 +28,8 @@ class NodeAPIPublic{
         let nSecondsBehind     = currentTimestamp - blockTimestamp;
         const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
 
-        if (nSecondsBehind < UNSYNC_THRESHOLD) {
+        if (nSecondsBehind < UNSYNC_THRESHOLD)
             is_synchronized = true;
-        }
 
         return {
 
@@ -79,11 +78,9 @@ class NodeAPIPublic{
         }
 
         return {
-
             top: Blockchain.blockchain.blocks.length,
             is_synchronized: is_synchronized,
             secondsBehind  : nSecondsBehind / 1000
-
         }
 
     }

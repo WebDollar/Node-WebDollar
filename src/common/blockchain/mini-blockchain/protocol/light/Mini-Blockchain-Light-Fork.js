@@ -140,9 +140,11 @@ class MiniBlockchainLightFork extends MiniBlockchainFork {
             this._blocksStartingPointClone = this.blockchain.blocks.blocksStartingPoint;
             this._lightAccountantTreeSerializationsHeightClone = this.blockchain.lightAccountantTreeSerializations[diffIndex] !== undefined;
             this._lightAccountantTreeSerializationsHeightCloneGzipped = this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] !== undefined ? this.blockchain.lightAccountantTreeSerializationsGzipped[diffIndex] : 0;
-            this._lightPrevDifficultyTargetClone = new Buffer(this.blockchain.lightPrevDifficultyTargets[diffIndex] !== undefined ? this.blockchain.lightPrevDifficultyTargets[diffIndex] : 0);
+
+            this._lightPrevDifficultyTargetClone = Buffer.isBuffer( this.blockchain.lightPrevDifficultyTargets[diffIndex] ) ? Buffer.from(this.blockchain.lightPrevDifficultyTargets[diffIndex]) : Buffer.alloc( 0 )
             this._lightPrevTimeStampClone = this.blockchain.lightPrevTimeStamps[diffIndex];
-            this._lightPrevHashPrevClone = new Buffer(this.blockchain.lightPrevHashPrevs[diffIndex] !== undefined ? this.blockchain.lightPrevHashPrevs[diffIndex] : 0);
+
+            this._lightPrevHashPrevClone = Buffer.isBuffer( this.blockchain.lightPrevHashPrevs[diffIndex] ) ? Buffer.from( this.blockchain.lightPrevHashPrevs[diffIndex] ) : Buffer.alloc(0);
 
             //it is just a simple fork
             return MiniBlockchainFork.prototype.preForkClone.call(this, true, true );

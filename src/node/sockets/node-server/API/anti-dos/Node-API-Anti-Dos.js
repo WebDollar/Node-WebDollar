@@ -3,7 +3,6 @@ class NodeAPIAntiDos{
     constructor(){
 
         this.waitlist = [];
-
         this.totalWeights = {};
 
         setInterval(this._reduceWeights.bind(this), 1000);
@@ -40,8 +39,7 @@ class NodeAPIAntiDos{
     protectRoute(route, callback){
 
         let element = this.totalWeights[route];
-
-        if (element === undefined) return callback();
+        if (!element) return callback();
 
         if (element.weight >= element.max )
             return {result:false, message: "TOO MANY REQUESTS"};
@@ -49,8 +47,6 @@ class NodeAPIAntiDos{
         element.weight++;
 
         return callback();
-
-
     }
 
 }

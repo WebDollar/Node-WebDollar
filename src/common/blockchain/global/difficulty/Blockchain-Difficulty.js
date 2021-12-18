@@ -68,8 +68,8 @@ class BlockchainDifficulty{
         let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; // blockNumber is not included
 
         //avoid first Block, because the firstBlock is correlated with the last block of the POW
-        if ( blockNumber >= consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION && (blockNumber+1) % 30 === 0)
-            firstBlock +=1;
+        const PoSModulo = BlockchainGenesis.PoSModulo(blockNumber);
+        if ( PoSModulo && ((blockNumber+1) % PoSModulo === 0) ) firstBlock += 1
 
         //adding blocks 0..8
         for (let i = firstBlock; i < blockNumber; i++) {
@@ -128,8 +128,8 @@ class BlockchainDifficulty{
         let firstBlock = (blockNumber+1) - consts.BLOCKCHAIN.DIFFICULTY.NO_BLOCKS; // blockNumber is not included
 
         //avoid first Block, because the firstBlock is correlated with the last block of the POW
-        if ((blockNumber+1) % 30 === 10)
-            firstBlock +=1;
+        const PoSModulo = BlockchainGenesis.PoSModulo(blockNumber);
+        if ( PoSModulo && ( (blockNumber+1) % PoSModulo === 10 ) ) firstBlock += 1
 
         //adding blocks 0..8
         for (let i = firstBlock; i < blockNumber; i++) {

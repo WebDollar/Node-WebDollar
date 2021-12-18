@@ -111,7 +111,7 @@ class PoolPayouts{
             let totalSumReward = 0;
 
             for (let blockConfirmed of blocksConfirmed)
-                totalSumReward += BlockchainMiningReward.getReward( blockConfirmed.block.height) * (1 - this.poolManagement.poolSettings.poolFee );
+                totalSumReward += BlockchainMiningReward.getFinalReward( blockConfirmed.block.height) * (1 - this.poolManagement.poolSettings.poolFee );
 
             let poolFork = totalSumReward - Blockchain.blockchain.accountantTree.getBalance( this.blockchain.mining.minerAddress );
 
@@ -152,7 +152,7 @@ class PoolPayouts{
 
                 }
 
-                let maxSumReward = BlockchainMiningReward.getReward( blockConfirmed.block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
+                let maxSumReward = BlockchainMiningReward.getFinalReward( blockConfirmed.block.height ) * (1 - this.poolManagement.poolSettings.poolFee);
 
                 let sumReward = 0;
 

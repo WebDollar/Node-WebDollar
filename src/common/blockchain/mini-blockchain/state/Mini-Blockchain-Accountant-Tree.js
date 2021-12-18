@@ -32,7 +32,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     updateAccount(address, value, tokenId, revertActions, showUpdate = true) {
 
         if ( !tokenId ) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 
@@ -222,7 +222,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     calculateNodeCoins(tokenId, node) {
 
         if (!tokenId ) {
-            tokenId = new Buffer(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
+            tokenId = Buffer.alloc(consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.LENGTH);
             tokenId[0] = consts.MINI_BLOCKCHAIN.TOKENS.WEBD_TOKEN.VALUE;
         }
 

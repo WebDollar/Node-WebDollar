@@ -113,8 +113,8 @@ class InterfaceBlockchainBlock {
 
         await this._validateBlockTimeStamp();
 
-        if (this.reward !== BlockchainMiningReward.getReward(this.height) )
-            throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getReward( this.height ) };
+        if (this.reward !== BlockchainMiningReward.getFinalReward(this.height) )
+            throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getFinalReward( this.height ) };
 
         if ( await this._supplementaryValidation() === false)
             throw {message: "supplementaryValidation failed"};
@@ -214,12 +214,13 @@ class InterfaceBlockchainBlock {
             version: this.version,
             hashPrev: this.hashPrev ? this.hashPrev.toString("hex") : '',
             hashChainPrev: this.hashChainPrev ? this.hashChainPrev.toString("hex") : '',
-            data: this.data ? this.data.toJSON() : '',
+            data: this.data ? this.data.toJSON(...arguments) : '',
             nonce: this.nonce,
             timeStamp: this.timeStamp,
             difficulty: this.difficultyTarget ? this.difficultyTarget.toString("hex") : '',
             hash: this.hash ? this.hash.toString("hex"): "",
             hashChain: this.hashChain ? this.hashChain.toString("hex") : '',
+            reward: this.reward,
         }
 
     }
@@ -238,7 +239,7 @@ class InterfaceBlockchainBlock {
             Serialization.serializeNumber2Bytes( this.version ),
             Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashPrev ),
             Serialization.serializeNumber4Bytes( this.timeStamp ),
-            (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChainPrev ) : new Buffer(0),
+            (this.height > consts.BLOCKCHAIN.HARD_FORKS.POS_ACTIVATION) ? Serialization.serializeToFixedBuffer( consts.BLOCKCHAIN.BLOCKS_POW_LENGTH , this.hashChainPrev ) : Buffer.alloc(0),
             //data contains addressMiner, transactions history, contracts, etc
             this.data.serializeData(requestHeader),
 
@@ -337,11 +338,11 @@ class InterfaceBlockchainBlock {
     deserializeBlock(buffer, height, reward, difficultyTargetPrev, offset = 0, blockLengthValidation = true, onlyHeader = false){
 
         if (!Buffer.isBuffer(buffer) && typeof buffer === "string")
-            buffer = new Buffer(buffer, "hex");
+            buffer = Buffer.from(buffer, "hex");
 
         if ( height )  this.height = height||0;
         if (reward ) this.reward = reward;
-        else this.reward = BlockchainMiningReward.getReward(this.height);
+        else this.reward = BlockchainMiningReward.getFinalReward(this.height);
 
         if (difficultyTargetPrev ) this.difficultyTargetPrev = difficultyTargetPrev;
 
@@ -522,7 +523,6 @@ class InterfaceBlockchainBlock {
     getBlockHeader(){
 
         return {
-
             version: this.version,
             height: this.height,
             hash: this.hash,

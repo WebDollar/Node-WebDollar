@@ -12,7 +12,7 @@ class WebDollarCrypto {
     static encodeBase64(buffer) {
 
         if (!Buffer.isBuffer(buffer))
-            buffer = new Buffer(buffer);
+            buffer = Buffer.from(buffer);
 
         let result = buffer.toString('base64');
 
@@ -47,17 +47,14 @@ class WebDollarCrypto {
             else newStr += str[i];
         }
 
-        let result = new Buffer(newStr, 'base64');
+        let result = Buffer.from(newStr, 'base64');
 
         return result;
     }
 
-    static getBufferRandomValues(count){
+    static getBufferRandomValues(count = 32){
 
-        if (count === undefined)
-            count = 32;
-
-        let randArr = new Buffer(count); //create a typed array of 32 bytes (256 bits)
+        let randArr = Buffer.alloc(count); //create a typed array of 32 bytes (256 bits)
 
         // if ( typeof window !== 'undefined' &&  window.crypto !==undefined)
         //     window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
@@ -160,7 +157,6 @@ class WebDollarCrypto {
      * @returns {Promise.<Buffer>}
      */
     static hashPOW(data){
-
        return Argon2.hash(data);
     }
 
@@ -170,7 +166,6 @@ class WebDollarCrypto {
      * @returns {Promise.<String>}
      */
     static hashPOW_String(data){
-
         return Argon2.hashString(data);
     }
 

@@ -1,5 +1,42 @@
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import consts from "../../../consts/const_global";
+class WebDollarCoinsClass{
+
+    constructor(){
+
+        this.MAX_SAFE_COINS = Number.MAX_SAFE_INTEGER;
+        this.MIN_SAFE_COINS = Number.MIN_SAFE_INTEGER;
+
+
+        //max safe int:     90071992547 40992
+        //rewards           42000000000.00000
+
+        this.WEBD = 10000;
+        this.UNIT = 1;
+    }
+
+
+    validateCoinsNumber(number){
+
+        if (number === undefined || number === null) return false;
+
+        if (!Number.isInteger(number)) return false;
+        if ( number > this.MAX_SAFE_COINS) return false;
+        if ( number < this.MIN_SAFE_COINS) return false;
+
+        return true;
+    }
+
+    convertToUnits(number){
+        return number * this.WEBD;
+    }
+
+    convertToWEBD(number){
+        return number / this.WEBD;
+    }
+
+}
+
+var WebDollarCoins = new WebDollarCoinsClass()
+var HARD_FORK_FAST_HALVING = 2158000
 
 class BlockchainMiningReward{
 
@@ -50,14 +87,14 @@ class BlockchainMiningReward{
 
 
         let blocksPerCycle, height, cycle ;
-        if (initialHeight <= consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING) {
+        if (initialHeight <= HARD_FORK_FAST_HALVING) {
             blocksPerCycle = this.blocksPerCycle
             height = initialHeight
             cycle = Math.trunc( height / blocksPerCycle );
         }
         else{
             blocksPerCycle = this.blocksPerCycle2Year
-            height = initialHeight - consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING
+            height = initialHeight - HARD_FORK_FAST_HALVING
             cycle = Math.trunc( height / blocksPerCycle ) + 1;
             if (cycle > 1   ) {
                 //cycle -=1
@@ -108,7 +145,7 @@ class BlockchainMiningReward{
      */
     _getRewardHalving(height){
 
-        height -= consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING
+        height -= HARD_FORK_FAST_HALVING
 
         const cycleNumber = Math.min( 53, Math.trunc( height / this.blocksPerCycle2Year ) + 1);
         const reward = 3000 / Math.pow(2, cycleNumber  );
@@ -122,13 +159,71 @@ class BlockchainMiningReward{
         if (typeof height !== "number")
             throw {message: 'height is not defined'};
 
-        if (height <= consts.BLOCKCHAIN.HARD_FORKS.FORCED_HALVING )
+        if (height <= HARD_FORK_FAST_HALVING ){
             return this._getReward(height)
-        else
+        } else {
             return this._getRewardHalving(height)
+        }
 
     }
 
 }
 
-export default new BlockchainMiningReward();
+rewarder = new BlockchainMiningReward()
+
+// console.log ( rewarder.getSumReward(HARD_FORK_FAST_HALVING) )
+
+console.log( "nextHalving: ", (3153600 - HARD_FORK_FAST_HALVING)*45/60/60/24, "days"  )
+
+console.log ( rewarder._getReward(HARD_FORK_FAST_HALVING) )
+
+console.log('------------------')
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING-1) ) + "  before hard fork2" )  //1 forced halving in 2021
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING) ) + "  before hard fork" )  //1 forced halving in 2021
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+1) ) +  "  after hard fork 2021" )
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+2) ) + "  2021" )
+
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600/2 -1 ) ) + "  before 2023" ) //2 forced halving in ~2023
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600/2 ) ) + "   2023" )
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600/2 +1 ) ) + "   2023" )
+
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600 -1 ) ) + "   before 2025" ) //2 forced halving in ~2025
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600 ) ) + "   2025" )
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+3153600 +1 ) ) + "   2025" )
+
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+1.5*3153600 -1 ) ) + "   before 2027" ) //2 forced halving halving in ~2027
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+1.5*3153600 ) )+ " 2027" )
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+1.5*3153600 +1 ) ) + " 2027" )
+
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+2*3153600 -1 ) ) + " before halving 2029" ) //2 forced halving halving in ~209
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+2*3153600 ) ) + " 2029" )
+console.log ( WebDollarCoins.convertToWEBD( rewarder.getFinalReward(HARD_FORK_FAST_HALVING+2*3153600 +1 ) ) + " 2029" )
+
+
+let total = 0
+
+let prevReward = 0
+for (let i = 0; i <  Number.MAX_SAFE_INTEGER; i++){
+    const reward = rewarder.getFinalReward(i)
+
+    if (prevReward !== reward || ( reward === 10000 && ( (i-HARD_FORK_FAST_HALVING) % rewarder.blocksPerCycle2Year === 0) )){
+        prevReward = reward
+        const out =  {reward, total}
+
+        //console.log( "i", i, "reward", reward, out, Math.trunc( i / rewarder.blocksPerCycle2Year ) + 1 )
+        //console.log( total, ",", i, reward )
+        //console.log( total, "," )
+    }
+
+    total += reward
+
+    if ( total !== rewarder.getSumReward(i) ) {
+        console.log(i, total, rewarder.getSumReward(i))
+    }
+
+    // if (i % 10000 === 0){
+    //     console.log(i)
+    // }
+}
+
+

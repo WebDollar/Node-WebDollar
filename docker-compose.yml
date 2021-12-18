@@ -1,0 +1,28 @@
+#
+# This docker-compose provides a development environment in case your
+# system is otherwise incompatible with the WebDollar project (like MacOS).
+#
+# Build with `docker-compose build`
+# To force a rebuild, remove the container `docker rm webdollar-dev-env`
+# Launch with `docker-compose run webdollar-dev-env`
+version: "3.9"
+
+services:
+  webdollar-dev-env:
+    container_name: webdollar-dev-env
+    build:
+      context: ./
+      dockerfile: Dockerfile.dev-env
+    # todo: what ports should be exposed?
+    volumes:
+    - .:/workspace/Node-WebDollar
+    ## Launch an interactive CLI workspace.
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    entrypoint:
+      - "/bin/bash"
+    networks:
+      webdollar:
+
+networks:
+  webdollar:

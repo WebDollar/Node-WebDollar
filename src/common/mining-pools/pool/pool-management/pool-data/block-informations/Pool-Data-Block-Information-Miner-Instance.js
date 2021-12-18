@@ -188,7 +188,7 @@ class PoolDataBlockInformationMinerInstance {
 
         let rewardDifficulty = rewardPOW.plus(rewardPOS);
 
-        let reward =  rewardDifficulty.multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getReward( this._lastHeight)  ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber();
+        let reward =  rewardDifficulty.multipliedBy(ratio).multipliedBy( BlockchainMiningReward.getFinalReward( this._lastHeight)  ).multipliedBy( 1-this.poolManagement.poolSettings.poolFee).toNumber();
 
         let prevReward;
         if ( this.miner.referrals.referralLinkMiner && this.poolManagement.poolSettings.poolReferralFee > 0 ) {

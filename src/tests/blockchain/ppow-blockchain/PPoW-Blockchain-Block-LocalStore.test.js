@@ -10,11 +10,11 @@ describe('test PPoW-Blocks save/load/remove to/from local storage', () => {
 
     let db = new InterfaceSatoshminDB();
     let version = consts.TRANSACTIONS.VERSIONS.SCHNORR_VERSION;
-    let hash = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
-    let interlinkHash1 = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d70b5462806b92be0cbccd30cb", "hex");
-    let interlinkHash2 = new Buffer("7bb3e84e1234c7e76be2beedb94a5678b7f095d50b5462806b92be0cbccd30cc", "hex");
-    let hashPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
-    let hashChainPrev = new Buffer("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
+    let hash = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd30ca", "hex");
+    let interlinkHash1 = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d70b5462806b92be0cbccd30cb", "hex");
+    let interlinkHash2 = Buffer.from("7bb3e84e1234c7e76be2beedb94a5678b7f095d50b5462806b92be0cbccd30cc", "hex");
+    let hashPrev = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
+    let hashChainPrev = Buffer.from("7bb3e84e6892c7e76be2beedb94a1035b7f095d50b5462806b92be0cbccd31fa", "hex");
     let timeStamp = Math.trunc(Math.random() * 100000);
     let nonce = Math.trunc(Math.random() * 1000);
     let minerAddress = BlockchainGenesis.minerAddress;

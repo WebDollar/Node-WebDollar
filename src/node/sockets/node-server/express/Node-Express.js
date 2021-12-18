@@ -30,16 +30,14 @@ class NodeExpress{
 
     _extractDomain( fileName ){
 
-        const x509 = require('x509');
-        let subject = x509.getSubject( fileName );
+        const { Certificate } = require('@sardinefish/x509')
 
-        let domain = subject.commonName;
+        const file = fs.readFileSync(fileName)
+        const cert = Certificate.fromPEM(file)
 
-        if (domain === undefined) domain = '';
+        const domain = cert.subject.CN || '';
 
-        domain = domain.replace( "*.", "" );
-
-        return domain;
+        return domain.replace( "*.", "" );
     }
 
     async startExpress(){
@@ -56,9 +54,7 @@ class NodeExpress{
             try {
                 this.app.use('/.well-known/acme-challenge', express.static('certificates/well-known/acme-challenge'))
             } catch (exception){
-
                 console.error("Couldn't read the SSL certificates");
-
             }
 
             let options = {};
@@ -154,7 +150,9 @@ class NodeExpress{
 
                     resolve(true);
 
-                }).on('error', (err) => {
+                })
+
+                this.server.on('error', (err) => {
 
                     this.domain = '';
 
@@ -245,8 +243,8 @@ class NodeExpress{
 
     close(){
 
-        if (this.app)
-            this.app.close();
+        if (this.server)
+            this.server.close();
     }
 
 }

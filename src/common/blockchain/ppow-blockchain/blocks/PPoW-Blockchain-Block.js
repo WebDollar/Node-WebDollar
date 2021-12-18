@@ -266,7 +266,8 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
     }
 
     toJSON(){
-        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this);
+
+        let answer = InterfaceBlockchainBlock.prototype.toJSON.call(this, ...arguments );
 
         answer.interlinks = this._interlinksToJSON(this.interlink);
 
@@ -301,11 +302,13 @@ class PPoWBlockchainBlock extends InterfaceBlockchainBlock{
                 throw {message: "interlink has different sizes"};
 
             for (let i = 0; i < interlink.length; i++) {
+
                 if (interlink[i].height !== this.interlink[i].height)
-                    throw {message: "interlink height is different"};
+                    throw {message: "interlink height is different", interlink:i , height: this.height};
 
                 if (!BufferExtended.safeCompare(interlink[i].blockId, this.interlink[i].blockId))
                     throw {message: "interlink prevBlock height is different"};
+
             }
 
         }

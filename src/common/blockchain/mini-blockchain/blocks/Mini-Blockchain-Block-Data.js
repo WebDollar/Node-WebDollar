@@ -83,7 +83,6 @@ class MiniBlockchainBlockData extends  inheritBlockData {
 
     }
 
-
 }
 
 export default MiniBlockchainBlockData;

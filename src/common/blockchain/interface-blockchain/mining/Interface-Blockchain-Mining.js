@@ -48,7 +48,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
             nextBlock = await this.blockchain.blockCreator.createBlockNew(this.unencodedMinerAddress, undefined, nextTransactions );
 
             nextBlock.timeStamp = await nextBlock.getTimestampForMining();
-            nextBlock.reward = BlockchainMiningReward.getReward(nextBlock.height);
+            nextBlock.reward = BlockchainMiningReward.getFinalReward(nextBlock.height);
             await nextBlock.updateInterlink();
 
         } catch (Exception){
@@ -92,7 +92,7 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
 
                 if (!nextBlock){
                     console.warn("nextBlock couldn't be created");
-                    await Utils.sleep(1000);
+                    await Utils.sleep(100);
                     continue;
                 }
 
@@ -389,94 +389,6 @@ class InterfaceBlockchainMining extends  InterfaceBlockchainMiningBasic{
         };
 
     }
-
-    async _mineNonces( start, end ){
-
-        let nonce = start;
-
-        if (start < 0 || end < 0 || start > end)
-            return {
-                result: false,
-                hash: new Buffer(consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER),
-                nonce: -1,
-            };
-
-        try {
-
-            while (nonce <= end && this.started && !this.resetForced && !(this.reset && this.useResetConsensus)) {
-
-                let hash = await this.calculateHash(nonce);
-
-                if (hash.compare(this.bestHash) < 0) {
-
-                    this.bestHash = hash;
-                    this.bestHashNonce = nonce;
-
-                    if (this.bestHash.compare(this.difficulty) <= 0) {
-
-                        return {
-                            result: true,
-                            nonce: this.bestHashNonce,
-                            hash: this.bestHash,
-                        };
-
-                    }
-
-                }
-
-                nonce++;
-                this._hashesPerSecond++;
-            }
-
-
-        } catch (exception){
-            console.error("Error _mineNonces", "nonce", nonce, start, end );
-
-            if (Blockchain.MinerPoolManagement.minerPoolStarted)
-                this.resetForced = true;
-        }
-
-        if (consts.DEBUG && Math.random() < 0.05 ) {
-            console.log("current bestHash -", this.bestHash.toString("hex"), " target -", this.difficulty.toString("hex"));
-            await this.blockchain.sleep( 5 );
-        }
-
-        return {
-            result: false,
-            hash: this.bestHash,
-            nonce: this.bestHashNonce
-        }
-
-    }
-
-    /**
-     * Simple Mining with no Workers
-     * @param block
-     * @param difficulty
-     * @returns {Promise.<boolean>}
-     */
-    async mine(block, difficulty, start, end, height){
-
-        if (start === undefined) start = 0;
-        if (end === undefined) end = 0xFFFFFFFF;
-
-        this.block = block;
-        this.difficulty = difficulty;
-
-        this.bestHash = consts.BLOCKCHAIN.BLOCKS_MAX_TARGET_BUFFER;
-        this.bestHashNonce = -1;
-
-        try {
-
-            await this._mineNonces(start, end);
-
-        } catch (exception){
-            console.log("Error Mining ", exception)
-        }
-
-    }
-
-
 
 }
 

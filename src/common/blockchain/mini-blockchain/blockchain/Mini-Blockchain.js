@@ -7,7 +7,6 @@ import MiniBlockchainBlockData from '../blocks/Mini-Blockchain-Block-Data'
 import InterfaceBlockchainBlockCreator from 'common/blockchain/interface-blockchain/blocks/Interface-Blockchain-Block-Creator'
 import MiniBlockchainTransactions from "../transactions/Mini-Blockchain-Transactions"
 import RevertActions from "common/utils/Revert-Actions/Revert-Actions"
-import global from "consts/global"
 import MiniBlockchainBlocks from "./../blocks/Mini-Blockchain-Blocks"
 let inheritBlockchain;
 
@@ -119,13 +118,9 @@ class MiniBlockchain extends  inheritBlockchain{
         return true;
     }
 
-
-
     getBalances(address){
         return this.accountantTree.getBalances(address);
     }
-
-
 
 }
 

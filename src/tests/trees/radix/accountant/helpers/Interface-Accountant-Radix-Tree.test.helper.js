@@ -15,7 +15,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
         accountantData.forEach((data, index) => {
 
-            accountantTree.add( new Buffer(data.text, "ascii"), {
+            accountantTree.add(  Buffer.from(data.text, "ascii"), {
                 text: data.text,
                 balances: data.value.toString()
             });
@@ -25,7 +25,7 @@ class InterfaceAccountantRadixTreeTestHelper {
             assert(accountantTree.validateRoot() === true, "validate Tree was not passed at " + index + " because " + JSON.stringify(data));
             assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parents and Children Edges don't match");
 
-            assert(accountantTree.search(new Buffer(data.text, "ascii")).result === true, "Accountant Tree couldn't find " + index + "   " + data + " although it was added");
+            assert(accountantTree.search(Buffer.from(data.text, "ascii")).result === true, "Accountant Tree couldn't find " + index + "   " + data + " although it was added");
 
             accountantData.forEach((data2, index2) => {
 
@@ -35,7 +35,7 @@ class InterfaceAccountantRadixTreeTestHelper {
                 if (index2 <= index)
                     mustFind = true;
 
-                assert(accountantTree.search(new Buffer(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find " + str2 + " although it was added successfully");
+                assert(accountantTree.search( Buffer.from(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find " + str2 + " although it was added successfully");
 
             });""
         });
@@ -64,7 +64,7 @@ class InterfaceAccountantRadixTreeTestHelper {
 
             let str = data.text;
 
-            accountantTree.delete(new Buffer(str, "ascii"));
+            accountantTree.delete( Buffer.from(str, "ascii"));
 
             if (showDebug) {
                 console.log("deleted", str);
@@ -74,7 +74,7 @@ class InterfaceAccountantRadixTreeTestHelper {
             assert(accountantTree.validateRoot() === true, "Accountant after " + str + " is not Valid");
             assert(accountantTree.validateParentsAndChildrenEdges() === true, "Accountant Tree Parent and Children Edges don't match");
 
-            assert(!accountantTree.search(new Buffer(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
+            assert(!accountantTree.search( Buffer.from(str, "ascii")).result, "Radix Tree2 couldn't find " + index + "   " + str + " although it was added");
 
             accountantData.forEach((data2, index2) => {
 
@@ -84,12 +84,12 @@ class InterfaceAccountantRadixTreeTestHelper {
                 if (index2 <= index)
                     mustFind = false;
 
-                if (accountantTree.search( new Buffer(str2, "ascii")).result !== mustFind) {
+                if (accountantTree.search(  Buffer.from(str2, "ascii")).result !== mustFind) {
                     console.log("accountant tree didn't work for deleting ", index, " str ", str, "and finding ", str2)
                     accountantTree.printLevelSearch();
                 }
 
-                assert(accountantTree.search( new Buffer(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find '" + str2 + "' although it was added successfully");
+                assert(accountantTree.search(  Buffer.from(str2, "ascii")).result === mustFind, "Accountant Tree couldn't find or not find '" + str2 + "' although it was added successfully");
 
             });
 

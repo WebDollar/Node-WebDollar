@@ -1,6 +1,6 @@
 /* eslint-disable */
 import WebDollarCoins from "common/utils/coins/WebDollar-Coins"
-import MiniBlockchainTransactions from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
+import MiniBlockchainTransaction from "./../../../mini-blockchain/transactions/trasanction/Mini-Blockchain-Transaction"
 import NodesList from 'node/lists/Nodes-List';
 import consts from 'consts/const_global'
 
@@ -16,7 +16,7 @@ class InterfaceBlockchainTransactionsWizard{
 
     async deserializeValidateTransaction(transaction){
 
-        let myTransaction = new MiniBlockchainTransactions(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
+        let myTransaction = new MiniBlockchainTransaction(this.blockchain,undefined,undefined,0,undefined,undefined,undefined,false,false,false,false,false,false);
 
         await myTransaction.deserializeTransaction(transaction.data,0,true);
 
@@ -28,8 +28,9 @@ class InterfaceBlockchainTransactionsWizard{
 
         let process = await this.validateTransaction( address, toAddress, toAmount, fee, currencyTokenId, password, timeLock, undefined);
 
-        if(process.result)
-            return await this.propagateTransaction( process.signature , process.transaction );
+        if (process.result) {
+            return this.propagateTransaction(process.signature, process.transaction);
+        }
         else
             return process;
 
@@ -209,6 +210,7 @@ class InterfaceBlockchainTransactionsWizard{
             result: true,
             message: "Your transaction is pending...",
             signature: signature,
+            txId: transaction.txId,
             transaction: transaction,
         }
 
@@ -227,7 +229,7 @@ class InterfaceBlockchainTransactionsWizard{
     }
 
     calculateFeeSimple(){
-        return this.calculateFeeWizzard( new Buffer(141) );
+        return this.calculateFeeWizzard( Buffer.alloc(141) );
     }
 
 }

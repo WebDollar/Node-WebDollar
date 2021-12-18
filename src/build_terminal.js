@@ -1,4 +1,4 @@
-var process = require('process');
+const process = require('process');
 
 import {Node, Blockchain} from './index';
 import consts from 'consts/const_global';
@@ -7,12 +7,20 @@ import {JsonRpcServer} from './node/jsonRpc';
 
 JsonRpcServer(consts.JSON_RPC);
 
-process.on('uncaughtException', function (err) {
-    console.error('Caught exception: ' + err);
+process.on('error', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error(`Caught exception: ${err}`);
+});
+
+process.on('unhandledRejection', (err) => {
+    console.error(`Caught exception: ${err}`);
 });
 
 //                            light-node
-Blockchain.createBlockchain('full-node', ()=>{}, async ()=>{
+Blockchain.createBlockchain('full-node', () => {}, async () => {
 
     await Node.NodeExpress.startExpress();
 
@@ -22,14 +30,10 @@ Blockchain.createBlockchain('full-node', ()=>{}, async ()=>{
     Node.NodeClientsService.startService();
 
     Node.NodeServer.startServer();
-
-
-}, ()=>{
+}, () => {
 });
 
 
 process.on('SIGINT', async () => {
-
     await termination(Blockchain);
-
 });
