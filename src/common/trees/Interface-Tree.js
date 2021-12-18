@@ -355,7 +355,7 @@ class InterfaceTree{
         if ( !serialization)
             serialization = this._serializeTree(includeHashes);
 
-        return await this.db.save(key, serialization, timeout);
+        return this.db.save(key, serialization, timeout);
     }
 
     async loadTree(key, buffer, offset=0, includeHashes){

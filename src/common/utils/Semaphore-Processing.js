@@ -28,7 +28,7 @@ class SemaphoreProcessing{
     processSempahoreCallback(callback){
 
         return new Promise ((resolve) =>{
-            this._list .push({callback: callback, resolver: resolve});
+            this._list.push({callback: callback, resolver: resolve});
         });
 
     }

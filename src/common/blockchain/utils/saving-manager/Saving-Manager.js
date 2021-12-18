@@ -61,9 +61,6 @@ class SavingManager{
 
                     await block.saveBlock();
 
-                    if (block.height % 5000 === 0)
-                        await this.blockchain.db.restart();
-
                 } catch (exception){
 
                     Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
@@ -173,7 +170,7 @@ class SavingManager{
 
     async saveBlockchainLength(length ){
 
-        let answer = await this.blockchain.db.save( this.blockchain._blockchainFileName, length, 20000, 1000000) ;
+        let answer = await this.blockchain.db.save( this.blockchain._blockchainFileName, length, 20000 ) ;
 
         if (!answer) {
             Log.error("Error saving the blocks.length", Log.LOG_TYPE.SAVING_MANAGER);

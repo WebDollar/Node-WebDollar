@@ -198,7 +198,7 @@ class MiniBlockchainAccountantTree extends MiniBlockchainAccountantTreeEvents {
     }
 
     async saveMiniAccountant(includeHashes, name, serialization, timeout) {
-        return await this.saveTree(name || "accountantTree", includeHashes, serialization, timeout);
+        return this.saveTree(name || "accountantTree", includeHashes, serialization, timeout);
     }
 
     async loadMiniAccountant(buffer, offset, includeHashes, name = "accountantTree", showUpdate = true) {

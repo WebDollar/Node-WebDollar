@@ -295,9 +295,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
 
                     let block = await this._loadBlock( index, undefined, revertActions);
 
-                    if (index > 0 && index % 50000 === 0)
-                        await this.db.restart();
-
                     if (index > 0 && index % 10000 === 0)
                         await this.blocks.savingManager.saveBlockchain();
 
@@ -306,8 +303,6 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
                 console.info("Loading Complete");
 
                 await this.blocks.savingManager.saveBlockchain();
-
-                await this.db.restart();
 
             } catch (exception){
                 console.error("Error loading block", index, exception);
