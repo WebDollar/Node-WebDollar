@@ -228,17 +228,17 @@ class MinerPoolSettings {
     }
 
     async _addPoolsList(){
-        await this.addPoolList("/pool/1/MartinCanto/0.02/f2406eea8d43bc17ac9f4d126d8baa56b0ffd0be28f2a76ae35b4e4ef6f67064/https:$$pool.martincanto.com:443", undefined, true);        
-        await this.addPoolList("/pool/1/MOFTpool/0.01/ca771a8a192c7f23b11a6b409732ab1f5e30949205a13e81a4580921ec5ae295/https:$$us-est.webdmine.io:8443", undefined, true);
+        //await this.addPoolList("/pool/1/MartinCanto/0.02/f2406eea8d43bc17ac9f4d126d8baa56b0ffd0be28f2a76ae35b4e4ef6f67064/https:$$pool.martincanto.com:443", undefined, true);
+        //await this.addPoolList("/pool/1/MOFTpool/0.01/ca771a8a192c7f23b11a6b409732ab1f5e30949205a13e81a4580921ec5ae295/https:$$us-est.webdmine.io:8443", undefined, true);
         await this.addPoolList("/pool/1/CanadianStakePool/0.02/ea115a560322c557d3617732145a837af9992d729e5f8165d3b7077b22ee12a4/https:$$webdollarpool.ca:443", undefined, true);
-        await this.addPoolList("/pool/1/WEBD-Splashpool-USA/0.02/61761896b4d958b3cc9073ae3c724a127b4ee5b31f6b8dcafd29643cf20a796a/https:$$splashpool.myvnc.com:8080", undefined, true);
-        await this.addPoolList("/pool/1/LOFT/0.01/777b64f4425cf319cd6f178d890178e6c5d5d367d65f100a3c8d71d815fef0d4/https:$$pool.maison:8443", undefined, true);
-        await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
-        await this.addPoolList("pool/1/EuroPool/0.02/f06b4720a725eb4fe13c06b26fca4c862b2f2f2ddc831e411418aceefae8e6df/https:$$webd-europool.ddns.net:2222", undefined, true);
+        //await this.addPoolList("/pool/1/WEBD-Splashpool-USA/0.02/61761896b4d958b3cc9073ae3c724a127b4ee5b31f6b8dcafd29643cf20a796a/https:$$splashpool.myvnc.com:8080", undefined, true);
+        //await this.addPoolList("/pool/1/LOFT/0.01/777b64f4425cf319cd6f178d890178e6c5d5d367d65f100a3c8d71d815fef0d4/https:$$pool.maison:8443", undefined, true);
+        //await this.addPoolList("/pool/1/Balanel_si_Miaunel/0.02/cd7217ad76118df5357ae7a094aa48096daae8a67767bd3acbc8638dc68955ac/https:$$webd.pool.coffee:8443", undefined, true);
+        //await this.addPoolList("pool/1/EuroPool/0.02/f06b4720a725eb4fe13c06b26fca4c862b2f2f2ddc831e411418aceefae8e6df/https:$$webd-europool.ddns.net:2222", undefined, true);
         await this.addPoolList("/pool/1/SpyClub/0.02/401c8f09a1fd93ea11737bffe062b9f51b7b2e793cea499084b7752948d5d21f/https:$$node.spyclub.ro:8080", undefined, true);
-        await this.addPoolList("/pool/1/WMP/0.02/d02e26e60a5b0631a0b71e7dc72bb7492fd018dad64531498df369ec14f87962/https:$$server.webdollarminingpool.com:443", undefined, true);
-        await this.addPoolList("/pool/1/Timi/0.001/7d863060bc5bf81695f53c5e61c79677ad6cb3b5fd48dafebbabb25f7dca8797/https:$$pool.timi.ro:443", undefined, true);
-        await this.addPoolList("/pool/1/WMP-ASIA/0.02/773a8d5f7ce3c0dba0b7216c35d2768b1a6abef716fa2a46d875d6ca0e2c115e/https:$$singapore.webdollarminingpool.com:443", undefined, true);
+        //await this.addPoolList("/pool/1/WMP/0.02/d02e26e60a5b0631a0b71e7dc72bb7492fd018dad64531498df369ec14f87962/https:$$server.webdollarminingpool.com:443", undefined, true);
+        //await this.addPoolList("/pool/1/Timi/0.001/7d863060bc5bf81695f53c5e61c79677ad6cb3b5fd48dafebbabb25f7dca8797/https:$$pool.timi.ro:443", undefined, true);
+        //await this.addPoolList("/pool/1/WMP-ASIA/0.02/773a8d5f7ce3c0dba0b7216c35d2768b1a6abef716fa2a46d875d6ca0e2c115e/https:$$singapore.webdollarminingpool.com:443", undefined, true);
     }
 
     async _replacePoolURL(url = ''){

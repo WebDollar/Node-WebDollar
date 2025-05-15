@@ -54,7 +54,7 @@ class GeoHelper {
             }
 
             let list = [];
-             list.push("https://geoip-db.com/json/"+address);
+             //list.push("https://geoip-db.com/json/"+address);
             // list.push("https://ipstack.com/ipstack_api.php?ip="+address);
             //list.push("https://geo.xoip.ro/?address="+address); //@Sorin' version
             // list.push("https://geoip.tools/v1/json/?q="+address);

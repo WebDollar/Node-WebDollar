@@ -42,9 +42,10 @@
   "homepage": "https://github.com/WebDollar/Node-WebDollar#readme",
   "dependencies": {
     "@sardinefish/x509": "^1.2.1",
-    "argon2-browser": "1.18.0",
+    "argon2-browser": "^1.8.0",
     "atob": "^2.0.3",
     "babel-plugin-module-alias": "^1.6.0",
+    "base64-loader": "^1.0.0",
     "big-integer": "^1.6.26",
     "bignumber.js": "^6.0.0",
     "bitcoinjs-lib": "^3.3.2",
