@@ -35,4 +35,7 @@ const config = merge(base, {
 
 });
 
+// configul de bază definește și el 'process.env' întreg (doar MINING_POOL_STATUS), ceea ce ar îngheța restul variabilelor la build
+config.plugins = config.plugins.filter(p => !(p instanceof webpack.DefinePlugin && p.definitions && p.definitions['process.env']));
+
 module.exports = config
