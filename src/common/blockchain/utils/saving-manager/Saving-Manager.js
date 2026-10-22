@@ -125,6 +125,48 @@ class SavingManager{
 
     }
 
+    // Salvare periodică în timpul funcționării: scrie pe disc blocurile rămase în memorie, apoi salvează starea
+    // (arbore de conturi + lungime), ca o oprire forțată să piardă cel mult intervalul dintre salvări.
+    async saveCheckpoint(){
+
+        if (process.env.BROWSER || this._isBeingSavedAll || this._checkpointRunning || global.TERMINATED || global.INTERFACE_BLOCKCHAIN_LOADING) return false;
+
+        this._checkpointRunning = true;
+
+        try {
+
+            for (let attempt = 0; attempt < 20; attempt++) {
+
+                if (this._isBeingSavedAll || global.TERMINATED) return false;
+
+                while ( this._pendingBlocksCount > 0 && !this._isBeingSavedAll ){
+                    let saved = await this._saveNextBlock();
+                    if (!saved) break; //nimic de salvat acum (procesare în curs sau blocuri de fork)
+                }
+
+                if (await this.blockchain.saveMiniBlockchainIfFlushed()) {
+                    Log.info('Checkpoint saved at ' + this.blockchain.blocks.length, Log.LOG_TYPE.SAVING_MANAGER);
+                    return true;
+                }
+
+                await Utils.sleep(1000);
+
+            }
+
+        } catch (exception){
+
+            Log.error('Checkpoint saving raised an error', Log.LOG_TYPE.SAVING_MANAGER, exception);
+
+        } finally {
+
+            this._checkpointRunning = false;
+
+        }
+
+        return false;
+
+    }
+
     async saveAllBlocks(){
 
         if (this._isBeingSavedAll) return;

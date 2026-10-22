@@ -79,6 +79,76 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
     }
 
+    // Salvează arborele de conturi + lungimea blocurilor (apelat sub semaforul de procesare)
+    async _saveMiniBlockchainState(){
+
+
+        console.info("accountant tree saveMiniBlockchain called!");
+
+        let length = this.blocks.length;
+        let serialization = this.accountantTree.serializeMiniAccountant(true, );
+
+        //avoid re saving the same blockchain
+        if (this._miniBlockchainSaveBlocks >= length) return false;
+
+        Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
+
+        console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
+        console.info("accountant tree", this.accountantTree.root.edges.length, serialization.length );
+
+        await Utils.sleep(5000);
+
+        if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
+            throw {message: "saveMiniAccountant couldn't be saved"};
+
+        console.info("accountant tree saving blockchain length", length );
+
+        if ( !(await this.blocks.saveBlockchainLength(length)) )
+            throw {message: "save blockchain length couldn't be saved"};
+
+        console.info("accountant tree saving profs");
+
+        await Utils.sleep(5000);
+
+        if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
+            throw { message: "save proves calculated couldn't be saved" };
+
+        console.info("accountant tree profs saved");
+
+        this._miniBlockchainSaveBlocks = length;
+
+        return true;
+
+    }
+
+    // Salvare periodică: se face doar dacă TOATE blocurile procesate sunt deja pe disc (altfel starea salvată ar arăta
+    // spre blocuri care lipsesc după o oprire forțată). Verificarea se face sub semaforul de procesare, deci nu apar blocuri noi între timp.
+    async saveMiniBlockchainIfFlushed(){
+
+        let saved = false;
+
+        try {
+
+            await this.semaphoreProcessing.processSempahoreCallback( async () => {
+
+                if (this.blocks.savingManager._pendingBlocksCount > 0) return true; //au sosit blocuri noi: se reia la următoarea încercare
+
+                saved = await this._saveMiniBlockchainState();
+
+                return true;
+
+            });
+
+        } catch (exception){
+
+            Log.error('Accountant Tree periodic saving raised an error ', Log.LOG_TYPE.SAVING_MANAGER, exception);
+
+        }
+
+        return saved;
+
+    }
+
     async saveMiniBlockchain(setGlobalVariable = true, useSemaphore = true){
 
         if (setGlobalVariable)
@@ -86,45 +156,7 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
         try {
 
-            let save = async () => {
-
-                console.info("accountant tree saveMiniBlockchain called!");
-
-                let length = this.blocks.length;
-                let serialization = this.accountantTree.serializeMiniAccountant(true, );
-
-                //avoid re saving the same blockchain
-                if (this._miniBlockchainSaveBlocks >= length) return false;
-
-                Log.info('Accountant Tree Saving ', Log.LOG_TYPE.SAVING_MANAGER);
-
-                console.info("accountant tree", this.accountantTree.root.hash.toString("hex"));
-                console.info("accountant tree", this.accountantTree.root.edges.length, serialization.length );
-
-                await Utils.sleep(5000);
-
-                if (!(await this.accountantTree.saveMiniAccountant(true, "accountantTree", serialization)))
-                    throw {message: "saveMiniAccountant couldn't be saved"};
-
-                console.info("accountant tree saving blockchain length", length );
-
-                if ( !(await this.blocks.saveBlockchainLength(length)) )
-                    throw {message: "save blockchain length couldn't be saved"};
-
-                console.info("accountant tree saving profs");
-
-                await Utils.sleep(5000);
-
-                if ( !(await this.prover.provesCalculated._saveProvesCalculated()) )
-                    throw { message: "save proves calculated couldn't be saved" };
-
-                console.info("accountant tree profs saved");
-
-                this._miniBlockchainSaveBlocks = length;
-
-                return true;
-
-            };
+            let save = () => this._saveMiniBlockchainState();
 
             if (useSemaphore) {
                 if ( !( await this.semaphoreProcessing.processSempahoreCallback(save) )) throw {message: "Saving was not done"};
