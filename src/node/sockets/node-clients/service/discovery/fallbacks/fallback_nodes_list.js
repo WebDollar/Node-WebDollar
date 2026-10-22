@@ -1,4 +1,4 @@
-export default {
+const fallbackNodesList = {
 
     "protocol": "WebDollar",
     "name": "fallback nodes",
@@ -146,3 +146,11 @@ export default {
         {"addr": ["http://86.126.138.61:2024"]}, // Thanks to Hostero
     ]
 }
+
+// Peeri de pornire adăugați la rulare (listă separată prin virgulă), ex. FALLBACK_NODES=http://host1:8081,https://host2:8443
+if (typeof process !== "undefined" && process.env && process.env.FALLBACK_NODES) {
+    const extra = process.env.FALLBACK_NODES.split(",").map((a) => a.trim()).filter((a) => a !== "").map((a) => ({addr: [a]}));
+    fallbackNodesList.nodes = extra.concat(fallbackNodesList.nodes);
+}
+
+export default fallbackNodesList;
