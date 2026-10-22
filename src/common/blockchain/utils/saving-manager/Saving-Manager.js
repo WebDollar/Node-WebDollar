@@ -41,55 +41,56 @@ class SavingManager{
 
         if (this.blockchain.semaphoreProcessing._list.length > 0) return;
 
-        let block = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+        return this.blockchain.semaphoreProcessing.processSempahoreCallback( () => this._saveNextBlockLocked() );
+    }
 
-            for (let key in this._pendingBlocks){
+    // Scrie pe disc următorul bloc în așteptare. Se apelează DOAR cu semaforul de procesare deja luat.
+    async _saveNextBlockLocked(){
 
-                let block = this._pendingBlocks[key];
-                if (block instanceof Promise) continue;
 
-                //it is a forkBlock, it is skipped
-                if (block.isForkBlock) continue;
+        for (let key in this._pendingBlocks){
 
-                //mark a promise to the save to enable loading to wait until it is saved
-                let resolver;
-                this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
+            let block = this._pendingBlocks[key];
+            if (block instanceof Promise) continue;
 
-                await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
+            //it is a forkBlock, it is skipped
+            if (block.isForkBlock) continue;
 
-                try {
+            //mark a promise to the save to enable loading to wait until it is saved
+            let resolver;
+            this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
 
-                    await block.saveBlock();
+            await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
 
-                } catch (exception){
+            try {
 
-                    Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
+                await block.saveBlock();
 
-                }
+            } catch (exception){
 
-                this._pendingBlocksCount--;
-
-                //propagate block in case loadingManager was using this block
-                await resolver(block);
-
-                //no new object, just the promise
-                if ( this._pendingBlocks[ key ] instanceof Promise)
-                    delete this._pendingBlocks[ key ] ;
-
-                //saving Accountant Tree
-                if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
-                    await this.saveBlockchain(false);
-
-                block.saving = false;
-                return block;
+                Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             }
 
-            return undefined;
+            this._pendingBlocksCount--;
 
-        });
+            //propagate block in case loadingManager was using this block
+            await resolver(block);
 
-        return block;
+            //no new object, just the promise
+            if ( this._pendingBlocks[ key ] instanceof Promise)
+                delete this._pendingBlocks[ key ] ;
+
+            //saving Accountant Tree
+            if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
+                await this.saveBlockchain(false);
+
+            block.saving = false;
+            return block;
+
+        }
+
+        return undefined;
 
     }
 

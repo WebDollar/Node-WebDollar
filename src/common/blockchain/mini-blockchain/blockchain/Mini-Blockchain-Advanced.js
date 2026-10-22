@@ -131,7 +131,13 @@ class MiniBlockchainAdvanced extends  MiniBlockchain{
 
             await this.semaphoreProcessing.processSempahoreCallback( async () => {
 
-                if (this.blocks.savingManager._pendingBlocksCount > 0) return true; //au sosit blocuri noi: se reia la următoarea încercare
+                // blocurile rămase în memorie se scriu pe disc AICI, sub același semafor, ca să nu apară blocuri noi între golire și salvarea stării
+                const savingManager = this.blocks.savingManager;
+                while (savingManager._pendingBlocksCount > 0) {
+                    if (!(await savingManager._saveNextBlockLocked())) break;
+                }
+
+                if (savingManager._pendingBlocksCount > 0) return true; //au rămas doar blocuri de fork: se reia la următoarea încercare
 
                 saved = await this._saveMiniBlockchainState();
 
