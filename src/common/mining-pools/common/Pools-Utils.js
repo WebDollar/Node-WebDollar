@@ -1,13 +1,12 @@
-import  Utils from "common/utils/helpers/Utils"
-import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NodesList from 'node/lists/Nodes-List';
-import NODE_TYPE from "node/lists/types/Node-Type";
-import NODE_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type"
-import Utils from "common/utils/helpers/Utils";
-import consts from 'consts/const_global'
-import InterfaceBlockchainAddressHelper from "../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper";
-import SocketAddress from "../../sockets/protocol/extend-socket/Socket-Address";
-const sanitizer = require('sanitizer');
+import Utils from "../../../utils/helpers/Utils.js";
+import NodesWaitlist from '../../../node/lists/waitlist/Nodes-Waitlist.js';
+import NodesList from '../../../node/lists/Nodes-List.js';
+import NODE_TYPE from "../../../node/lists/types/Node-Type.js";
+import NODE_CONSENSUS_TYPE from "../../../node/lists/types/Node-Consensus-Type.js";
+import consts from '../../../consts/const_global.js';
+import InterfaceBlockchainAddressHelper from "../../../blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper.js";
+import SocketAddress from "../../../sockets/protocol/extend-socket/Socket-Address.js";
+import sanitizer from 'sanitizer';
 
 class PoolsUtils {
 

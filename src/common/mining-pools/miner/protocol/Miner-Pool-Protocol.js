@@ -32,6 +32,24 @@ class MinerPoolProtocol extends PoolProtocolList{
         this.connectedPools = [];
         this.list = this.connectedPools;
 
+        // DEBUG: Log all disconnect events with context
+        NodesList.emitter.on("nodes-list/disconnected", (nodesListObject) => {
+            try {
+                const socket = nodesListObject && nodesListObject.socket;
+                const remoteAddress = socket && socket.node && socket.node.sckAddress ? socket.node.sckAddress.url : undefined;
+                const consensusType = socket && socket.node && socket.node.protocol ? socket.node.protocol.nodeConsensusType : undefined;
+                console.warn("[DEBUG][MinerPoolProtocol] Disconnected from node", {
+                    remoteAddress,
+                    consensusType,
+                    time: new Date().toISOString(),
+                    stack: new Error().stack
+                });
+            } catch (e) {
+                console.error("[DEBUG][MinerPoolProtocol] Error logging disconnect event", e);
+            }
+            this._unsubscribeMiner(nodesListObject);
+        });
+
     }
 
     async _startMinerProtocol(){
@@ -84,12 +102,24 @@ class MinerPoolProtocol extends PoolProtocolList{
                     throw {message: "send hello is not working"};
 
                 socket.on("mining-pool/hello-pool/again", (data) => this._sendPoolHello(socket) );
+                // DEBUG: Log successful subscribe
+                console.info("[DEBUG][MinerPoolProtocol] Subscribed to pool server", {
+                    remoteAddress: socket.node && socket.node.sckAddress ? socket.node.sckAddress.url : undefined,
+                    time: new Date().toISOString()
+                });
             }
 
         } catch (exception){
 
-            console.error("subscribeMiner raised an error", exception);
-            socket.disconnect();
+            // DEBUG: Log subscribe error with context
+            console.error("[DEBUG][MinerPoolProtocol] subscribeMiner raised an error", {
+                error: exception,
+                remoteAddress: socket && socket.node && socket.node.sckAddress ? socket.node.sckAddress.url : undefined,
+                consensusType: socket && socket.node && socket.node.protocol ? socket.node.protocol.nodeConsensusType : undefined,
+                time: new Date().toISOString(),
+                stack: new Error().stack
+            });
+            if (socket && typeof socket.disconnect === 'function') socket.disconnect();
 
         }
 

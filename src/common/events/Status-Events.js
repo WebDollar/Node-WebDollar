@@ -1,4 +1,4 @@
-import AdvancedEmitter from "common/utils/Advanced-Emitter";
+import AdvancedEmitter from "../utils/Advanced-Emitter.js";
 
 class StatusEvents extends AdvancedEmitter{
 

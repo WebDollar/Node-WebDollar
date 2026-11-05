@@ -1,12 +1,10 @@
 /* eslint-disable */
-const BigInteger = require('big-integer');
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-import consts from 'consts/const_global'
-
-import Serialization from "common/utils/Serialization";
-import BufferExtended from "common/utils/BufferExtended";
+import WebDollarCrypto from '../../../crypto/WebDollar-Crypto.js';
+import BlockchainGenesis from '../../global/Blockchain-Genesis.js';
+import BlockchainMiningReward from '../../global/Blockchain-Mining-Reward.js';
+import consts from '../../../../consts/const_global.js';
+import Serialization from '../../../utils/Serialization.js';
+import BufferExtended from '../../../utils/BufferExtended.js';
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm

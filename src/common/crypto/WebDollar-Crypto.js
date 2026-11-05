@@ -1,6 +1,6 @@
 /* eslint-disable */
-import Argon2 from 'common/crypto/Argon2/Argon2'
-let crypto = (process.env.BROWSER) ? require('crypto-browserify') : require('crypto');
+import Argon2 from '../crypto/Argon2/Argon2.js';
+import crypto from 'crypto';
 
 class WebDollarCrypto {
 
@@ -59,8 +59,8 @@ class WebDollarCrypto {
         // if ( typeof window !== 'undefined' &&  window.crypto !==undefined)
         //     window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
         // else {
-            const getRandomValues = require('get-random-values');
-            getRandomValues(randArr);
+        import getRandomValues from 'get-random-values';
+        getRandomValues(randArr);
         // }
 
         return randArr;

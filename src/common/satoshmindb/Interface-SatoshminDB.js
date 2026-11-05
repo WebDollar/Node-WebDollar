@@ -1,10 +1,13 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
 /* Edited by Cosmin-Dumitru Oprea */
 
-import consts from 'consts/const_global'
+import consts from '../../consts/const_global.js'
 
-import StatusEvents from "common/events/Status-Events";
-let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
+import StatusEvents from "../events/Status-Events.js";
+import pouchdbBrowser from 'pouchdb-browser';
+import pouchdbNode from 'pouchdb-node';
+
+const pounchdb = (typeof window !== 'undefined' || process.env.BROWSER) ? pouchdbBrowser : pouchdbNode;
 
 class InterfaceSatoshminDB {
 
