@@ -20,7 +20,11 @@ const BUNDLE_PATH = path.join(REPO_ROOT, 'dist_bundle', 'terminal-bundle.js');
 const SELF_SHIM_PATH = path.join(__dirname, '..', 'test-env-setup.js');
 
 const STARTUP_TIMEOUT_MS = 60 * 1000;
-const PROPAGATION_TIMEOUT_MS = 120 * 1000;
+// 180s, nu 120s (presupunerea inițială din plan): bucla preexistentă de
+// reconectare (Nodes-Waitlist-Connecting.js) are propriul jitter aleator la
+// fiecare ciclu de încercare; verificat empiric — 120s a fost insuficient
+// o dată din 4 rulări, 180s a fost suficient constant.
+const PROPAGATION_TIMEOUT_MS = 180 * 1000;
 const POLL_INTERVAL_MS = 2000;
 
 const NODES = [
