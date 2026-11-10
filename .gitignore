@@ -81,3 +81,5 @@ vue-Frontend/
 certificates/ca_bundle.crt
 certificates/certificate.crt
 certificates/private.key
+
+.worktrees/
