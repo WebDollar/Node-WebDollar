@@ -84,3 +84,5 @@ certificates/private.key
 
 .worktrees/
 .superpowers/
+
+src/tests/node/gossip-discovery/*.log
