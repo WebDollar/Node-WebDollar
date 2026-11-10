@@ -7,6 +7,7 @@ import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
+import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
 const MAX_WAITLIST_QUEUE_LENGTH = 1000;
 const DOWNLOAD_WAITLIST_COUNT = 20;
@@ -265,11 +266,20 @@ class NodePropagationProtocol {
     }
 
     /**
-     * The reconnectable address for a newly validated peer.
+     * The reconnectable address for a newly validated peer, or null if none can be
+     * trusted enough to announce.
      * For an inbound connection (we are the server), the raw socket address is the
      * client's ephemeral TCP source port, not its real listening port — unusable for
      * reconnecting. Use its self-reported domain from Hello instead, same source
      * `registerUniqueSocket` already uses for its own waitlist entry (Nodes-List.js).
+     * That domain is an unvalidated string the peer sent us (Node-Server.js reads it
+     * straight off the Hello query) — gossiping it unchecked would let any peer make
+     * us advertise an arbitrary address to the rest of the network. We only trust it
+     * when its host matches the TCP connection's real, OS-observed source IP
+     * (`socket.node.sckAddress.address`, not attacker-controlled) — a peer can report
+     * its own real reachable address this way, never someone else's. A peer with no
+     * self-reported domain at all (e.g. a miner with no listening server) is not
+     * announced — there is nothing reconnectable to tell anyone about.
      * For an outbound connection (we are the client), the raw socket address is exactly
      * what we dialed, so it's already correct.
      */
@@ -277,9 +287,26 @@ class NodePropagationProtocol {
 
         const socket = nodeWaitListObject.socket;
 
-        if (nodeWaitListObject.connectionType === CONNECTION_TYPE.CONNECTION_SERVER_SOCKET &&
-            socket && socket.node && socket.node.protocol && socket.node.protocol.nodeDomain)
-            return socket.node.protocol.nodeDomain;
+        if (nodeWaitListObject.connectionType === CONNECTION_TYPE.CONNECTION_SERVER_SOCKET){
+
+            const domain = socket && socket.node && socket.node.protocol && socket.node.protocol.nodeDomain;
+            if (!domain) return null;
+
+            const observedIP = socket.node.sckAddress && socket.node.sckAddress.address;
+            let domainHost;
+            try { domainHost = SocketAddress.createSocketAddress(domain).address; }
+            catch (exception) { return null; }
+
+            // Node/OS raportează inconsecvent o adresă IPv4 observată pe un socket
+            // dual-stack: câteodată "127.0.0.1", câteodată "::ffff:127.0.0.1" —
+            // verificat empiric. Normalizăm ambele părți înainte de comparare, ca
+            // să nu respingem o adresă legitimă doar din cauza formatării.
+            const normalize = (ip) => (ip || '').replace(/^::ffff:/i, '');
+
+            if (!observedIP || normalize(domainHost) !== normalize(observedIP)) return null;
+
+            return domain;
+        }
 
         return nodeWaitListObject.toJSON().a;
     }
@@ -287,6 +314,7 @@ class NodePropagationProtocol {
     _newNodeConnected( nodeWaitListObject ){
 
         const address = this._reconnectableAddress(nodeWaitListObject);
+        if ( !address ) return;
         if ( !this._canAnnounce(address) ) return;
 
         const payload = Object.assign({}, nodeWaitListObject.toJSON(), {a: address});

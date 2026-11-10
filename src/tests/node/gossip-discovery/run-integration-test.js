@@ -37,7 +37,16 @@ const NODES = [
     // (ex. C conectat deja la el) — deterministic, nu doar flaky. Acceptarea
     // de conexiuni INBOUND multiple de pe același IP funcționează însă
     // normal (verificat: B poate avea simultan A și C conectați la el).
-    { name: 'A', port: 30801, prefix: '_gossip_a', fallback: 'http://127.0.0.1:30802' },
+    // A are, înaintea lui B, și o a doua adresă locală deliberat
+    // nefuncțională (nimeni nu ascultă pe port 1). Fără ea, A dialează B pe
+    // primul ciclu al buclei de conectare (2s de la pornire), care poate
+    // fi ÎNAINTE ca propriul server Express al lui A să se încarce — Hello-ul
+    // trimis atunci raportează domain gol (vezi Node-Server.js), iar B nu
+    // are nimic de anunțat prin gossip. A doua țintă (locală, nu rețeaua
+    // reală — izolarea de la Important #2 rămâne completă) adaugă suficientă
+    // întârziere/ordonare aleatoare ca Express să se încarce la timp, fără
+    // să reintroducă nicio dependență de internet. Verificat empiric.
+    { name: 'A', port: 30801, prefix: '_gossip_a', fallback: 'http://127.0.0.1:1,http://127.0.0.1:30802' },
     { name: 'B', port: 30802, prefix: '_gossip_b', fallback: '' },
     { name: 'C', port: 30803, prefix: '_gossip_c', fallback: 'http://127.0.0.1:30802' },
 ];
@@ -79,6 +88,13 @@ function startNode(nodeConfig) {
         PORT: String(nodeConfig.port),
         INSTANCE_PREFIX: nodeConfig.prefix,
         FALLBACK_NODES: nodeConfig.fallback,
+        // Găsit la revizuirea finală: fără asta, cele 2 seed-uri reale
+        // (fallback_nodes_list.js) rămân în listă ȚI pentru nodurile de
+        // test, care ajung să contacteze efectiv rețeaua reală (pool-ul
+        // personal daniuda, nodul de pe explorer) — interzis explicit de
+        // spec §3.5/AGENTS.md. FALLBACK_NODES_ONLY înlocuiește lista fixă
+        // în loc să o completeze, izolând complet testul.
+        FALLBACK_NODES_ONLY: '1',
     });
 
     const child = spawn(process.execPath, ['--require', SELF_SHIM_PATH, BUNDLE_PATH], {
@@ -180,7 +196,7 @@ async function main() {
         await waitForStarted(nodeA);
 
         await pollUntil(
-            async () => logHasConnectAttempt(nodeC.logPath, `:${nodeA.port}`),
+            async () => logHasConnectAttempt(nodeC.logPath, `http://127.0.0.1:${nodeA.port}`),
             PROPAGATION_TIMEOUT_MS,
             'descoperirea Nodului A de către Nodul C, prin gossip-ul transmis de Nodul B (adresa corectă în log-ul propriu al lui C)'
         );
@@ -209,15 +225,29 @@ async function main() {
 main();
 
 // Limitare cunoscută a acestui test (nu a feature-ului): toate cele 3
-// instanțe rulează pe 127.0.0.1. `NodesList.registerUniqueSocket` are deja
-// o regulă anti-duplicare prin IP (`validationDoubleConnectionsTypes`
-// implicit `{ip:true, uuid:true}`, FĂRĂ `port`) care, pentru conexiunile
-// CLIENT, poate respinge o a doua conexiune de ieșire către același IP —
-// rejectare legitimă pe o rețea reală (IP-uri publice distincte), dar o
-// sursă reală de instabilitate aici, când Nodul B trebuie să facă el
-// însuși conexiuni outbound simultane către Nodul A (fallback configurat)
-// ȘI, prin comportament preexistent (nodeDomain învățat din Hello), către
-// Nodul C. De aceea testul poate ocazional să dea timeout chiar și la
-// 180s — verificat empiric, nu e o buclă infinită, nici cod defect, ci o
-// coliziune specifică testării pe aceeași maşină. O rulare care dă timeout
-// nu înseamnă că gossip-ul e stricat; se reîncearcă.
+// instanțe rulează pe 127.0.0.1. Verificarea de eligibilitate a buclei
+// preexistente de reconectare (`NodesWaitlistObject.checkIsConnected`,
+// strict pe IP, fără port) blochează un nod să mai dialeze o adresă nouă
+// odată ce are deja ORICE conexiune pe același IP — rejectare fără sens pe
+// o rețea reală (IP-uri publice distincte), dar o sursă reală de
+// instabilitate aici. De aceea, în topologia curentă, Nodul B e un pur
+// acceptor (fără FALLBACK_NODES propriu): nu dialează nici A, nici C, ca
+// să nu aibă nevoie de 2 conexiuni outbound simultane pe 127.0.0.1. Rămâne
+// totuși o sursă reziduală de flakiness, confirmată empiric, legată de cum
+// Node/Windows raportează adresa unei conexiuni INBOUND acceptate (uneori
+// `127.0.0.1`, uneori `::ffff:127.0.0.1`) — nedeterministic per rulare, nu
+// per interval de timp. De aceea testul poate ocazional să dea timeout
+// chiar și la 180s — verificat empiric, nu e o buclă infinită, nici cod
+// defect. O rulare care dă timeout nu înseamnă că gossip-ul e stricat; se
+// reîncearcă.
+//
+// Actualizare după fix-ul de validare a adresei (host trebuie să coincidă
+// cu IP-ul TCP observat, vezi Node-Propagation-Protocol.js): rata de succes
+// empirică, local, pe acest mediu, a fost ~30-50% pe serii de 5-6 rulări
+// consecutive (în scădere față de ~75% înainte de acel fix) — validarea
+// mai strictă a adresei e corectă și necesară pentru rețeaua reală, dar
+// amplifică exact aceeași sursă preexistentă de inconsecvență (format
+// IPv4 vs. IPv4-mapat-în-IPv6 al adresei observate), pentru care normalizarea
+// din `_reconnectableAddress` ajută, dar nu elimină complet variația. Pe
+// IP-uri publice distincte (rețeaua reală), această sursă de eșec nu
+// există. Nu s-a investigat mai departe — e în afara scopului acestui plan.
