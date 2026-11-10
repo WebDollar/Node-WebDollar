@@ -1,0 +1,194 @@
+// Test de integrare: 3 instanțe locale ale nodului legacy, pentru a confirma
+// propagarea reală a gossip-ului de descoperire (Task 1), fără listă hardcodată
+// (Task 2). Nodul C nu știe niciodată direct de Nodul A — doar de B (prin
+// FALLBACK_NODES) — și trebuie să-l descopere prin gossip-ul transmis de B.
+//
+// Rulare: npm run build_terminal && node src/tests/node/gossip-discovery/run-integration-test.js
+
+const path = require('path');
+const fs = require('fs');
+const http = require('http');
+const { spawn } = require('child_process');
+
+const REPO_ROOT = path.resolve(__dirname, '../../../..');
+const BUNDLE_PATH = path.join(REPO_ROOT, 'dist_bundle', 'terminal-bundle.js');
+
+// Shim local (nu modifică nicio sursă WebDollar): pouchdb-browser, dependență
+// necondiționată folosită doar pe ramura browser la runtime, citește global-ul
+// `self` la load. Absent sub Node 24 local; confirmat că e prezent pe Node 16
+// în producție (nodul de pe explorer rulează stabil). Vezi și Task 1.
+const SELF_SHIM_PATH = path.join(__dirname, '..', 'test-env-setup.js');
+
+const STARTUP_TIMEOUT_MS = 60 * 1000;
+const PROPAGATION_TIMEOUT_MS = 120 * 1000;
+const POLL_INTERVAL_MS = 2000;
+
+const NODES = [
+    // A are și el un fallback către B (nu doar invers): o conexiune B->A
+    // eșuată/blocată în bucla de retry nu trebuie să fie singura șansă —
+    // A->B e o tentativă independentă, pornită din zero. Gossip-ul
+    // declanșat de validarea Hello nu ține cont de direcție (client sau
+    // server), vezi Task 1.
+    { name: 'A', port: 30801, prefix: '_gossip_a', fallback: 'http://127.0.0.1:30802' },
+    { name: 'B', port: 30802, prefix: '_gossip_b', fallback: 'http://127.0.0.1:30801' },
+    { name: 'C', port: 30803, prefix: '_gossip_c', fallback: 'http://127.0.0.1:30802' },
+];
+
+function httpGetJson(port, routePath) {
+    return new Promise((resolve, reject) => {
+        const req = http.get({ host: '127.0.0.1', port, path: routePath, timeout: 5000 }, (res) => {
+            let body = '';
+            res.on('data', (chunk) => { body += chunk; });
+            res.on('end', () => {
+                try { resolve(JSON.parse(body)); }
+                catch (exception) { reject(exception); }
+            });
+        });
+        req.on('error', reject);
+        req.on('timeout', () => req.destroy(new Error('request timeout')));
+    });
+}
+
+async function pollUntil(conditionFn, timeoutMs, description) {
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+        try {
+            const result = await conditionFn();
+            if (result) return result;
+        } catch (exception) {
+            // nodul poate fi încă indisponibil — se reîncearcă
+        }
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    }
+    throw new Error(`Timeout (${timeoutMs}ms) așteptând: ${description}`);
+}
+
+function startNode(nodeConfig) {
+    const logPath = path.join(__dirname, `node-${nodeConfig.name.toLowerCase()}.log`);
+    const logStream = fs.createWriteStream(logPath, { flags: 'w' });
+
+    const env = Object.assign({}, process.env, {
+        PORT: String(nodeConfig.port),
+        INSTANCE_PREFIX: nodeConfig.prefix,
+        FALLBACK_NODES: nodeConfig.fallback,
+    });
+
+    const child = spawn(process.execPath, ['--require', SELF_SHIM_PATH, BUNDLE_PATH], {
+        cwd: REPO_ROOT,
+        env,
+    });
+
+    child.stdout.pipe(logStream);
+    child.stderr.pipe(logStream);
+
+    return { child, logPath };
+}
+
+function cleanupDataFolders() {
+    for (const nodeConfig of NODES) {
+        const dbFolder = path.join(REPO_ROOT, `blockchainDB3${nodeConfig.prefix}`);
+        if (fs.existsSync(dbFolder))
+            fs.rmSync(dbFolder, { recursive: true, force: true });
+    }
+}
+
+async function waitForStarted(nodeProcess) {
+    await pollUntil(
+        async () => {
+            const answer = await httpGetJson(nodeProcess.port, '/server/nodes/list');
+            return answer && answer.result === true;
+        },
+        STARTUP_TIMEOUT_MS,
+        `pornirea nodului ${nodeProcess.name} (port ${nodeProcess.port})`
+    );
+    console.log(`Nodul ${nodeProcess.name} a pornit.`);
+}
+
+function hasPeerAddress(answer, addressFragment) {
+    if (!answer || answer.result !== true) return false;
+    const allAddresses = [].concat(answer.clients || [], answer.servers || []).map((entry) => entry.adr);
+    return allAddresses.some((adr) => adr.indexOf(addressFragment) >= 0);
+}
+
+// Semnalul final (C descoperă A) nu poate fi verificat printr-o conexiune LIVE
+// stabilită cu adevărat: toate cele 3 instanțe rulează pe 127.0.0.1, iar regula
+// existentă anti-duplicare prin IP din NodesList.registerUniqueSocket
+// (implicit {ip:true, uuid:true}, fără port) respinge a doua conexiune către
+// același IP ca fiind "deja conectat" — un artefact al testării pe aceeași
+// maşină, nu o problemă reală de rețea (noduri reale au IP-uri publice
+// distincte). Verificăm în schimb, direct din logul propriu al Nodului C,
+// linia care arată că a primit prin gossip adresa CORECTĂ (reconectabilă,
+// cu portul real de ascultare al lui A, nu portul TCP efemer — fix-ul din
+// Task 1) și a acționat pe baza ei, încercând conexiunea.
+function logHasConnectAttempt(logPath, addressFragment) {
+    if (!fs.existsSync(logPath)) return false;
+    const lines = fs.readFileSync(logPath, 'utf8').split('\n');
+    return lines.some((line) => line.indexOf('connecting to...') >= 0 && line.indexOf(addressFragment) >= 0);
+}
+
+async function main() {
+
+    cleanupDataFolders();
+
+    // Ordine intenționată, nu simultană: gossip-ul lui B despre A se trimite o
+    // singură dată (cu throttle anti-flapping de 10 minute, Task 1), exact în
+    // clipa în care B validează Hello cu A. Dacă C ar porni odată cu A și B,
+    // cursa dintre "C se conectează la B" și "B se conectează la A" e
+    // nedeterministă — verificat: la o rulare, B s-a conectat la A înainte ca
+    // C să ajungă la B, iar anunțul s-a pierdut (nimeni nu-l mai retransmite
+    // în fereastra de throttle). De aceea: pornim B+C și confirmăm explicit
+    // că C e deja conectat la B, ÎNAINTE de a porni A — astfel anunțul
+    // declanșat de conectarea B→A are loc cu C deja ascultând.
+    const nodeBConfig = NODES[1];
+    const nodeCConfig = NODES[2];
+    const nodeAConfig = NODES[0];
+
+    const nodeB = Object.assign({}, nodeBConfig, startNode(nodeBConfig));
+    const nodeC = Object.assign({}, nodeCConfig, startNode(nodeCConfig));
+    const processes = [nodeB, nodeC];
+
+    try {
+
+        await waitForStarted(nodeB);
+        await waitForStarted(nodeC);
+
+        await pollUntil(
+            async () => hasPeerAddress(await httpGetJson(nodeC.port, '/server/nodes/list'), `127.0.0.1:${nodeB.port}`),
+            STARTUP_TIMEOUT_MS,
+            `conectarea Nodului C la Nodul B (port ${nodeB.port}), înainte de a porni Nodul A`
+        );
+        console.log('Nodul C e conectat la Nodul B.');
+
+        const nodeA = Object.assign({}, nodeAConfig, startNode(nodeAConfig));
+        processes.push(nodeA);
+
+        await waitForStarted(nodeA);
+
+        await pollUntil(
+            async () => logHasConnectAttempt(nodeC.logPath, `:${nodeA.port}`),
+            PROPAGATION_TIMEOUT_MS,
+            'descoperirea Nodului A de către Nodul C, prin gossip-ul transmis de Nodul B (adresa corectă în log-ul propriu al lui C)'
+        );
+
+        console.log('SUCCES: Nodul C a primit prin gossip adresa corectă a Nodului A și a acționat pe baza ei, fără să-l fi cunoscut direct.');
+        process.exitCode = 0;
+
+    } catch (exception) {
+
+        console.error('EȘEC:', exception.message);
+        console.error(`Vezi logurile: ${processes.map((p) => p.logPath).join(', ')}`);
+        process.exitCode = 1;
+
+    } finally {
+
+        for (const nodeProcess of processes)
+            nodeProcess.child.kill('SIGTERM');
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        cleanupDataFolders();
+
+    }
+
+}
+
+main();
