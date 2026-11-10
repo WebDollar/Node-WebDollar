@@ -11,6 +11,7 @@ import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
 const MAX_WAITLIST_QUEUE_LENGTH = 1000;
 const DOWNLOAD_WAITLIST_COUNT = 20;
+const SNAPSHOT_MAX_ADDRESSES = 50; // limita deja aplicată de receptor în _processNodesList
 
 class NodePropagationProtocol {
 
@@ -68,6 +69,10 @@ class NodePropagationProtocol {
 
 
     initializePropagationProtocol(){
+
+        // idempotent: a second call must not register a second listener (would announce/snapshot twice)
+        if (this._propagationInitialized) return;
+        this._propagationInitialized = true;
 
         NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
 
@@ -313,6 +318,16 @@ class NodePropagationProtocol {
 
     _newNodeConnected( nodeWaitListObject ){
 
+        this._announceNewPeer(nodeWaitListObject);
+        this._sendKnownPeersSnapshot(nodeWaitListObject);
+
+    }
+
+    /**
+     * Tell every other connected peer about the newly validated one (throttled per address).
+     */
+    _announceNewPeer( nodeWaitListObject ){
+
         const address = this._reconnectableAddress(nodeWaitListObject);
         if ( !address ) return;
         if ( !this._canAnnounce(address) ) return;
@@ -322,6 +337,43 @@ class NodePropagationProtocol {
         if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
         else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
 
+    }
+
+    /**
+     * Tell the newly validated peer, once, about the full-node peers THIS node has
+     * itself validated (NodesList) — a snapshot on join. Without it, a peer joining
+     * later only ever hears about peers that appear AFTER it, never about the ones
+     * already connected. Same trust rule as the announce: only addresses this node
+     * validated itself (`_reconnectableAddress`), never hearsay; the receiver treats
+     * them as candidates and validates each before trusting. Bounded to one message
+     * per connection, capped at the receiver-side limit of 50.
+     */
+    _sendKnownPeersSnapshot( newNodeObject ){
+
+        const socket = newNodeObject.socket;
+        if (!socket || !socket.node || typeof socket.node.sendRequest !== "function") return;
+
+        const newAddress = this._reconnectableAddress(newNodeObject);
+        const seen = {};
+        const addresses = [];
+
+        for (const other of NodesList.nodes){
+
+            if (other === newNodeObject || other.socket === socket) continue;
+            if (other.nodeType !== NODE_TYPE.NODE_TERMINAL) continue;
+
+            const address = this._reconnectableAddress(other);
+            if (!address || address === newAddress || seen[address]) continue;
+
+            seen[address] = true;
+            addresses.push( Object.assign({}, other.toJSON(), {a: address}) );
+
+            if (addresses.length >= SNAPSHOT_MAX_ADDRESSES) break;
+        }
+
+        if (addresses.length === 0) return;
+
+        socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: addresses});
     }
 
 

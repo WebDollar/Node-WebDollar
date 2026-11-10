@@ -149,3 +149,104 @@ describe('NodePropagationProtocol gossip', () => {
     });
 
 });
+
+// Extensie aprobată după testarea manuală (vezi spec §3.2bis): la o conexiune
+// nouă validată, nodul trimite peer-ului nou, o singură dată, lista peers-ilor
+// pe care EL ÎNSUȘI i-a validat (cei din NodesList) — un "snapshot la
+// alăturare". Fără asta, un nod care se alătură mai târziu afla doar despre
+// peers apăruți DUPĂ el, niciodată despre cei deja conectați.
+describe('NodePropagationProtocol gossip — snapshot of known peers sent to a newly connected peer', () => {
+
+    let broadcastStub;
+    let originalNodes;
+
+    const outboundPeer = (address) => ({
+        nodeType: NODE_TYPE.NODE_TERMINAL,
+        connectionType: CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET,
+        socket: { node: {} },
+        toJSON: () => ({ a: address, t: NODE_TYPE.NODE_TERMINAL, c: true }),
+    });
+
+    const newPeer = (address) => {
+        const sendRequest = sinon.spy();
+        return {
+            nodeType: NODE_TYPE.NODE_TERMINAL,
+            connectionType: CONNECTION_TYPE.CONNECTION_CLIENT_SOCKET,
+            socket: { node: { sendRequest } },
+            toJSON: () => ({ a: address, t: NODE_TYPE.NODE_TERMINAL, c: true }),
+            sendRequest,
+        };
+    };
+
+    const snapshotCalls = (peer) => peer.sendRequest.getCalls().filter((call) => call.args[0] === 'propagation/nodes');
+
+    beforeEach(() => {
+        broadcastStub = sinon.stub(NodeProtocol, 'broadcastRequest');
+        originalNodes = NodesList.nodes;
+        NodesList.nodes = [];
+        NodePropagationProtocol.initializePropagationProtocol();
+    });
+
+    afterEach(() => {
+        broadcastStub.restore();
+        NodesList.nodes = originalNodes;
+    });
+
+    it('sends the new peer the reconnectable addresses of the other validated peers, once', () => {
+        NodesList.nodes = [outboundPeer('http://10.0.0.1:8080'), outboundPeer('http://10.0.0.2:8080')];
+        const peer = newPeer('http://10.0.0.9:8080');
+
+        NodesList.emitter.emit('nodes-list/connected', peer);
+
+        const calls = snapshotCalls(peer);
+        assert.strictEqual(calls.length, 1);
+        assert.strictEqual(calls[0].args[1].op, 'new-full-nodes');
+        assert.deepStrictEqual(calls[0].args[1].addresses.map((entry) => entry.a).sort(), ['http://10.0.0.1:8080', 'http://10.0.0.2:8080']);
+    });
+
+    it('does not include the new peer itself in its own snapshot', () => {
+        const peer = newPeer('http://10.0.0.9:8080');
+        NodesList.nodes = [outboundPeer('http://10.0.0.1:8080'), peer];
+
+        NodesList.emitter.emit('nodes-list/connected', peer);
+
+        const addresses = snapshotCalls(peer)[0].args[1].addresses.map((entry) => entry.a);
+        assert.deepStrictEqual(addresses, ['http://10.0.0.1:8080']);
+    });
+
+    it('omits peers with no reconnectable address (inbound without a validated domain) and does not send an empty snapshot', () => {
+        NodesList.nodes = [{
+            nodeType: NODE_TYPE.NODE_TERMINAL,
+            connectionType: CONNECTION_TYPE.CONNECTION_SERVER_SOCKET,
+            socket: { node: { sckAddress: { address: '10.0.0.5' }, protocol: { nodeDomain: '' } } },
+            toJSON: () => ({ a: '10.0.0.5:53621', t: NODE_TYPE.NODE_TERMINAL, c: true }),
+        }];
+        const peer = newPeer('http://10.0.0.9:8080');
+
+        NodesList.emitter.emit('nodes-list/connected', peer);
+
+        assert.strictEqual(snapshotCalls(peer).length, 0);
+    });
+
+    it('caps the snapshot at 50 addresses (the existing receiver-side limit)', () => {
+        NodesList.nodes = [];
+        for (let i = 0; i < 70; i++) NodesList.nodes.push(outboundPeer(`http://10.1.0.${i}:8080`));
+        const peer = newPeer('http://10.0.0.9:8080');
+
+        NodesList.emitter.emit('nodes-list/connected', peer);
+
+        assert.strictEqual(snapshotCalls(peer)[0].args[1].addresses.length, 50);
+    });
+
+    it('still sends the snapshot even when announcing this peer is throttled (anti-flapping applies to the broadcast only)', () => {
+        NodesList.nodes = [outboundPeer('http://10.0.0.1:8080')];
+        const first = newPeer('http://10.0.0.9:8080');
+        const second = newPeer('http://10.0.0.9:8080');
+
+        NodesList.emitter.emit('nodes-list/connected', first);
+        NodesList.emitter.emit('nodes-list/connected', second);
+
+        assert.strictEqual(snapshotCalls(second).length, 1);
+    });
+
+});
