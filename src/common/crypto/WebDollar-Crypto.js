@@ -1,6 +1,7 @@
 /* eslint-disable */
 import Argon2 from '../crypto/Argon2/Argon2.js';
 import crypto from 'crypto';
+import getRandomValues from 'get-random-values';
 
 class WebDollarCrypto {
 
@@ -59,7 +60,6 @@ class WebDollarCrypto {
         // if ( typeof window !== 'undefined' &&  window.crypto !==undefined)
         //     window.crypto.getRandomValues(randArr) //populate array with cryptographically secure random numbers
         // else {
-        import getRandomValues from 'get-random-values';
         getRandomValues(randArr);
         // }
 
