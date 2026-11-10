@@ -21,6 +21,9 @@ class NodePropagationProtocol {
 
         this._waitlistProccessed = {};
 
+        this._recentlyAnnounced = new Map(); // address -> timestamp ultimei anunțări
+        this.ANNOUNCE_THROTTLE_MS = 10 * 60 * 1000; // 10 minute, spec §3.4
+
         setTimeout( this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
 
     }
@@ -64,12 +67,24 @@ class NodePropagationProtocol {
 
     initializePropagationProtocol(){
 
-        NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
-        NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
+        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
 
-        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
-        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
+    }
 
+    /**
+     * True (and records the announcement) if `address` was not announced in the last ANNOUNCE_THROTTLE_MS.
+     * Anti-flapping: a rapidly reconnecting peer must not spam the rest of the network with repeat gossip.
+     */
+    _canAnnounce(address){
+
+        const now = Date.now();
+        const last = this._recentlyAnnounced.get(address);
+
+        if (last !== undefined && now - last < this.ANNOUNCE_THROTTLE_MS)
+            return false;
+
+        this._recentlyAnnounced.set(address, now);
+        return true;
     }
 
     initializeSocketForPropagation(socket){
@@ -250,15 +265,11 @@ class NodePropagationProtocol {
 
     _newNodeConnected( nodeWaitListObject ){
 
-        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        const address = nodeWaitListObject.toJSON().a;
+        if ( !this._canAnnounce(address) ) return;
 
-    }
-
-    _nodeDisconnected(nodeWaitListObject){
-
-        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
+        if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
 
     }
 
