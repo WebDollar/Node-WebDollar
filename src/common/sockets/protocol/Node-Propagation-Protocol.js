@@ -3,6 +3,7 @@ import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
 import NODE_TYPE from "node/lists/types/Node-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
@@ -263,13 +264,35 @@ class NodePropagationProtocol {
 
     }
 
+    /**
+     * The reconnectable address for a newly validated peer.
+     * For an inbound connection (we are the server), the raw socket address is the
+     * client's ephemeral TCP source port, not its real listening port — unusable for
+     * reconnecting. Use its self-reported domain from Hello instead, same source
+     * `registerUniqueSocket` already uses for its own waitlist entry (Nodes-List.js).
+     * For an outbound connection (we are the client), the raw socket address is exactly
+     * what we dialed, so it's already correct.
+     */
+    _reconnectableAddress(nodeWaitListObject){
+
+        const socket = nodeWaitListObject.socket;
+
+        if (nodeWaitListObject.connectionType === CONNECTION_TYPE.CONNECTION_SERVER_SOCKET &&
+            socket && socket.node && socket.node.protocol && socket.node.protocol.nodeDomain)
+            return socket.node.protocol.nodeDomain;
+
+        return nodeWaitListObject.toJSON().a;
+    }
+
     _newNodeConnected( nodeWaitListObject ){
 
-        const address = nodeWaitListObject.toJSON().a;
+        const address = this._reconnectableAddress(nodeWaitListObject);
         if ( !this._canAnnounce(address) ) return;
 
-        if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        const payload = Object.assign({}, nodeWaitListObject.toJSON(), {a: address});
+
+        if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
+        else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
 
     }
 
