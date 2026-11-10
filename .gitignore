@@ -83,3 +83,4 @@ certificates/certificate.crt
 certificates/private.key
 
 .worktrees/
+.superpowers/
