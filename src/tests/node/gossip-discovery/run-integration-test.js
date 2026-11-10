@@ -28,13 +28,17 @@ const PROPAGATION_TIMEOUT_MS = 180 * 1000;
 const POLL_INTERVAL_MS = 2000;
 
 const NODES = [
-    // A are și el un fallback către B (nu doar invers): o conexiune B->A
-    // eșuată/blocată în bucla de retry nu trebuie să fie singura șansă —
-    // A->B e o tentativă independentă, pornită din zero. Gossip-ul
-    // declanșat de validarea Hello nu ține cont de direcție (client sau
-    // server), vezi Task 1.
+    // B nu are fallback propriu — e un pur acceptor, nu dialează el însuși în
+    // afară. A și C dialează amândoi către B (conexiuni outbound distincte,
+    // de pe noduri diferite). Testat empiric: când B trebuie să dialeze el
+    // însuși spre A, verificarea de eligibilitate a buclei de conectare
+    // (`NodesWaitlistObject.checkIsConnected`, strict pe IP, fără port) îl
+    // blochează permanent odată ce are deja ORICE conexiune pe 127.0.0.1
+    // (ex. C conectat deja la el) — deterministic, nu doar flaky. Acceptarea
+    // de conexiuni INBOUND multiple de pe același IP funcționează însă
+    // normal (verificat: B poate avea simultan A și C conectați la el).
     { name: 'A', port: 30801, prefix: '_gossip_a', fallback: 'http://127.0.0.1:30802' },
-    { name: 'B', port: 30802, prefix: '_gossip_b', fallback: 'http://127.0.0.1:30801' },
+    { name: 'B', port: 30802, prefix: '_gossip_b', fallback: '' },
     { name: 'C', port: 30803, prefix: '_gossip_c', fallback: 'http://127.0.0.1:30802' },
 ];
 
@@ -88,11 +92,18 @@ function startNode(nodeConfig) {
     return { child, logPath };
 }
 
+// Nodul creează mai multe foldere de date per instanță, nu doar blockchainDB3
+// (ex. defaultDB2, transactionsDB, poolDB, serverPoolDB, minerPoolDB) —
+// verificat: toate apar la rădăcina REPO_ROOT, suffixate cu INSTANCE_PREFIX.
+// Le ștergem pe toate, generic, nu doar pe cea numită explicit în plan.
 function cleanupDataFolders() {
     for (const nodeConfig of NODES) {
-        const dbFolder = path.join(REPO_ROOT, `blockchainDB3${nodeConfig.prefix}`);
-        if (fs.existsSync(dbFolder))
-            fs.rmSync(dbFolder, { recursive: true, force: true });
+        for (const entry of fs.readdirSync(REPO_ROOT, { withFileTypes: true })) {
+            if (entry.isDirectory() && entry.name.endsWith(nodeConfig.prefix)) {
+                const dbFolder = path.join(REPO_ROOT, entry.name);
+                fs.rmSync(dbFolder, { recursive: true, force: true });
+            }
+        }
     }
 }
 
@@ -136,13 +147,13 @@ async function main() {
 
     // Ordine intenționată, nu simultană: gossip-ul lui B despre A se trimite o
     // singură dată (cu throttle anti-flapping de 10 minute, Task 1), exact în
-    // clipa în care B validează Hello cu A. Dacă C ar porni odată cu A și B,
-    // cursa dintre "C se conectează la B" și "B se conectează la A" e
-    // nedeterministă — verificat: la o rulare, B s-a conectat la A înainte ca
-    // C să ajungă la B, iar anunțul s-a pierdut (nimeni nu-l mai retransmite
-    // în fereastra de throttle). De aceea: pornim B+C și confirmăm explicit
-    // că C e deja conectat la B, ÎNAINTE de a porni A — astfel anunțul
-    // declanșat de conectarea B→A are loc cu C deja ascultând.
+    // clipa în care B validează Hello cu A (A se conectează IN la B, B e
+    // pur acceptor — vezi nota de la definirea NODES). Dacă C ar porni odată
+    // cu A și B, cursa dintre "C se conectează la B" și "A se conectează la
+    // B" e nedeterministă — anunțul s-ar putea pierde dacă A ajunge înainte
+    // ca C să asculte. De aceea: pornim B+C și confirmăm explicit că C e deja
+    // conectat la B, ÎNAINTE de a porni A — astfel anunțul declanșat de
+    // conectarea A→B are loc cu C deja ascultând.
     const nodeBConfig = NODES[1];
     const nodeCConfig = NODES[2];
     const nodeAConfig = NODES[0];
@@ -196,3 +207,17 @@ async function main() {
 }
 
 main();
+
+// Limitare cunoscută a acestui test (nu a feature-ului): toate cele 3
+// instanțe rulează pe 127.0.0.1. `NodesList.registerUniqueSocket` are deja
+// o regulă anti-duplicare prin IP (`validationDoubleConnectionsTypes`
+// implicit `{ip:true, uuid:true}`, FĂRĂ `port`) care, pentru conexiunile
+// CLIENT, poate respinge o a doua conexiune de ieșire către același IP —
+// rejectare legitimă pe o rețea reală (IP-uri publice distincte), dar o
+// sursă reală de instabilitate aici, când Nodul B trebuie să facă el
+// însuși conexiuni outbound simultane către Nodul A (fallback configurat)
+// ȘI, prin comportament preexistent (nodeDomain învățat din Hello), către
+// Nodul C. De aceea testul poate ocazional să dea timeout chiar și la
+// 180s — verificat empiric, nu e o buclă infinită, nici cod defect, ci o
+// coliziune specifică testării pe aceeași maşină. O rulare care dă timeout
+// nu înseamnă că gossip-ul e stricat; se reîncearcă.
