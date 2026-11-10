@@ -5,6 +5,7 @@ import BlockchainMiningReward from '../../global/Blockchain-Mining-Reward.js';
 import consts from '../../../../consts/const_global.js';
 import Serialization from '../../../utils/Serialization.js';
 import BufferExtended from '../../../utils/BufferExtended.js';
+const BigInteger = require('big-integer');
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
