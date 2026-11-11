@@ -8,9 +8,9 @@ import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis';
 // serviciile și versiunea — exact ce are nevoie harta rețelei (webd-network-map).
 describe('Node-API-Public syncState', () => {
 
-    it('reports not synchronized with null secondsBehind when no block is in memory', () => {
-        assert.deepStrictEqual(syncState(undefined, 1000000), { is_synchronized: false, secondsBehind: null });
-        assert.deepStrictEqual(syncState(null, 1000000), { is_synchronized: false, secondsBehind: null });
+    it('reports unknown (null) sync state when no block is in memory', () => {
+        assert.deepStrictEqual(syncState(undefined, 1000000), { is_synchronized: null, secondsBehind: null });
+        assert.deepStrictEqual(syncState(null, 1000000), { is_synchronized: null, secondsBehind: null });
     });
 
     it('is synchronized when the last block is under 600 s old', () => {
@@ -27,4 +27,12 @@ describe('Node-API-Public syncState', () => {
         assert.strictEqual(syncState(block, nowMs).is_synchronized, false);
     });
 
+});
+
+describe('Node-API-Public top payload', () => {
+    const { topPayload } = require('node/sockets/node-server/API/Node-API-Public');
+
+    it('does not throw and reports unknown sync state when no block is in memory', () => {
+        assert.deepStrictEqual(topPayload(12, undefined, 1000000), { top: 12, is_synchronized: null, secondsBehind: null });
+    });
 });

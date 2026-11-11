@@ -16,13 +16,21 @@ const UNSYNC_THRESHOLD_MS = 600 * 1000; // ~ 15 blocuri
  */
 export function syncState(lastBlock, nowMs){
 
+    // null = necunoscut (nu „nesincronizat”): consumatorii care citesc booleanul
+    // (webd-staking, explorer) trebuie să distingă „fără bloc în memorie” de „în urmă”.
     if ( !lastBlock || typeof lastBlock.timeStamp !== "number" )
-        return { is_synchronized: false, secondsBehind: null };
+        return { is_synchronized: null, secondsBehind: null };
 
     const blockTimestampMs = (lastBlock.timeStamp + BlockchainGenesis.timeStampOffset) * 1000;
     const behindMs = nowMs - blockTimestampMs;
 
     return { is_synchronized: behindMs < UNSYNC_THRESHOLD_MS, secondsBehind: behindMs / 1000 };
+}
+
+/** Răspunsul rutei `/top`, pur (testabil), fără să crape când lipsește blocul din memorie. */
+export function topPayload(blocksLength, lastBlock, nowMs){
+    const { is_synchronized, secondsBehind } = syncState( lastBlock, nowMs );
+    return { top: blocksLength, is_synchronized: is_synchronized, secondsBehind: secondsBehind };
 }
 
 class NodeAPIPublic{
@@ -69,25 +77,7 @@ class NodeAPIPublic{
     }
 
     top(){
-
-        let is_synchronized    = false;
-        let currentTimestamp   = new Date().getTime();
-        let oDate              = new Date((Blockchain.blockchain.blocks.last.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
-        let blockTimestamp     = oDate.getTime();
-        let nSecondsBehind     = currentTimestamp - blockTimestamp;
-
-        const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
-
-        if (nSecondsBehind < UNSYNC_THRESHOLD) {
-            is_synchronized = true;
-        }
-
-        return {
-            top: Blockchain.blockchain.blocks.length,
-            is_synchronized: is_synchronized,
-            secondsBehind  : nSecondsBehind / 1000
-        }
-
+        return topPayload( Blockchain.blockchain.blocks.length, Blockchain.blockchain.blocks.last, new Date().getTime() );
     }
 
     helloWorld(req, res){
