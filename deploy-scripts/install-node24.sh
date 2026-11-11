@@ -32,6 +32,19 @@ fi
 # shellcheck disable=SC1091
 source "$NVM_DIR/nvm.sh"
 
+# IMPORTANT: capturăm directorul Node activ ÎNAINTE de `nvm install 24` —
+# acel comandă face și un `nvm use 24` implicit pentru sesiunea curentă a
+# shell-ului, așa că "current" nu mai înseamnă Node 16 după el (bug găsit
+# la rularea reală pe explorer: symlink-ul inițial prinsese Node 24).
+# Alias-ul `default` e persistent pe disc și nu e afectat de `nvm install`.
+if [ -L "$NODE_ACTIVE_LINK" ] || [ -e "$NODE_ACTIVE_LINK" ]; then
+    ORIGINAL_NODE_DIR=""
+    echo "Symlink-ul $NODE_ACTIVE_LINK deja există — nu îl suprascriu. Țintă curentă:"
+    readlink -f "$NODE_ACTIVE_LINK" || true
+else
+    ORIGINAL_NODE_DIR="$(nvm which default 2>/dev/null | xargs dirname 2>/dev/null || dirname "$(command -v node)")"
+fi
+
 if nvm ls 24 2>/dev/null | grep -q "v24\."; then
     echo "Node 24 deja instalat via nvm."
 else
@@ -42,13 +55,9 @@ fi
 NODE24_BIN="$(nvm which 24)"
 echo "Node 24 binar: $NODE24_BIN"
 
-if [ -L "$NODE_ACTIVE_LINK" ] || [ -e "$NODE_ACTIVE_LINK" ]; then
-    echo "Symlink-ul $NODE_ACTIVE_LINK deja există — nu îl suprascriu. Țintă curentă:"
-    readlink -f "$NODE_ACTIVE_LINK" || true
-else
-    CURRENT_NODE_DIR="$(nvm which current 2>/dev/null | xargs dirname 2>/dev/null || dirname "$(command -v node)")"
-    echo "Creez symlink inițial $NODE_ACTIVE_LINK -> $CURRENT_NODE_DIR (directorul bin al Node-ului activ curent, presupus Node 16)."
-    ln -s "$CURRENT_NODE_DIR" "$NODE_ACTIVE_LINK"
+if [ -n "$ORIGINAL_NODE_DIR" ]; then
+    echo "Creez symlink inițial $NODE_ACTIVE_LINK -> $ORIGINAL_NODE_DIR (directorul bin al Node-ului activ ÎNAINTE de această instalare, presupus Node 16)."
+    ln -s "$ORIGINAL_NODE_DIR" "$NODE_ACTIVE_LINK"
 fi
 
 echo "OK: Node 24 instalat alături de versiunea existentă. Node 16 nu a fost dezinstalat."
