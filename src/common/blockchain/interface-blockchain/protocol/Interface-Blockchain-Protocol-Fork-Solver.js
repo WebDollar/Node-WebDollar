@@ -507,6 +507,11 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
+            // saveFork rulează o singură dată la finalul ÎNTREGULUI fork
+            // (poate fi milioane de blocuri) — logăm periodic, per lot, ca
+            // să vedem evoluția reală fără să așteptăm acel moment final.
+            if (syncTimingEnabled) console.log("SYNC_TIMING (lot, bloc " + nextBlockHeight + ") " + syncTimingStats.formatLine());
+
         }
 
         if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
