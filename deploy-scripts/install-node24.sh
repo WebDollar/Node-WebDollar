@@ -13,7 +13,9 @@
 # Usage: ./install-node24.sh [NODE_ACTIVE_LINK]
 #   NODE_ACTIVE_LINK - calea symlink-ului (implicit: $HOME/node-active)
 
-set -euo pipefail
+# Fără "-u": nvm.sh (third-party) nu e scris să fie "nounset"-safe — referă
+# variabile neinițializate (ex. NVM_IOJS_ORG_MIRROR) la sursare.
+set -eo pipefail
 
 NODE_ACTIVE_LINK="${1:-$HOME/node-active}"
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"

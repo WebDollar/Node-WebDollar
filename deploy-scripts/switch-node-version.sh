@@ -23,7 +23,9 @@
 # poată fi testată independent de nvm/restart, sursând acest script fără
 # argumente (vezi deploy-scripts/test-health-check.sh).
 
-set -uo pipefail
+# Fără "-u": nvm.sh (third-party) nu e scris să fie "nounset"-safe — referă
+# variabile neinițializate (ex. NVM_IOJS_ORG_MIRROR) la sursare.
+set -o pipefail
 
 NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 
