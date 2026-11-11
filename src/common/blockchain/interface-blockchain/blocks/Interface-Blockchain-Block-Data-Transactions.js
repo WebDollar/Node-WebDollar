@@ -4,6 +4,9 @@ import const_global    from './../../../../consts/const_global';
 import Serialization   from './../../../utils/Serialization';
 import Blockchain      from './../../../../main-blockchain/Blockchain';
 import Log             from './../../../utils/logging/Log';
+import syncTimingStats from '../protocol/Sync-Timing-Stats-Singleton';
+
+const syncTimingEnabled = !!process.env.SYNC_TIMING_DEBUG;
 
 class InterfaceBlockchainBlockDataTransactions {
 
@@ -94,11 +97,16 @@ class InterfaceBlockchainBlockDataTransactions {
                 transactions: this.transactions.slice(0, i),
             };
 
-            if (!this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType)) {
+            const txStartedAt = syncTimingEnabled ? Date.now() : 0;
+            const txValid = this.transactions[i].validateTransactionOnce(blockHeight, blockValidationType);
+            if (syncTimingEnabled) syncTimingStats.record('validateTransactionOnce', Date.now() - txStartedAt);
+            if (!txValid) {
                 throw {message: 'validation failed at transaction', transaction: this.transactions[i]};
             }
 
         }
+
+        if (syncTimingEnabled) syncTimingStats.record('transactionCount', this.transactions.length);
 
         // Cedare ocazională a controlului către event loop (introdusă deliberat,
         // 2018, commit 1b3d15e1), ca nodul să rămână responsiv la alți peeri
