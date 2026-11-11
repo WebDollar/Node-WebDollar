@@ -5,14 +5,16 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 import BufferExtended from "common/utils/BufferExtended";
 import BansList from "common/utils/bans/BansList"
-import SyncTimingStats from "./Sync-Timing-Stats";
+import syncTimingStats from "./Sync-Timing-Stats-Singleton";
 
 // Măsurare opțională a timpului per etapă la resincronizare (descărcare /
 // validare / scriere), ca să se vadă empiric unde se pierde timpul la o
 // resincronizare lungă, în loc să se ghicească. Activată doar cu
 // SYNC_TIMING_DEBUG=1 (cost zero altfel — nicio instrumentare activă).
+// Instanța e partajată (Sync-Timing-Stats-Singleton) cu sub-etapele
+// instrumentate în Interface-Blockchain.js / Interface-Blockchain-Block.js,
+// ca să se agrege într-un singur raport.
 const syncTimingEnabled = !!process.env.SYNC_TIMING_DEBUG;
-const syncTimingStats = new SyncTimingStats();
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
