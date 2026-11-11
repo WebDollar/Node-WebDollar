@@ -98,9 +98,16 @@ class InterfaceBlockchainBlockDataTransactions {
                 throw {message: 'validation failed at transaction', transaction: this.transactions[i]};
             }
 
-            if (!blockValidationType['skip-sleep']) {
-                await Blockchain.blockchain.sleep(2);
-            }
+        }
+
+        // Cedare ocazională a controlului către event loop (introdusă deliberat,
+        // 2018, commit 1b3d15e1), ca nodul să rămână responsiv la alți peeri
+        // în timpul unei resincronizări lungi. Cel mult O DATĂ per bloc, nu per
+        // tranzacție — măsurat empiric (SYNC_TIMING_DEBUG=1): la per-tranzacție,
+        // un singur bloc cu multe tranzacții putea costa sute de ms, anulând
+        // beneficiul skip-sleep-ului aplicat pe restul blocurilor.
+        if (!blockValidationType['skip-sleep'] && this.transactions.length > 0) {
+            await Blockchain.blockchain.sleep(2);
         }
 
         if (!this.validateDuplicateTransactions()) {
