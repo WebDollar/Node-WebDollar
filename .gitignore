@@ -10,7 +10,7 @@ mochawesome-report/
 
 dist_bundle/CPU/
 dist_bundle/GPU/
-argon2/
+/argon2/
 
 dist_bundle/bundle_terminal\.js
 
