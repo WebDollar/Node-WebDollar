@@ -1,0 +1,25 @@
+# Imagine minimă pentru testul local de interoperabilitate Node 16 <-> Node 24
+# (Pasul 0, Task 5). NU e imaginea de producție (vezi Dockerfile din rădăcină,
+# care face și pm2/certbot) — doar instalează, build-uiește și pornește
+# bundle-ul terminal, parametrizat pe versiunea de Node.
+#
+# Build: docker build --build-arg NODE_VERSION=24 -t webd-node-test:24 \
+#          -f deploy-scripts/local-docker-test/Dockerfile.test .
+#        (rulat din rădăcina Node-WebDollar, ca .dockerignore/contextul să fie corect)
+
+ARG NODE_VERSION=24
+FROM node:${NODE_VERSION}-bookworm-slim
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends build-essential python3 curl && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . .
+
+RUN npm install
+RUN npm run build_terminal
+
+EXPOSE 8090
+
+CMD ["node", "dist_bundle/terminal-bundle.js"]
