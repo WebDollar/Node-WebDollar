@@ -2,10 +2,13 @@
 # Instalează Node 24 alături de Node 16 pe un VPS, fără să dezinstaleze nimic.
 # Idempotent: poate fi rulat de mai multe ori fără efecte secundare.
 #
-# Creează/păstrează un symlink "node-active" care arată spre binarul Node
-# activ în acest moment (implicit Node 16, până la primul swap explicit cu
-# switch-node-version.sh). Rollback-ul la Node 16 devine apoi doar o
-# schimbare a acestui symlink, nu o reinstalare.
+# Creează/păstrează un symlink "node-active" care arată spre DIRECTORUL bin
+# al versiunii Node active în acest moment (implicit Node 16, până la primul
+# swap explicit cu switch-node-version.sh) — un director, nu un singur binar,
+# ca symlink-ul să funcționeze și pentru `PATH=$LINK:$PATH; npm run ...`
+# (noduri pornite manual/screen), nu doar pentru `ExecStart=$LINK/node`
+# (servicii systemd). Rollback-ul la Node 16 devine apoi doar o schimbare a
+# acestui symlink, nu o reinstalare.
 #
 # Usage: ./install-node24.sh [NODE_ACTIVE_LINK]
 #   NODE_ACTIVE_LINK - calea symlink-ului (implicit: $HOME/node-active)
@@ -41,9 +44,9 @@ if [ -L "$NODE_ACTIVE_LINK" ] || [ -e "$NODE_ACTIVE_LINK" ]; then
     echo "Symlink-ul $NODE_ACTIVE_LINK deja există — nu îl suprascriu. Țintă curentă:"
     readlink -f "$NODE_ACTIVE_LINK" || true
 else
-    CURRENT_NODE_BIN="$(command -v node)"
-    echo "Creez symlink inițial $NODE_ACTIVE_LINK -> $CURRENT_NODE_BIN (Node activ curent, presupus Node 16)."
-    ln -s "$CURRENT_NODE_BIN" "$NODE_ACTIVE_LINK"
+    CURRENT_NODE_DIR="$(nvm which current 2>/dev/null | xargs dirname 2>/dev/null || dirname "$(command -v node)")"
+    echo "Creez symlink inițial $NODE_ACTIVE_LINK -> $CURRENT_NODE_DIR (directorul bin al Node-ului activ curent, presupus Node 16)."
+    ln -s "$CURRENT_NODE_DIR" "$NODE_ACTIVE_LINK"
 fi
 
 echo "OK: Node 24 instalat alături de versiunea existentă. Node 16 nu a fost dezinstalat."
