@@ -67,6 +67,7 @@
     "ipaddr.js": "^1.6.0",
     "is-array-buffer": "^1.0.0",
     "jayson": "^2.1.1",
+    "libsodium-wrappers": "^0.8.4",
     "lodash": "^4.17.11",
     "md5": "^2.2.1",
     "mnemonic": "^1.0.1",
