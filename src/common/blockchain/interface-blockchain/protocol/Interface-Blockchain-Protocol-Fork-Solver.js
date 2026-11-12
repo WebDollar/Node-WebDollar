@@ -5,6 +5,16 @@ import consts from 'consts/const_global'
 import StatusEvents from "common/events/Status-Events"
 import BufferExtended from "common/utils/BufferExtended";
 import BansList from "common/utils/bans/BansList"
+import syncTimingStats from "./Sync-Timing-Stats-Singleton";
+
+// Măsurare opțională a timpului per etapă la resincronizare (descărcare /
+// validare / scriere), ca să se vadă empiric unde se pierde timpul la o
+// resincronizare lungă, în loc să se ghicească. Activată doar cu
+// SYNC_TIMING_DEBUG=1 (cost zero altfel — nicio instrumentare activă).
+// Instanța e partajată (Sync-Timing-Stats-Singleton) cu sub-etapele
+// instrumentate în Interface-Blockchain.js / Interface-Blockchain-Block.js,
+// ca să se agrege într-un singur raport.
+const syncTimingEnabled = !!process.env.SYNC_TIMING_DEBUG;
 
 /**
  * Blockchain Protocol Fork Solver - that solves the fork of a new blockchain
@@ -328,6 +338,8 @@ class InterfaceBlockchainProtocolForkSolver{
             let alreadyDownloaded = 0;
             let resolved = false;
 
+            const downloadBatchStartedAt = syncTimingEnabled ? Date.now() : 0;
+
             let finished = new Promise((resolve)=>{
 
                 let downloadingBlock = async (index)=>{
@@ -421,6 +433,8 @@ class InterfaceBlockchainProtocolForkSolver{
                 finished = false;
             }
 
+            if (syncTimingEnabled) syncTimingStats.record('download', Date.now() - downloadBatchStartedAt);
+
             //verify if all blocks were downloaded
 
             let blockValidation;
@@ -437,7 +451,9 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
                 blockValidation = fork._createBlockValidation_ForkValidation(nextBlockHeight, fork.forkBlocks.length-1);
+                const deserializeStartedAt = syncTimingEnabled ? Date.now() : 0;
                 block = await this._deserializeForkBlock(fork, downloadingList[i].block, nextBlockHeight, blockValidation );
+                if (syncTimingEnabled) syncTimingStats.record('deserialize', Date.now() - deserializeStartedAt);
 
                 if (fork.downloadBlocksSleep && nextBlockHeight % 10 === 0)
                     await this.blockchain.sleep(15);
@@ -462,10 +478,12 @@ class InterfaceBlockchainProtocolForkSolver{
                 }
 
                 let result;
+                const includeStartedAt = syncTimingEnabled ? Date.now() : 0;
 
                 try {
 
                     result = await fork.includeForkBlock(block);
+                    if (syncTimingEnabled) syncTimingStats.record('validate', Date.now() - includeStartedAt);
 
                 } catch (Exception) {
 
@@ -491,11 +509,23 @@ class InterfaceBlockchainProtocolForkSolver{
 
             }
 
+            // saveFork rulează o singură dată la finalul ÎNTREGULUI fork
+            // (poate fi milioane de blocuri) — logăm periodic, per lot, ca
+            // să vedem evoluția reală fără să așteptăm acel moment final.
+            if (syncTimingEnabled) console.log("SYNC_TIMING (lot, bloc " + nextBlockHeight + ") " + syncTimingStats.formatLine());
+
         }
 
         if (fork.forkStartingHeight + fork.forkBlocks.length >= fork.forkChainLength ) {
 
-            if (await fork.saveFork())
+            const saveStartedAt = syncTimingEnabled ? Date.now() : 0;
+            const saved = await fork.saveFork();
+            if (syncTimingEnabled){
+                syncTimingStats.record('save', Date.now() - saveStartedAt);
+                console.log("SYNC_TIMING " + syncTimingStats.formatLine());
+            }
+
+            if (saved)
                 return true;
             else
                 throw {message: "Save Fork couldn't be saved"};

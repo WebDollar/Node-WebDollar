@@ -1,11 +1,11 @@
-import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
-import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
+import GeoLocationLists from './geolocation-lists/GeoLocation-Lists.js';
+import SocketAddress from '../../common/sockets/protocol/extend-socket/Socket-Address.js';
 import NodesListObject from './Mode-List-Object.js';
-import CONNECTION_TYPE from "node/lists/types/Connection-Type";
-import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NODE_TYPE from "node/lists/types/Node-Type"
-import consts from 'consts/const_global'
-import AdvancedEmitter from "common/utils/Advanced-Emitter";
+import CONNECTION_TYPE from "./types/Connection-Type.js";
+import NodesWaitlist from './waitlist/Nodes-Waitlist.js';
+import NODE_TYPE from "./types/Node-Type.js";
+import consts from '../../consts/const_global.js';
+import AdvancedEmitter from "../../common/utils/Advanced-Emitter.js";
 
 /*
     The List is populated with Node Sockets only if the socket pass the Hello Message

@@ -1,4 +1,4 @@
-const BigInteger = require('big-integer');
+import bigInt from 'big-integer';
 
 class Utils{
 

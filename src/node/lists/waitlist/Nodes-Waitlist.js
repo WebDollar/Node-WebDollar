@@ -1,15 +1,13 @@
-import NodesList from 'node/lists/Nodes-List'
-import NodesWaitlistObject from './Nodes-Waitlist-Object';
-import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
-import NODE_TYPE from "node/lists/types/Node-Type"
-import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import DownloadManager from "common/utils/helpers/Download-Manager"
-import consts from 'consts/const_global'
-import Blockchain from "main-blockchain/Blockchain";
-import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type";
-
-import GeoLocationLists from 'node/lists/geolocation-lists/GeoLocation-Lists'
-import AdvancedEmitter from "common/utils/Advanced-Emitter";
+import NodesList from '../Nodes-List.js';
+import NodesWaitlistObject from './Nodes-Waitlist-Object.js';
+import SocketAddress from '../../../common/sockets/protocol/extend-socket/Socket-Address.js';
+import NODE_TYPE from "../types/Node-Type.js";
+import DownloadManager from "../../../common/utils/helpers/Download-Manager.js";
+import consts from '../../../consts/const_global.js';
+import Blockchain from "../../../main-blockchain/Blockchain.js";
+import NODES_CONSENSUS_TYPE from "../types/Node-Consensus-Type.js";
+import GeoLocationLists from '../geolocation-lists/GeoLocation-Lists.js';
+import AdvancedEmitter from "../../../common/utils/Advanced-Emitter.js";
 
 class NodesWaitlist {
 

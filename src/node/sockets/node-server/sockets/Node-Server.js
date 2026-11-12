@@ -131,14 +131,6 @@ class NodeServer {
                 }
 
 
-                if ( (Blockchain.PoolManagement && Blockchain.PoolManagement._poolStarted && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER) ||
-                        (Blockchain.ServerPoolManagement && Blockchain.ServerPoolManagement._serverPoolStarted  && nodeConsensusType !== NODES_CONSENSUS_TYPE.NODE_CONSENSUS_SERVER)){
-
-                    if (Math.random() < 0.1)
-                        console.error("disconnecting user for being simple node", nodeConsensusType);
-
-                    return socket.disconnect();
-                }
 
                 //avoid allowing
                 if (!Blockchain.blockchain.agent.consensus)

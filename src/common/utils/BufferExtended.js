@@ -1,8 +1,7 @@
-const bs58 = require('bs58');
-
-import consts from "consts/const_global";
-import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
-const safeCompare = require('safe-compare');
+import bs58 from 'bs58';
+import consts from "../../consts/const_global.js";
+import WebDollarCrypto from "../crypto/WebDollar-Crypto.js";
+import safeCompare from 'safe-compare';
 
 class BufferExtended {
 

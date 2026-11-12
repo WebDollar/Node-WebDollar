@@ -1,5 +1,5 @@
-const EventEmitter = require('events');
-import consts from "consts/const_global";
+import { EventEmitter } from 'events';
+import consts from "../../consts/const_global.js";
 
 class AdvancedEmitter{
 

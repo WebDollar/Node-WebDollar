@@ -16,6 +16,13 @@ import RevertActions from "common/utils/Revert-Actions/Revert-Actions";
 import InterfaceBlockchainBasic from "./Interface-Blockchain-Basic"
 import InterfaceBlockchainHardForks from "./../blocks/hard-forks/Interface-Blockchain-Hard-Forks"
 import Log from 'common/utils/logging/Log';
+import syncTimingStats from "common/blockchain/interface-blockchain/protocol/Sync-Timing-Stats-Singleton";
+
+// Instrumentare opțională (SYNC_TIMING_DEBUG=1) — vezi Fork-Solver pentru
+// context. Aici măsurăm separat recalcularea dificultății, care citește
+// din loadingManager și ar putea deveni tot mai costisitoare pe măsură
+// ce lanțul crește.
+const syncTimingEnabled = !!process.env.SYNC_TIMING_DEBUG;
 /**
  * Blockchain contains a chain of blocks based on Proof of Work
  */
@@ -136,12 +143,18 @@ class InterfaceBlockchain extends InterfaceBlockchainBasic{
             block.blockValidation = this.createBlockValidation();
 
         //validate difficulty & hash
-        if (! (await block.validateBlock( block.height )))
+        const validateBlockStartedAt = syncTimingEnabled ? Date.now() : 0;
+        const validateBlockResult = await block.validateBlock( block.height );
+        if (syncTimingEnabled) syncTimingStats.record('block.validateBlock', Date.now() - validateBlockStartedAt);
+        if (! validateBlockResult)
             throw {message: 'block validation failed'};
 
         //recalculate next target difficulty
-        if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] )
+        if ( !block.blockValidation.blockValidationType['skip-difficulty-recalculation'] ) {
+            const difficultyStartedAt = syncTimingEnabled ? Date.now() : 0;
             await block.calculateDifficultyTarget();
+            if (syncTimingEnabled) syncTimingStats.record('calculateDifficultyTarget', Date.now() - difficultyStartedAt);
+        }
 
         return true;
     }

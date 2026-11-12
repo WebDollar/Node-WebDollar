@@ -6,6 +6,33 @@ import NodesList from 'node/lists/Nodes-List'
 import Blockchain from "main-blockchain/Blockchain"
 import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
 
+const UNSYNC_THRESHOLD_MS = 600 * 1000; // ~ 15 blocuri
+
+/**
+ * Starea de sincronizare raportată de ruta publică `/`.
+ * `lastBlock` poate lipsi când blocurile nu sunt în memorie (salvarea periodică
+ * le golește) — atunci răspundem „nesincronizat / necunoscut”, nu cu eroare,
+ * ca restul informațiilor (waitlist, servicii, versiune) să rămână vizibile.
+ */
+export function syncState(lastBlock, nowMs){
+
+    // null = necunoscut (nu „nesincronizat”): consumatorii care citesc booleanul
+    // (webd-staking, explorer) trebuie să distingă „fără bloc în memorie” de „în urmă”.
+    if ( !lastBlock || typeof lastBlock.timeStamp !== "number" )
+        return { is_synchronized: null, secondsBehind: null };
+
+    const blockTimestampMs = (lastBlock.timeStamp + BlockchainGenesis.timeStampOffset) * 1000;
+    const behindMs = nowMs - blockTimestampMs;
+
+    return { is_synchronized: behindMs < UNSYNC_THRESHOLD_MS, secondsBehind: behindMs / 1000 };
+}
+
+/** Răspunsul rutei `/top`, pur (testabil), fără să crape când lipsește blocul din memorie. */
+export function topPayload(blocksLength, lastBlock, nowMs){
+    const { is_synchronized, secondsBehind } = syncState( lastBlock, nowMs );
+    return { top: blocksLength, is_synchronized: is_synchronized, secondsBehind: secondsBehind };
+}
+
 class NodeAPIPublic{
 
     constructor(){
@@ -14,22 +41,8 @@ class NodeAPIPublic{
 
     info(){
 
-        if ( !Blockchain.blockchain.blocks.last ){
-            return {
-                message: "lastBlock is undefined",
-                length: Blockchain.blockchain.blocks.length,
-            }
-        }
-
-        let is_synchronized    = false;
-        let currentTimestamp   = new Date().getTime();
-        let oDate              = new Date((Blockchain.blockchain.blocks.last.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
-        let blockTimestamp     = oDate.getTime();
-        let nSecondsBehind     = currentTimestamp - blockTimestamp;
-        const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
-
-        if (nSecondsBehind < UNSYNC_THRESHOLD)
-            is_synchronized = true;
+        const lastBlock = Blockchain.blockchain.blocks.last;
+        const { is_synchronized, secondsBehind } = syncState( lastBlock, new Date().getTime() );
 
         return {
 
@@ -40,7 +53,7 @@ class NodeAPIPublic{
 
             blocks: {
                 length: Blockchain.blockchain.blocks.length,
-                lastBlockHash: Blockchain.blockchain.blocks.last ? Blockchain.blockchain.blocks.last.hash.toString("hex") : '',
+                lastBlockHash: lastBlock ? lastBlock.hash.toString("hex") : '',
             },
             networkHashRate: Blockchain.blockchain.blocks.networkHashRate,
             chainWork: Blockchain.blockchain.blocks.chainWork.toString(),
@@ -58,31 +71,13 @@ class NodeAPIPublic{
                 list: NodesWaitlist.getJSONList( NODE_TYPE.NODE_TERMINAL, false ),
             },
             is_synchronized: is_synchronized,
-            secondsBehind  : nSecondsBehind / 1000
+            secondsBehind  : secondsBehind
 
         };
     }
 
     top(){
-
-        let is_synchronized    = false;
-        let currentTimestamp   = new Date().getTime();
-        let oDate              = new Date((Blockchain.blockchain.blocks.last.timeStamp + BlockchainGenesis.timeStampOffset) * 1000);
-        let blockTimestamp     = oDate.getTime();
-        let nSecondsBehind     = currentTimestamp - blockTimestamp;
-
-        const UNSYNC_THRESHOLD = 600 * 1000; // ~ 15 blocks
-
-        if (nSecondsBehind < UNSYNC_THRESHOLD) {
-            is_synchronized = true;
-        }
-
-        return {
-            top: Blockchain.blockchain.blocks.length,
-            is_synchronized: is_synchronized,
-            secondsBehind  : nSecondsBehind / 1000
-        }
-
+        return topPayload( Blockchain.blockchain.blocks.length, Blockchain.blockchain.blocks.last, new Date().getTime() );
     }
 
     helloWorld(req, res){
