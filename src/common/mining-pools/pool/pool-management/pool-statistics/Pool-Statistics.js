@@ -1,7 +1,6 @@
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Log from 'common/utils/logging/Log';
-import NodesList from 'node/lists/Nodes-List'
 import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class PoolStatistics{
@@ -25,6 +24,10 @@ class PoolStatistics{
         this.poolBlocksConfirmed = 0;
         this.poolBlocksBeingConfirmed = 0;
         this.poolTimeRemaining = 0;
+
+        this.lastBlockFoundAt = null;
+        this.lastPayoutAt = null;
+        this.lastPayoutTx = null;
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
@@ -91,6 +94,15 @@ class PoolStatistics{
 
         this.poolManagement.poolStatistics.poolHashesNow += hashes.toNumber();
 
+    }
+
+    markBlockFound(){
+        this.lastBlockFoundAt = new Date().getTime();
+    }
+
+    markPayout(txId){
+        this.lastPayoutAt = new Date().getTime();
+        this.lastPayoutTx = txId;
     }
 
 
