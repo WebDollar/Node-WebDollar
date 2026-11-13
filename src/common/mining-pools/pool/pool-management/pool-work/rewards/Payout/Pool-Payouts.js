@@ -259,6 +259,9 @@ class PoolPayouts{
                 index++;
             }
 
+            if (transactions.length > 0)
+                this.poolManagement.poolStatistics.markPayout( transactions[transactions.length - 1].txId );
+
             Log.info("Payout: Transaction Created", Log.LOG_TYPE.POOLS);
 
             for (let blockConfirmed of blocksConfirmed ){
