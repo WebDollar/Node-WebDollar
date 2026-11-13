@@ -13,6 +13,7 @@ describe('NodeAPIPublicPools.stats - last block / last payout fields', () => {
         Blockchain.PoolManagement = undefined;
         let stats = NodeAPIPublicPools.stats({}, {});
         assert.strictEqual(stats.last_block_found_at, null);
+        assert.strictEqual(stats.last_block_found_height, null);
         assert.strictEqual(stats.last_payout_at, null);
         assert.strictEqual(stats.last_payout_tx, null);
     });
@@ -24,11 +25,12 @@ describe('NodeAPIPublicPools.stats - last block / last payout fields', () => {
                 poolHashes: 0, poolHashesNow: 0, poolMinersOnline: [],
                 poolBlocksConfirmedAndPaid: 0, poolBlocksUnconfirmed: 0,
                 poolBlocksConfirmed: 0, poolBlocksBeingConfirmed: 0, poolTimeRemaining: 0,
-                lastBlockFoundAt: 1000, lastPayoutAt: 2000, lastPayoutTx: 'txid-xyz',
+                lastBlockFoundAt: 1000, lastBlockFoundHeight: 500, lastPayoutAt: 2000, lastPayoutTx: 'txid-xyz',
             },
         };
         let stats = NodeAPIPublicPools.stats({}, {});
         assert.strictEqual(stats.last_block_found_at, 1000);
+        assert.strictEqual(stats.last_block_found_height, 500);
         assert.strictEqual(stats.last_payout_at, 2000);
         assert.strictEqual(stats.last_payout_tx, 'txid-xyz');
     });

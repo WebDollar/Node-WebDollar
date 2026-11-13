@@ -15,6 +15,7 @@ class NodeAPIPublicPools {
       blocks_being_confirmed: 0,
       time_remaining: 0,
       last_block_found_at: null,
+      last_block_found_height: null,
       last_payout_at: null,
       last_payout_tx: null,
     };
@@ -30,6 +31,7 @@ class NodeAPIPublicPools {
       stats.blocks_being_confirmed = statistics.poolBlocksBeingConfirmed;
       stats.time_remaining = statistics.poolTimeRemaining;
       stats.last_block_found_at = statistics.lastBlockFoundAt || null;
+      stats.last_block_found_height = statistics.lastBlockFoundHeight || null;
       stats.last_payout_at = statistics.lastPayoutAt || null;
       stats.last_payout_tx = statistics.lastPayoutTx || null;
     }

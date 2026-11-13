@@ -86,3 +86,4 @@ certificates/private.key
 .superpowers/
 
 src/tests/node/gossip-discovery/*.log
+test_pool_statistics_last_fields/
