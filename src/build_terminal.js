@@ -34,6 +34,13 @@ Blockchain.createBlockchain('full-node', () => {}, async () => {
 });
 
 
+// Salvare periodică a stării (minute; 0 = dezactivat), ca o oprire forțată să nu piardă sincronizarea
+{
+    const minutes = process.env.CHECKPOINT_INTERVAL_MINUTES === undefined ? 10 : parseInt(process.env.CHECKPOINT_INTERVAL_MINUTES);
+    if (minutes > 0)
+        setInterval(() => { Blockchain.blockchain.blocks.savingManager.saveCheckpoint().catch(() => {}); }, minutes * 60 * 1000);
+}
+
 process.on('SIGINT', async () => {
     await termination(Blockchain);
 });

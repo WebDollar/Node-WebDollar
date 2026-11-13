@@ -3,12 +3,15 @@ import NODES_CONSENSUS_TYPE from "node/lists/types/Node-Consensus-Type";
 import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
 import NodesList from 'node/lists/Nodes-List'
 import NODE_TYPE from "node/lists/types/Node-Type";
+import CONNECTION_TYPE from "node/lists/types/Connection-Type";
 import NodeProtocol from 'common/sockets/protocol/extend-socket/Node-Protocol';
 import Blockchain from "main-blockchain/Blockchain"
 import NodePropagationList from 'common/sockets/protocol/Node-Propagation-List'
+import SocketAddress from 'common/sockets/protocol/extend-socket/Socket-Address'
 
 const MAX_WAITLIST_QUEUE_LENGTH = 1000;
 const DOWNLOAD_WAITLIST_COUNT = 20;
+const SNAPSHOT_MAX_ADDRESSES = 50; // limita deja aplicată de receptor în _processNodesList
 
 class NodePropagationProtocol {
 
@@ -20,6 +23,9 @@ class NodePropagationProtocol {
 
 
         this._waitlistProccessed = {};
+
+        this._recentlyAnnounced = new Map(); // address -> timestamp ultimei anunțări
+        this.ANNOUNCE_THROTTLE_MS = 10 * 60 * 1000; // 10 minute, spec §3.4
 
         setTimeout( this._processNewWaitlistInterval.bind(this), 5000 + Math.random()*2000 );
 
@@ -64,12 +70,28 @@ class NodePropagationProtocol {
 
     initializePropagationProtocol(){
 
-        NodesList.emitter.once("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
-        NodesList.emitter.once("nodes-list/disconnected", nodeListObject => { this._nodeDisconnected( nodeListObject) });
+        // idempotent: a second call must not register a second listener (would announce/snapshot twice)
+        if (this._propagationInitialized) return;
+        this._propagationInitialized = true;
 
-        NodesWaitlist.emitter.on("waitlist/new-node", nodeWaitListObject => { this._newNodeConnected( nodeWaitListObject) } );
-        NodesWaitlist.emitter.on("waitlist/delete-node", nodeWaitListObject => { this._nodeDisconnected( nodeWaitListObject) });
+        NodesList.emitter.on("nodes-list/connected", nodeListObject => { this._newNodeConnected( nodeListObject ) } );
 
+    }
+
+    /**
+     * True (and records the announcement) if `address` was not announced in the last ANNOUNCE_THROTTLE_MS.
+     * Anti-flapping: a rapidly reconnecting peer must not spam the rest of the network with repeat gossip.
+     */
+    _canAnnounce(address){
+
+        const now = Date.now();
+        const last = this._recentlyAnnounced.get(address);
+
+        if (last !== undefined && now - last < this.ANNOUNCE_THROTTLE_MS)
+            return false;
+
+        this._recentlyAnnounced.set(address, now);
+        return true;
     }
 
     initializeSocketForPropagation(socket){
@@ -248,18 +270,110 @@ class NodePropagationProtocol {
 
     }
 
+    /**
+     * The reconnectable address for a newly validated peer, or null if none can be
+     * trusted enough to announce.
+     * For an inbound connection (we are the server), the raw socket address is the
+     * client's ephemeral TCP source port, not its real listening port — unusable for
+     * reconnecting. Use its self-reported domain from Hello instead, same source
+     * `registerUniqueSocket` already uses for its own waitlist entry (Nodes-List.js).
+     * That domain is an unvalidated string the peer sent us (Node-Server.js reads it
+     * straight off the Hello query) — gossiping it unchecked would let any peer make
+     * us advertise an arbitrary address to the rest of the network. We only trust it
+     * when its host matches the TCP connection's real, OS-observed source IP
+     * (`socket.node.sckAddress.address`, not attacker-controlled) — a peer can report
+     * its own real reachable address this way, never someone else's. A peer with no
+     * self-reported domain at all (e.g. a miner with no listening server) is not
+     * announced — there is nothing reconnectable to tell anyone about.
+     * For an outbound connection (we are the client), the raw socket address is exactly
+     * what we dialed, so it's already correct.
+     */
+    _reconnectableAddress(nodeWaitListObject){
+
+        const socket = nodeWaitListObject.socket;
+
+        if (nodeWaitListObject.connectionType === CONNECTION_TYPE.CONNECTION_SERVER_SOCKET){
+
+            const domain = socket && socket.node && socket.node.protocol && socket.node.protocol.nodeDomain;
+            if (!domain) return null;
+
+            const observedIP = socket.node.sckAddress && socket.node.sckAddress.address;
+            let domainHost;
+            try { domainHost = SocketAddress.createSocketAddress(domain).address; }
+            catch (exception) { return null; }
+
+            // Node/OS raportează inconsecvent o adresă IPv4 observată pe un socket
+            // dual-stack: câteodată "127.0.0.1", câteodată "::ffff:127.0.0.1" —
+            // verificat empiric. Normalizăm ambele părți înainte de comparare, ca
+            // să nu respingem o adresă legitimă doar din cauza formatării.
+            const normalize = (ip) => (ip || '').replace(/^::ffff:/i, '');
+
+            if (!observedIP || normalize(domainHost) !== normalize(observedIP)) return null;
+
+            return domain;
+        }
+
+        return nodeWaitListObject.toJSON().a;
+    }
+
     _newNodeConnected( nodeWaitListObject ){
 
-        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
+        this._announceNewPeer(nodeWaitListObject);
+        this._sendKnownPeersSnapshot(nodeWaitListObject);
 
     }
 
-    _nodeDisconnected(nodeWaitListObject){
+    /**
+     * Tell every other connected peer about the newly validated one (throttled per address).
+     */
+    _announceNewPeer( nodeWaitListObject ){
 
-        // if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-full-nodes", addresses: [nodeWaitListObject.toJSON() ]}, undefined, nodeWaitListObject.socket);
-        // else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "disconnected-light-nodes", addresses: [nodeWaitListObject.toJSON() ]} , undefined, nodeWaitListObject.socket );
+        const address = this._reconnectableAddress(nodeWaitListObject);
+        if ( !address ) return;
+        if ( !this._canAnnounce(address) ) return;
 
+        const payload = Object.assign({}, nodeWaitListObject.toJSON(), {a: address});
+
+        if (nodeWaitListObject.nodeType === NODE_TYPE.NODE_TERMINAL) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-full-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
+        else if(nodeWaitListObject.nodeType === NODE_TYPE.NODE_WEB_PEER) NodeProtocol.broadcastRequest("propagation/nodes", {op: "new-light-nodes", addresses: [payload]}, undefined, nodeWaitListObject.socket);
+
+    }
+
+    /**
+     * Tell the newly validated peer, once, about the full-node peers THIS node has
+     * itself validated (NodesList) — a snapshot on join. Without it, a peer joining
+     * later only ever hears about peers that appear AFTER it, never about the ones
+     * already connected. Same trust rule as the announce: only addresses this node
+     * validated itself (`_reconnectableAddress`), never hearsay; the receiver treats
+     * them as candidates and validates each before trusting. Bounded to one message
+     * per connection, capped at the receiver-side limit of 50.
+     */
+    _sendKnownPeersSnapshot( newNodeObject ){
+
+        const socket = newNodeObject.socket;
+        if (!socket || !socket.node || typeof socket.node.sendRequest !== "function") return;
+
+        const newAddress = this._reconnectableAddress(newNodeObject);
+        const seen = {};
+        const addresses = [];
+
+        for (const other of NodesList.nodes){
+
+            if (other === newNodeObject || other.socket === socket) continue;
+            if (other.nodeType !== NODE_TYPE.NODE_TERMINAL) continue;
+
+            const address = this._reconnectableAddress(other);
+            if (!address || address === newAddress || seen[address]) continue;
+
+            seen[address] = true;
+            addresses.push( Object.assign({}, other.toJSON(), {a: address}) );
+
+            if (addresses.length >= SNAPSHOT_MAX_ADDRESSES) break;
+        }
+
+        if (addresses.length === 0) return;
+
+        socket.node.sendRequest("propagation/nodes", {op: "new-full-nodes", addresses: addresses});
     }
 
 

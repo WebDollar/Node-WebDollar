@@ -1,16 +1,16 @@
-import GeoHelper from 'node/lists/geolocation-lists/geo-helpers/geo-helper';
-import InterfaceBlockchainAddressHelper from 'common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper';
-import WebDollarCoins from "common/utils/coins/WebDollar-Coins";
-import consts from 'consts/const_global';
-import NODE_TYPE from 'node/lists/types/Node-Type';
-import CONNECTIONS_TYPE from 'node/lists/types/Connection-Type';
-import VersionCheckerHelper from "common/utils/helpers/Version-Checker-Helper";
-import BufferExtended from "common/utils/BufferExtended";
-import NodesWaitlist from 'node/lists/waitlist/Nodes-Waitlist'
-import NodesList from 'node/lists/Nodes-List';
-import PoolsUtils from "common/mining-pools/common/Pools-Utils"
-import WebDollarCrypto from "common/crypto/WebDollar-Crypto";
-import AdvancedMessages from "node/menu/Advanced-Messages";
+import GeoHelper from '../node/lists/geolocation-lists/geo-helpers/geo-helper.js';
+import InterfaceBlockchainAddressHelper from '../common/blockchain/interface-blockchain/addresses/Interface-Blockchain-Address-Helper.js';
+import WebDollarCoins from "../common/utils/coins/WebDollar-Coins.js";
+import consts from '../consts/const_global.js';
+import NODE_TYPE from '../node/lists/types/Node-Type.js';
+import CONNECTIONS_TYPE from '../node/lists/types/Connection-Type.js';
+import VersionCheckerHelper from "../common/utils/helpers/Version-Checker-Helper.js";
+import BufferExtended from "../common/utils/BufferExtended.js";
+import NodesWaitlist from '../node/lists/waitlist/Nodes-Waitlist.js';
+import NodesList from '../node/lists/Nodes-List.js';
+import PoolsUtils from "../common/mining-pools/common/Pools-Utils.js";
+import WebDollarCrypto from "../common/crypto/WebDollar-Crypto.js";
+import AdvancedMessages from "../node/menu/Advanced-Messages.js";
 
 class Applications {
 

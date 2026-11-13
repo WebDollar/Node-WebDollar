@@ -1,10 +1,9 @@
-/* eslint-disable */
-const uuid = require('uuid');
-import FallBackNodesList from 'node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list';
-import  Utils from "common/utils/helpers/Utils"
 
-const BigNumber = require('bignumber.js');
-const BigInteger = require('big-integer');
+import { v4 as uuid } from 'uuid';
+import FallBackNodesList from '../node/sockets/node-clients/service/discovery/fallbacks/fallback_nodes_list.js';
+import Utils from "../common/utils/helpers/Utils.js";
+import BigNumber from 'bignumber.js';
+import bigInt from 'big-integer';
 
 let consts = {
 
@@ -36,7 +35,7 @@ consts.BLOCKCHAIN = {
 
     BLOCKS_POW_LENGTH: 32,
     BLOCKS_MAX_TARGET: new BigNumber("0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"),
-    BLOCKS_MAX_TARGET_BIG_INTEGER: new BigInteger("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16),
+    BLOCKS_MAX_TARGET_BIG_INTEGER: bigInt("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16),
     BLOCKS_MAX_TARGET_BUFFER: Buffer.from("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", "hex"),
     BLOCKS_NONCE : 4,
 

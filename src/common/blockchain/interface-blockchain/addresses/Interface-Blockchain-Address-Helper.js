@@ -1,16 +1,9 @@
 /* eslint-disable */
-import ed25519 from "common/crypto/ed25519";
-
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import BufferExtended from 'common/utils/BufferExtended';
-
-// tutorial based on http://procbits.com/2013/08/27/generating-a-bitcoin-address-with-javascript
-// full demo https://bstavroulakis.com/demos/billcoin/address.php
-
-//video tutorial https://asecuritysite.com/encryption/base58
-
-import consts from 'consts/const_global';
-import AdvancedMessages from "node/menu/Advanced-Messages"
+import ed25519 from '../../../crypto/ed25519.js';
+import WebDollarCrypto from '../../../crypto/WebDollar-Crypto.js';
+import BufferExtended from '../../../utils/BufferExtended.js';
+import consts from '../../../../consts/const_global.js';
+import AdvancedMessages from "../../../../node/menu/Advanced-Messages.js";
 
 class InterfaceBlockchainAddressHelper{
 

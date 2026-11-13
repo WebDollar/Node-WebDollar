@@ -179,6 +179,16 @@ class InterfaceBlockchainFork {
 
         let validationType = {};
 
+        // Măsurat empiric (SYNC_TIMING_DEBUG=1): fără asta, validateTransactions()
+        // plătește un sleep(2) necondiționat per tranzacție, la FIECARE bloc
+        // descărcat în această trecere (nu doar la saveFork, care deja are
+        // exact această optimizare — vezi Interface-Blockchain-Fork.js,
+        // bucla de saveIncludeBlock). Pe un backlog mare (downloadBlocksSleep),
+        // păstrăm același throttle redus (1 din 10 blocuri) ca să nu
+        // supraîncărcăm peerii; altfel, sărim sleep-ul complet.
+        if (!process.env.BROWSER && (!this.downloadBlocksSleep || (forkHeight > 0 && forkHeight % 10 !== 0)))
+            validationType['skip-sleep'] = true;
+
         return new InterfaceBlockchainBlockValidation(this.getForkBlock.bind(this), this.getForkDifficultyTarget.bind(this), this.getForkTimeStamp.bind(this), this.getForkHash.bind(this), this.getForkChainHash.bind(this), validationType );
     }
 

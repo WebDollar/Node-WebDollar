@@ -1,12 +1,17 @@
 /* eslint-disable */
+import WebDollarCrypto from '../../../crypto/WebDollar-Crypto.js';
+import BlockchainGenesis from '../../global/Blockchain-Genesis.js';
+import BlockchainMiningReward from '../../global/Blockchain-Mining-Reward.js';
+import consts from '../../../../consts/const_global.js';
+import Serialization from '../../../utils/Serialization.js';
+import BufferExtended from '../../../utils/BufferExtended.js';
+import syncTimingStats from '../protocol/Sync-Timing-Stats-Singleton';
 const BigInteger = require('big-integer');
-import WebDollarCrypto from 'common/crypto/WebDollar-Crypto'
-import BlockchainGenesis from 'common/blockchain/global/Blockchain-Genesis'
-import BlockchainMiningReward from 'common/blockchain/global/Blockchain-Mining-Reward'
-import consts from 'consts/const_global'
 
-import Serialization from "common/utils/Serialization";
-import BufferExtended from "common/utils/BufferExtended";
+// Instrumentare opțională (SYNC_TIMING_DEBUG=1) — vezi Fork-Solver pentru
+// context. Sub-etapele validării unui bloc, ca să vedem care anume
+// crește pe măsură ce lanțul local crește (nu doar "validarea" per total).
+const syncTimingEnabled = !!process.env.SYNC_TIMING_DEBUG;
 
 /*
     Tutorial based on https://en.bitcoin.it/wiki/Block_hashing_algorithm
@@ -106,12 +111,19 @@ class InterfaceBlockchainBlock {
         if (height !== this.height)
             throw {message: 'height is different', height: height, myHeight: this.height};
 
-        if ( ! (await this._validateHash()) )
+        let stageStartedAt = syncTimingEnabled ? Date.now() : 0;
+        const validHash = await this._validateHash();
+        if (syncTimingEnabled) syncTimingStats.record('_validateHash', Date.now() - stageStartedAt);
+        if ( !validHash )
             throw {message: "validateBlockchain returned false"};
 
+        stageStartedAt = syncTimingEnabled ? Date.now() : 0;
         await this._validateTargetDifficulty();
+        if (syncTimingEnabled) syncTimingStats.record('_validateTargetDifficulty', Date.now() - stageStartedAt);
 
+        stageStartedAt = syncTimingEnabled ? Date.now() : 0;
         await this._validateBlockTimeStamp();
+        if (syncTimingEnabled) syncTimingStats.record('_validateBlockTimeStamp', Date.now() - stageStartedAt);
 
         if (this.reward !== BlockchainMiningReward.getFinalReward(this.height) )
             throw {message: 'reward is not right: ', myReward: this.reward, reward: BlockchainMiningReward.getFinalReward( this.height ) };

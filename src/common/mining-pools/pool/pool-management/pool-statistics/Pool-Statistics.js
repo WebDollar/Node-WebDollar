@@ -1,7 +1,6 @@
 import consts from 'consts/const_global'
 import InterfaceSatoshminDB from 'common/satoshmindb/Interface-SatoshminDB';
 import Log from 'common/utils/logging/Log';
-import NodesList from 'node/lists/Nodes-List'
 import AdvancedEmitter from "common/utils/Advanced-Emitter";
 
 class PoolStatistics{
@@ -25,6 +24,11 @@ class PoolStatistics{
         this.poolBlocksConfirmed = 0;
         this.poolBlocksBeingConfirmed = 0;
         this.poolTimeRemaining = 0;
+
+        this.lastBlockFoundAt = null;
+        this.lastBlockFoundHeight = null;
+        this.lastPayoutAt = null;
+        this.lastPayoutTx = null;
 
         this._db = new InterfaceSatoshminDB( databaseName ? databaseName : consts.DATABASE_NAMES.SERVER_POOL_DATABASE );
 
@@ -93,6 +97,16 @@ class PoolStatistics{
 
     }
 
+    markBlockFound(height){
+        this.lastBlockFoundAt = new Date().getTime();
+        this.lastBlockFoundHeight = height;
+    }
+
+    markPayout(txId){
+        this.lastPayoutAt = new Date().getTime();
+        this.lastPayoutTx = Buffer.isBuffer(txId) ? txId.toString('hex') : txId;
+    }
+
 
 
     async _save(){
@@ -100,6 +114,10 @@ class PoolStatistics{
         Log.info('Saving pool statistics...', Log.LOG_TYPE.POOLS);
         await this._db.save("serverPool_statistics_confirmedAndPaid", this.poolBlocksConfirmedAndPaid );
         await this._db.save("serverPool_statistics_unconfirmed", this.poolBlocksUnconfirmed);
+        await this._db.save("serverPool_statistics_lastBlockFoundAt", this.lastBlockFoundAt);
+        await this._db.save("serverPool_statistics_lastBlockFoundHeight", this.lastBlockFoundHeight);
+        await this._db.save("serverPool_statistics_lastPayoutAt", this.lastPayoutAt);
+        await this._db.save("serverPool_statistics_lastPayoutTx", this.lastPayoutTx);
 
     }
 
@@ -108,12 +126,20 @@ class PoolStatistics{
         Log.info('Loading pool statistics...', Log.LOG_TYPE.POOLS);
         let confirmedAndPaid = await this._db.get("serverPool_statistics_confirmedAndPaid", 30*1000,  undefined, true);
         let unconfirmed = await this._db.get("serverPool_statistics_unconfirmed", 30*1000,  undefined,true);
+        let lastBlockFoundAt = await this._db.get("serverPool_statistics_lastBlockFoundAt", 30*1000, undefined, true);
+        let lastBlockFoundHeight = await this._db.get("serverPool_statistics_lastBlockFoundHeight", 30*1000, undefined, true);
+        let lastPayoutAt = await this._db.get("serverPool_statistics_lastPayoutAt", 30*1000, undefined, true);
+        let lastPayoutTx = await this._db.get("serverPool_statistics_lastPayoutTx", 30*1000, undefined, true);
 
         if (typeof confirmedAndPaid !== "number") confirmedAndPaid = 0;
         if (typeof unconfirmed !== "number") unconfirmed = 0;
 
         this.poolBlocksConfirmedAndPaid = confirmedAndPaid;
         this.poolBlocksUnconfirmed = unconfirmed;
+        this.lastBlockFoundAt = (typeof lastBlockFoundAt === "number") ? lastBlockFoundAt : null;
+        this.lastBlockFoundHeight = (typeof lastBlockFoundHeight === "number") ? lastBlockFoundHeight : null;
+        this.lastPayoutAt = (typeof lastPayoutAt === "number") ? lastPayoutAt : null;
+        this.lastPayoutTx = (typeof lastPayoutTx === "string") ? lastPayoutTx : null;
 
         return true;
     }

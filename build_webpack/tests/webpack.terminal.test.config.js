@@ -23,13 +23,10 @@ const config = merge(base, {
         ]
     },
 
-    plugins: [
-        new webpack.DefinePlugin({
-            "process.env": {
-                MOCHA_TESTS: 'true'
-            }
-        })
-    ]
+    // Nicio definire a 'process.env' întreg aici: ar îngheța la build toate
+    // variabilele de mediu citite la runtime (ex. FALLBACK_NODES), exact
+    // problema deja evitată în webpack.terminal.config.js pentru build-ul real.
+    // 'MOCHA_TESTS' nu era folosit nicăieri în src/ — eliminat, nu înlocuit.
 
 });
 

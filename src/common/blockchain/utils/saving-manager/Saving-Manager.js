@@ -41,55 +41,56 @@ class SavingManager{
 
         if (this.blockchain.semaphoreProcessing._list.length > 0) return;
 
-        let block = await this.blockchain.semaphoreProcessing.processSempahoreCallback( async () => {
+        return this.blockchain.semaphoreProcessing.processSempahoreCallback( () => this._saveNextBlockLocked() );
+    }
 
-            for (let key in this._pendingBlocks){
+    // Scrie pe disc următorul bloc în așteptare. Se apelează DOAR cu semaforul de procesare deja luat.
+    async _saveNextBlockLocked(){
 
-                let block = this._pendingBlocks[key];
-                if (block instanceof Promise) continue;
 
-                //it is a forkBlock, it is skipped
-                if (block.isForkBlock) continue;
+        for (let key in this._pendingBlocks){
 
-                //mark a promise to the save to enable loading to wait until it is saved
-                let resolver;
-                this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
+            let block = this._pendingBlocks[key];
+            if (block instanceof Promise) continue;
 
-                await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
+            //it is a forkBlock, it is skipped
+            if (block.isForkBlock) continue;
 
-                try {
+            //mark a promise to the save to enable loading to wait until it is saved
+            let resolver;
+            this._pendingBlocks[ key ] = new Promise( resolve=> resolver = resolve );
 
-                    await block.saveBlock();
+            await this.blockchain.blocks.loadingManager.deleteBlock(block.height, block);
 
-                } catch (exception){
+            try {
 
-                    Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
+                await block.saveBlock();
 
-                }
+            } catch (exception){
 
-                this._pendingBlocksCount--;
-
-                //propagate block in case loadingManager was using this block
-                await resolver(block);
-
-                //no new object, just the promise
-                if ( this._pendingBlocks[ key ] instanceof Promise)
-                    delete this._pendingBlocks[ key ] ;
-
-                //saving Accountant Tree
-                if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
-                    await this.saveBlockchain(false);
-
-                block.saving = false;
-                return block;
+                Log.error("Saving raised an Error", Log.LOG_TYPE.SAVING_MANAGER, exception);
 
             }
 
-            return undefined;
+            this._pendingBlocksCount--;
 
-        });
+            //propagate block in case loadingManager was using this block
+            await resolver(block);
 
-        return block;
+            //no new object, just the promise
+            if ( this._pendingBlocks[ key ] instanceof Promise)
+                delete this._pendingBlocks[ key ] ;
+
+            //saving Accountant Tree
+            if (block.height === this.blockchain.blocks.length-1 && block.height % (250 + this._factor ) === 0)
+                await this.saveBlockchain(false);
+
+            block.saving = false;
+            return block;
+
+        }
+
+        return undefined;
 
     }
 
@@ -122,6 +123,48 @@ class SavingManager{
         }
 
         this._timeoutSaveManager = setTimeout( this._saveManager.bind(this), SAVING_MANAGER_INTERVAL );
+
+    }
+
+    // Salvare periodică în timpul funcționării: scrie pe disc blocurile rămase în memorie, apoi salvează starea
+    // (arbore de conturi + lungime), ca o oprire forțată să piardă cel mult intervalul dintre salvări.
+    async saveCheckpoint(){
+
+        if (process.env.BROWSER || this._isBeingSavedAll || this._checkpointRunning || global.TERMINATED || global.INTERFACE_BLOCKCHAIN_LOADING) return false;
+
+        this._checkpointRunning = true;
+
+        try {
+
+            for (let attempt = 0; attempt < 20; attempt++) {
+
+                if (this._isBeingSavedAll || global.TERMINATED) return false;
+
+                while ( this._pendingBlocksCount > 0 && !this._isBeingSavedAll ){
+                    let saved = await this._saveNextBlock();
+                    if (!saved) break; //nimic de salvat acum (procesare în curs sau blocuri de fork)
+                }
+
+                if (await this.blockchain.saveMiniBlockchainIfFlushed()) {
+                    Log.info('Checkpoint saved at ' + this.blockchain.blocks.length, Log.LOG_TYPE.SAVING_MANAGER);
+                    return true;
+                }
+
+                await Utils.sleep(1000);
+
+            }
+
+        } catch (exception){
+
+            Log.error('Checkpoint saving raised an error', Log.LOG_TYPE.SAVING_MANAGER, exception);
+
+        } finally {
+
+            this._checkpointRunning = false;
+
+        }
+
+        return false;
 
     }
 

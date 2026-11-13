@@ -1,13 +1,13 @@
-import Blockchain from 'main-blockchain/Blockchain';
-import Node from 'node/Node';
-import Applications from 'applications/Applications'
-import StatusEvents from "common/events/Status-Events";
+import Blockchain from './main-blockchain/Blockchain.js';
+import Node from './node/Node.js';
+import Applications from './applications/Applications.js';
+import StatusEvents from "./common/events/Status-Events.js";
 
 export default {
-    Node: Node,
-    Blockchain: Blockchain,
-    StatusEvents: StatusEvents,
-    Applications: Applications,
+    Node,
+    Blockchain,
+    StatusEvents,
+    Applications,
 };
 
 

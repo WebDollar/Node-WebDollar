@@ -1,10 +1,18 @@
 /* Added by Silviu Bogdan Stroe - https://www.silviu-s.com */
 /* Edited by Cosmin-Dumitru Oprea */
 
-import consts from 'consts/const_global'
+import consts from '../../consts/const_global.js'
 
-import StatusEvents from "common/events/Status-Events";
-let pounchdb = (process.env.BROWSER) ? (require('pouchdb-browser').default) : (require('pouchdb-node'));
+import StatusEvents from "../events/Status-Events.js";
+
+// Încărcare condiționată LA RULARE, nu import static: `pouchdb-browser`
+// referă `self` la încărcarea modulului și crapă în Node (ReferenceError)
+// — bundle-ul de terminal îl lasă extern (nodeExternals), deci un import
+// static îl evaluează la pornire. Reprodus pe nodul explorer (Node 16)
+// la deploy-ul din 2026-11-10; verificat de src/tests/node/check-terminal-bundle.js.
+const pounchdb = (typeof window !== 'undefined' || process.env.BROWSER)
+    ? require('pouchdb-browser').default
+    : require('pouchdb-node');
 
 class InterfaceSatoshminDB {
 

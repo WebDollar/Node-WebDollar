@@ -257,6 +257,8 @@ class PoolWorkManagement{
                             console.error("blockInformation block", exception);
                         }
 
+                        this.poolManagement.poolStatistics.markBlockFound(block.height);
+
                         this.poolManagement.poolData.addBlockInformation();
 
                         StatusEvents.emit("blockchain/new-blocks", { });

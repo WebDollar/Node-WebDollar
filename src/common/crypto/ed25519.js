@@ -9,6 +9,25 @@
  **/
 
 import nacl from 'tweetnacl'
+import sodium from 'libsodium-wrappers'
+
+// libsodium-wrappers e WASM, cu inițializare asincronă (`sodium.ready`).
+// Verificarea de semnătură e pe calea critică a validării fiecărei
+// tranzacții la resincronizare (măsurat: tweetnacl ~17ms/verify,
+// libsodium ~0.29ms/verify, ~58x — vezi investigația de viteză).
+// Până se încarcă WASM-ul (tipic câteva ms-zeci de ms la pornirea
+// procesului), verify() rămâne corect folosind tweetnacl ca fallback —
+// nu se schimbă contractul sincron al funcției nicăieri în restul
+// codului.
+let sodiumReady = false;
+const sodiumReadyPromise = sodium.ready.then(() => { sodiumReady = true; });
+
+/** Funcție pură, testabilă determinist pe ambele ramuri (fără cursă de timing). */
+export function verifySignature(signature, data, publicKey, useSodium){
+    return useSodium
+        ? sodium.crypto_sign_verify_detached(signature, data, publicKey)
+        : nacl.sign.detached.verify(data, signature, publicKey);
+}
 
 class ED25519{
 
@@ -57,8 +76,16 @@ class ED25519{
         if (!data || !Buffer.isBuffer(data) ) throw {message: 'data must be a Buffer', data:data};
         if (!publicKey || !Buffer.isBuffer(publicKey) ) throw {message: 'publicKey must be a Buffer', publicKey: publicKey};
 
-        return nacl.sign.detached.verify(data, signature, publicKey)
+        return verifySignature(signature, data, publicKey, sodiumReady);
 
+    }
+
+    static isSodiumReady(){
+        return sodiumReady;
+    }
+
+    static sodiumReadyPromise(){
+        return sodiumReadyPromise;
     }
 
 }
